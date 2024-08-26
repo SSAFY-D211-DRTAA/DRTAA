@@ -1,0 +1,37 @@
+spring:
+  main:
+    web-application-type: servlet
+    allow-circular-references: true
+  profiles:
+    active: prod
+  server:
+    port: 8080  # 서버 포트 설정
+    forward-headers-strategy: framework
+  logging:
+    level:
+      org.springframework.web: DEBUG  # 웹 요청 관련 디버그 로깅 (필요에 따라 조정)
+
+  # JPA
+  jpa:
+    hibernate:
+      ddl-auto: none  # 스키마 자동 생성 전략 (update, create, create-drop 등)
+    show-sql: true  # SQL 쿼리 로깅 여부
+    properties:
+      hibernate:
+        format_sql: true  # SQL 쿼리 포맷팅 여부
+
+  # MySQL
+  datasource:
+    url: jdbc:mysql://localhost:3306/d211?serverTimezone=UTC&useUniCode=yes&characterEncoding=UTF-8
+    username: ssafy
+    password: ssafy
+    hikari:
+      maximum-pool-size: 10  # 커넥션 풀의 최대 크기 (필요에 따라 조정)
+
+  # JWT
+jwt:
+  secret-key: ssafy+gumi02+D211+ssafy+gumi02+D211+jwt+secretkey
+  access-token:
+    expiretime: 3600000 # 1시간
+  refresh-token:
+    expiretime: 2592000000 # 30일
