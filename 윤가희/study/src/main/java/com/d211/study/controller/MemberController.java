@@ -1,6 +1,7 @@
 package com.d211.study.controller;
 
 import com.d211.study.config.jwt.JwtToken;
+import com.d211.study.dto.request.PasswordRequest;
 import com.d211.study.dto.response.UserInfoResponse;
 import com.d211.study.service.CustomUserDetailsService;
 import com.d211.study.dto.request.LoginRequest;
@@ -85,6 +86,24 @@ public class MemberController {
             status = HttpStatus.NOT_FOUND; // 404
 
             return new ResponseEntity<>(e.getMessage(), status);
+        } catch (Exception e) {
+            status = HttpStatus.INTERNAL_SERVER_ERROR; // 500
+
+            return new ResponseEntity<>(e.getMessage(), status);
+        }
+    }
+
+    @PatchMapping("/password")
+    public ResponseEntity<?> passwordChange
+            (Authentication authentication, @RequestBody PasswordRequest request) {
+        HttpStatus status = HttpStatus.ACCEPTED;
+
+        try {
+            userDetailsService.changePassword(request.getOldPassword(), request.getNewPassword());
+
+            status = HttpStatus.OK; // 200
+
+            return new ResponseEntity<>(status);
         } catch (Exception e) {
             status = HttpStatus.INTERNAL_SERVER_ERROR; // 500
 
