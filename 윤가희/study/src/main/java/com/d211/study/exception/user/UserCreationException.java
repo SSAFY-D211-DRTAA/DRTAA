@@ -1,4 +1,4 @@
-package com.d211.study.exception;
+package com.d211.study.exception.user;
 
 public class UserCreationException extends RuntimeException {
     public UserCreationException(String message) {
