@@ -1,7 +1,6 @@
 package com.d211.study.service;
 
 import com.d211.study.config.jwt.JwtToken;
-import com.d211.study.config.jwt.JwtTokenService;
 import com.d211.study.dto.request.LoginRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;

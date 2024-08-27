@@ -1,10 +1,7 @@
 package com.d211.study.service;
 
 
-import com.d211.study.config.jwt.JwtToken;
-import com.d211.study.config.jwt.JwtTokenService;
 import com.d211.study.domain.Member;
-import com.d211.study.dto.request.LoginRequest;
 import com.d211.study.dto.request.SignUpRequest;
 import com.d211.study.exception.user.UserCreationException;
 import com.d211.study.repository.MemberRepository;

@@ -1,14 +1,14 @@
-package com.d211.study.config.jwt;
+package com.d211.study.service;
 
+import com.d211.study.config.jwt.JwtToken;
+import com.d211.study.config.jwt.JwtTokenProvider;
 import com.d211.study.domain.Member;
-import com.d211.study.exception.auth.AuthenticationCreationException;
 import com.d211.study.exception.auth.AuthenticationFailedException;
 import com.d211.study.repository.MemberRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
