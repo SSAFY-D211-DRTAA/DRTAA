@@ -1,12 +1,16 @@
-package com.d211.study.config.security;
+package com.d211.study.service;
 
 
+import com.d211.study.config.jwt.JwtToken;
+import com.d211.study.config.jwt.JwtTokenService;
 import com.d211.study.domain.Member;
-import com.d211.study.dto.request.SignUpUserRequest;
-import com.d211.study.exception.UserCreationException;
+import com.d211.study.dto.request.LoginRequest;
+import com.d211.study.dto.request.SignUpRequest;
+import com.d211.study.exception.user.UserCreationException;
 import com.d211.study.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -24,12 +28,14 @@ public class CustomUserDetailsService implements UserDetailsManager {
 
     @Autowired
     private final MemberRepository memberRepository;
+
+    @Lazy
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Override
     public UserDetails loadUserByUsername(String memberUsername) throws UsernameNotFoundException {
-        // 사용자 이름으로 사용자를 찾아 UserDetails객체를 반환
+        // userName으로 사용자를 찾아 UserDetails객체를 반환
         return memberRepository.findByMemberUsername(memberUsername)
                 .map(this::createUserDetails)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 회원을 찾을 수 없습니다."));
@@ -59,7 +65,7 @@ public class CustomUserDetailsService implements UserDetailsManager {
         }
     }
 
-    public void createUser(SignUpUserRequest request) {
+    public void createUser(SignUpRequest request) {
         Member member = Member.builder()
                 .memberUsername(request.getMemberUsername())
                 .memberEmail(request.getMemberEmail())
@@ -112,5 +118,4 @@ public class CustomUserDetailsService implements UserDetailsManager {
     public boolean userExists(String username) {
         return memberRepository.existsByMemberUsername(username);
     }
-
 }
