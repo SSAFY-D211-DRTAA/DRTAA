@@ -51,3 +51,6 @@
 1. **Sub PJT2: Node의 TODO 작성**
     - gps_parser.py
     - gpsimu_parser.py
+
+2. **Multi Ego 및 Ego Mode 확인**
+    - 다중 제어 방법 확인하기 
