@@ -187,3 +187,11 @@ def listener():
 if __name__ == '__main__':
     listener()
 ```
+
+MORAI 연결
+
+roslaunch rosbridge_server rosbridge_websocket.launch
+
+먼저 해서 ROS 브리지 서버를 열고, MORAI쪽에서 connect한다.
+
+그 후 생성한 노드를 rosrun 하면 publish된 msg를 morai쪽에서 받을 수 있게된다.
