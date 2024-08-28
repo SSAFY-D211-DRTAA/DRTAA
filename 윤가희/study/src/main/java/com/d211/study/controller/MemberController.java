@@ -1,6 +1,8 @@
 package com.d211.study.controller;
 
 import com.d211.study.config.jwt.JwtToken;
+import com.d211.study.dto.request.PasswordRequest;
+import com.d211.study.dto.response.UserInfoResponse;
 import com.d211.study.service.CustomUserDetailsService;
 import com.d211.study.dto.request.LoginRequest;
 import com.d211.study.dto.request.SignUpRequest;
@@ -11,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
@@ -62,6 +65,45 @@ public class MemberController {
             status = HttpStatus.NOT_FOUND; // 404
 
             return new ResponseEntity<>(e.getMessage(), status);
+        } catch (Exception e) {
+            status = HttpStatus.INTERNAL_SERVER_ERROR; // 500
+
+            return new ResponseEntity<>(e.getMessage(), status);
+        }
+    }
+
+    @GetMapping("/info")
+    public ResponseEntity<?> info(Authentication authentication) {
+        HttpStatus status = HttpStatus.ACCEPTED;
+
+        try {
+            UserInfoResponse response = memberService.info(authentication.getName());
+
+            status = HttpStatus.OK;
+
+            return new ResponseEntity<>(response, status);
+        } catch (UsernameNotFoundException e) {
+            status = HttpStatus.NOT_FOUND; // 404
+
+            return new ResponseEntity<>(e.getMessage(), status);
+        } catch (Exception e) {
+            status = HttpStatus.INTERNAL_SERVER_ERROR; // 500
+
+            return new ResponseEntity<>(e.getMessage(), status);
+        }
+    }
+
+    @PatchMapping("/password")
+    public ResponseEntity<?> passwordChange
+            (Authentication authentication, @RequestBody PasswordRequest request) {
+        HttpStatus status = HttpStatus.ACCEPTED;
+
+        try {
+            userDetailsService.changePassword(request.getOldPassword(), request.getNewPassword());
+
+            status = HttpStatus.OK; // 200
+
+            return new ResponseEntity<>(status);
         } catch (Exception e) {
             status = HttpStatus.INTERNAL_SERVER_ERROR; // 500
 
