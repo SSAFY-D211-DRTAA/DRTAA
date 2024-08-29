@@ -30,11 +30,11 @@ def talker():
     # MultiEgoSetting 메세지는 차량의 위치와 상태를 바꾸는 명령어이다.
     # 원하는 위치에 원하는 상태 로 차량을 배치할 수 있다. 
     ego_setting_msg = MultiEgoSetting()
-    ego_setting_msg.number_of_ego_vehicle = 
-    ego_setting_msg.camera_index = 
+    # ego_setting_msg.number_of_ego_vehicle = 
+    # ego_setting_msg.camera_index = 
     ego_setting_msg.ego_index = [ ]
-    ego_setting_msg.global_position_x = [ ]
-    ego_setting_msg.global_position_y = [ ]
+    ego_setting_msg.global_position_x = [20]
+    ego_setting_msg.global_position_y = [20]
     ego_setting_msg.global_position_z = [ ]
     ego_setting_msg.global_roll = [ ]
     ego_setting_msg.global_pitch = [ ]

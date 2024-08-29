@@ -91,9 +91,9 @@ endif()
 # flag project as catkin-based to distinguish if a find_package()-ed project is a catkin project
 set(ssafy_1_FOUND_CATKIN_PROJECT TRUE)
 
-if(NOT "/opt/ros/noetic/include;/usr/include;/home/jeongjae/catkin_ws/devel/include " STREQUAL " ")
+if(NOT "/home/jeongjae/catkin_ws/devel/include " STREQUAL " ")
   set(ssafy_1_INCLUDE_DIRS "")
-  set(_include_dirs "/opt/ros/noetic/include;/usr/include;/home/jeongjae/catkin_ws/devel/include")
+  set(_include_dirs "/home/jeongjae/catkin_ws/devel/include")
   if(NOT " " STREQUAL " ")
     set(_report "Check the issue tracker '' and consider creating a ticket if the problem has not been reported yet.")
   elseif(NOT " " STREQUAL " ")
@@ -116,7 +116,7 @@ if(NOT "/opt/ros/noetic/include;/usr/include;/home/jeongjae/catkin_ws/devel/incl
   endforeach()
 endif()
 
-set(libraries "/opt/ros/noetic/lib/libroscpp_serialization.so;/opt/ros/noetic/lib/librostime.so;/usr/lib/x86_64-linux-gnu/libboost_date_time.so.1.71.0;/opt/ros/noetic/lib/libcpp_common.so;/usr/lib/x86_64-linux-gnu/libboost_system.so.1.71.0;/usr/lib/x86_64-linux-gnu/libboost_thread.so.1.71.0;/usr/lib/x86_64-linux-gnu/libconsole_bridge.so.0.4")
+set(libraries "")
 foreach(library ${libraries})
   # keep build configuration keywords, target names and absolute libraries as-is
   if("${library}" MATCHES "^(debug|optimized|general)$")
