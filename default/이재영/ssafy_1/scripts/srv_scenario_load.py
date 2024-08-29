@@ -22,7 +22,7 @@ def srv_client():
 
     # (2) 송신 될 메세지 변수 생성
     scenario_setting = ScenarioLoad()
-    scenario_setting.file_name = "../scenario_files/ssafy_scenario.json"  # 시나리오 파일의 이름 입력
+    scenario_setting.file_name = "/catkin_ws/ssafy_1/scenario_files/ssafy_scenario.json"  # 시나리오 파일의 이름 입력
     scenario_setting.load_network_connection_data = True
     scenario_setting.delete_all = False
     scenario_setting.load_ego_vehicle_data = True
