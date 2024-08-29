@@ -2,7 +2,7 @@ package com.d211.study.service;
 
 import com.d211.study.config.jwt.JwtToken;
 import com.d211.study.domain.Member;
-import com.d211.study.dto.request.LoginRequest;
+import com.d211.study.dto.request.LoginRequestDTO;
 import com.d211.study.dto.response.UserInfoResponse;
 import com.d211.study.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ public class MemberService {
     private final CustomUserDetailsService userDetailsService;
     private final MemberRepository memberRepository;
 
-    public JwtToken login(LoginRequest request) {
+    public JwtToken login(LoginRequestDTO request) {
         // 사용자 검증
         UserDetails userDetails = userDetailsService.loadUserByUsername(request.getMemberUsername());
         if (!passwordEncoder.matches(request.getMemberPassword(), userDetails.getPassword())) {

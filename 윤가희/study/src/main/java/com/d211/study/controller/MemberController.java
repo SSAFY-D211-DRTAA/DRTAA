@@ -1,11 +1,11 @@
 package com.d211.study.controller;
 
 import com.d211.study.config.jwt.JwtToken;
-import com.d211.study.dto.request.PasswordRequest;
+import com.d211.study.dto.request.PasswordRequestDTO;
 import com.d211.study.dto.response.UserInfoResponse;
 import com.d211.study.service.CustomUserDetailsService;
-import com.d211.study.dto.request.LoginRequest;
-import com.d211.study.dto.request.SignUpRequest;
+import com.d211.study.dto.request.LoginRequestDTO;
+import com.d211.study.dto.request.SignUpRequestDTO;
 import com.d211.study.exception.user.UserCreationException;
 import com.d211.study.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,7 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signUp(@RequestBody SignUpRequest request) {
+    public ResponseEntity<?> signUp(@RequestBody SignUpRequestDTO request) {
         HttpStatus status = HttpStatus.ACCEPTED; // 202
 
         try {
@@ -52,7 +52,7 @@ public class MemberController {
     }
 
     @GetMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<?> login(@RequestBody LoginRequestDTO request) {
         HttpStatus status = HttpStatus.ACCEPTED; // 202
 
         try {
@@ -95,7 +95,7 @@ public class MemberController {
 
     @PatchMapping("/password")
     public ResponseEntity<?> passwordChange
-            (Authentication authentication, @RequestBody PasswordRequest request) {
+            (Authentication authentication, @RequestBody PasswordRequestDTO request) {
         HttpStatus status = HttpStatus.ACCEPTED;
 
         try {

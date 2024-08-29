@@ -2,7 +2,7 @@ package com.d211.study.service;
 
 
 import com.d211.study.domain.Member;
-import com.d211.study.dto.request.SignUpRequest;
+import com.d211.study.dto.request.SignUpRequestDTO;
 import com.d211.study.exception.user.UserCreationException;
 import com.d211.study.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -62,7 +62,7 @@ public class CustomUserDetailsService implements UserDetailsManager {
         }
     }
 
-    public void createUser(SignUpRequest request) {
+    public void createUser(SignUpRequestDTO request) {
         Member member = Member.builder()
                 .memberUsername(request.getMemberUsername())
                 .memberEmail(request.getMemberEmail())
