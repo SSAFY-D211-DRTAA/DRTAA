@@ -24,7 +24,11 @@
 [VirtualBox Video Memory Limit](https://forums.virtualbox.org/viewtopic.php?t=107806)
 
 ### Day 3
+1. Multi Ego 기능 확인
+
+2. 서브 프로젝트 1 2-2까지 진행 완료
 
 ### Day 4
+1. 서브 프로젝트 1 완료
 
 ### Day 5
