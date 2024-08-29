@@ -1,0 +1,2 @@
+MORAI-ROS_morai_msgs:ssafy_1:ssafy_2:ssafy_3
+-DCATKIN_DEVEL_PREFIX=/home/mingyu/catkin_sub/devel -DCMAKE_INSTALL_PREFIX=/home/mingyu/catkin_sub/install -G Unix Makefiles
