@@ -56,6 +56,18 @@ CMAKE_BINARY_DIR = /home/jeongjae/catkin_ws/build
 #=============================================================================
 # Targets provided globally by CMake.
 
+# Special rule for the target install/strip
+install/strip: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
+	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+.PHONY : install/strip
+
+# Special rule for the target install/strip
+install/strip/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
+	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+.PHONY : install/strip/fast
+
 # Special rule for the target install/local
 install/local: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
@@ -67,6 +79,16 @@ install/local/fast: preinstall/fast
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
 	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
 .PHONY : install/local/fast
+
+# Special rule for the target list_install_components
+list_install_components:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Available install components are: \"Unspecified\""
+.PHONY : list_install_components
+
+# Special rule for the target list_install_components
+list_install_components/fast: list_install_components
+
+.PHONY : list_install_components/fast
 
 # Special rule for the target rebuild_cache
 rebuild_cache:
@@ -101,18 +123,6 @@ test/fast: test
 
 .PHONY : test/fast
 
-# Special rule for the target install/strip
-install/strip: preinstall
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
-	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
-.PHONY : install/strip
-
-# Special rule for the target install/strip
-install/strip/fast: preinstall/fast
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
-	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
-.PHONY : install/strip/fast
-
 # Special rule for the target install
 install: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
@@ -124,16 +134,6 @@ install/fast: preinstall/fast
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
 	/usr/bin/cmake -P cmake_install.cmake
 .PHONY : install/fast
-
-# Special rule for the target list_install_components
-list_install_components:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Available install components are: \"Unspecified\""
-.PHONY : list_install_components
-
-# Special rule for the target list_install_components
-list_install_components/fast: list_install_components
-
-.PHONY : list_install_components/fast
 
 # The main all target
 all: cmake_check_build_system
@@ -183,51 +183,6 @@ ssafy_1_gennodejs/fast:
 .PHONY : ssafy_1_gennodejs/fast
 
 # Convenience name for target.
-skeleton/ssafy_ad/ssafy_1/CMakeFiles/ssafy_1_generate_messages_nodejs.dir/rule:
-	cd /home/jeongjae/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 skeleton/ssafy_ad/ssafy_1/CMakeFiles/ssafy_1_generate_messages_nodejs.dir/rule
-.PHONY : skeleton/ssafy_ad/ssafy_1/CMakeFiles/ssafy_1_generate_messages_nodejs.dir/rule
-
-# Convenience name for target.
-ssafy_1_generate_messages_nodejs: skeleton/ssafy_ad/ssafy_1/CMakeFiles/ssafy_1_generate_messages_nodejs.dir/rule
-
-.PHONY : ssafy_1_generate_messages_nodejs
-
-# fast build rule for target.
-ssafy_1_generate_messages_nodejs/fast:
-	cd /home/jeongjae/catkin_ws/build && $(MAKE) -f skeleton/ssafy_ad/ssafy_1/CMakeFiles/ssafy_1_generate_messages_nodejs.dir/build.make skeleton/ssafy_ad/ssafy_1/CMakeFiles/ssafy_1_generate_messages_nodejs.dir/build
-.PHONY : ssafy_1_generate_messages_nodejs/fast
-
-# Convenience name for target.
-skeleton/ssafy_ad/ssafy_1/CMakeFiles/ssafy_1_genlisp.dir/rule:
-	cd /home/jeongjae/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 skeleton/ssafy_ad/ssafy_1/CMakeFiles/ssafy_1_genlisp.dir/rule
-.PHONY : skeleton/ssafy_ad/ssafy_1/CMakeFiles/ssafy_1_genlisp.dir/rule
-
-# Convenience name for target.
-ssafy_1_genlisp: skeleton/ssafy_ad/ssafy_1/CMakeFiles/ssafy_1_genlisp.dir/rule
-
-.PHONY : ssafy_1_genlisp
-
-# fast build rule for target.
-ssafy_1_genlisp/fast:
-	cd /home/jeongjae/catkin_ws/build && $(MAKE) -f skeleton/ssafy_ad/ssafy_1/CMakeFiles/ssafy_1_genlisp.dir/build.make skeleton/ssafy_ad/ssafy_1/CMakeFiles/ssafy_1_genlisp.dir/build
-.PHONY : ssafy_1_genlisp/fast
-
-# Convenience name for target.
-skeleton/ssafy_ad/ssafy_1/CMakeFiles/std_msgs_generate_messages_cpp.dir/rule:
-	cd /home/jeongjae/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 skeleton/ssafy_ad/ssafy_1/CMakeFiles/std_msgs_generate_messages_cpp.dir/rule
-.PHONY : skeleton/ssafy_ad/ssafy_1/CMakeFiles/std_msgs_generate_messages_cpp.dir/rule
-
-# Convenience name for target.
-std_msgs_generate_messages_cpp: skeleton/ssafy_ad/ssafy_1/CMakeFiles/std_msgs_generate_messages_cpp.dir/rule
-
-.PHONY : std_msgs_generate_messages_cpp
-
-# fast build rule for target.
-std_msgs_generate_messages_cpp/fast:
-	cd /home/jeongjae/catkin_ws/build && $(MAKE) -f skeleton/ssafy_ad/ssafy_1/CMakeFiles/std_msgs_generate_messages_cpp.dir/build.make skeleton/ssafy_ad/ssafy_1/CMakeFiles/std_msgs_generate_messages_cpp.dir/build
-.PHONY : std_msgs_generate_messages_cpp/fast
-
-# Convenience name for target.
 skeleton/ssafy_ad/ssafy_1/CMakeFiles/ssafy_1_generate_messages.dir/rule:
 	cd /home/jeongjae/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 skeleton/ssafy_ad/ssafy_1/CMakeFiles/ssafy_1_generate_messages.dir/rule
 .PHONY : skeleton/ssafy_ad/ssafy_1/CMakeFiles/ssafy_1_generate_messages.dir/rule
@@ -243,49 +198,64 @@ ssafy_1_generate_messages/fast:
 .PHONY : ssafy_1_generate_messages/fast
 
 # Convenience name for target.
-skeleton/ssafy_ad/ssafy_1/CMakeFiles/std_msgs_generate_messages_eus.dir/rule:
-	cd /home/jeongjae/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 skeleton/ssafy_ad/ssafy_1/CMakeFiles/std_msgs_generate_messages_eus.dir/rule
-.PHONY : skeleton/ssafy_ad/ssafy_1/CMakeFiles/std_msgs_generate_messages_eus.dir/rule
+skeleton/ssafy_ad/ssafy_1/CMakeFiles/ssafy_1_gencpp.dir/rule:
+	cd /home/jeongjae/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 skeleton/ssafy_ad/ssafy_1/CMakeFiles/ssafy_1_gencpp.dir/rule
+.PHONY : skeleton/ssafy_ad/ssafy_1/CMakeFiles/ssafy_1_gencpp.dir/rule
 
 # Convenience name for target.
-std_msgs_generate_messages_eus: skeleton/ssafy_ad/ssafy_1/CMakeFiles/std_msgs_generate_messages_eus.dir/rule
+ssafy_1_gencpp: skeleton/ssafy_ad/ssafy_1/CMakeFiles/ssafy_1_gencpp.dir/rule
 
-.PHONY : std_msgs_generate_messages_eus
+.PHONY : ssafy_1_gencpp
 
 # fast build rule for target.
-std_msgs_generate_messages_eus/fast:
-	cd /home/jeongjae/catkin_ws/build && $(MAKE) -f skeleton/ssafy_ad/ssafy_1/CMakeFiles/std_msgs_generate_messages_eus.dir/build.make skeleton/ssafy_ad/ssafy_1/CMakeFiles/std_msgs_generate_messages_eus.dir/build
-.PHONY : std_msgs_generate_messages_eus/fast
+ssafy_1_gencpp/fast:
+	cd /home/jeongjae/catkin_ws/build && $(MAKE) -f skeleton/ssafy_ad/ssafy_1/CMakeFiles/ssafy_1_gencpp.dir/build.make skeleton/ssafy_ad/ssafy_1/CMakeFiles/ssafy_1_gencpp.dir/build
+.PHONY : ssafy_1_gencpp/fast
 
 # Convenience name for target.
-skeleton/ssafy_ad/ssafy_1/CMakeFiles/std_msgs_generate_messages_lisp.dir/rule:
-	cd /home/jeongjae/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 skeleton/ssafy_ad/ssafy_1/CMakeFiles/std_msgs_generate_messages_lisp.dir/rule
-.PHONY : skeleton/ssafy_ad/ssafy_1/CMakeFiles/std_msgs_generate_messages_lisp.dir/rule
+skeleton/ssafy_ad/ssafy_1/CMakeFiles/ssafy_1_generate_messages_nodejs.dir/rule:
+	cd /home/jeongjae/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 skeleton/ssafy_ad/ssafy_1/CMakeFiles/ssafy_1_generate_messages_nodejs.dir/rule
+.PHONY : skeleton/ssafy_ad/ssafy_1/CMakeFiles/ssafy_1_generate_messages_nodejs.dir/rule
 
 # Convenience name for target.
-std_msgs_generate_messages_lisp: skeleton/ssafy_ad/ssafy_1/CMakeFiles/std_msgs_generate_messages_lisp.dir/rule
+ssafy_1_generate_messages_nodejs: skeleton/ssafy_ad/ssafy_1/CMakeFiles/ssafy_1_generate_messages_nodejs.dir/rule
 
-.PHONY : std_msgs_generate_messages_lisp
+.PHONY : ssafy_1_generate_messages_nodejs
 
 # fast build rule for target.
-std_msgs_generate_messages_lisp/fast:
-	cd /home/jeongjae/catkin_ws/build && $(MAKE) -f skeleton/ssafy_ad/ssafy_1/CMakeFiles/std_msgs_generate_messages_lisp.dir/build.make skeleton/ssafy_ad/ssafy_1/CMakeFiles/std_msgs_generate_messages_lisp.dir/build
-.PHONY : std_msgs_generate_messages_lisp/fast
+ssafy_1_generate_messages_nodejs/fast:
+	cd /home/jeongjae/catkin_ws/build && $(MAKE) -f skeleton/ssafy_ad/ssafy_1/CMakeFiles/ssafy_1_generate_messages_nodejs.dir/build.make skeleton/ssafy_ad/ssafy_1/CMakeFiles/ssafy_1_generate_messages_nodejs.dir/build
+.PHONY : ssafy_1_generate_messages_nodejs/fast
 
 # Convenience name for target.
-skeleton/ssafy_ad/ssafy_1/CMakeFiles/std_msgs_generate_messages_nodejs.dir/rule:
-	cd /home/jeongjae/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 skeleton/ssafy_ad/ssafy_1/CMakeFiles/std_msgs_generate_messages_nodejs.dir/rule
-.PHONY : skeleton/ssafy_ad/ssafy_1/CMakeFiles/std_msgs_generate_messages_nodejs.dir/rule
+skeleton/ssafy_ad/ssafy_1/CMakeFiles/_ssafy_1_generate_messages_check_deps_student.dir/rule:
+	cd /home/jeongjae/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 skeleton/ssafy_ad/ssafy_1/CMakeFiles/_ssafy_1_generate_messages_check_deps_student.dir/rule
+.PHONY : skeleton/ssafy_ad/ssafy_1/CMakeFiles/_ssafy_1_generate_messages_check_deps_student.dir/rule
 
 # Convenience name for target.
-std_msgs_generate_messages_nodejs: skeleton/ssafy_ad/ssafy_1/CMakeFiles/std_msgs_generate_messages_nodejs.dir/rule
+_ssafy_1_generate_messages_check_deps_student: skeleton/ssafy_ad/ssafy_1/CMakeFiles/_ssafy_1_generate_messages_check_deps_student.dir/rule
 
-.PHONY : std_msgs_generate_messages_nodejs
+.PHONY : _ssafy_1_generate_messages_check_deps_student
 
 # fast build rule for target.
-std_msgs_generate_messages_nodejs/fast:
-	cd /home/jeongjae/catkin_ws/build && $(MAKE) -f skeleton/ssafy_ad/ssafy_1/CMakeFiles/std_msgs_generate_messages_nodejs.dir/build.make skeleton/ssafy_ad/ssafy_1/CMakeFiles/std_msgs_generate_messages_nodejs.dir/build
-.PHONY : std_msgs_generate_messages_nodejs/fast
+_ssafy_1_generate_messages_check_deps_student/fast:
+	cd /home/jeongjae/catkin_ws/build && $(MAKE) -f skeleton/ssafy_ad/ssafy_1/CMakeFiles/_ssafy_1_generate_messages_check_deps_student.dir/build.make skeleton/ssafy_ad/ssafy_1/CMakeFiles/_ssafy_1_generate_messages_check_deps_student.dir/build
+.PHONY : _ssafy_1_generate_messages_check_deps_student/fast
+
+# Convenience name for target.
+skeleton/ssafy_ad/ssafy_1/CMakeFiles/_ssafy_1_generate_messages_check_deps_AddTwoInts.dir/rule:
+	cd /home/jeongjae/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 skeleton/ssafy_ad/ssafy_1/CMakeFiles/_ssafy_1_generate_messages_check_deps_AddTwoInts.dir/rule
+.PHONY : skeleton/ssafy_ad/ssafy_1/CMakeFiles/_ssafy_1_generate_messages_check_deps_AddTwoInts.dir/rule
+
+# Convenience name for target.
+_ssafy_1_generate_messages_check_deps_AddTwoInts: skeleton/ssafy_ad/ssafy_1/CMakeFiles/_ssafy_1_generate_messages_check_deps_AddTwoInts.dir/rule
+
+.PHONY : _ssafy_1_generate_messages_check_deps_AddTwoInts
+
+# fast build rule for target.
+_ssafy_1_generate_messages_check_deps_AddTwoInts/fast:
+	cd /home/jeongjae/catkin_ws/build && $(MAKE) -f skeleton/ssafy_ad/ssafy_1/CMakeFiles/_ssafy_1_generate_messages_check_deps_AddTwoInts.dir/build.make skeleton/ssafy_ad/ssafy_1/CMakeFiles/_ssafy_1_generate_messages_check_deps_AddTwoInts.dir/build
+.PHONY : _ssafy_1_generate_messages_check_deps_AddTwoInts/fast
 
 # Convenience name for target.
 skeleton/ssafy_ad/ssafy_1/CMakeFiles/_catkin_empty_exported_target.dir/rule:
@@ -363,66 +333,6 @@ ssafy_1_generate_messages_eus/fast:
 .PHONY : ssafy_1_generate_messages_eus/fast
 
 # Convenience name for target.
-skeleton/ssafy_ad/ssafy_1/CMakeFiles/ssafy_1_gencpp.dir/rule:
-	cd /home/jeongjae/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 skeleton/ssafy_ad/ssafy_1/CMakeFiles/ssafy_1_gencpp.dir/rule
-.PHONY : skeleton/ssafy_ad/ssafy_1/CMakeFiles/ssafy_1_gencpp.dir/rule
-
-# Convenience name for target.
-ssafy_1_gencpp: skeleton/ssafy_ad/ssafy_1/CMakeFiles/ssafy_1_gencpp.dir/rule
-
-.PHONY : ssafy_1_gencpp
-
-# fast build rule for target.
-ssafy_1_gencpp/fast:
-	cd /home/jeongjae/catkin_ws/build && $(MAKE) -f skeleton/ssafy_ad/ssafy_1/CMakeFiles/ssafy_1_gencpp.dir/build.make skeleton/ssafy_ad/ssafy_1/CMakeFiles/ssafy_1_gencpp.dir/build
-.PHONY : ssafy_1_gencpp/fast
-
-# Convenience name for target.
-skeleton/ssafy_ad/ssafy_1/CMakeFiles/std_msgs_generate_messages_py.dir/rule:
-	cd /home/jeongjae/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 skeleton/ssafy_ad/ssafy_1/CMakeFiles/std_msgs_generate_messages_py.dir/rule
-.PHONY : skeleton/ssafy_ad/ssafy_1/CMakeFiles/std_msgs_generate_messages_py.dir/rule
-
-# Convenience name for target.
-std_msgs_generate_messages_py: skeleton/ssafy_ad/ssafy_1/CMakeFiles/std_msgs_generate_messages_py.dir/rule
-
-.PHONY : std_msgs_generate_messages_py
-
-# fast build rule for target.
-std_msgs_generate_messages_py/fast:
-	cd /home/jeongjae/catkin_ws/build && $(MAKE) -f skeleton/ssafy_ad/ssafy_1/CMakeFiles/std_msgs_generate_messages_py.dir/build.make skeleton/ssafy_ad/ssafy_1/CMakeFiles/std_msgs_generate_messages_py.dir/build
-.PHONY : std_msgs_generate_messages_py/fast
-
-# Convenience name for target.
-skeleton/ssafy_ad/ssafy_1/CMakeFiles/_ssafy_1_generate_messages_check_deps_student.dir/rule:
-	cd /home/jeongjae/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 skeleton/ssafy_ad/ssafy_1/CMakeFiles/_ssafy_1_generate_messages_check_deps_student.dir/rule
-.PHONY : skeleton/ssafy_ad/ssafy_1/CMakeFiles/_ssafy_1_generate_messages_check_deps_student.dir/rule
-
-# Convenience name for target.
-_ssafy_1_generate_messages_check_deps_student: skeleton/ssafy_ad/ssafy_1/CMakeFiles/_ssafy_1_generate_messages_check_deps_student.dir/rule
-
-.PHONY : _ssafy_1_generate_messages_check_deps_student
-
-# fast build rule for target.
-_ssafy_1_generate_messages_check_deps_student/fast:
-	cd /home/jeongjae/catkin_ws/build && $(MAKE) -f skeleton/ssafy_ad/ssafy_1/CMakeFiles/_ssafy_1_generate_messages_check_deps_student.dir/build.make skeleton/ssafy_ad/ssafy_1/CMakeFiles/_ssafy_1_generate_messages_check_deps_student.dir/build
-.PHONY : _ssafy_1_generate_messages_check_deps_student/fast
-
-# Convenience name for target.
-skeleton/ssafy_ad/ssafy_1/CMakeFiles/_ssafy_1_generate_messages_check_deps_AddTwoInts.dir/rule:
-	cd /home/jeongjae/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 skeleton/ssafy_ad/ssafy_1/CMakeFiles/_ssafy_1_generate_messages_check_deps_AddTwoInts.dir/rule
-.PHONY : skeleton/ssafy_ad/ssafy_1/CMakeFiles/_ssafy_1_generate_messages_check_deps_AddTwoInts.dir/rule
-
-# Convenience name for target.
-_ssafy_1_generate_messages_check_deps_AddTwoInts: skeleton/ssafy_ad/ssafy_1/CMakeFiles/_ssafy_1_generate_messages_check_deps_AddTwoInts.dir/rule
-
-.PHONY : _ssafy_1_generate_messages_check_deps_AddTwoInts
-
-# fast build rule for target.
-_ssafy_1_generate_messages_check_deps_AddTwoInts/fast:
-	cd /home/jeongjae/catkin_ws/build && $(MAKE) -f skeleton/ssafy_ad/ssafy_1/CMakeFiles/_ssafy_1_generate_messages_check_deps_AddTwoInts.dir/build.make skeleton/ssafy_ad/ssafy_1/CMakeFiles/_ssafy_1_generate_messages_check_deps_AddTwoInts.dir/build
-.PHONY : _ssafy_1_generate_messages_check_deps_AddTwoInts/fast
-
-# Convenience name for target.
 skeleton/ssafy_ad/ssafy_1/CMakeFiles/ssafy_1_generate_messages_lisp.dir/rule:
 	cd /home/jeongjae/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 skeleton/ssafy_ad/ssafy_1/CMakeFiles/ssafy_1_generate_messages_lisp.dir/rule
 .PHONY : skeleton/ssafy_ad/ssafy_1/CMakeFiles/ssafy_1_generate_messages_lisp.dir/rule
@@ -452,38 +362,48 @@ ssafy_1_geneus/fast:
 	cd /home/jeongjae/catkin_ws/build && $(MAKE) -f skeleton/ssafy_ad/ssafy_1/CMakeFiles/ssafy_1_geneus.dir/build.make skeleton/ssafy_ad/ssafy_1/CMakeFiles/ssafy_1_geneus.dir/build
 .PHONY : ssafy_1_geneus/fast
 
+# Convenience name for target.
+skeleton/ssafy_ad/ssafy_1/CMakeFiles/ssafy_1_genlisp.dir/rule:
+	cd /home/jeongjae/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 skeleton/ssafy_ad/ssafy_1/CMakeFiles/ssafy_1_genlisp.dir/rule
+.PHONY : skeleton/ssafy_ad/ssafy_1/CMakeFiles/ssafy_1_genlisp.dir/rule
+
+# Convenience name for target.
+ssafy_1_genlisp: skeleton/ssafy_ad/ssafy_1/CMakeFiles/ssafy_1_genlisp.dir/rule
+
+.PHONY : ssafy_1_genlisp
+
+# fast build rule for target.
+ssafy_1_genlisp/fast:
+	cd /home/jeongjae/catkin_ws/build && $(MAKE) -f skeleton/ssafy_ad/ssafy_1/CMakeFiles/ssafy_1_genlisp.dir/build.make skeleton/ssafy_ad/ssafy_1/CMakeFiles/ssafy_1_genlisp.dir/build
+.PHONY : ssafy_1_genlisp/fast
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
+	@echo "... install/strip"
 	@echo "... install/local"
+	@echo "... list_install_components"
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
 	@echo "... test"
 	@echo "... ssafy_1_gennodejs"
-	@echo "... ssafy_1_generate_messages_nodejs"
-	@echo "... ssafy_1_genlisp"
-	@echo "... install/strip"
-	@echo "... std_msgs_generate_messages_cpp"
 	@echo "... install"
 	@echo "... ssafy_1_generate_messages"
-	@echo "... std_msgs_generate_messages_eus"
-	@echo "... list_install_components"
-	@echo "... std_msgs_generate_messages_lisp"
-	@echo "... std_msgs_generate_messages_nodejs"
+	@echo "... ssafy_1_gencpp"
+	@echo "... ssafy_1_generate_messages_nodejs"
+	@echo "... _ssafy_1_generate_messages_check_deps_student"
+	@echo "... _ssafy_1_generate_messages_check_deps_AddTwoInts"
 	@echo "... _catkin_empty_exported_target"
 	@echo "... ssafy_1_generate_messages_cpp"
 	@echo "... ssafy_1_genpy"
 	@echo "... ssafy_1_generate_messages_py"
 	@echo "... ssafy_1_generate_messages_eus"
-	@echo "... ssafy_1_gencpp"
-	@echo "... std_msgs_generate_messages_py"
-	@echo "... _ssafy_1_generate_messages_check_deps_student"
-	@echo "... _ssafy_1_generate_messages_check_deps_AddTwoInts"
 	@echo "... ssafy_1_generate_messages_lisp"
 	@echo "... ssafy_1_geneus"
+	@echo "... ssafy_1_genlisp"
 .PHONY : help
 
 

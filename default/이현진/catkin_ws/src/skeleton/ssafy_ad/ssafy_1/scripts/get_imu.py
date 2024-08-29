@@ -13,18 +13,16 @@ from sensor_msgs.msg import Imu
 
 #TODO: (1) Callback 함수 생성 및 데이터 출력
 def imu_callback(data):
-    '''
+
     # 시뮬레이터의 GPS 데이터를 아래와 같은 형식으로 터미널 창에 출력한다.
     os.system('clear')
     rospy.loginfo('------------------ IMU Sensor Status ------------------')
     rospy.loginfo("orientation:")
-    rospy.loginfo("x : {} y : {} z : {} w : {}".format( 변수 1 , 변수 2 , 변수 3 , 변수 4 ))
+    rospy.loginfo("x : {} y : {} z : {} w : {}".format( ori.x , ori.y , ori.z , ori.w ))
     rospy.loginfo("angular_velocity:")
-    rospy.loginfo("x : {} y : {} z : {}".format( 변수 1 , 변수 2 , 변수 3 ))
+    rospy.loginfo("x : {} y : {} z : {}".format( vel_ang.x , vel_ang.y , vel_ang.z ))
     rospy.loginfo("linear_acceleration:")
-    rospy.loginfo("x : {} y : {} z : {}".format( 변수 1 , 변수 2 , 변수 3 ))
-
-    '''
+    rospy.loginfo("x : {} y : {} z : {}".format( acc_lin.x , acc_lin.y , acc_lin.z ))
 
 def listener():
     rospy.init_node('imu_data_listener', anonymous=True)
@@ -35,7 +33,7 @@ def listener():
     
 
     '''
-
+    rospy.Subscriber('/imu', Imu, imu_callback)
     rospy.spin()
 
 if __name__ == '__main__':

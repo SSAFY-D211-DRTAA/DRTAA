@@ -131,6 +131,7 @@ endif()
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
   include("/home/jeongjae/catkin_ws/build/gtest/cmake_install.cmake")
+  include("/home/jeongjae/catkin_ws/build/skeleton/ssafy_ad/MORAI-ROS_morai_msgs/cmake_install.cmake")
   include("/home/jeongjae/catkin_ws/build/skeleton/ssafy_ad/ssafy_1/cmake_install.cmake")
   include("/home/jeongjae/catkin_ws/build/skeleton/ssafy_ad/ssafy_2/cmake_install.cmake")
   include("/home/jeongjae/catkin_ws/build/skeleton/ssafy_ad/ssafy_3/cmake_install.cmake")

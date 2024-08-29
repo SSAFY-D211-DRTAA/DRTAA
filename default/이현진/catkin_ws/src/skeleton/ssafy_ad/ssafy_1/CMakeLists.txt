@@ -11,7 +11,6 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
   rospy
   std_msgs
-  ssafy_1
 )
 
 ## System dependencies are found with CMake's conventions
