@@ -2,7 +2,7 @@ package com.d211.study.service;
 
 import com.d211.study.config.jwt.JwtToken;
 import com.d211.study.domain.Member;
-import com.d211.study.dto.request.LoginRequest;
+import com.d211.study.dto.request.LoginRequestDTO;
 import com.d211.study.dto.response.UserInfoResponse;
 import com.d211.study.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ public class MemberService {
     private final CustomUserDetailsService userDetailsService;
     private final MemberRepository memberRepository;
 
-    public JwtToken login(LoginRequest request) {
+    public JwtToken login(LoginRequestDTO request) {
         // 사용자 검증
         UserDetails userDetails = userDetailsService.loadUserByUsername(request.getMemberUsername());
         if (!passwordEncoder.matches(request.getMemberPassword(), userDetails.getPassword())) {
@@ -36,14 +36,13 @@ public class MemberService {
 
     public UserInfoResponse info(String name) {
         // 사용자 정보 가져오기
-        Member member = memberRepository.findByMemberUsername(name)
+        Member member = memberRepository.findByMemberEmail(name)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 회원을 찾을 수 없습니다."));
 
         UserInfoResponse userInfo = new UserInfoResponse(
                 member.getMemberId(),
-                member.getMemberUsername(),
                 member.getMemberEmail(),
-                member.getMemberPassword(),
+                member.getMemberNickname(),
                 member.isMemberIsAdmin()
         );
 

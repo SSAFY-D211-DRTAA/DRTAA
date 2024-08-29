@@ -9,8 +9,7 @@ import lombok.Getter;
 @Getter
 public class UserInfoResponse {
     private long memberId;
-    private String memberUsername;
     private String memberEmail;
-    private String memberPassword;
+    private String memberNickname;
     private boolean memberIsAdmin;
 }
