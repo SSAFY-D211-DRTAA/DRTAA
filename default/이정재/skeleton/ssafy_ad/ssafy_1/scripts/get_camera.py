@@ -29,6 +29,8 @@ def listener():
     
 
     '''
+    rospy.Subscriber('/image_jpeg/compressed', CompressedImage, Camera_callback)
+
 
     rospy.spin()
 
