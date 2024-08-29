@@ -28,10 +28,10 @@ def gps_callback(data):
 
     # os.system('clear')
     print("\n ------------------------------------ \n")
-    rospy.loginfo("latitude {}".format( GPS 의 위도 데이터 ))
-    rospy.loginfo("longitude {}".format( GPS 의 경도 데이터 ))
-    rospy.loginfo("eastOffset {}".format( 시뮬레이터의 맵 좌표계의 offset 값 ))
-    rospy.loginfo("northOffset {}".format( 시뮬레이터의 맵 좌표계의 offset 값 ))
+    rospy.loginfo("latitude {}".format( data.latitude ))
+    rospy.loginfo("longitude {}".format( data.longitude ))
+    rospy.loginfo("eastOffset {}".format( data.eastOffset ))
+    rospy.loginfo("northOffset {}".format( data.northOffset ))
 
 
 def listener():
@@ -43,6 +43,8 @@ def listener():
     
 
     '''
+    rospy.Subscriber('/gps', GPSMessage, gps_callback)
+
 
     rospy.spin()
 
