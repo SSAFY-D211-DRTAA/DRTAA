@@ -4,43 +4,40 @@
 import rospy
 from morai_msgs.msg import MultiEgoSetting
 
-# Ego_setting_Command 는 Simulator 에서 Ego 차량의 위치를 제어하는 메세지 송신의 예제입니다.
-# /ego_setting 라는 메세지를 Publish 하여 Ego 차량을 제어 합니다.
-
-# 노드 실행 순서 
-# 1. publisher 생성
-# 2. 송신 될 메세지 변수 생성
-# 3. /ego_setting 메세지 Publish
-
-def talker():
-    # (1) publisher 생성
+def setup_multiple_egos():
+    # Publisher 생성
     publisher = rospy.Publisher('/ego_setting', MultiEgoSetting, queue_size=10)
-    rospy.init_node('Ego_setting_Command', anonymous=True)
+    rospy.init_node('Multi_Ego_Setup', anonymous=True)
 
-    # (2) 송신 될 메세지 변수 생성
+    # MultiEgoSetting 메시지 생성 및 초기화
     ego_setting_msg = MultiEgoSetting()
-    ego_setting_msg.number_of_ego_vehicle = 3
-    ego_setting_msg.camera_index = 0
-    ego_setting_msg.ego_index = [0, 1, 2]
-    ego_setting_msg.global_position_x = [10.0, 20.0, 30.0]
-    ego_setting_msg.global_position_y = [0.0, 0.0, 0.0]
-    ego_setting_msg.global_position_z = [0.0, 0.0, 0.0]
-    ego_setting_msg.global_roll = [0.0, 0.0, 0.0]
-    ego_setting_msg.global_pitch = [0.0, 0.0, 0.0]
-    ego_setting_msg.global_yaw = [0.0, 0.0, 0.0]
-    ego_setting_msg.velocity = [0.0, 0.0, 0.0]
-    ego_setting_msg.gear = [0, 0, 0]
-    ego_setting_msg.ctrl_mode = [2, 2, 2]
+    ego_setting_msg.number_of_ego_vehicle = 4  # 생성할 Ego 차량의 수
+    ego_setting_msg.camera_index = 0  # 카메라 인덱스 설정
 
-    rate = rospy.Rate(1)  # 1 hz
+    # 각 차량의 인덱스 및 초기 위치 설정
+    ego_setting_msg.ego_index = [0, 2, 3, 4]
+    ego_setting_msg.global_position_x = [10.0, 20.0, 30.0, 40.0]
+    ego_setting_msg.global_position_y = [0.0, 0.0, 0.0, 0.0]
+    ego_setting_msg.global_position_z = [0.0, 0.0, 0.0, 0.0]
+
+    # 각 차량의 초기 회전 각도 설정
+    ego_setting_msg.global_roll = [0.0, 0.0, 0.0, 0.0]
+    ego_setting_msg.global_pitch = [0.0, 0.0, 0.0, 0.0]
+    ego_setting_msg.global_yaw = [0.0, 0.0, 0.0, 0.0]
+
+    # 각 차량의 초기 속도 및 제어 모드 설정
+    ego_setting_msg.velocity = [0.0, 0.0, 0.0, 0.0]
+    ego_setting_msg.gear = [0, 0, 0, 0]
+    ego_setting_msg.ctrl_mode = [4, 4, 4, 4]  # 제어 모드 설정
+
+    rate = rospy.Rate(1)  # 1 Hz로 메시지 발행
     while not rospy.is_shutdown():
-        rospy.loginfo(ego_setting_msg)
-        # (3) /ego_setting 메세지 Publish
+        rospy.loginfo("Publishing MultiEgoSetting: %s", ego_setting_msg)
         publisher.publish(ego_setting_msg)
         rate.sleep()
 
 if __name__ == '__main__':
     try:
-        talker()
+        setup_multiple_egos()
     except rospy.ROSInterruptException:
         pass
