@@ -8,3 +8,5 @@
 - `:core-model` -> 전체에서 사용되는 데이터클래스, 인터페이스, 상수 같은 것들
 - `:core-ui` -> Base코드들
 - `:feature-main` -> 메인 feature, 각 feature들 모두 연결시켜주는 주체
+
+![dartta_module_graph](Drtaa-Android/project.dot.png)
