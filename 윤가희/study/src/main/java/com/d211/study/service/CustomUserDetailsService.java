@@ -31,16 +31,16 @@ public class CustomUserDetailsService implements UserDetailsManager {
     private PasswordEncoder passwordEncoder;
 
     @Override
-    public UserDetails loadUserByUsername(String memberUsername) throws UsernameNotFoundException {
-        // userName으로 사용자를 찾아 UserDetails객체를 반환
-        return memberRepository.findByMemberUsername(memberUsername)
+    public UserDetails loadUserByUsername(String memberEmail) throws UsernameNotFoundException {
+        // userEmail으로 사용자를 찾아 UserDetails객체를 반환
+        return memberRepository.findByMemberEmail(memberEmail)
                 .map(this::createUserDetails)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 회원을 찾을 수 없습니다."));
     }
 
     private UserDetails createUserDetails(Member member) {
         return org.springframework.security.core.userdetails.User.builder()
-                .username(member.getMemberUsername())
+                .username(member.getMemberEmail())
                 .password(member.getMemberPassword())
                 .roles(member.isMemberIsAdmin() ? "ADMIN" : "USER")
                 .build();
@@ -64,9 +64,9 @@ public class CustomUserDetailsService implements UserDetailsManager {
 
     public void createUser(SignUpRequestDTO request) {
         Member member = Member.builder()
-                .memberUsername(request.getMemberUsername())
                 .memberEmail(request.getMemberEmail())
                 .memberPassword(passwordEncoder.encode(request.getMemberPassword()))
+                .memberNickname(request.getMemberNickname())
                 .memberIsAdmin(request.isMemberIsAdmin())
                 .memberRefreshToken("")
                 .build();
@@ -76,12 +76,12 @@ public class CustomUserDetailsService implements UserDetailsManager {
 
     @Override
     public void deleteUser(String username) {
-        memberRepository.deleteByMemberUsername(username);
+        memberRepository.deleteByMemberEmail(username);
     }
 
     @Override
     public void updateUser(UserDetails user) {
-        memberRepository.findByMemberUsername(user.getUsername())
+        memberRepository.findByMemberEmail(user.getUsername())
                 .ifPresent(member -> {
                     member.setMemberPassword(passwordEncoder.encode(user.getPassword()));
                     member.setMemberIsAdmin(user.getAuthorities().stream()
@@ -100,7 +100,7 @@ public class CustomUserDetailsService implements UserDetailsManager {
 
         String username = currentUser.getName();
 
-        memberRepository.findByMemberUsername(username)
+        memberRepository.findByMemberEmail(username)
                 .ifPresent(member -> {
                     if (passwordEncoder.matches(oldPassword, member.getMemberPassword())) {
                         member.setMemberPassword(passwordEncoder.encode(newPassword));
@@ -113,6 +113,6 @@ public class CustomUserDetailsService implements UserDetailsManager {
 
     @Override
     public boolean userExists(String username) {
-        return memberRepository.existsByMemberUsername(username);
+        return memberRepository.existsByMemberEmail(username);
     }
 }

@@ -36,14 +36,13 @@ public class MemberService {
 
     public UserInfoResponse info(String name) {
         // 사용자 정보 가져오기
-        Member member = memberRepository.findByMemberUsername(name)
+        Member member = memberRepository.findByMemberEmail(name)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 회원을 찾을 수 없습니다."));
 
         UserInfoResponse userInfo = new UserInfoResponse(
                 member.getMemberId(),
-                member.getMemberUsername(),
                 member.getMemberEmail(),
-                member.getMemberPassword(),
+                member.getMemberNickname(),
                 member.isMemberIsAdmin()
         );
 

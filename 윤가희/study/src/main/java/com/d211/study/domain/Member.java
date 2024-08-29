@@ -24,14 +24,14 @@ public class Member implements UserDetails {
     @Column(name = "member_id", nullable = false)
     private long memberId;
 
-    @Column(name = "member_username", nullable = false)
-    private String memberUsername;
-
     @Column(name = "member_email", nullable = false)
     private String memberEmail;
 
     @Column(name = "member_password", nullable = false)
     private String memberPassword;
+
+    @Column(name = "member_nickname", nullable = false)
+    private String memberNickname;
 
     @Column(name = "member_refreshtoken", nullable = false)
     private String memberRefreshToken;
@@ -51,7 +51,7 @@ public class Member implements UserDetails {
 
     @Override
     public String getUsername() {
-        return memberUsername;
+        return memberEmail;
     }
 
     @Override

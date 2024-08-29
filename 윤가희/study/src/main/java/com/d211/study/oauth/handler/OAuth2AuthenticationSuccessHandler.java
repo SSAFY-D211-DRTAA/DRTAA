@@ -2,11 +2,14 @@ package com.d211.study.oauth.handler;
 
 import com.d211.study.config.jwt.JwtToken;
 import com.d211.study.config.jwt.JwtTokenProvider;
+import com.d211.study.domain.Member;
 import com.d211.study.oauth.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.d211.study.oauth.service.OAuth2UserPrincipal;
 import com.d211.study.oauth.user.OAuth2Provider;
 import com.d211.study.oauth.user.OAuth2UserUnlinkManager;
 import com.d211.study.oauth.util.CookieUtils;
+import com.d211.study.repository.MemberRepository;
+import com.d211.study.service.MemberService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -32,6 +35,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
     private final OAuth2UserUnlinkManager oAuth2UserUnlinkManager;
     private final JwtTokenProvider tokenProvider;
+    private final MemberRepository memberRepository;
+
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -71,16 +76,25 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         }
 
         if ("login".equalsIgnoreCase(mode)) {
-            // TODO: DB 저장
-            // TODO: 액세스 토큰, 리프레시 토큰 발급
-            // TODO: 리프레시 토큰 DB 저장
-            log.info("email={}, name={}, nickname={}, accessToken={}", principal.getUserInfo().getEmail(),
-                    principal.getUserInfo().getName(),
-                    principal.getUserInfo().getNickname(),
-                    principal.getUserInfo().getAccessToken()
+            // 사용자 정보 저장 로직
+            String email = principal.getUserInfo().getEmail();
+            String username = principal.getUserInfo().getName();
+            String nickname = principal.getUserInfo().getNickname();
+            String accessToken = principal.getUserInfo().getAccessToken();
+            
+            // 사용자 정보 로그 찍기
+            log.info("email={}, name={}, nickname={}, accessToken={}",
+                    email,
+                    username,
+                    nickname,
+                    accessToken
             );
 
+            // 토큰 발급
             JwtToken tokens = tokenProvider.generateToken(authentication);
+
+            // 사용자 정보 및 리프레시 토큰 저장
+            saveOrUpdateMember(email, username, "", tokens.getRefreshToken()); // 멤버 저장 또는 업데이트
 
             return UriComponentsBuilder.fromUriString(targetUrl)
                     .queryParam("access_token", tokens.getAccessToken())
@@ -92,8 +106,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             String accessToken = principal.getUserInfo().getAccessToken();
             OAuth2Provider provider = principal.getUserInfo().getProvider();
 
-            // TODO: DB 삭제
-            // TODO: 리프레시 토큰 삭제
+            // DB 삭제 및 리프레시 토큰 삭제
+            deleteMemberByEmail(principal.getUserInfo().getEmail()); // 멤버 삭제
             oAuth2UserUnlinkManager.unlink(provider, accessToken);
 
             return UriComponentsBuilder.fromUriString(targetUrl)
@@ -117,5 +131,26 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     protected void clearAuthenticationAttributes(HttpServletRequest request, HttpServletResponse response) {
         super.clearAuthenticationAttributes(request);
         httpCookieOAuth2AuthorizationRequestRepository.removeAuthorizationRequestCookies(request, response);
+    }
+
+    public Member saveOrUpdateMember(String email, String name, String password, String refreshToken) {
+        // 이메일로 멤버 찾기
+        Member member = memberRepository.findByMemberEmail(email)
+                .orElse(Member.builder()
+                        .memberEmail(email)
+                        .memberNickname(name)
+                        .memberPassword(password)  // 소셜 로그인일 경우 비밀번호는 빈 문자열로 설정
+                        .memberRefreshToken(refreshToken)
+                        .memberIsAdmin(false) // 기본값은 사용자로 설정
+                        .build());
+
+        // 리프레시 토큰 업데이트
+        member.setMemberRefreshToken(refreshToken);
+
+        return memberRepository.save(member); // 멤버 저장 또는 업데이트
+    }
+
+    public void deleteMemberByEmail(String email) {
+        memberRepository.deleteByMemberEmail(email);
     }
 }

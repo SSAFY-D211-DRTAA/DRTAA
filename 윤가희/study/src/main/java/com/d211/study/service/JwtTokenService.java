@@ -50,7 +50,7 @@ public class JwtTokenService {
     // refreshToken 업데이트
     @Transactional
     public void saveRefreshToken(String userName, String newRefreshToken) {
-        Member user = memberRepository.findByMemberUsername(userName)
+        Member user = memberRepository.findByMemberEmail(userName)
                 .orElseThrow(() -> new EntityNotFoundException("해당 userName으로 사용자를 찾을 수 없습니다."));
 
         // 기존 객체의 리프레시 토큰만 업데이트
@@ -62,7 +62,7 @@ public class JwtTokenService {
 
     // refreshToken 조회
     public String getRefreshToken(String userName) {
-        return memberRepository.findMemberRefreshTokenByMemberUsername(userName)
+        return memberRepository.findMemberRefreshTokenByMemberEmail(userName)
                 .orElseThrow(() -> new EntityNotFoundException("해당 refreshToken으로 사용자를 찾을 수 없습니다."));
     }
 }
