@@ -1,0 +1,8 @@
+prefix=/home/mingyu/catkin_sub/install
+
+Name: ssafy_1
+Description: Description of ssafy_1
+Version: 0.0.0
+Cflags: -I${prefix}/include
+Libs: -L${prefix}/lib 
+Requires: message_runtime
