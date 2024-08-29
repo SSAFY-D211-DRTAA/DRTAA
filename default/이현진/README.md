@@ -1,6 +1,5 @@
 # 이현진 TIL
 
-## Day1
 ### Dependency Injection - 의존성 주입
 
 #### 의존성
@@ -43,7 +42,6 @@ class Person(val name: String)
 - 보일러 플레이트 코드가 줄어든다
 - 앱 생명주기에 따라 관리되어 적절한 시점에 필요한 객체들이 자동으로 주입된다
 
-## Day2
 ### Dagger Hilt
 
 - 인스턴스를 클래스 외부에서 주입하기 위해서는 인스턴스에 대한 생명주기 관리가 필요
@@ -78,3 +76,8 @@ class Person(val name: String)
 - 컴포넌트관련 scope, 생성 및 파괴시점
 
 ![image.png](img/hilt_scope_lifecycle.png)
+
+## **SubProject1**
+![image.png](img/get_status.PNG)
+
+![image.png](img/set.PNG)
