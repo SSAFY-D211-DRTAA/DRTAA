@@ -35,3 +35,7 @@
 
 ### Day 5
 1. Ubuntu 24.04 Triple Boot
+
+2. Morai Sim & Docker Container 연동 완료
+
+![alt text](img/morai_docker.png)
