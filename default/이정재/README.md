@@ -31,4 +31,7 @@
 ### Day 4
 1. 서브 프로젝트 1 완료
 
+2. Ubuntu 20.04 Triple Boot - Fail
+
 ### Day 5
+1. Ubuntu 24.04 Triple Boot
