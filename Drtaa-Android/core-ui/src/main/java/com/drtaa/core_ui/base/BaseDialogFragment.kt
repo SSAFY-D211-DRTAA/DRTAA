@@ -1,4 +1,4 @@
-package com.drtaa.core_ui
+package com.drtaa.core_ui.base
 
 import android.app.Dialog
 import android.os.Bundle

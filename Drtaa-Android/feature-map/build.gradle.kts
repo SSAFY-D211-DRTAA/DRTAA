@@ -1,14 +1,13 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
-
     alias(libs.plugins.hilt.gradle.plugin)
     alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.navigation.safe.args)
 }
 
 android {
-    namespace = "com.drtaa.feature_main"
+    namespace = "com.drtaa.feature_map"
     compileSdk = 34
 
     defaultConfig {
@@ -38,22 +37,13 @@ android {
         dataBinding = true
         buildConfig = true
     }
-    sourceSets {
-        getByName("main") {
-            res {
-                srcDirs("src\\main\\res", "src\\main\\res")
-            }
-        }
-    }
 }
 
 dependencies {
-    // modules
+// modules
     implementation(project(":core-data"))
     implementation(project(":core-ui"))
     implementation(project(":core-model"))
-    implementation(project(":feature-map"))
-    implementation(project(":feature-mypage"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

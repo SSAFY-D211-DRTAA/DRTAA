@@ -49,6 +49,8 @@ dependencies {
     implementation(project(":core-ui"))
     implementation(project(":core-model"))
     implementation(project(":feature-main"))
+    implementation(project(":feature-map"))
+    implementation(project(":feature-mypage"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
