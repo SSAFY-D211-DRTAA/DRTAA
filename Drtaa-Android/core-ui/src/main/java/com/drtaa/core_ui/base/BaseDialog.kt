@@ -1,4 +1,4 @@
-package com.drtaa.core_ui
+package com.drtaa.core_ui.base
 
 import android.content.Context
 import android.graphics.Color
