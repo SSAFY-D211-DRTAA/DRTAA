@@ -68,8 +68,9 @@ public class CustomUserDetailsServiceImpl implements UserDetailsManager {
                 .userEmail(request.getUserEmail())
                 .userPassword(passwordEncoder.encode(request.getUserPassword()))
                 .userNickname(request.getUserNickname())
-                .userIsAdmin(request.isUserIsAdmin())
                 .userRefreshToken("")
+                .userIsSocial(request.isUserIsSocial())
+                .userIsAdmin(request.isUserIsAdmin())
                 .build();
 
         createUser(member); // 기존 createUser(UserDetails user) 호출

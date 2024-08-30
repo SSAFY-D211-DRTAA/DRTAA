@@ -27,7 +27,10 @@ public class SecurityConfig {
                 .csrf(csrfConfig -> csrfConfig.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/user/signup", "/user/login").permitAll()
+                        .requestMatchers("/user/signup", "/user/login").permitAll() // 회원가입, 로그인 허용
+                        .requestMatchers("/api/public/**").permitAll() // 공용 API 접근 허용
+                        .requestMatchers("/swagger-ui/**").permitAll() // Swagger UI 접근 허용
+                        .requestMatchers("/v3/api-docs/**").permitAll() // API 문서 접근 허용
                         .anyRequest().authenticated()
                 );
 //                .sessionManagement(sessions -> sessions.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
