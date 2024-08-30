@@ -44,25 +44,11 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
+    implementation(libs.bundles.network.default)
 
     // DI
-    implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
 
     // Network
-    implementation(libs.retrofit)
-    implementation(libs.retrofit.converter.gson)
-    implementation(libs.retrofit.converter.kotlinxSerialization)
-    implementation(libs.okhttp)
     implementation(platform(libs.okhttp.bom))
-    implementation(libs.okhttp.loggingInterceptor)
-    implementation(libs.kotlinx.serialization.core)
-    implementation(libs.kotlinx.serialization.json)
-    implementation(libs.retrofit.converter.sclars)
-
-    // Log
-    implementation(libs.timber)
-    // DataStore
-    implementation(libs.datastore.preferences)
-    implementation(libs.androidx.datastore.preferences.core)
 }

@@ -52,24 +52,8 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
-    // Navigation
-    implementation(libs.navigation.ui.ktx)
-    implementation(libs.navigation.fragment.ktx)
-    // Datastore
-    implementation(libs.datastore.preferences)
-    // Lifecycle
-    implementation(libs.lifecycle.runtime.ktx)
-    implementation(libs.lifecycle.extensions)
-    // Logging
-    implementation(libs.timber)
-    // Media
-    implementation(libs.glide)
-    // Coroutine
-    implementation(libs.coroutines.android)
-    implementation(libs.coroutines.core)
-    // DI
-    implementation(libs.hilt.android)
+    implementation(libs.bundles.feature.default)
+
     kapt(libs.hilt.compiler)
     kapt(libs.androidx.hilt.compiler)
-    implementation(libs.androidx.hilt.navigation.fragment)
 }

@@ -75,6 +75,33 @@ retrofit-converter-kotlinxSerialization = { module = "com.squareup.retrofit2:con
 # Media
 glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
 
+[bundles]
+network-default = [
+    "hilt-android",
+    "timber",
+    "datastore-preferences",
+    "androidx-datastore-preferences-core",
+    "okhttp",
+    "okhttp-loggingInterceptor",
+    "retrofit",
+    "retrofit-converter-gson",
+    "retrofit-converter-kotlinxSerialization",
+    "retrofit-converter-sclars",
+    "kotlinx-serialization-core",
+    "kotlinx-serialization-json"
+]
+feature-default = [
+    "coroutines-android",
+    "coroutines-core",
+    "timber",
+    "hilt-android",
+    "glide",
+    "navigation-fragment-ktx",
+    "navigation-ui-ktx",
+    "androidx-hilt-navigation-fragment",
+    "lifecycle-extensions",
+    "lifecycle-runtime-ktx"
+]
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
