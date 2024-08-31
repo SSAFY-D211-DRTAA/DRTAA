@@ -35,7 +35,19 @@ gradlePlugin {
             id = "drtaa.plugin.hilt"
             implementationClass = "AndroidHiltConventionPlugin"
         }
-        register("AndroidFeatureConventionPlugin") {
+        register("AndroidCorePlugin") {
+            id = "drtaa.plugin.core"
+            implementationClass = "AndroidCoreConventionPlugin"
+        }
+        register("AndroidCommonPlugin") {
+            id = "drtaa.plugin.common"
+            implementationClass = "AndroidCommonConventionPlugin"
+        }
+        register("AndroidCoreNetworkPlugin") {
+            id = "drtaa.plugin.network"
+            implementationClass = "AndroidCoreNetworkConventionPlugin"
+        }
+        register("AndroidFeaturePlugin") {
             id = "drtaa.plugin.feature"
             implementationClass = "AndroidFeatureConventionPlugin"
         }

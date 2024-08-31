@@ -49,6 +49,4 @@ dependencies {
     implementation(project(":feature-map"))
     implementation(project(":feature-mypage"))
 
-    // DI
-    implementation(libs.androidx.hilt.navigation.fragment)
 }
