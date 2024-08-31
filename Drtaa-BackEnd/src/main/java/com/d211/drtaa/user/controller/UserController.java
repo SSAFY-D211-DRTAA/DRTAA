@@ -34,11 +34,11 @@ public class UserController {
 
     @PostMapping("/signup")
     @Operation(summary = "회원가입", description = "Form 회원가입")
-    public ResponseEntity<?> signUp(@RequestBody SignUpRequestDTO request) {
+    public ResponseEntity signUp(@RequestBody SignUpRequestDTO request) {
         try {
             userDetailsService.createUser(request);
 
-            // 회원가입 성공 응답 (200 OK)
+            // 200, 클라이언트 요청 성공
             return ResponseEntity.ok("회원가입 성공");
         } catch (DataIntegrityViolationException e) {
             // 409, 리소스 간의 충돌이 발생했을 때
@@ -54,7 +54,7 @@ public class UserController {
 
     @PostMapping("/login")
     @Operation(summary = "로그인", description = "Form 로그인")
-    public ResponseEntity<?> login(@RequestBody FormLoginRequestDTO request) {
+    public ResponseEntity login(@RequestBody FormLoginRequestDTO request) {
         try {
             JwtToken tokens = userService.login(request);
 
@@ -71,7 +71,7 @@ public class UserController {
 
     @GetMapping("/info")
     @Operation(summary = "회원 정보 조회", description = "액세스 토큰을 사용해 회원 정보 조회")
-    public ResponseEntity<?> info(Authentication authentication) {
+    public ResponseEntity info(Authentication authentication) {
         try {
             UserInfoResponseDTO response = userService.info(authentication.getName());
 
