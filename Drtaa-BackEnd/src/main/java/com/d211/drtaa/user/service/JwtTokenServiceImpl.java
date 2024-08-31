@@ -30,12 +30,13 @@ public class JwtTokenServiceImpl {
         // userName를 기반으로 Authentication 객체 생성
         Authentication authentication = authenticate(userName, password);
         // 인증 정보를 기반으로 JWT 토큰 생성
-        JwtToken jwtToken = jwtTokenProvider.generateToken(authentication);
+        JwtToken jwtToken = jwtTokenProvider.generateTokenForFormLogin(authentication);
         // 리프레시 토큰 저장
         saveRefreshToken(userName, jwtToken.getRefreshToken());
 
         return jwtToken;
     }
+
 
     // 사용자 정보 기반 인증
     private Authentication authenticate(String userName, String password) {
