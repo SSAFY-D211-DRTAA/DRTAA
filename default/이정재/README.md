@@ -48,4 +48,5 @@
 #### Day 0
 1. Docker Image 파일 생성
 
-2. 서브 프로젝트 2 1-3까지 진행 완료
+2. 서브 프로젝트 2 2-1까지 진행 완료
+![alt text](img/morai_mgeo.png)
