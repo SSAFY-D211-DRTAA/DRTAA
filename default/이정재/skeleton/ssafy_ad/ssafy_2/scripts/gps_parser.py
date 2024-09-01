@@ -6,7 +6,7 @@ import numpy as np
 import tf
 import os
 #TODO: (0) pyproj 라이브러리 Import [ pip install pyproj ]
-from pyproj import Proj
+from pyproj import CRS, Transformer
 from std_msgs.msg import Float32MultiArray
 from morai_msgs.msg import GPSMessage, EgoVehicleStatus
 
@@ -37,6 +37,11 @@ class LL2UTMConverter:
         self.proj_UTM = Proj( 좌표 변환을 위한 변수 입력 )
 
         '''
+        # UTM zone 52N에 대한 CRS 정의
+        self.crs_utm = CRS(proj='utm', zone=52, ellps='WGS84')
+
+        # 변환기 정의 (WGS84 지리 좌표계에서 UTM으로 변환)
+        self.transformer = Transformer.from_crs("EPSG:4326", self.crs_utm)
 
     #TODO: (2) 시뮬레이터에서 GPS 데이터를 받아오는 Callback 함수 생성
     def navsat_callback(self, gps_msg):
@@ -46,6 +51,9 @@ class LL2UTMConverter:
         self.lon = 
 
         '''
+        self.lat = gps_msg.latitude
+        self.lon = gps_msg.longitude
+
         self.convertLL2UTM()
 
         utm_msg = Float32MultiArray()
@@ -61,6 +69,12 @@ class LL2UTMConverter:
         print(' utm Y : ', utm 좌표로 변환한 y 좌표)
 
         '''
+        utm_msg.data = [self.x, self.y]
+        os.system('clear')
+        print(' lat : ', self.lat)
+        print(' lon : ', self.lon)
+        print(' utm X : ', self.x)
+        print(' utm Y : ', self.y)
 
 
     #TODO: (3) 위도 경도 데이터를 UTM 좌표로 변환
@@ -73,6 +87,10 @@ class LL2UTMConverter:
         self.y = xy_zone[1]
 
         '''
+        xy_zone = self.transformer.transform(self.lat, self.lon)
+
+        self.x = xy_zone[0]
+        self.y = xy_zone[1]
 
 if __name__ == '__main__':
 
