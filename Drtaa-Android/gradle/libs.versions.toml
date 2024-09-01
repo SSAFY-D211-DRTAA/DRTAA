@@ -1,6 +1,6 @@
 [versions]
 agp = "8.5.0"
-kotlin = "1.9.0"
+kotlin = "1.9.22"
 coreKtx = "1.13.1"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -31,8 +31,12 @@ hiltCompiler = "1.2.0"
 kotlinx-serialization = "1.6.2"
 okhttp = "4.12.0"
 retrofit = "2.11.0"
+jetbrainsKotlinJvm = "1.9.0"
 
 [libraries]
+android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
+kotlin-gradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -75,6 +79,33 @@ retrofit-converter-kotlinxSerialization = { module = "com.squareup.retrofit2:con
 # Media
 glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
 
+[bundles]
+network-default = [
+    "hilt-android",
+    "timber",
+    "datastore-preferences",
+    "androidx-datastore-preferences-core",
+    "okhttp",
+    "okhttp-loggingInterceptor",
+    "retrofit",
+    "retrofit-converter-gson",
+    "retrofit-converter-kotlinxSerialization",
+    "retrofit-converter-sclars",
+    "kotlinx-serialization-core",
+    "kotlinx-serialization-json"
+]
+feature-default = [
+    "coroutines-android",
+    "coroutines-core",
+    "timber",
+    "hilt-android",
+    "glide",
+    "navigation-fragment-ktx",
+    "navigation-ui-ktx",
+    "androidx-hilt-navigation-fragment",
+    "lifecycle-extensions",
+    "lifecycle-runtime-ktx"
+]
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -84,3 +115,4 @@ kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 hilt-gradle-plugin = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 navigation-safe-args = { id = "androidx.navigation.safeargs.kotlin", version.ref = "navigation" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }

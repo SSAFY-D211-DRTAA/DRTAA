@@ -1,9 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
-
-    alias(libs.plugins.hilt.gradle.plugin)
-    alias(libs.plugins.kotlin.kapt)
+    id("drtaa.plugin.common")
+    id("drtaa.plugin.hilt")
 }
 
 android {
@@ -52,27 +51,12 @@ dependencies {
     implementation(project(":feature-map"))
     implementation(project(":feature-mypage"))
 
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.material)
-    implementation(libs.androidx.activity)
-    implementation(libs.androidx.constraintlayout)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-
     // Datastore
     implementation(libs.datastore.preferences)
     // Lifecycle
     implementation(libs.lifecycle.runtime.ktx)
     implementation(libs.lifecycle.extensions)
-    // Logging
-    implementation(libs.timber)
     // Coroutine
     implementation(libs.coroutines.android)
     implementation(libs.coroutines.core)
-    // DI
-    implementation(libs.hilt.android)
-    kapt(libs.hilt.compiler)
-    kapt(libs.androidx.hilt.compiler)
 }
