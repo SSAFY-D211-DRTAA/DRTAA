@@ -5,7 +5,7 @@ import com.d211.drtaa.user.dto.request.FormLoginRequestDTO;
 import com.d211.drtaa.user.dto.response.UserInfoResponseDTO;
 import com.d211.drtaa.user.entity.User;
 import com.d211.drtaa.user.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -13,16 +13,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService{
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-    @Autowired
-    private JwtTokenServiceImpl jwtTokenService;
-    @Autowired
-    private CustomUserDetailsServiceImpl userDetailsService;
-    @Autowired
-    private UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtTokenService jwtTokenService;
+    private final CustomUserDetailsService userDetailsService;
+    private final UserRepository userRepository;
 
     @Override
     public JwtToken login(FormLoginRequestDTO request) {

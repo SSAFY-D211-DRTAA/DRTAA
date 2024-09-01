@@ -6,13 +6,11 @@ import com.d211.drtaa.exception.user.UserCreationException;
 import com.d211.drtaa.user.dto.request.FormLoginRequestDTO;
 import com.d211.drtaa.user.dto.request.SignUpRequestDTO;
 import com.d211.drtaa.user.dto.response.UserInfoResponseDTO;
-import com.d211.drtaa.user.service.CustomUserDetailsServiceImpl;
+import com.d211.drtaa.user.service.CustomUserDetailsService;
 import com.d211.drtaa.user.service.UserService;
-import com.d211.drtaa.user.service.UserServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,9 +26,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "회원 컨트롤러", description = "회원관련 기능 수행")
 public class UserController {
 
-    private final CustomUserDetailsServiceImpl userDetailsService;
-    @Autowired
-    private UserService userService;
+    private final CustomUserDetailsService userDetailsService;
+    private final UserService userService;
 
     @PostMapping("/signup")
     @Operation(summary = "회원가입", description = "Form 회원가입")

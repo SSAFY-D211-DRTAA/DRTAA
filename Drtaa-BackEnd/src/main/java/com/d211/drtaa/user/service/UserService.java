@@ -13,5 +13,4 @@ public interface UserService {
 
     // userEmail을 사용해 회원 삭제
     void delete(String userEmail);
-
 }

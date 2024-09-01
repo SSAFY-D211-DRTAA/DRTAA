@@ -1,4 +1,4 @@
-package com.d211.drtaa.exception.oauth;
+package com.d211.drtaa.exception.oauth2;
 
 import org.springframework.security.core.AuthenticationException;
 

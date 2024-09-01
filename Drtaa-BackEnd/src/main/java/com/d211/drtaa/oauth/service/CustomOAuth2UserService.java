@@ -1,6 +1,6 @@
 package com.d211.drtaa.oauth.service;
 
-import com.d211.drtaa.exception.oauth.OAuth2AuthenticationProcessingException;
+import com.d211.drtaa.exception.oauth2.OAuth2AuthenticationProcessingException;
 import com.d211.drtaa.oauth.repository.OAuth2UserInfo;
 import com.d211.drtaa.oauth.repository.OAuth2UserInfoFactory;
 import lombok.RequiredArgsConstructor;

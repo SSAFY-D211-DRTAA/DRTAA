@@ -4,6 +4,7 @@ import com.d211.drtaa.exception.user.UserCreationException;
 import com.d211.drtaa.user.dto.request.SignUpRequestDTO;
 import com.d211.drtaa.user.entity.User;
 import com.d211.drtaa.user.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -20,14 +21,11 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class CustomUserDetailsServiceImpl implements UserDetailsManager {
-
-    @Autowired
-    private final UserRepository userRepository;
+public class CustomUserDetailsServiceImpl implements CustomUserDetailsService {
 
     @Lazy
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
 
     @Override
     public UserDetails loadUserByUsername(String userEmail) throws UsernameNotFoundException {
@@ -37,7 +35,8 @@ public class CustomUserDetailsServiceImpl implements UserDetailsManager {
                 .orElseThrow(() -> new UsernameNotFoundException("해당 회원을 찾을 수 없습니다."));
     }
 
-    private UserDetails createUserDetails(User user) {
+    @Transactional
+    public UserDetails createUserDetails(User user) {
         // UserDetails객체 생성
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getUserEmail())
@@ -47,6 +46,7 @@ public class CustomUserDetailsServiceImpl implements UserDetailsManager {
     }
 
     @Override
+    @Transactional
     public void createUser(UserDetails user) {
         try {
             // 사용자가 이미 존재하는 경우
@@ -63,6 +63,7 @@ public class CustomUserDetailsServiceImpl implements UserDetailsManager {
         }
     }
 
+    @Transactional
     public void createUser(SignUpRequestDTO request) {
         User member = User.builder()
                 .userEmail(request.getUserEmail())
@@ -77,11 +78,13 @@ public class CustomUserDetailsServiceImpl implements UserDetailsManager {
     }
 
     @Override
-    public void deleteUser(String username) {
-        userRepository.deleteByUserEmail(username);
+    @Transactional
+    public void deleteUser(String userName) {
+        userRepository.deleteByUserEmail(userName);
     }
 
     @Override
+    @Transactional
     public void updateUser(UserDetails user) {
         userRepository.findByUserEmail(user.getUsername())
                 .ifPresent(existingUser  -> {
@@ -94,6 +97,7 @@ public class CustomUserDetailsServiceImpl implements UserDetailsManager {
     }
 
     @Override
+    @Transactional
     public void changePassword(String oldPassword, String newPassword) {
         // 현재 인증된 사용자의 비밀번호를 변경
         Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
@@ -114,9 +118,9 @@ public class CustomUserDetailsServiceImpl implements UserDetailsManager {
     }
 
     @Override
-    public boolean userExists(String username) {
+    public boolean userExists(String userName) {
         // 회원 존재 여부 확인
-        return userRepository.existsByUserEmail(username);
+        return userRepository.existsByUserEmail(userName);
     }
 }
 

@@ -1,4 +1,4 @@
-package com.d211.drtaa.config.resttemplate;
+package com.d211.drtaa.config.restTemplate;
 
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;

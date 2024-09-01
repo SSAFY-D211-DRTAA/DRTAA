@@ -17,14 +17,13 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class JwtTokenServiceImpl {
+public class JwtTokenTokenServiceImpl implements JwtTokenService {
 
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
-    
     private final UserRepository userRepository;
 
-    // AccessToken, RefreshToken 발급
+    @Override
     @Transactional
     public JwtToken generateToken(String userName, String password) {
         // userName를 기반으로 Authentication 객체 생성
@@ -37,9 +36,8 @@ public class JwtTokenServiceImpl {
         return jwtToken;
     }
 
-
-    // 사용자 정보 기반 인증
-    private Authentication authenticate(String userName, String password) {
+    @Override
+    public Authentication authenticate(String userName, String password) {
         try {
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userName, password);
             return authenticationManager.authenticate(authenticationToken);
@@ -49,6 +47,7 @@ public class JwtTokenServiceImpl {
         }
     }
 
+    @Override
     @Transactional
     public void saveRefreshToken(String userName, String newRefreshToken) {
         User user = userRepository.findByUserEmail(userName)
@@ -61,7 +60,7 @@ public class JwtTokenServiceImpl {
         userRepository.save(user);
     }
 
-    // refreshToken 조회
+    @Override
     public String getRefreshToken(String userName) {
         return userRepository.findUserRefreshTokenByUserEmail(userName)
                 .orElseThrow(() -> new EntityNotFoundException("해당 refreshToken으로 사용자를 찾을 수 없습니다."));

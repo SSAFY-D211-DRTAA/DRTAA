@@ -6,12 +6,10 @@ import com.d211.drtaa.oauth.repository.HttpCookieOAuth2AuthorizationRequestRepos
 import com.d211.drtaa.oauth.repository.OAuth2Provider;
 import com.d211.drtaa.oauth.repository.OAuth2UserUnlinkManager;
 import com.d211.drtaa.oauth.service.OAuth2UserPrincipal;
-import com.d211.drtaa.oauth.util.CookieUtils;
 import com.d211.drtaa.user.entity.User;
 import com.d211.drtaa.user.repository.UserRepository;
-import com.d211.drtaa.user.service.CustomUserDetailsServiceImpl;
+import com.d211.drtaa.user.service.CustomUserDetailsService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -27,15 +25,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Optional;
-
-import static com.d211.drtaa.oauth.repository.HttpCookieOAuth2AuthorizationRequestRepository.MODE_PARAM_COOKIE_NAME;
-import static com.d211.drtaa.oauth.repository.HttpCookieOAuth2AuthorizationRequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
 
 @Component
 @RequiredArgsConstructor
@@ -44,7 +37,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
     private final OAuth2UserUnlinkManager oAuth2UserUnlinkManager;
     private final JwtTokenProvider tokenProvider;
-    private final CustomUserDetailsServiceImpl customUserDetailsService;
+    private final CustomUserDetailsService customUserDetailsService;
 
     private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
     private final UserRepository userRepository;
