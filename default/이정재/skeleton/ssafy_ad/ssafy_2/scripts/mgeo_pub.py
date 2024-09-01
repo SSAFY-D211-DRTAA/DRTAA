@@ -70,7 +70,8 @@ class get_mgeo :
             self.node_pub.
             
             '''
-                
+            self.link_pub.publish(self.link_msg)
+            self.node_pub.publish(self.node_msg)
             rate.sleep()
 
 
@@ -88,6 +89,13 @@ class get_mgeo :
 
         
         '''
+        for link_idx in self.links:
+            for point in self.links[link_idx].points:
+                p = Point32()
+                p.x = point[0]
+                p.y = point[1]
+                p.z = point[2]
+                all_link.points.append(p)
 
         return all_link
     
@@ -103,6 +111,13 @@ class get_mgeo :
         for node_idx in self.nodes :
 
         '''
+        for node_idx in self.nodes :
+            tmp = self.nodes[node_idx].point
+            p = Point32()
+            p.x = tmp[0]
+            p.y = tmp[1]
+            p.z = tmp[2]
+            all_node.points.append(p)
 
         return all_node
 
