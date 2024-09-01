@@ -1,9 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
-    alias(libs.plugins.hilt.gradle.plugin)
-    alias(libs.plugins.kotlin.kapt)
-    alias(libs.plugins.navigation.safe.args)
+    id("drtaa.plugin.feature")
 }
 
 android {
@@ -40,20 +38,5 @@ android {
 }
 
 dependencies {
-// modules
-    implementation(project(":core-data"))
-    implementation(project(":core-ui"))
-    implementation(project(":core-model"))
 
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.material)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-
-    implementation(libs.bundles.feature.default)
-
-    kapt(libs.hilt.compiler)
-    kapt(libs.androidx.hilt.compiler)
 }

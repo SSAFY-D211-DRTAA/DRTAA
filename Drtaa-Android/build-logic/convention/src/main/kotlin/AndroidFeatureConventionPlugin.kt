@@ -10,7 +10,7 @@ internal class AndroidFeatureConventionPlugin : Plugin<Project> {
             with(pluginManager) {
                 apply("drtaa.plugin.common")
                 apply("drtaa.plugin.hilt")
-                apply("androidx.navigation.safeargs.kotlin")
+                apply(libs.findPlugin("navigation.safe.args").get().get().pluginId)
             }
 
             dependencies {
