@@ -1,6 +1,5 @@
 package com.drtaa.core_data.util
 
-import com.example.doteacher.ui.util.server.ResultWrapper
 import com.google.gson.JsonSyntaxException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers

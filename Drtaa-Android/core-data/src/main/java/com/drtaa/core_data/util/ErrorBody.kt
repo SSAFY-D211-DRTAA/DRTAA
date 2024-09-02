@@ -1,4 +1,4 @@
-package com.example.doteacher.ui.util.server
+package com.drtaa.core_data.util
 
 data class ErrorBody(
     val data: Data,
