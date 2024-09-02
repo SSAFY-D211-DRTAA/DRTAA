@@ -29,7 +29,7 @@ public class JwtTokenTokenServiceImpl implements JwtTokenService {
         // userName를 기반으로 Authentication 객체 생성
         Authentication authentication = authenticate(userName, password);
         // 인증 정보를 기반으로 JWT 토큰 생성
-        JwtToken jwtToken = jwtTokenProvider.generateTokenForFormLogin(authentication);
+        JwtToken jwtToken = jwtTokenProvider.generateToken(authentication);
         // 리프레시 토큰 저장
         saveRefreshToken(userName, jwtToken.getRefreshToken());
 

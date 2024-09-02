@@ -35,7 +35,7 @@ public class JwtTokenProvider {
     }
 
     // AccessToken, RefreshToken 생성 메소드 - 폼 로그인
-    public JwtToken generateTokenForFormLogin(Authentication authentication) {
+    public JwtToken generateToken(Authentication authentication) {
         // 권한 가져오기
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -53,37 +53,6 @@ public class JwtTokenProvider {
                 .compact();
 
         // RefreshToken 생성
-        String refreshToken = Jwts.builder()
-                .setExpiration(new Date(now + refreshTokenExpireTime))
-                .signWith(key, SignatureAlgorithm.HS256)
-                .compact();
-
-        return JwtToken.builder()
-                .grantType("Bearer")
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build();
-    }
-
-    // AccessToken, RefreshToken 생성 메소드 - 소셜 로그인
-    public JwtToken generateTokenForSocialLogin(String email, Collection<? extends GrantedAuthority> authorities) {
-        long now = (new Date()).getTime();
-
-        // 권한 정보 문자열로 변환
-        String authoritiesString = authorities.stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(","));
-
-        // Access Token 생성
-        Date accessTokenExpiresIn = new Date(now + accessTokenExpireTime);
-        String accessToken = Jwts.builder()
-                .setSubject(email)
-                .claim("auth", authoritiesString)
-                .setExpiration(accessTokenExpiresIn)
-                .signWith(key, SignatureAlgorithm.HS256)
-                .compact();
-
-        // Refresh Token 생성
         String refreshToken = Jwts.builder()
                 .setExpiration(new Date(now + refreshTokenExpireTime))
                 .signWith(key, SignatureAlgorithm.HS256)
