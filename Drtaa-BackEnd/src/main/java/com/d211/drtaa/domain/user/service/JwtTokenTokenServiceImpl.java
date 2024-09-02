@@ -50,7 +50,7 @@ public class JwtTokenTokenServiceImpl implements JwtTokenService {
     @Override
     @Transactional
     public void saveRefreshToken(String userName, String newRefreshToken) {
-        User user = userRepository.findByUserEmail(userName)
+        User user = userRepository.findByUserProviderId(userName)
                 .orElseThrow(() -> new EntityNotFoundException("해당 userName으로 사용자를 찾을 수 없습니다."));
 
         // 기존 객체의 리프레시 토큰만 업데이트

@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
 
 @Data
 @AllArgsConstructor
@@ -16,6 +15,8 @@ public class UserInfoResponseDTO {
     private String userEmail;
     @Schema(description = "회원 닉네임", example = "TEST")
     private String userNickname;
+    @Schema(description = "회원 로그인처", example = "Form")
+    private String userLogin;
     @Schema(description = "회원 관리자 유무", example = "false")
     private boolean userIsAdmin;
 }
