@@ -1,0 +1,54 @@
+digraph {
+  graph [label="DRTAA\n ",labelloc=t,fontsize=30,ranksep=1.4];
+  node [style=filled, fillcolor="#bbbbbb"];
+  rankdir=TB;
+
+  # Projects
+
+  ":app" [shape=box, fillcolor="#baffc9"];
+  ":core-data" [fillcolor="#81D4FA"];
+  ":core-model" [fillcolor="#81D4FA"];
+  ":core-network" [fillcolor="#81D4FA"];
+  ":core-ui" [fillcolor="#81D4FA"];
+  ":feature-home" [fillcolor="#81D4FA"];
+  ":feature-main" [fillcolor="#81D4FA"];
+  ":feature-map" [fillcolor="#81D4FA"];
+  ":feature-mypage" [fillcolor="#81D4FA"];
+  ":feature-sign" [fillcolor="#81D4FA"];
+
+  {rank = same; ":app";}
+
+  # Dependencies
+
+  ":app" -> ":core-data" [style=dotted]
+  ":app" -> ":core-network" [style=dotted]
+  ":app" -> ":core-ui" [style=dotted]
+  ":app" -> ":core-model" [style=dotted]
+  ":app" -> ":feature-main" [style=dotted]
+  ":app" -> ":feature-map" [style=dotted]
+  ":app" -> ":feature-mypage" [style=dotted]
+  ":app" -> ":feature-home" [style=dotted]
+  ":app" -> ":feature-sign" [style=dotted]
+  ":feature-map" -> ":core-data" [style=dotted]
+  ":feature-map" -> ":core-ui" [style=dotted]
+  ":feature-map" -> ":core-model" [style=dotted]
+  ":feature-mypage" -> ":core-data" [style=dotted]
+  ":feature-mypage" -> ":core-ui" [style=dotted]
+  ":feature-mypage" -> ":core-model" [style=dotted]
+  ":feature-sign" -> ":core-data" [style=dotted]
+  ":feature-sign" -> ":core-ui" [style=dotted]
+  ":feature-sign" -> ":core-model" [style=dotted]
+  ":feature-sign" -> ":feature-main" [style=dotted]
+  ":core-network" -> ":core-model" [style=dotted]
+  ":core-data" -> ":core-model" [style=dotted]
+  ":core-data" -> ":core-network" [style=dotted]
+  ":feature-home" -> ":core-data" [style=dotted]
+  ":feature-home" -> ":core-ui" [style=dotted]
+  ":feature-home" -> ":core-model" [style=dotted]
+  ":feature-main" -> ":core-data" [style=dotted]
+  ":feature-main" -> ":core-ui" [style=dotted]
+  ":feature-main" -> ":core-model" [style=dotted]
+  ":feature-main" -> ":feature-map" [style=dotted]
+  ":feature-main" -> ":feature-mypage" [style=dotted]
+  ":feature-main" -> ":feature-home" [style=dotted]
+}
