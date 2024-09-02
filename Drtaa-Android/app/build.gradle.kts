@@ -50,6 +50,7 @@ dependencies {
     implementation(project(":feature-main"))
     implementation(project(":feature-map"))
     implementation(project(":feature-mypage"))
+    implementation(project(":feature-home"))
 
     // Datastore
     implementation(libs.datastore.preferences)

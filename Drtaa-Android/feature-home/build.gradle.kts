@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.drtaa.feature_main"
+    namespace = "com.drtaa.feature_home"
     compileSdk = 34
 
     defaultConfig {
@@ -31,23 +31,14 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+
     buildFeatures{
         dataBinding = true
         buildConfig = true
     }
-    sourceSets {
-        getByName("main") {
-            res {
-                srcDirs("src\\main\\res", "src\\main\\res")
-            }
-        }
-    }
+
 }
 
 dependencies {
-    // modules
-    implementation(project(":feature-map"))
-    implementation(project(":feature-mypage"))
-    implementation(project(":feature-home"))
 
 }
