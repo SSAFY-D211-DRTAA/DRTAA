@@ -8,11 +8,11 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
     // find
     Optional<User> findByUserProviderId(String userProviderId);
-    Optional<String> findUserRefreshTokenByUserEmail(String userEmail);
+    Optional<String> findUserRefreshTokenByUserProviderId(String userProviderId);
 
     // exists
-    boolean existsByUserEmail(String userEmail);
+    boolean existsByUserProviderId(String userProviderId);
 
     // delete
-    boolean deleteByUserEmail(String userEmail);
+    boolean deleteByUserProviderId(String userProviderId);
 }

@@ -62,7 +62,7 @@ public class JwtTokenTokenServiceImpl implements JwtTokenService {
 
     @Override
     public String getRefreshToken(String userName) {
-        return userRepository.findUserRefreshTokenByUserEmail(userName)
+        return userRepository.findUserRefreshTokenByUserProviderId(userName)
                 .orElseThrow(() -> new EntityNotFoundException("해당 refreshToken으로 사용자를 찾을 수 없습니다."));
     }
 }

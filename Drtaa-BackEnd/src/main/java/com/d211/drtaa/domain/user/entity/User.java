@@ -29,10 +29,6 @@ public class User implements UserDetails {
     @Schema(description = "회원 고유 번호", example = "1")
     private String userProviderId;
 
-    @Column(name = "user_email", nullable = false)
-    @Schema(description = "회원 ID", example = "test@naver.com")
-    private String userEmail;
-
     @Column(name = "user_password", nullable = false)
     @Schema(description = "회원 PW", example = "암호화된 내용")
     private String userPassword;
@@ -40,6 +36,10 @@ public class User implements UserDetails {
     @Column(name = "user_nickname", nullable = false)
     @Schema(description = "회원 닉네임", example = "TEST")
     private String userNickname;
+
+    @Column(name = "user_profile_img")
+    @Schema(description = "회원 프로필 사진", example = "multipart 이미지")
+    private String userProfileImg;
 
     @Column(name = "user_refreshtoken", nullable = false)
     @Schema(description = "회원 refreshToken", example = "ex7534487435468~~")
@@ -66,7 +66,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return userEmail;
+        return userProviderId;
     }
 
     @Override

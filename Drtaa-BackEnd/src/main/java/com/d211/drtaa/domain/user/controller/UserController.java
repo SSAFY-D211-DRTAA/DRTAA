@@ -17,6 +17,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/user")
@@ -30,9 +31,11 @@ public class UserController {
 
     @PostMapping("/signup/form")
     @Operation(summary = "회원가입", description = "Form 회원가입")
-    public ResponseEntity signUp(@RequestBody FormSignUpRequestDTO request) {
+    public ResponseEntity signUp
+            (@RequestPart(value="FormSignUpRequestDTO") FormSignUpRequestDTO request,
+             @RequestPart(value="image") MultipartFile image) {
         try {
-            userDetailsService.createUser(request);
+            userDetailsService.createUser(request, image);
 
             // 200, 클라이언트 요청 성공
             return ResponseEntity.ok("회원가입 성공");
@@ -48,25 +51,25 @@ public class UserController {
         }
     }
 
-    @PostMapping("/signup/social")
-    @Operation(summary = "회원가입", description = "Form 회원가입")
-    public ResponseEntity signUp(@RequestBody SocialSignUpRequestDTO request) {
-        try {
-            userDetailsService.createUser(request);
-
-            // 200, 클라이언트 요청 성공
-            return ResponseEntity.ok("회원가입 성공");
-        } catch (DataIntegrityViolationException e) {
-            // 409, 리소스 간의 충돌이 발생했을 때
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-        } catch (UserCreationException e) {
-            // 400, 잘못된 요청에 대한 예외 처리
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (Exception e) {
-            // 500, 서버 오류가 발생했을 때
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
-    }
+//    @PostMapping("/signup/social")
+//    @Operation(summary = "회원가입", description = "Form 회원가입")
+//    public ResponseEntity signUp(@RequestBody SocialSignUpRequestDTO request) {
+//        try {
+//            userDetailsService.createUser(request);
+//
+//            // 200, 클라이언트 요청 성공
+//            return ResponseEntity.ok("회원가입 성공");
+//        } catch (DataIntegrityViolationException e) {
+//            // 409, 리소스 간의 충돌이 발생했을 때
+//            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+//        } catch (UserCreationException e) {
+//            // 400, 잘못된 요청에 대한 예외 처리
+//            return ResponseEntity.badRequest().body(e.getMessage());
+//        } catch (Exception e) {
+//            // 500, 서버 오류가 발생했을 때
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+//        }
+//    }
 
     @PostMapping("/login/form")
     @Operation(summary = "로그인", description = "Form 로그인")
@@ -89,16 +92,11 @@ public class UserController {
     @Operation(summary = "로그인", description = "Social 로그인")
     public ResponseEntity login(@RequestBody SocialLoginRequestDTO request) {
         try {
-            //
-            if(userDetailsService.userExists(request.getUserProviderId())) {
-                JwtToken tokens = userService.SocialLogin(request);
+            
+            JwtToken tokens = userService.SocialLogin(request);
 
-                // 200, 클라이언트 요청 성공
-                return ResponseEntity.ok(tokens);
-            } else {
-                // 404, 클라이언트 요청 탐색 실패
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("회원가입 필요");
-            }
+            // 200, 클라이언트 요청 성공
+            return ResponseEntity.ok(tokens);
 
         } catch (Exception e) {
             // 400, 잘못된 요청
@@ -115,11 +113,71 @@ public class UserController {
             // 200, 클라이언트 요청 성공
             return ResponseEntity.ok(response);
         } catch (UsernameNotFoundException e) {
-            // 404, 클라이언트 요청 탐색 실패
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            // 401, 클라이언트 인증 실패
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         } catch (Exception e) {
             // 400, 잘못된 요청
             return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/img")
+    @Operation(summary = "회원 이미지 수정", description = "마이 페이지에서 회원 이미지 수정")
+    public ResponseEntity updateImg
+            (Authentication authentication, @RequestPart(value = "image") MultipartFile image) {
+        try {
+            userService.updateImg(authentication.getName(), image);
+
+            return ResponseEntity.ok("이미지 수정 성공");
+        } catch (UsernameNotFoundException e) {
+            // 401, 클라이언트 인증 실패
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        } catch (DataIntegrityViolationException e) {
+            // 409, 리소스 간의 충돌이 발생했을 때
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        } catch (Exception e) {
+            // 500, 서버 오류가 발생했을 때
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/img")
+    @Operation(summary = "회원 이미지 삭제", description = "마이 페이지에서 회원 이미지 삭제")
+    public ResponseEntity deleteImg
+            (Authentication authentication) {
+        try {
+            userService.deleteImg(authentication.getName());
+
+            return ResponseEntity.ok("이미지 삭제 성공");
+        } catch (UsernameNotFoundException e) {
+            // 401, 클라이언트 인증 실패
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        } catch (DataIntegrityViolationException e) {
+            // 409, 리소스 간의 충돌이 발생했을 때
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        } catch (Exception e) {
+            // 500, 서버 오류가 발생했을 때
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/nickname")
+    @Operation(summary = "회원 닉네임 수정", description = "마이 페이지에서 회원 닉네임 수정")
+    public ResponseEntity updateNickname
+            (Authentication authentication, @RequestBody String nickname) {
+        try {
+            userService.updateNickname(authentication.getName(), nickname);
+
+            return ResponseEntity.ok("닉네임 수정 성공");
+        } catch (UsernameNotFoundException e) {
+            // 401, 클라이언트 인증 실패
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        } catch (DataIntegrityViolationException e) {
+            // 409, 리소스 간의 충돌이 발생했을 때
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        } catch (Exception e) {
+            // 500, 서버 오류가 발생했을 때
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 }
