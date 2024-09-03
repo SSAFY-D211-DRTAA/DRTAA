@@ -42,21 +42,6 @@ dependencies {
     implementation(project(":feature-main"))
 
     //Sign
-    implementation("com.navercorp.nid:oauth:5.10.0")
+    implementation(libs.naver.oauth)
 
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.6.21")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
-    implementation("androidx.appcompat:appcompat:1.3.1")
-    implementation("androidx.legacy:legacy-support-core-utils:1.0.0")
-    implementation("androidx.browser:browser:1.4.0")
-    implementation("androidx.constraintlayout:constraintlayout:1.1.3")
-    implementation("androidx.security:security-crypto:1.1.0-alpha06")
-    implementation("androidx.core:core-ktx:1.3.0")
-    implementation("androidx.fragment:fragment-ktx:1.3.6")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0")
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation("com.squareup.moshi:moshi-kotlin:1.11.0")
-    implementation("com.squareup.okhttp3:logging-interceptor:4.2.1")
-    implementation("com.airbnb.android:lottie:3.1.0")
 }

@@ -8,15 +8,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class SignActivity : BaseActivity<ActivitySignBinding>(R.layout.activity_sign) {
     override fun init() {
-        initNaverSign()
+
     }
 
-    private fun initNaverSign(){
-        NaverIdLoginSDK.initialize(
-            this,
-            "",
-            "",
-            "사용자",
-        )
-    }
 }

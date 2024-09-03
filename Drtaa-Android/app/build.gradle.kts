@@ -1,8 +1,15 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    id("drtaa.plugin.network")
     id("drtaa.plugin.common")
     id("drtaa.plugin.hilt")
+}
+
+fun getApiKey(propertyKey: String): String {
+    return gradleLocalProperties(rootDir, providers).getProperty(propertyKey)
 }
 
 android {
@@ -15,6 +22,11 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
+
+        buildConfigField("String", "NAVER_MAP_CLIENT_ID", getApiKey("NAVER_MAP_CLIENT_ID"))
+        buildConfigField("String", "NAVER_MAP_CLIENT_SECRET", getApiKey("NAVER_MAP_CLIENT_SECRET"))
+        buildConfigField("String", "NAVER_LOGIN_CLIENT_ID", getApiKey("NAVER_LOGIN_CLIENT_ID"))
+        buildConfigField("String", "NAVER_LOGIN_CLIENT_SECRET", getApiKey("NAVER_LOGIN_CLIENT_SECRET"))
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -61,4 +73,6 @@ dependencies {
     // Coroutine
     implementation(libs.coroutines.android)
     implementation(libs.coroutines.core)
+    //Sign
+    implementation(libs.naver.oauth)
 }
