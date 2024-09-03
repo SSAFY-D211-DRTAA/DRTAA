@@ -25,6 +25,10 @@ public class User implements UserDetails {
     @Schema(description = "회원 고유 번호", example = "1")
     private long userId;
 
+    @Column(name = "user_provider_id", nullable = false)
+    @Schema(description = "회원 고유 번호", example = "1")
+    private String userProviderId;
+
     @Column(name = "user_email", nullable = false)
     @Schema(description = "회원 ID", example = "test@naver.com")
     private String userEmail;
@@ -41,9 +45,9 @@ public class User implements UserDetails {
     @Schema(description = "회원 refreshToken", example = "ex7534487435468~~")
     private String userRefreshToken;
 
-    @Column(name = "user_is_social", nullable = false)
-    @Schema(description = "회원 소셜 로그인 유무", example = "false")
-    private boolean userIsSocial;
+    @Column(name = "user_login", nullable = false)
+    @Schema(description = "회원 로그인처", example = "Form")
+    private String userLogin;
 
     @Column(name = "user_is_admin", nullable = false)
     @Schema(description = "회원 관리자 유무", example = "false")

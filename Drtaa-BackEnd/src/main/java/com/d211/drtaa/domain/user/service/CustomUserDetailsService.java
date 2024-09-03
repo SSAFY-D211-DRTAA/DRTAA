@@ -1,6 +1,8 @@
 package com.d211.drtaa.domain.user.service;
 
+import com.d211.drtaa.domain.user.dto.request.FormSignUpRequestDTO;
 import com.d211.drtaa.domain.user.dto.request.SignUpRequestDTO;
+import com.d211.drtaa.domain.user.dto.request.SocialSignUpRequestDTO;
 import com.d211.drtaa.domain.user.entity.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -13,7 +15,8 @@ public interface CustomUserDetailsService extends UserDetailsManager {
     // 회원 생성
     UserDetails createUserDetails(User user);
     void createUser(UserDetails user);
-    void createUser(SignUpRequestDTO request);
+    void createUser(FormSignUpRequestDTO request); // 폼 로그인
+    void createUser(SocialSignUpRequestDTO request); // 소셜 로그인
 
     // 회원 삭제
     void deleteUser(String userName);

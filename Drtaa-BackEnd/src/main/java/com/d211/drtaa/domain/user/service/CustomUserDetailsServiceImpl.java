@@ -1,6 +1,8 @@
 package com.d211.drtaa.domain.user.service;
 
+import com.d211.drtaa.domain.user.dto.request.FormSignUpRequestDTO;
 import com.d211.drtaa.domain.user.dto.request.SignUpRequestDTO;
+import com.d211.drtaa.domain.user.dto.request.SocialSignUpRequestDTO;
 import com.d211.drtaa.domain.user.entity.User;
 import com.d211.drtaa.domain.user.repository.UserRepository;
 import com.d211.drtaa.global.exception.user.UserCreationException;
@@ -26,9 +28,9 @@ public class CustomUserDetailsServiceImpl implements CustomUserDetailsService {
     private final UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String userEmail) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String userProviderId) throws UsernameNotFoundException {
         // userEmail으로 사용자를 찾아 UserDetails객체를 반환
-        return userRepository.findByUserEmail(userEmail)
+        return userRepository.findByUserProviderId(userProviderId)
                 .map(this::createUserDetails)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 회원을 찾을 수 없습니다."));
     }
@@ -37,7 +39,7 @@ public class CustomUserDetailsServiceImpl implements CustomUserDetailsService {
     public UserDetails createUserDetails(User user) {
         // UserDetails객체 생성
         return org.springframework.security.core.userdetails.User.builder()
-                .username(user.getUserEmail())
+                .username(user.getUserProviderId())
                 .password(user.getUserPassword())
                 .roles(user.isUserIsAdmin() ? "ADMIN" : "USER")
                 .build();
@@ -62,17 +64,33 @@ public class CustomUserDetailsServiceImpl implements CustomUserDetailsService {
     }
 
     @Transactional
-    public void createUser(SignUpRequestDTO request) {
-        User member = User.builder()
-                .userEmail(request.getUserEmail())
+    public void createUser(FormSignUpRequestDTO request) {
+        User user = User.builder()
+                .userProviderId(request.getUserProviderId())
+                .userEmail(request.getUserProviderId())
                 .userPassword(passwordEncoder.encode(request.getUserPassword()))
                 .userNickname(request.getUserNickname())
                 .userRefreshToken("")
-                .userIsSocial(request.isUserIsSocial())
+                .userLogin("Form")
                 .userIsAdmin(request.isUserIsAdmin())
                 .build();
 
-        createUser(member); // 기존 createUser(UserDetails user) 호출
+        createUser(user); // 기존 createUser(UserDetails user) 호출
+    }
+
+    @Transactional
+    public void createUser(SocialSignUpRequestDTO request) {
+        User user = User.builder()
+                .userProviderId(request.getUserProviderId())
+                .userEmail(request.getUserProviderId())
+                .userPassword(passwordEncoder.encode(""))
+                .userNickname(request.getUserNickname())
+                .userRefreshToken("")
+                .userLogin(request.getUserLogin())
+                .userIsAdmin(request.isUserIsAdmin())
+                .build();
+
+        createUser(user); // 기존 createUser(UserDetails user) 호출
     }
 
     @Override
@@ -84,7 +102,7 @@ public class CustomUserDetailsServiceImpl implements CustomUserDetailsService {
     @Override
     @Transactional
     public void updateUser(UserDetails user) {
-        userRepository.findByUserEmail(user.getUsername())
+        userRepository.findByUserProviderId(user.getUsername())
                 .ifPresent(existingUser  -> {
                     existingUser .setUserPassword(passwordEncoder.encode(user.getPassword()));
                     existingUser .setUserIsAdmin(user.getAuthorities().stream()
@@ -104,7 +122,7 @@ public class CustomUserDetailsServiceImpl implements CustomUserDetailsService {
 
         String username = currentUser.getName();
 
-        userRepository.findByUserEmail(username)
+        userRepository.findByUserProviderId(username)
                 .ifPresent(user -> {
                     if (passwordEncoder.matches(oldPassword, user.getUserPassword())) {
                         user.setUserPassword(passwordEncoder.encode(newPassword));
