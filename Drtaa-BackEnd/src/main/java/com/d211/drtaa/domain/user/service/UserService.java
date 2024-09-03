@@ -20,10 +20,10 @@ public interface UserService {
     void delete(String userEmail);
 
     // 회원 기존 프로필 이미지(userProfileImg)를 image로 변경
-    void updateImg(String userName, MultipartFile image);
+    void updateImg(String userName, MultipartFile image) throws Exception;
 
     // 회원 기존 프로필 이미지(userProfileImg)를 삭제
-    void deleteImg(String userName);
+    void deleteImg(String userName) throws Exception;
 
     // 회원 기존 닉네임을 nickName으로 변경
     void updateNickname(String userName, String nickName);

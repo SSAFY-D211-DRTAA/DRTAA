@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -29,13 +30,13 @@ public class UserController {
     private final CustomUserDetailsService userDetailsService;
     private final UserService userService;
 
-    @PostMapping("/signup/form")
+    @PostMapping(value = "/signup", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "회원가입", description = "Form 회원가입")
-    public ResponseEntity signUp
-            (@RequestPart(value="FormSignUpRequestDTO") FormSignUpRequestDTO request,
-             @RequestPart(value="image") MultipartFile image) {
+    public ResponseEntity signUp(
+            @RequestPart("formSignUpRequestDTO") FormSignUpRequestDTO formSignUpRequestDTO,
+            @RequestPart("image") MultipartFile image) {
         try {
-            userDetailsService.createUser(request, image);
+            userDetailsService.createUser(formSignUpRequestDTO, image);
 
             // 200, 클라이언트 요청 성공
             return ResponseEntity.ok("회원가입 성공");
@@ -50,26 +51,6 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
-
-//    @PostMapping("/signup/social")
-//    @Operation(summary = "회원가입", description = "Form 회원가입")
-//    public ResponseEntity signUp(@RequestBody SocialSignUpRequestDTO request) {
-//        try {
-//            userDetailsService.createUser(request);
-//
-//            // 200, 클라이언트 요청 성공
-//            return ResponseEntity.ok("회원가입 성공");
-//        } catch (DataIntegrityViolationException e) {
-//            // 409, 리소스 간의 충돌이 발생했을 때
-//            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-//        } catch (UserCreationException e) {
-//            // 400, 잘못된 요청에 대한 예외 처리
-//            return ResponseEntity.badRequest().body(e.getMessage());
-//        } catch (Exception e) {
-//            // 500, 서버 오류가 발생했을 때
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-//        }
-//    }
 
     @PostMapping("/login/form")
     @Operation(summary = "로그인", description = "Form 로그인")
@@ -97,7 +78,6 @@ public class UserController {
 
             // 200, 클라이언트 요청 성공
             return ResponseEntity.ok(tokens);
-
         } catch (Exception e) {
             // 400, 잘못된 요청
             return ResponseEntity.badRequest().body(e.getMessage());

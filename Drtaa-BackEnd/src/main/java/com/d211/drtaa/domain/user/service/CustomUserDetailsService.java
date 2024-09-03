@@ -8,6 +8,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 public interface CustomUserDetailsService extends UserDetailsManager {
     // 회원 정보 로딩
     UserDetails loadUserByUsername(String userEmail) throws UsernameNotFoundException;
@@ -15,7 +17,7 @@ public interface CustomUserDetailsService extends UserDetailsManager {
     // 회원 생성
     UserDetails createUserDetails(User user);
     void createUser(UserDetails user);
-    void createUser(FormSignUpRequestDTO request, MultipartFile image); // 폼 로그인
+    void createUser(FormSignUpRequestDTO request, MultipartFile image) throws IOException; // 폼 로그인
     void createUser(SocialSignUpRequestDTO request, String image); // 소셜 로그인
 
     // 회원 삭제
