@@ -59,9 +59,8 @@ class dijkstra_path_pub :
         self.global_path_pub = rospy.Publisher('/global_path',Path, queue_size = 1)
 
         #TODO: (1) Mgeo data 읽어온 후 데이터 확인
-        load_path = os.path.normpath(os.path.join(current_path, 'lib/mgeo_data/R_KR_PG_K-City'))
+        load_path = os.path.normpath(os.path.join(current_path, 'lib/mgeo_data/R_KR_PG_KIAPI'))
         mgeo_planner_map = MGeo.create_instance_from_json(load_path)
-
         node_set = mgeo_planner_map.node_set
         link_set = mgeo_planner_map.link_set
 
@@ -82,6 +81,8 @@ class dijkstra_path_pub :
         self.end_node = 'A119BS010148'
 
         '''
+        self.start_node = 'A119AR140002'
+        self.end_node = 'A119AR140035'
 
         self.global_path_msg = Path()
         self.global_path_msg.header.frame_id = '/map'
@@ -96,10 +97,10 @@ class dijkstra_path_pub :
             self.global_path_pub.
             
             '''
+            self.global_path_pub.publish(self.global_path_msg)
             rate.sleep()
 
     def calc_dijkstra_path_node(self, start_node, end_node):
-
         result, path = self.global_planner.find_shortest_path(start_node, end_node)
 
         #TODO: (10) dijkstra 경로 데이터를 ROS Path 메세지 형식에 맞춰 정의
@@ -109,6 +110,12 @@ class dijkstra_path_pub :
         # dijkstra 경로 데이터 중 Point 정보를 이용하여 Path 데이터를 만들어 줍니다.
 
         '''
+        for x, y, z in path['point_path']:
+            pose = PoseStamped()
+            pose.pose.position.x = x
+            pose.pose.position.y = y
+            pose.pose.orientation.w = 1
+            out_path.poses.append(pose)
 
         return out_path
 
@@ -125,13 +132,7 @@ class Dijkstra:
         '''
         # weight 값 계산은 각 Node 에서 인접 한 다른 Node 까지의 비용을 계산합니다.
         # 계산된 weight 값 은 각 노드간 이동시 발생하는 비용(거리)을 가지고 있기 때문에
-        # Dijkstra 탐색에서 중요하게 사용 됩니다.
-        # weight 값은 딕셔너리 형태로 사용 합니다.
-        # 이중 중첩된 딕셔너리 형태로 사용하며 
-        # Key 값으로 Node의 Idx Value 값으로 다른 노드 까지의 비용을 가지도록 합니다.
-        # 아래 코드 중 self.find_shortest_link_leading_to_node 를 완성하여 
-        # Dijkstra 알고리즘 계산을 위한 Node와 Node 사이의 최단 거리를 계산합니다.
-
+        # Dijkstra 탐색에서 중요하게 사용 됩니다.find_shortest_path
         '''
         # 초기 설정
         weight = dict() 
@@ -150,8 +151,7 @@ class Dijkstra:
             for to_node in from_node.get_to_nodes():
                 # 현재 노드에서 to_node로 연결되어 있는 링크를 찾고, 그 중에서 가장 빠른 링크를 찾아준다
                 shortest_link, min_cost = self.find_shortest_link_leading_to_node(from_node,to_node)
-                weight[from_node_id][to_node.idx] = min_cost           
-
+                weight[from_node_id][to_node.idx] = min_cost
         return weight
 
     def find_shortest_link_leading_to_node(self, from_node,to_node):
@@ -162,11 +162,12 @@ class Dijkstra:
         # shortest_link 의 min_cost 를 계산 합니다.
 
         '''
-
+        shortest_link, min_cost = from_node.find_shortest_link_leading_to_node(to_node)
+        # print(f'from_node: {from_node.idx} shortest_link: {shortest_link.idx} cost: {min_cost}')        
         return shortest_link, min_cost
         
     def find_nearest_node_idx(self, distance, s):        
-        idx_list = self.nodes.keys()
+        idx_list = list(self.nodes.keys())
         min_value = float('inf')
         min_idx = idx_list[-1]
 

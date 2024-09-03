@@ -63,7 +63,7 @@ class dijkstra_path_pub :
         rospy.Subscriber('/initialpose', PoseWithCovarianceStamped, self.init_callback)
 
         #TODO: (1) Mgeo data 읽어온 후 데이터 확인
-        load_path = os.path.normpath(os.path.join(current_path, 'lib/mgeo_data/R_KR_PG_K-City'))
+        load_path = os.path.normpath(os.path.join(current_path, 'lib/mgeo_data/R_KR_PG_KIAPI'))
         mgeo_planner_map = MGeo.create_instance_from_json(load_path)
 
         node_set = mgeo_planner_map.node_set
@@ -77,12 +77,13 @@ class dijkstra_path_pub :
         self.is_goal_pose = False
         self.is_init_pose = False
 
-        while True:
+        while not rospy.is_shutdown():
             if self.is_goal_pose == True and self.is_init_pose == True:
                 break
             else:
                 rospy.loginfo('Waiting goal pose data')
                 rospy.loginfo('Waiting init pose data')
+            rospy.sleep(0.5)
 
 
         self.global_path_msg = Path()
@@ -98,6 +99,7 @@ class dijkstra_path_pub :
             self.global_path_pub.
             
             '''
+            self.global_path_pub.publish(self.global_path_msg)
             rate.sleep()
     
     def init_callback(self,msg):
@@ -114,6 +116,9 @@ class dijkstra_path_pub :
         self.start_node = node_idx
 
         '''
+        pos = msg.pose.pose.position
+        print(f'start_node_pos: {pos}')
+        #TODO: 현재 위치 조정 및 노드 찾기
 
         self.is_init_pose = True
 
@@ -131,6 +136,9 @@ class dijkstra_path_pub :
         self.end_node = node_idx
 
         '''
+        pos = msg.pose.position
+        print(f'end_node_pos: {pos}')
+        #TODO: 현재 위치 조정 및 노드 찾기
 
         self.is_goal_pose = True
 
@@ -145,6 +153,12 @@ class dijkstra_path_pub :
         # dijkstra 경로 데이터 중 Point 정보를 이용하여 Path 데이터를 만들어 줍니다.
 
         '''
+        for x, y, z in path['point_path']:
+            pose = PoseStamped()
+            pose.pose.position.x = x
+            pose.pose.position.y = y
+            pose.pose.orientation.w = 1
+            out_path.poses.append(pose)
 
         return out_path
 
@@ -197,6 +211,7 @@ class Dijkstra:
         # shortest_link 의 min_cost 를 계산 합니다.
 
         '''
+        shortest_link, min_cost = from_node.find_shortest_link_leading_to_node(to_node)
 
         return shortest_link, min_cost
         
