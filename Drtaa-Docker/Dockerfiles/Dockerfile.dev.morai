@@ -6,6 +6,7 @@ RUN apt-get update && apt-get install -y \
     # ROS 패키지 (GUI 도구 제외)
     ros-noetic-image-transport \
     ros-noetic-compressed-image-transport \
+    ros-noetic-rosbridge-suite \
     ros-noetic-rosserial \
     \
     # 개발 도구 및 빌드 필수 패키지
@@ -38,23 +39,29 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # 라이브러리 설치
-RUN pip3 install pyproj
+RUN pip3 install --no-cache-dir pyproj
 
-# Step 3: 작업 디렉토리 설정
-WORKDIR /root/catkin_ws
-
-# Step 4: catkin workspace 디렉토리 생성
+# Step 3: catkin workspace 디렉토리 생성
 RUN mkdir -p /root/catkin_ws/src
 
+# Step 4: 작업 디렉토리 설정
+WORKDIR /root/catkin_ws
+
 # Step 5: 소스 파일 복사
-# COPY ./catkin_ws/src /root/catkin_ws/src
+COPY ./catkin_ws/src /root/catkin_ws/src
 
 # Step 6: 기본 환경 설정
-RUN echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
+RUN echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc && \
+    echo "source /root/catkin_ws/devel/setup.bash" >> ~/.bashrc && \
+    echo 'alias cm="catkin_make"' >> ~/.bashrc && \
+    echo 'alias scds="source /root/catkin_ws/devel/setup.bash"' >> ~/.bashrc && \
+    echo 'alias rosbridge_server="roslaunch rosbridge_server rosbridge_websocket.launch"' >> ~/.bashrc
 
-# 소스는 공유 디렉토리로 대체
+# Step 7: catkin workspace 빌드
 WORKDIR /root/catkin_ws
 RUN /bin/bash -c "source /opt/ros/noetic/setup.bash && catkin_make"
 
-# 기본 개발 환경 이미지를 위한 CMD 설정 (bash 쉘 실행)
+
+# 기본 개발 환경 이미지를 위한 CMD 설정 (roslaunch 실행)
+# CMD ["roslaunch", "rosbridge_server", "rosbridge_websocket.launch"]
 CMD ["bash"]
