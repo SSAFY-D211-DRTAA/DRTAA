@@ -29,6 +29,7 @@ object NaverLoginManager {
                 _resultLogin.emit(
                     Result.success(
                         User(
+                            userLogin = "Naver",
                             id = result.profile?.id,
                             name = result.profile?.name,
                             nickname = result.profile?.nickname,
