@@ -56,6 +56,10 @@ class pure_pursuit :
         self.ctrl_cmd_pub = 
 
         '''
+        rospy.Subscriber("/local_path", Path, self.path_callback)
+        rospy.Subscriber("/odom", Odometry, self.odom_callback)
+        rospy.Subscriber("/Ego_topic", EgoVehicleStatus, self.status_callback)
+        self.ctrl_cmd_pub = rospy.Publisher('/ctrl_cmd', CtrlCmd, queue_size=1)
 
         self.ctrl_cmd_msg=CtrlCmd()
         self.ctrl_cmd_msg.longlCmdType=1
@@ -69,7 +73,7 @@ class pure_pursuit :
         self.forward_point=Point()
         self.current_postion=Point()
 
-        self.vehicle_length = 1
+        self.vehicle_length = 3.010
         self.lfd = 5
         self.target_vel = 60
 
@@ -77,7 +81,6 @@ class pure_pursuit :
 
         rate = rospy.Rate(30) # 30hz
         while not rospy.is_shutdown():
-
             if self.is_path == True and self.is_odom == True and self.is_status == True:
 
                 steering = self.calc_pure_pursuit()
@@ -102,6 +105,8 @@ class pure_pursuit :
                 self.ctrl_cmd_pub.
                 
                 '''
+                self.ctrl_cmd_pub.publish(self.ctrl_cmd_msg)
+                print(f'{self.ctrl_cmd_msg}')
 
             rate.sleep()
 
@@ -156,6 +161,24 @@ class pure_pursuit :
                     break
 
         '''
+        trans_matrix = np.array([[1                      ,0                      ,translation[0]],
+                                 [0                      ,1                      ,translation[1]],
+                                 [0                      ,0                      ,1             ]])
+
+        det_trans_matrix = np.linalg.inv(trans_matrix)
+
+        for num,i in enumerate(self.path.poses) :
+            path_point = i.pose.position
+
+            global_path_point = [path_point.x, path_point.y, 1]
+            local_path_point = det_trans_matrix.dot(global_path_point)    
+
+            if local_path_point[0] > 0:
+                dis = sqrt(local_path_point[0]**2 + local_path_point[1]**2)
+                if dis >= self.lfd :
+                    self.forward_point = local_path_point
+                    self.is_look_forward_point = True
+                    break
 
         #TODO: (3) Steering 각도 계산
         '''
@@ -166,13 +189,15 @@ class pure_pursuit :
         steering = 
         
         '''
+        theta = atan2(local_path_point[1], local_path_point[0])
+        steering = atan2(2 * self.vehicle_length * sin(theta), self.lfd)
 
         return steering
 
 class pidControl:
     def __init__(self):
-        self.p_gain = 0.3
-        self.i_gain = 0.00
+        self.p_gain = 0.12
+        self.i_gain = 0.0005
         self.d_gain = 0.03
         self.prev_error = 0
         self.i_control = 0
@@ -195,6 +220,12 @@ class pidControl:
         self.prev_error = 
 
         '''
+        p_control = self.p_gain * error
+        self.i_control += self.i_gain * error * self.controlTime
+        d_control = self.d_gain * error / self.controlTime
+
+        output = p_control + self.i_control + d_control
+        self.prev_error = error
 
         return output
 
