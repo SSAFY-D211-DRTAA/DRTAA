@@ -500,7 +500,7 @@ class MGeo():
 
             return global_info, node_set, link_set
 
-        # 읽을 버전 정보 파일이 있는 경우    
+        # 읽을 버전 정보 파일이 있는 경우
         with open(filename, 'r') as f:
             global_info = json.load(f)
 
@@ -508,6 +508,7 @@ class MGeo():
         if global_info['maj_ver'] == 2:
 
             from save_load import subproc_load_link_ver2
+
             node_set, link_set, junction_set = subproc_load_link_ver2.load_node_and_link(
                 node_save_info_list, line_save_info_list, global_info)
 
@@ -779,11 +780,11 @@ class MGeo():
         파일을 읽어서 MGeo 인스턴스를 생성한다
         '''
         # global_info.mprj 파일 선택할 수 있게 설정
+
         if not os.path.isdir(folder_path):
             folder_path = os.path.dirname(folder_path)
 
         global_info, node_set, link_set, junction_set = MGeo.load_node_and_link(folder_path)
-
         lane_boundary_set, lane_node_set = MGeo.load_lane_boundary(folder_path)
         
         # lane_marking_set이 있으면 link_set에다가 연결
@@ -852,7 +853,7 @@ class MGeo():
         
         if 'road_type' in global_info:
             mgeo_planner_map.road_type = global_info['road_type']
-        
+            
         if 'road_type_def' in global_info:
             mgeo_planner_map.road_type_def = global_info['road_type_def']
 

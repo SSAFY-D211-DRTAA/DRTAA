@@ -50,3 +50,8 @@
 
 2. 서브 프로젝트 2 2-1까지 진행 완료
 ![alt text](img/morai_mgeo.png)
+
+#### Day 1, 2
+1. 서브 프로젝트 2 3-3까지 진행 완료
+![alt text](img/path_maker.png)
+![alt text](img/path_pub.png)
