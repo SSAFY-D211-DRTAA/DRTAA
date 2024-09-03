@@ -1,6 +1,7 @@
 package com.drtaa.feature_sign
 
 import android.content.Intent
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.drtaa.core_ui.base.BaseFragment
@@ -14,6 +15,8 @@ import timber.log.Timber
 
 @AndroidEntryPoint
 class SignInFragment : BaseFragment<FragmentSignInBinding>(R.layout.fragment_sign_in) {
+
+    private val signViewModel: SignViewModel by activityViewModels()
 
     override fun initView() {
         initEvent()
@@ -37,8 +40,11 @@ class SignInFragment : BaseFragment<FragmentSignInBinding>(R.layout.fragment_sig
                 result.onSuccess { data ->
                     Timber.tag("login success").d("$data")
 
-                    startActivity(Intent(requireContext(), MainActivity::class.java))
-                    requireActivity().finish()
+                    val isSuccess = signViewModel.getTokens(data)
+                    if (isSuccess) {
+                        startActivity(Intent(requireContext(), MainActivity::class.java))
+                        requireActivity().finish()
+                    }
                 }.onFailure {
                     Timber.tag("login fail").d("$result")
                 }
