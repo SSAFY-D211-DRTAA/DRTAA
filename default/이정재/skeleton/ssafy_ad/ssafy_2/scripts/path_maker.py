@@ -6,6 +6,7 @@ import rospkg
 from math import sqrt
 from geometry_msgs.msg import Point32,PoseStamped
 from nav_msgs.msg import Odometry
+import os
 
 # path_maker 는 차량의 위치 데이터를 받아 txt 파일로 저장하는 예제입니다.
 # 저장한 txt 파일은 차량의 주행 경로가 되며 경로 계획에 이용 할 수 있습니다.
@@ -38,6 +39,12 @@ class pathMaker :
         self.f = 
 
         '''
+        rospack = rospkg.RosPack()
+        pkg_path = rospack.get_path(pkg_name)
+        full_path = os.path.join(pkg_path, 'KIAPI')
+
+        self.f = open(full_path, 'w')
+        
         while not rospy.is_shutdown():
             if self.is_odom == True :
                 # Ego 위치 기록
@@ -56,6 +63,8 @@ class pathMaker :
         distance = 
 
         '''
+        distance = sqrt((x-self.prev_x)**2 + (y-self.prev_y)**2)
+
 
         #TODO: (4) 이전 위치보다 0.5m 이상일 때 위치를 저장        
         if distance >0.5:
@@ -72,6 +81,13 @@ class pathMaker :
             print(기록 된 위치 좌표를 출력한다)
 
             '''
+            data =f'{x:.6f}\t{y:.6f}\t{z:.6f}\n'
+            self.f.write(data)
+            self.prev_x = x
+            self.prev_y = y
+            self.prev_z = 0.0
+            
+            print(data)
 
     def odom_callback(self,msg):
         self.is_odom = True
@@ -84,6 +100,9 @@ class pathMaker :
         self.y = 물체의 y 좌표
 
         '''
+        self.x = msg.pose.pose.position.x
+        self.y = msg.pose.pose.position.y
+
 if __name__ == '__main__' :
     try:
         p_m=pathMaker()
