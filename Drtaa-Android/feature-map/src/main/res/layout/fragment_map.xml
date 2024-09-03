@@ -8,11 +8,14 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
-        <TextView
+        <com.naver.maps.map.MapView
+            android:id="@+id/map_naver"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="MAP"/>
+            android:layout_height="match_parent">
+        </com.naver.maps.map.MapView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
 </layout>
