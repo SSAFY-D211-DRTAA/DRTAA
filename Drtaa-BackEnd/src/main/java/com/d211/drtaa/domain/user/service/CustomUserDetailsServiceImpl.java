@@ -1,7 +1,6 @@
 package com.d211.drtaa.domain.user.service;
 
 import com.d211.drtaa.domain.user.dto.request.FormSignUpRequestDTO;
-import com.d211.drtaa.domain.user.dto.request.SignUpRequestDTO;
 import com.d211.drtaa.domain.user.dto.request.SocialSignUpRequestDTO;
 import com.d211.drtaa.domain.user.entity.User;
 import com.d211.drtaa.domain.user.repository.UserRepository;
@@ -18,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -64,12 +64,17 @@ public class CustomUserDetailsServiceImpl implements CustomUserDetailsService {
     }
 
     @Transactional
-    public void createUser(FormSignUpRequestDTO request) {
+    public void createUser
+            (FormSignUpRequestDTO request, MultipartFile image) {
+//        String imgUrl = "defualtProfileImg.png";  // 앱 내 기본 이미지
+//        if(image != null && !image.isEmpty())
+//          imgUrl = s3Service.upLoadS3(image, "profileImg");
+
         User user = User.builder()
                 .userProviderId(request.getUserProviderId())
-                .userEmail(request.getUserProviderId())
                 .userPassword(passwordEncoder.encode(request.getUserPassword()))
                 .userNickname(request.getUserNickname())
+//                .userProfileImg(imgUrl)
                 .userRefreshToken("")
                 .userLogin("Form")
                 .userIsAdmin(request.isUserIsAdmin())
@@ -79,15 +84,15 @@ public class CustomUserDetailsServiceImpl implements CustomUserDetailsService {
     }
 
     @Transactional
-    public void createUser(SocialSignUpRequestDTO request) {
+    public void createUser(SocialSignUpRequestDTO request, String image) {
         User user = User.builder()
                 .userProviderId(request.getUserProviderId())
-                .userEmail(request.getUserProviderId())
                 .userPassword(passwordEncoder.encode(""))
                 .userNickname(request.getUserNickname())
+                .userProfileImg(image)
                 .userRefreshToken("")
                 .userLogin(request.getUserLogin())
-                .userIsAdmin(request.isUserIsAdmin())
+                .userIsAdmin(false)
                 .build();
 
         createUser(user); // 기존 createUser(UserDetails user) 호출
@@ -96,7 +101,7 @@ public class CustomUserDetailsServiceImpl implements CustomUserDetailsService {
     @Override
     @Transactional
     public void deleteUser(String userName) {
-        userRepository.deleteByUserEmail(userName);
+        userRepository.deleteByUserProviderId(userName);
     }
 
     @Override
@@ -136,7 +141,7 @@ public class CustomUserDetailsServiceImpl implements CustomUserDetailsService {
     @Override
     public boolean userExists(String userName) {
         // 회원 존재 여부 확인
-        return userRepository.existsByUserEmail(userName);
+        return userRepository.existsByUserProviderId(userName);
     }
 }
 
