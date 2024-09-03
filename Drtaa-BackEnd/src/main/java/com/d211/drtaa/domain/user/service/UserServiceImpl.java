@@ -81,6 +81,7 @@ public class UserServiceImpl implements UserService{
         UserInfoResponseDTO userInfo = UserInfoResponseDTO.builder()
                 .userId(user.getUserId())
                 .userNickname(user.getUserNickname())
+                .userProfileImg(user.getUserProfileImg())
                 .userLogin(user.getUserLogin())
                 .userIsAdmin(user.isUserIsAdmin())
                 .build();

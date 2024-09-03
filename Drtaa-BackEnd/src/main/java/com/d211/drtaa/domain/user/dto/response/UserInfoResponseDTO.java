@@ -13,6 +13,8 @@ public class UserInfoResponseDTO {
     private long userId;
     @Schema(description = "회원 닉네임", example = "TEST")
     private String userNickname;
+    @Schema(description = "회원 프로필 사진", example = "multipart 이미지")
+    private String userProfileImg;
     @Schema(description = "회원 로그인처", example = "Form")
     private String userLogin;
     @Schema(description = "회원 관리자 유무", example = "false")
