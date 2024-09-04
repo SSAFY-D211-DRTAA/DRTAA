@@ -1,6 +1,6 @@
-package com.d211.drtaa.domain.common.service;
+package com.d211.drtaa.global.service.s3;
 
-import com.d211.drtaa.domain.common.util.S3Uploader;
+import com.d211.drtaa.global.util.s3.S3Uploader;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

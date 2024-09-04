@@ -1,7 +1,7 @@
 package com.d211.drtaa.global.config.security;
 
 import com.d211.drtaa.global.config.jwt.JwtAuthenticationFilter;
-import com.d211.drtaa.global.config.jwt.JwtTokenProvider;
+import com.d211.drtaa.global.util.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

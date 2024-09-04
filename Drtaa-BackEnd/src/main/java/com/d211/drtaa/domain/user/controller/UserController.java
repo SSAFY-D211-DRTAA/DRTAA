@@ -5,7 +5,7 @@ import com.d211.drtaa.domain.user.dto.request.*;
 import com.d211.drtaa.domain.user.dto.response.UserInfoResponseDTO;
 import com.d211.drtaa.domain.user.service.CustomUserDetailsService;
 import com.d211.drtaa.domain.user.service.UserService;
-import com.d211.drtaa.global.config.jwt.JwtToken;
+import com.d211.drtaa.global.util.jwt.JwtToken;
 import com.d211.drtaa.global.exception.user.UserCreationException;
 import com.d211.drtaa.global.exception.user.UserNicknameDuplicateException;
 import io.swagger.v3.oas.annotations.Operation;

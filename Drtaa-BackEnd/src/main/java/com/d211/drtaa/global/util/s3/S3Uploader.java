@@ -1,9 +1,8 @@
-package com.d211.drtaa.domain.common.util;
+package com.d211.drtaa.global.util.s3;
 
-import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.d211.drtaa.global.exception.s3.GlobalException;
+import com.d211.drtaa.global.exception.s3.S3FileNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -78,7 +77,7 @@ public class S3Uploader {
                 log.info("File deleted successfully: {}", key);
             } else { // file not found
                 log.warn("File not found: {}", key);
-                throw new GlobalException("파일이 존재하지 않습니다.");
+                throw new S3FileNotFoundException("파일이 존재하지 않습니다.");
             }
         } catch (Exception exception) {
             log.info(exception.getMessage());
