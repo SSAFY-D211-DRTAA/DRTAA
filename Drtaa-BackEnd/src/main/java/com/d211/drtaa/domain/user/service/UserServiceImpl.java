@@ -1,12 +1,12 @@
 package com.d211.drtaa.domain.user.service;
 
-import com.d211.drtaa.domain.common.service.JwtTokenService;
-import com.d211.drtaa.domain.common.service.S3Service;
+import com.d211.drtaa.global.service.jwt.JwtTokenService;
+import com.d211.drtaa.global.service.s3.S3Service;
 import com.d211.drtaa.domain.user.dto.request.FormLoginRequestDTO;
 import com.d211.drtaa.domain.user.dto.request.SocialLoginRequestDTO;
 import com.d211.drtaa.domain.user.dto.request.SocialSignUpRequestDTO;
 import com.d211.drtaa.domain.user.dto.response.UserInfoResponseDTO;
-import com.d211.drtaa.global.config.jwt.JwtToken;
+import com.d211.drtaa.global.util.jwt.JwtToken;
 import com.d211.drtaa.domain.user.entity.User;
 import com.d211.drtaa.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;

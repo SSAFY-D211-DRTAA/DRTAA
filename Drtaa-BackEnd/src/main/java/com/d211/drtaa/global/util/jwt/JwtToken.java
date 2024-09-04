@@ -1,4 +1,4 @@
-package com.d211.drtaa.global.config.jwt;
+package com.d211.drtaa.global.util.jwt;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

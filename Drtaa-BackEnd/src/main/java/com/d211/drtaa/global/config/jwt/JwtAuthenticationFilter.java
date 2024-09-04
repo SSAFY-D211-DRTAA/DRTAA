@@ -1,5 +1,6 @@
 package com.d211.drtaa.global.config.jwt;
 
+import com.d211.drtaa.global.util.jwt.JwtTokenProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;

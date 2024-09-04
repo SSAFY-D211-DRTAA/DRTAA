@@ -1,7 +1,7 @@
 package com.d211.drtaa.domain.user.service;
 
 import com.d211.drtaa.domain.user.dto.request.SocialLoginRequestDTO;
-import com.d211.drtaa.global.config.jwt.JwtToken;
+import com.d211.drtaa.global.util.jwt.JwtToken;
 import com.d211.drtaa.domain.user.dto.request.FormLoginRequestDTO;
 import com.d211.drtaa.domain.user.dto.response.UserInfoResponseDTO;
 import org.springframework.web.multipart.MultipartFile;

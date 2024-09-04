@@ -1,4 +1,4 @@
-package com.d211.drtaa.global.config.jwt;
+package com.d211.drtaa.global.util.jwt;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -43,7 +43,7 @@ public class JwtTokenProvider {
 
         long now = (new Date()).getTime();
 
-        // Access Token 생성
+        // Access RefreshToken 생성
         Date accessTokenExpiresIn = new Date(now + accessTokenExpireTime);
         String accessToken = Jwts.builder()
                 .setSubject(authentication.getName())
@@ -94,11 +94,11 @@ public class JwtTokenProvider {
                     .parseClaimsJws(token);
             return true;
         } catch (SecurityException | MalformedJwtException e) {
-            log.info("Invalid JWT Token", e);
+            log.info("Invalid JWT RefreshToken", e);
         } catch (ExpiredJwtException e) {
-            log.info("Expired JWT Token", e);
+            log.info("Expired JWT RefreshToken", e);
         } catch (UnsupportedJwtException e) {
-            log.info("Unsupported JWT Token", e);
+            log.info("Unsupported JWT RefreshToken", e);
         } catch (IllegalArgumentException e) {
             log.info("JWT claims string is empty.", e);
         }

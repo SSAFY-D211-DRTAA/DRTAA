@@ -1,4 +1,4 @@
-package com.d211.drtaa.domain.common.service;
+package com.d211.drtaa.global.service.s3;
 
 import org.springframework.web.multipart.MultipartFile;
 
