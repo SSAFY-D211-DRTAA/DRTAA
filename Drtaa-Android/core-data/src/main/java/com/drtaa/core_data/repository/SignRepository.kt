@@ -6,11 +6,12 @@ import com.drtaa.core_model.network.RequestSignUp
 import kotlinx.coroutines.flow.Flow
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import java.io.File
 
 interface SignRepository {
     suspend fun getTokens(userLoginInfo: UserLoginInfo): Flow<Result<Tokens>>
     suspend fun signUp(
         requestSignUp: RequestSignUp,
-        image: MultipartBody.Part?
+        image: File?
     ): Flow<Result<String>>
 }

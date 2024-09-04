@@ -2,6 +2,7 @@ package com.drtaa.core_data.repositoryimpl
 
 import com.drtaa.core_data.datasource.SignDataSource
 import com.drtaa.core_data.repository.SignRepository
+import com.drtaa.core_data.util.FormDataConverterUtil
 import com.drtaa.core_data.util.ResultWrapper
 import com.drtaa.core_data.util.safeApiCall
 import com.drtaa.core_model.data.Tokens
@@ -15,6 +16,7 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import timber.log.Timber
+import java.io.File
 import javax.inject.Inject
 
 class SignRepositoryImpl @Inject constructor(
@@ -43,13 +45,13 @@ class SignRepositoryImpl @Inject constructor(
 
     override suspend fun signUp(
         requestSignUp: RequestSignUp,
-        image: MultipartBody.Part?
+        image: File?
     ): Flow<Result<String>> = flow {
-        val gson = Gson()
-        val requestBody = gson.toJson(requestSignUp).toRequestBody("application/json".toMediaTypeOrNull())
-
         when (val response = safeApiCall {
-            signDataSource.signUp(requestBody, image)
+            val requestPart = FormDataConverterUtil.getJsonRequestBody(requestSignUp)
+            val filePart: MultipartBody.Part? =
+                FormDataConverterUtil.getNullableMultiPartBody("file", image)
+            signDataSource.signUp(requestPart, filePart)
         }) {
             is ResultWrapper.Success -> {
                 emit(Result.success(response.data))
