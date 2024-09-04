@@ -123,11 +123,10 @@ public class UserServiceImpl implements UserService{
                 .orElseThrow(() -> new UsernameNotFoundException("해당 userProviderId의 맞는 회원을 찾을 수 없습니다."));
 
         String beforeImg = user.getUserProfileImg(); // 사용자의 변경전 이미지
-        // S3에서 변경 전 이미지 삭제
-        s3Service.deleteS3(beforeImg);
+        s3Service.deleteS3(beforeImg); // S3에서 변경 전 이미지 삭제
 
         // 기본 이미지 DB에 업데이트
-        String basicImgUrl = "defualtProfileImg.png";  // 앱 내 기본 이미지
+        String basicImgUrl = "https://myd211s3bucket.s3.ap-northeast-2.amazonaws.com/profileImg/default.png";  // 앱 내 기본 이미지
         user.setUserProfileImg(basicImgUrl);
 
         // DB 저장
