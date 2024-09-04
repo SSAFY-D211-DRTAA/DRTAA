@@ -13,4 +13,6 @@ public class FormLoginRequestDTO {
     private String userProviderId;
     @Schema(description = "회원 PW", example = "1234")
     private String userPassword;
+    @Schema(description = "회원 로그인처", example = "Form")
+    private String userLogin;
 }
