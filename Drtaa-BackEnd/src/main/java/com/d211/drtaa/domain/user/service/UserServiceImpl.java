@@ -50,15 +50,14 @@ public class UserServiceImpl implements UserService{
 
         // 사용자가 없는 경우
         if (user == null) {
-            // 회원 가입
-            String basicImgUrl = "defualtProfileImg.png";  // 앱 내 기본 이미지
             SocialSignUpRequestDTO requestDTO = SocialSignUpRequestDTO.builder()
                     .userProviderId(request.getUserProviderId())
                     .userNickname(request.getUserNickname())
+                    .userProfileImg(request.getUserProfileImg())
                     .userLogin(request.getUserLogin())
                     .build();
 
-            userDetailsService.createUser(requestDTO, basicImgUrl);
+            userDetailsService.createUser(requestDTO, request.getUserProfileImg());
         } else {
             // 비밀번호 매칭 확인
             if (!passwordEncoder.matches("", user.getUserPassword()))
