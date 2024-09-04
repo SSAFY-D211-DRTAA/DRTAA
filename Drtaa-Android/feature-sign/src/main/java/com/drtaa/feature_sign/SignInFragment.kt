@@ -40,14 +40,21 @@ class SignInFragment : BaseFragment<FragmentSignInBinding>(R.layout.fragment_sig
                 result.onSuccess { data ->
                     Timber.tag("login success").d("$data")
 
-                    val isSuccess = signViewModel.getTokens(data)
-                    if (isSuccess) {
-                        startActivity(Intent(requireContext(), MainActivity::class.java))
-                        requireActivity().finish()
-                    }
+                    signViewModel.getTokens(data)
                 }.onFailure {
                     Timber.tag("login fail").d("$result")
                 }
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+        signViewModel.tokens.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach { result ->
+                result.onSuccess {
+                    startActivity(Intent(requireContext(), MainActivity::class.java))
+                    requireActivity().finish()
+                }.onFailure {
+
+                }
+
             }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
 

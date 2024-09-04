@@ -31,6 +31,7 @@ class SignRepositoryImpl @Inject constructor(
             }
 
             is ResultWrapper.NetworkError -> {
+                emit(Result.failure(Exception("네트워크 에러")))
                 Timber.d("네트워크 에러")
             }
 
