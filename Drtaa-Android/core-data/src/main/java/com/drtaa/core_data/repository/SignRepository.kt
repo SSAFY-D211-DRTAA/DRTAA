@@ -1,9 +1,9 @@
 package com.drtaa.core_data.repository
 
 import com.drtaa.core_model.data.Tokens
-import com.drtaa.core_model.data.User
+import com.drtaa.core_model.data.SocialUser
 import kotlinx.coroutines.flow.Flow
 
 interface SignRepository {
-    suspend fun getTokens(user: User): Flow<Result<Tokens>>
+    suspend fun getTokens(socialUser: SocialUser): Flow<Result<Tokens>>
 }

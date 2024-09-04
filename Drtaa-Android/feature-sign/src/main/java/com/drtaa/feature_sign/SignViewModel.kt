@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.drtaa.core_data.repository.SignRepository
 import com.drtaa.core_data.repository.TokenRepository
 import com.drtaa.core_model.data.Tokens
-import com.drtaa.core_model.data.User
+import com.drtaa.core_model.data.SocialUser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -28,9 +28,9 @@ class SignViewModel @Inject constructor(
         }
     }
 
-    fun getTokens(user: User) {
+    fun getTokens(socialUser: SocialUser) {
         viewModelScope.launch {
-            signRepository.getTokens(user).collect { result ->
+            signRepository.getTokens(socialUser).collect { result ->
                 result.onSuccess { data ->
                     Timber.tag("tokens").d("success $data")
                     _tokens.emit(Result.success(data))
@@ -41,5 +41,9 @@ class SignViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun formLogin(id: String, pw: String) {
+
     }
 }
