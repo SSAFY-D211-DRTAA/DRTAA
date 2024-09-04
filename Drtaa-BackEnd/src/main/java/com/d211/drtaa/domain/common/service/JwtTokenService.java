@@ -1,4 +1,4 @@
-package com.d211.drtaa.domain.user.service;
+package com.d211.drtaa.domain.common.service;
 
 import com.d211.drtaa.global.config.jwt.JwtToken;
 import org.springframework.security.core.Authentication;

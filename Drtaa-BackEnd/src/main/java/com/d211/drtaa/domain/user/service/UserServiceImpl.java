@@ -1,5 +1,7 @@
 package com.d211.drtaa.domain.user.service;
 
+import com.d211.drtaa.domain.common.service.JwtTokenService;
+import com.d211.drtaa.domain.common.service.S3Service;
 import com.d211.drtaa.domain.user.dto.request.FormLoginRequestDTO;
 import com.d211.drtaa.domain.user.dto.request.SocialLoginRequestDTO;
 import com.d211.drtaa.domain.user.dto.request.SocialSignUpRequestDTO;
@@ -22,6 +24,7 @@ public class UserServiceImpl implements UserService{
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenService jwtTokenService;
     private final CustomUserDetailsService userDetailsService;
+    private final S3Service s3Service;
     private final UserRepository userRepository;
 
     @Override
@@ -78,6 +81,7 @@ public class UserServiceImpl implements UserService{
         UserInfoResponseDTO userInfo = UserInfoResponseDTO.builder()
                 .userId(user.getUserId())
                 .userNickname(user.getUserNickname())
+                .userProfileImg(user.getUserProfileImg())
                 .userLogin(user.getUserLogin())
                 .userIsAdmin(user.isUserIsAdmin())
                 .build();
@@ -91,7 +95,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public void updateImg(String userName, MultipartFile image) {
+    public void updateImg(String userName, MultipartFile image) throws Exception {
         // 사용자 조회
         User user = userRepository.findByUserProviderId(userName)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 userProviderId의 맞는 회원을 찾을 수 없습니다."));
@@ -100,9 +104,9 @@ public class UserServiceImpl implements UserService{
         String newImgUrl = null; // 사용자가 변경할 이미지
         if (image != null && !image.isEmpty()) {
             // 기존 이미지 S3에서 삭제
-//            s3Service.deleteS3(beforeImg);
+            s3Service.deleteS3(beforeImg);
             // 새 이미지 S3의 업로드
-//            newImgUrl = s3Service.upLoadS3(image, "profileImg");
+            newImgUrl = s3Service.uploadS3(image, "profileImg");
         }
 
         // 새 이미지 DB에 업데이트
@@ -113,16 +117,17 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public void deleteImg(String userName) {
+    public void deleteImg(String userName) throws Exception {
         // 사용자 조회
         User user = userRepository.findByUserProviderId(userName)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 userProviderId의 맞는 회원을 찾을 수 없습니다."));
 
-        String basicImgUrl = "defualtProfileImg.png";  // 앱 내 기본 이미지
-//        if(image != null && !image.isEmpty())
-//          imgUrl = s3Service.upLoadS3(image, "profileImg");
+        String beforeImg = user.getUserProfileImg(); // 사용자의 변경전 이미지
+        // S3에서 변경 전 이미지 삭제
+        s3Service.deleteS3(beforeImg);
 
         // 기본 이미지 DB에 업데이트
+        String basicImgUrl = "defualtProfileImg.png";  // 앱 내 기본 이미지
         user.setUserProfileImg(basicImgUrl);
 
         // DB 저장

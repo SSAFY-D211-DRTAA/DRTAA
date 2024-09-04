@@ -1,5 +1,6 @@
 package com.d211.drtaa.domain.user.service;
 
+import com.d211.drtaa.domain.common.service.S3Service;
 import com.d211.drtaa.domain.user.dto.request.FormSignUpRequestDTO;
 import com.d211.drtaa.domain.user.dto.request.SocialSignUpRequestDTO;
 import com.d211.drtaa.domain.user.entity.User;
@@ -19,6 +20,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 @Service
 @RequiredArgsConstructor
 public class CustomUserDetailsServiceImpl implements CustomUserDetailsService {
@@ -26,6 +29,7 @@ public class CustomUserDetailsServiceImpl implements CustomUserDetailsService {
     @Lazy
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+    private final S3Service s3Service;
 
     @Override
     public UserDetails loadUserByUsername(String userProviderId) throws UsernameNotFoundException {
@@ -65,16 +69,16 @@ public class CustomUserDetailsServiceImpl implements CustomUserDetailsService {
 
     @Transactional
     public void createUser
-            (FormSignUpRequestDTO request, MultipartFile image) {
-//        String imgUrl = "defualtProfileImg.png";  // 앱 내 기본 이미지
-//        if(image != null && !image.isEmpty())
-//          imgUrl = s3Service.upLoadS3(image, "profileImg");
+            (FormSignUpRequestDTO request, MultipartFile image) throws IOException {
+        String imgUrl = "defualtProfileImg.png";  // 앱 내 기본 이미지
+        if(image != null && !image.isEmpty())
+          imgUrl = s3Service.uploadS3(image, "profileImg");
 
         User user = User.builder()
                 .userProviderId(request.getUserProviderId())
                 .userPassword(passwordEncoder.encode(request.getUserPassword()))
                 .userNickname(request.getUserNickname())
-//                .userProfileImg(imgUrl)
+                .userProfileImg(imgUrl)
                 .userRefreshToken("")
                 .userLogin("Form")
                 .userIsAdmin(request.isUserIsAdmin())
