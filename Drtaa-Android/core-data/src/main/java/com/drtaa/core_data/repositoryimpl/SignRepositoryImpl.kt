@@ -50,7 +50,7 @@ class SignRepositoryImpl @Inject constructor(
         when (val response = safeApiCall {
             val requestPart = FormDataConverterUtil.getJsonRequestBody(requestSignUp)
             val filePart: MultipartBody.Part? =
-                FormDataConverterUtil.getNullableMultiPartBody("file", image)
+                FormDataConverterUtil.getNullableMultiPartBody("image", image)
             signDataSource.signUp(requestPart, filePart)
         }) {
             is ResultWrapper.Success -> {
