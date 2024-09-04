@@ -57,3 +57,7 @@
 ![alt text](img/path_pub.png)
 ![alt text](img/dijkstra_path.png)
 ![alt text](img/pure_pursuit.png)
+
+#### Day 3
+1. 서브 프로젝트 2 완료
+![alt text](img/acc.png)

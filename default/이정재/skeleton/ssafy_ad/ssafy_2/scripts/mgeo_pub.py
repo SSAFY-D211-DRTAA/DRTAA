@@ -46,9 +46,10 @@ class get_mgeo :
         
         '''
         # load_path = os.path.normpath(os.path.join(current_path, 'lib/mgeo_data/R_KR_PG_K-City/'))
-        load_path = os.path.join(current_path, 'lib/mgeo_data/R_KR_PG_KIAPI/')
+        # load_path = os.path.join(current_path, 'lib/mgeo_data/R_KR_PG_KIAPI/')
+        load_path = os.path.join(current_path, 'lib/mgeo_data/R_KR_PG_KATRI/')
         mgeo_planner_map = MGeo.create_instance_from_json(load_path)
-
+        
         node_set = mgeo_planner_map.node_set
         link_set = mgeo_planner_map.link_set
 

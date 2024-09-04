@@ -41,7 +41,8 @@ class pathMaker :
         '''
         rospack = rospkg.RosPack()
         pkg_path = rospack.get_path(pkg_name)
-        full_path = os.path.join(pkg_path, 'KIAPI')
+        # full_path = os.path.join(pkg_path, 'KIAPI')
+        full_path = os.path.join(pkg_path, 'KATRI')
 
         self.f = open(full_path, 'w')
         

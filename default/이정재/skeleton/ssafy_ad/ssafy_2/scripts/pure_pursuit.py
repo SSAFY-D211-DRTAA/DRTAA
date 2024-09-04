@@ -136,13 +136,13 @@ class pure_pursuit :
                     break
 
         '''
-        trans_matrix = np.array([[1                      ,0                      ,translation[0]],
-                                 [0                      ,1                      ,translation[1]],
+        trans_matrix = np.array([[cos(self.vehicle_yaw)  ,-sin(self.vehicle_yaw) ,translation[0]],
+                                 [sin(self.vehicle_yaw)  ,cos(self.vehicle_yaw)  ,translation[1]],
                                  [0                      ,0                      ,1             ]])
 
         det_trans_matrix = np.linalg.inv(trans_matrix)
 
-        for num,i in enumerate(self.path.poses) :
+        for num, i in enumerate(self.path.poses) :
             path_point = i.pose.position
 
             global_path_point = [path_point.x, path_point.y, 1]

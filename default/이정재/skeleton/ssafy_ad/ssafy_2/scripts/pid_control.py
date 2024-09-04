@@ -90,7 +90,7 @@ class pure_pursuit :
                     print("no found forward point")
                     self.ctrl_cmd_msg.steering=0.0
 
-                output = self.pid.pid(self.target_vel,self.status_msg.velocity.x*3.6)
+                output = self.pid.pid(self.target_vel,self.status_msg.velocity.x*1.8)
 
                 if output > 0.0:
                     self.ctrl_cmd_msg.accel = output
@@ -161,8 +161,8 @@ class pure_pursuit :
                     break
 
         '''
-        trans_matrix = np.array([[1                      ,0                      ,translation[0]],
-                                 [0                      ,1                      ,translation[1]],
+        trans_matrix = np.array([[cos(self.vehicle_yaw)  ,-sin(self.vehicle_yaw) ,translation[0]],
+                                 [sin(self.vehicle_yaw)  ,cos(self.vehicle_yaw)  ,translation[1]],
                                  [0                      ,0                      ,1             ]])
 
         det_trans_matrix = np.linalg.inv(trans_matrix)
@@ -196,8 +196,8 @@ class pure_pursuit :
 
 class pidControl:
     def __init__(self):
-        self.p_gain = 0.12
-        self.i_gain = 0.0005
+        self.p_gain = 0.5
+        self.i_gain = 0.00
         self.d_gain = 0.03
         self.prev_error = 0
         self.i_control = 0
@@ -222,7 +222,7 @@ class pidControl:
         '''
         p_control = self.p_gain * error
         self.i_control += self.i_gain * error * self.controlTime
-        d_control = self.d_gain * error / self.controlTime
+        d_control = self.d_gain * (error - self.prev_error)  / self.controlTime
 
         output = p_control + self.i_control + d_control
         self.prev_error = error
