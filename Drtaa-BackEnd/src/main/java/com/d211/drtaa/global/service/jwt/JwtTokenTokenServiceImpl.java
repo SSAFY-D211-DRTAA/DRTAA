@@ -77,8 +77,10 @@ public class JwtTokenTokenServiceImpl implements JwtTokenService {
         RefreshToken refreshToken = refreshTokenRepository.findByUserId(user.getUserId())
                 .orElseThrow(() -> new EntityNotFoundException("해당 userId으로 리프레시 토큰을 찾을 수 없습니다."));
 
-//        return userRepository.findUserRefreshTokenByUserProviderId(userName)
-//                .orElseThrow(() -> new EntityNotFoundException("해당 refreshToken으로 사용자를 찾을 수 없습니다."));
-        return refreshToken.getRefreshToken();
+        // DB 사용
+        return userRepository.findUserRefreshTokenByUserProviderId(userName)
+                .orElseThrow(() -> new EntityNotFoundException("해당 refreshToken으로 사용자를 찾을 수 없습니다."));
+        // Redis 사용
+//        return refreshToken.getRefreshToken();
     }
 }
