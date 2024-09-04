@@ -1,7 +1,7 @@
 package com.drtaa.feature_sign.util
 
 import android.content.Context
-import com.drtaa.core_model.data.User
+import com.drtaa.core_model.data.SocialUser
 import com.navercorp.nid.NaverIdLoginSDK
 import com.navercorp.nid.oauth.NidOAuthLogin
 import com.navercorp.nid.oauth.OAuthLoginCallback
@@ -14,8 +14,8 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 
 object NaverLoginManager {
-    private val _resultLogin = MutableSharedFlow<Result<User>>()
-    val resultLogin: SharedFlow<Result<User>> = _resultLogin
+    private val _resultLogin = MutableSharedFlow<Result<SocialUser>>()
+    val resultLogin: SharedFlow<Result<SocialUser>> = _resultLogin
 
     private fun loginScope(action: suspend () -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
@@ -28,7 +28,7 @@ object NaverLoginManager {
             loginScope {
                 _resultLogin.emit(
                     Result.success(
-                        User(
+                        SocialUser(
                             userLogin = "Naver",
                             id = result.profile?.id,
                             name = result.profile?.name,

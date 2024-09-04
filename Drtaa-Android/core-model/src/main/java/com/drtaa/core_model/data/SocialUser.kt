@@ -1,6 +1,6 @@
 package com.drtaa.core_model.data
 
-data class User(
+data class SocialUser(
     val userLogin: String? = null,
     val id: String? = null,
     val name: String? = null,
@@ -8,4 +8,4 @@ data class User(
     val profileImageUrl: String? = null,
     val accessToken: String? = null,
     val refreshToken: String? = null,
-)
+) : UserLoginInfo
