@@ -35,7 +35,7 @@ public class UserController {
     @Operation(summary = "회원가입", description = "Form 회원가입")
     public ResponseEntity signUp(
             @RequestPart("formSignUpRequestDTO") FormSignUpRequestDTO formSignUpRequestDTO,
-            @RequestPart("image") MultipartFile image) {
+            @RequestPart(value = "image", required = false) MultipartFile image) {
         try {
             userDetailsService.createUser(formSignUpRequestDTO, image);
 

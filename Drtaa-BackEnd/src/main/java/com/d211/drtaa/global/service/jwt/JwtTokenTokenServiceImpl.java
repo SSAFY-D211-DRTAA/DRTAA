@@ -39,8 +39,8 @@ public class JwtTokenTokenServiceImpl implements JwtTokenService {
         // 리프레시 토큰 저장 - Redis
         User user = userRepository.findByUserProviderId(userName)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 userProviderId으로 찾을 수 있는 회원이 없습니다."));
-        RefreshToken redisRefreshToken = new RefreshToken(user.getUserId(), jwtToken.getRefreshToken());
-        refreshTokenRepository.save(redisRefreshToken);
+//        RefreshToken redisRefreshToken = new RefreshToken(user.getUserId(), jwtToken.getRefreshToken());
+//        refreshTokenRepository.save(redisRefreshToken);
 
         return jwtToken;
     }
