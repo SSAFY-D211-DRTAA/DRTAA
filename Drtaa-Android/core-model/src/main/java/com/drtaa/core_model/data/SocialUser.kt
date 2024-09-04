@@ -8,4 +8,4 @@ data class SocialUser(
     val profileImageUrl: String? = null,
     val accessToken: String? = null,
     val refreshToken: String? = null,
-)
+) : UserLoginInfo

@@ -4,10 +4,12 @@ import com.drtaa.core_data.datasource.SignDataSource
 import com.drtaa.core_data.repository.SignRepository
 import com.drtaa.core_data.util.ResultWrapper
 import com.drtaa.core_data.util.safeApiCall
-import com.drtaa.core_model.data.Tokens
 import com.drtaa.core_model.data.SocialUser
-import com.drtaa.core_model.data.toEntity
+import com.drtaa.core_model.data.Tokens
+import com.drtaa.core_model.data.UserLoginInfo
 import com.drtaa.core_model.data.toRequestLogin
+import com.drtaa.core_model.data.toTokens
+import com.drtaa.core_model.network.RequestFormLogin
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import timber.log.Timber
@@ -16,12 +18,12 @@ import javax.inject.Inject
 class SignRepositoryImpl @Inject constructor(
     private val signDataSource: SignDataSource
 ) : SignRepository {
-    override suspend fun getTokens(socialUser: SocialUser): Flow<Result<Tokens>> = flow {
+    override suspend fun getTokens(userLoginInfo: UserLoginInfo): Flow<Result<Tokens>> = flow {
         when (val response = safeApiCall {
-            signDataSource.getTokens(socialUser.toRequestLogin())
+            signDataSource.getTokens(userLoginInfo)
         }) {
             is ResultWrapper.Success -> {
-                emit(Result.success(response.data.toEntity()))
+                emit(Result.success(response.data.toTokens()))
                 Timber.d("성공")
             }
 
@@ -34,8 +36,6 @@ class SignRepositoryImpl @Inject constructor(
                 emit(Result.failure(Exception("네트워크 에러")))
                 Timber.d("네트워크 에러")
             }
-
         }
-
     }
 }

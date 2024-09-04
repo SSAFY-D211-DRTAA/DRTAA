@@ -32,6 +32,13 @@ class SignInFragment : BaseFragment<FragmentSignInBinding>(R.layout.fragment_sig
         binding.signinNaverBtn.setOnClickListener {
             NaverLoginManager.login(requireActivity())
         }
+
+        binding.signinLoginBtn.setOnClickListener {
+            signViewModel.formLogin(
+                id = binding.signinIdEt.text.toString(),
+                pw = binding.signinPwEt.text.toString()
+            )
+        }
     }
 
     private fun initObserver() {
