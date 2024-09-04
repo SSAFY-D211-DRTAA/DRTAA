@@ -40,4 +40,8 @@ android {
 dependencies {
     //Module
     implementation(project(":feature-main"))
+
+    //Sign
+    implementation(libs.naver.oauth)
+
 }
