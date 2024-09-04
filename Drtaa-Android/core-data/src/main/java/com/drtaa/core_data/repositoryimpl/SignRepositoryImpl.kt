@@ -4,16 +4,16 @@ import com.drtaa.core_data.datasource.SignDataSource
 import com.drtaa.core_data.repository.SignRepository
 import com.drtaa.core_data.util.ResultWrapper
 import com.drtaa.core_data.util.safeApiCall
-import com.drtaa.core_model.data.SocialUser
 import com.drtaa.core_model.data.Tokens
 import com.drtaa.core_model.data.UserLoginInfo
-import com.drtaa.core_model.data.toRequestLogin
 import com.drtaa.core_model.data.toTokens
-import com.drtaa.core_model.network.RequestFormLogin
 import com.drtaa.core_model.network.RequestSignUp
+import com.google.gson.Gson
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -45,8 +45,11 @@ class SignRepositoryImpl @Inject constructor(
         requestSignUp: RequestSignUp,
         image: MultipartBody.Part?
     ): Flow<Result<String>> = flow {
+        val gson = Gson()
+        val requestBody = gson.toJson(requestSignUp).toRequestBody("application/json".toMediaTypeOrNull())
+
         when (val response = safeApiCall {
-            signDataSource.signUp(requestSignUp, image)
+            signDataSource.signUp(requestBody, image)
         }) {
             is ResultWrapper.Success -> {
                 emit(Result.success(response.data))

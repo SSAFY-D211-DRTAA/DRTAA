@@ -26,6 +26,10 @@ class SignUpFragmentViewModel @Inject constructor(
             userNickname = nickname,
             userIsAdmin = false
         )
+//
+//        val gson = Gson()
+//        val requestBody = gson.toJson(requestSignUp).toRequestBody("application/json".toMediaTypeOrNull())
+
         viewModelScope.launch {
             signRepository.signUp(requestSignUp, null).collect { result ->
                 result.onSuccess {
