@@ -7,6 +7,10 @@ plugins {
     id("drtaa.plugin.common")
     id("drtaa.plugin.hilt")
 }
+fun getApiKey(propertyKey: String): String {
+    return gradleLocalProperties(rootDir, providers).getProperty(propertyKey)
+}
+
 
 fun getApiKey(propertyKey: String): String {
     return gradleLocalProperties(rootDir, providers).getProperty(propertyKey)
@@ -29,6 +33,10 @@ android {
         buildConfigField("String", "NAVER_LOGIN_CLIENT_SECRET", getApiKey("NAVER_LOGIN_CLIENT_SECRET"))
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "NAVER_MAP_CLIENT_ID", getApiKey("NAVER_MAP_CLIENT_ID"))
+
+        manifestPlaceholders["NAVER_MAP_CLIENT_ID_MANIFEST"] = getApiKey("NAVER_MAP_CLIENT_ID_MANIFEST")
     }
 
     buildTypes {
