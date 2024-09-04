@@ -49,5 +49,5 @@ dependencies {
     implementation(project(":feature-map"))
     implementation(project(":feature-mypage"))
     implementation(project(":feature-home"))
-
+    implementation(libs.map.sdk)
 }

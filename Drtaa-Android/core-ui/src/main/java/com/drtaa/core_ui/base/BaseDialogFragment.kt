@@ -12,6 +12,7 @@ import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.DialogFragment
 import androidx.navigation.NavDirections
 import androidx.navigation.fragment.findNavController
+import com.drtaa.core_ui.R
 
 abstract class BaseDialogFragment<B : ViewDataBinding>(private val layoutResId: Int) :
     DialogFragment() {
@@ -23,7 +24,7 @@ abstract class BaseDialogFragment<B : ViewDataBinding>(private val layoutResId: 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        setStyle(STYLE_NO_FRAME, R.style.FullScreenDialogNoAnim)
+        setStyle(STYLE_NO_FRAME, R.style.FullScreenDialogNoAnim)
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
