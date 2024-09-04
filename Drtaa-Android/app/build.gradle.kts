@@ -7,10 +7,6 @@ plugins {
     id("drtaa.plugin.common")
     id("drtaa.plugin.hilt")
 }
-fun getApiKey(propertyKey: String): String {
-    return gradleLocalProperties(rootDir, providers).getProperty(propertyKey)
-}
-
 
 fun getApiKey(propertyKey: String): String {
     return gradleLocalProperties(rootDir, providers).getProperty(propertyKey)
