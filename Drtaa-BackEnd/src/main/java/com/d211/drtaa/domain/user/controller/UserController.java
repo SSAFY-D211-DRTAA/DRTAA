@@ -7,6 +7,7 @@ import com.d211.drtaa.domain.user.service.CustomUserDetailsService;
 import com.d211.drtaa.domain.user.service.UserService;
 import com.d211.drtaa.global.config.jwt.JwtToken;
 import com.d211.drtaa.global.exception.user.UserCreationException;
+import com.d211.drtaa.global.exception.user.UserNicknameDuplicateException;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +47,23 @@ public class UserController {
         } catch (UserCreationException e) {
             // 400, 잘못된 요청에 대한 예외 처리
             return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            // 500, 서버 오류가 발생했을 때
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/signup/{userPorviderId}")
+    @Operation(summary = "아이디 중복 체크", description = "회원가입 시 아이디 중복 체크(소셜 로그인은 중복 위험 미존재)")
+    public ResponseEntity checkNickname(@RequestParam("userPorviderId") String userPorviderId) {
+        try {
+            boolean chk = userService.chkUSerPorviderId(userPorviderId);
+
+            // 닉네임 중복이 발생하지 않음
+            return ResponseEntity.ok(chk);
+        } catch (UserNicknameDuplicateException e) {
+            // 409, 리소스 간의 충돌이 발생했을 때 -> 닉네임 중복 발생
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(true);
         } catch (Exception e) {
             // 500, 서버 오류가 발생했을 때
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -152,12 +170,13 @@ public class UserController {
         } catch (UsernameNotFoundException e) {
             // 401, 클라이언트 인증 실패
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
-        } catch (DataIntegrityViolationException e) {
+        } catch (UserNicknameDuplicateException e) {
             // 409, 리소스 간의 충돌이 발생했을 때
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(false);
         } catch (Exception e) {
             // 500, 서버 오류가 발생했을 때
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
+
 }

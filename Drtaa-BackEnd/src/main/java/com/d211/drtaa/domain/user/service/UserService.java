@@ -27,4 +27,7 @@ public interface UserService {
 
     // 회원 기존 닉네임을 nickName으로 변경
     void updateNickname(String userName, String nickName);
+
+    // userNickname을 닉네임 중복 체크
+    boolean chkUSerPorviderId(String userPorviderId);
 }

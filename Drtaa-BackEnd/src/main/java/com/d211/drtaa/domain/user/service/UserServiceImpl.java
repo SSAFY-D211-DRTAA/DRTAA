@@ -9,6 +9,7 @@ import com.d211.drtaa.domain.user.dto.response.UserInfoResponseDTO;
 import com.d211.drtaa.global.config.jwt.JwtToken;
 import com.d211.drtaa.domain.user.entity.User;
 import com.d211.drtaa.domain.user.repository.UserRepository;
+import com.d211.drtaa.global.exception.user.UserNicknameDuplicateException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -135,14 +136,23 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public void updateNickname(String userName, String nickName) {
-        // 사용자 조회
-        User user = userRepository.findByUserProviderId(userName)
-                .orElseThrow(() -> new UsernameNotFoundException("해당 userProviderId의 맞는 회원을 찾을 수 없습니다."));
+        if (!userRepository.existsByUserNickname(nickName)) {
+            // 사용자 조회
+            User user = userRepository.findByUserProviderId(userName)
+                    .orElseThrow(() -> new UsernameNotFoundException("해당 userProviderId의 맞는 회원을 찾을 수 없습니다."));
 
-        // 새로운 닉네임 DB에 업데이트
-        user.setUserNickname(nickName);
+            // 새로운 닉네임 DB에 업데이트
+            user.setUserNickname(nickName);
 
-        // DB 저장
-        userRepository.save(user);
+            // DB 저장
+            userRepository.save(user);
+        } else {
+            new UserNicknameDuplicateException(nickName + "을 닉네임으로 가진 회원이 이미 존재합니다.");
+        }
+    }
+
+    @Override
+    public boolean chkUSerPorviderId(String userPorviderId) {
+        return userRepository.existsByUserProviderId(userPorviderId);
     }
 }
