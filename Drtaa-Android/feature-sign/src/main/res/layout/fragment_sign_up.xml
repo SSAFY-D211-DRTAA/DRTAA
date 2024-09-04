@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".SignUpFragment">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/sign_up_profile_cv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="80dp"
+            app:cardCornerRadius="100dp"
+            app:cardElevation="0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/sign_up_profile_iv"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:src="@drawable/ic_launcher_foreground" />
+        </androidx.cardview.widget.CardView>
+
+        <TextView
+            android:id="@+id/sign_up_id_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="아이디"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/sign_up_profile_cv" />
+
+        <EditText
+            android:id="@+id/sign_up_id_et"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toStartOf="@+id/sign_up_id_chk_btn"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/sign_up_id_tv" />
+
+        <TextView
+            android:id="@+id/sign_up_id_help_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="중복체크관련 메세지 띄울 예정"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/sign_up_id_et" />
+
+        <Button
+            android:id="@+id/sign_up_id_chk_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="중복확인"
+            app:layout_constraintBottom_toBottomOf="@+id/sign_up_id_et"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/sign_up_id_et"
+            app:layout_constraintTop_toTopOf="@+id/sign_up_id_et" />
+
+        <TextView
+            android:id="@+id/sign_up_pw_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="비밀번호"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/sign_up_id_help_tv" />
+
+        <EditText
+            android:id="@+id/sign_up_pw_et"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/sign_up_pw_tv" />
+
+        <TextView
+            android:id="@+id/sign_up_pw_help_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="비밀번호 형식 관련 메세지 띄울 예정"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/sign_up_pw_et" />
+
+        <TextView
+            android:id="@+id/sign_up_chk_pw_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="비밀번호 재입력"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/sign_up_pw_help_tv" />
+
+        <EditText
+            android:id="@+id/sign_up_chk_pw_et"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/sign_up_chk_pw_tv" />
+
+        <TextView
+            android:id="@+id/sign_up_chk_pw_help_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="비밀번호 일치 관련 메세지 띄울 예정"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/sign_up_chk_pw_et" />
+
+        <TextView
+            android:id="@+id/sign_up_nickname_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="닉네임"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/sign_up_chk_pw_help_tv" />
+
+        <EditText
+            android:id="@+id/sign_up_nickname_et"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toStartOf="@+id/sign_up_nickname_chk_btn"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/sign_up_nickname_tv" />
+
+        <Button
+            android:id="@+id/sign_up_nickname_chk_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="중복확인"
+            app:layout_constraintBottom_toBottomOf="@+id/sign_up_nickname_et"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/sign_up_nickname_et"
+            app:layout_constraintTop_toTopOf="@+id/sign_up_nickname_et" />
+
+        <TextView
+            android:id="@+id/sign_up_nickname_help_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="닉네임 관련 메세지 띄울 예정"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/sign_up_nickname_et" />
+
+        <Button
+            android:id="@+id/sign_up_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="회원가입"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/sign_up_nickname_help_tv" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

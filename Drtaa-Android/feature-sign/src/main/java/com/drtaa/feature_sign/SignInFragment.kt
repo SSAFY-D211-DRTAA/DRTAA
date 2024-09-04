@@ -39,6 +39,10 @@ class SignInFragment : BaseFragment<FragmentSignInBinding>(R.layout.fragment_sig
                 pw = binding.signinPwEt.text.toString()
             )
         }
+
+        binding.signinSignUpBtn.setOnClickListener {
+            navigateDestination(R.id.action_signInFragment_to_signUpFragment)
+        }
     }
 
     private fun initObserver() {
