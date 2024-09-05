@@ -52,17 +52,16 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main), 
         val height260dp = resources.getDimensionPixelSize(R.dimen.bottom_sheet_height_260dp)
         val height650dp = resources.getDimensionPixelSize(R.dimen.bottom_sheet_height_650dp)
 
-        val bottomSheet = findViewById<ConstraintLayout>(R.id.bottom_sheet)
-        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
+        bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheet)
 
         bottomSheetBehavior.apply {
             halfExpandedRatio = height260dp.toFloat() / height650dp
             expandedOffset = height60dp
+            peekHeight = height260dp / 2
+            state = BottomSheetBehavior.STATE_HALF_EXPANDED
             isFitToContents = false
             isDraggable = true
             isHideable = false
-            peekHeight = height60dp
-            state = BottomSheetBehavior.STATE_HALF_EXPANDED
 
             addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
                 override fun onStateChanged(bottomSheet: View, newState: Int) {
@@ -86,26 +85,27 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main), 
     private fun initBottomMenu() {
         binding.apply {
             menuHome.setOnClickListener {
-                containterMyPage.visibility = View.GONE
-                bottomSheet.visibility = View.VISIBLE
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
                 navigateTo(com.drtaa.feature_home.R.id.nav_graph_home)
             }
             menuTicket.setOnClickListener {
-                containterMyPage.visibility = View.GONE
-                bottomSheet.visibility = View.VISIBLE
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
                 navigateTo(com.drtaa.feature_ticket.R.id.nav_graph_map)
             }
             menuMypage.setOnClickListener {
-                containterMyPage.visibility = View.VISIBLE
-                bottomSheet.visibility = View.GONE
+                showMyPage()
             }
         }
     }
 
     private fun navigateTo(destinationId: Int) {
+        binding.containterMyPage.visibility = View.GONE
+        binding.bottomSheet.visibility = View.VISIBLE
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
         navController.navigate(destinationId)
+    }
+
+    private fun showMyPage() {
+        binding.containterMyPage.visibility = View.VISIBLE
+        binding.bottomSheet.visibility = View.GONE
     }
 
     private fun navControllerSetting() {
@@ -119,8 +119,9 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main), 
         val screenHeight = resources.displayMetrics.heightPixels
         val mapMargin = screenHeight - bottomSheetTop - 200
 
-        val layoutParams = mapContainer.layoutParams as CoordinatorLayout.LayoutParams
-        layoutParams.bottomMargin = mapMargin
-        mapContainer.layoutParams = layoutParams
+        (mapContainer.layoutParams as CoordinatorLayout.LayoutParams).apply {
+            bottomMargin = mapMargin
+            mapContainer.layoutParams = this
+        }
     }
 }
