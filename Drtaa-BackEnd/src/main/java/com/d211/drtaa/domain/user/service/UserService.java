@@ -29,5 +29,5 @@ public interface UserService {
     void updateNickname(String userName, String nickName);
 
     // userNickname을 닉네임 중복 체크
-    boolean chkUSerPorviderId(String userPorviderId);
+    boolean chkuserProviderId(String userProviderId);
 }

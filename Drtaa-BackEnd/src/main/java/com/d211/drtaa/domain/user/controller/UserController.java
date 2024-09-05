@@ -53,11 +53,11 @@ public class UserController {
         }
     }
 
-    @GetMapping("/signup/{userPorviderId}")
+    @GetMapping("/signup/{userProviderId}")
     @Operation(summary = "아이디 중복 체크", description = "회원가입 시 아이디 중복 체크(소셜 로그인은 중복 위험 미존재)")
-    public ResponseEntity checkNickname(@RequestParam("userPorviderId") String userPorviderId) {
+    public ResponseEntity checkNickname(@RequestParam("userProviderId") String userProviderId) {
         try {
-            boolean chk = userService.chkUSerPorviderId(userPorviderId);
+            boolean chk = userService.chkuserProviderId(userProviderId);
 
             // 닉네임 중복이 발생하지 않음
             return ResponseEntity.ok(chk);

@@ -151,7 +151,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public boolean chkUSerPorviderId(String userPorviderId) {
-        return userRepository.existsByUserProviderId(userPorviderId);
+    public boolean chkuserProviderId(String userProviderId) {
+        return userRepository.existsByUserProviderId(userProviderId);
     }
 }
