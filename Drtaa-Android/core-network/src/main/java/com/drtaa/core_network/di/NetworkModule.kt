@@ -1,6 +1,10 @@
 package com.drtaa.core_network.di
 
+import com.drtaa.core_network.util.isJsonArray
+import com.drtaa.core_network.util.isJsonObject
 import com.google.gson.GsonBuilder
+import com.google.gson.JsonParser
+import com.google.gson.JsonSyntaxException
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -10,6 +14,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
@@ -45,8 +50,23 @@ object NetworkModule {
     @Singleton
     @DefaultOkHttpClient
     @Provides
-    fun provideOkHttpClient() = OkHttpClient.Builder().run {
-        HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
+    fun provideOkHttpClient(logger: HttpLoggingInterceptor) = OkHttpClient.Builder().run {
+        connectTimeout(120, TimeUnit.SECONDS)
+        readTimeout(120, TimeUnit.SECONDS)
+        writeTimeout(120, TimeUnit.SECONDS)
+        addInterceptor(logger)
+        build()
+    }
+
+    @Singleton
+    @AuthOkHttpClient
+    @Provides
+    fun provideAuthOkHttpClient(
+        logger: HttpLoggingInterceptor,
+        interceptor: AccessTokenInterceptor
+    ) = OkHttpClient.Builder().run {
+        addInterceptor(logger)
+        addInterceptor(interceptor)
         connectTimeout(120, TimeUnit.SECONDS)
         readTimeout(120, TimeUnit.SECONDS)
         writeTimeout(120, TimeUnit.SECONDS)
@@ -54,14 +74,25 @@ object NetworkModule {
     }
 
     @Singleton
-    @AuthOkHttpClient
     @Provides
-    fun provideAuthOkHttpClient(interceptor: AccessTokenInterceptor) = OkHttpClient.Builder().run {
-        HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
-        addInterceptor(interceptor)
-        connectTimeout(120, TimeUnit.SECONDS)
-        readTimeout(120, TimeUnit.SECONDS)
-        writeTimeout(120, TimeUnit.SECONDS)
-        build()
+    fun provideLoggingInterceptor(): HttpLoggingInterceptor {
+        val loggingInterceptor = HttpLoggingInterceptor {
+            when {
+                !it.isJsonArray() && !it.isJsonObject() ->
+                    Timber.tag("RETROFIT").d("CONNECTION INFO: $it")
+
+                else -> try {
+                    Timber.tag("RETROFIT").d(
+                        GsonBuilder().setPrettyPrinting().create().toJson(
+                            JsonParser().parse(it)
+                        )
+                    )
+                } catch (m: JsonSyntaxException) {
+                    Timber.tag("RETROFIT").d(it)
+                }
+            }
+        }
+        loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
+        return loggingInterceptor
     }
 }
