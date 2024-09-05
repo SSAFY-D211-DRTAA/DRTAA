@@ -51,7 +51,7 @@
             android:id="@+id/sign_up_id_help_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="중복체크관련 메세지 띄울 예정"
+            android:text=""
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/sign_up_id_et" />
 
