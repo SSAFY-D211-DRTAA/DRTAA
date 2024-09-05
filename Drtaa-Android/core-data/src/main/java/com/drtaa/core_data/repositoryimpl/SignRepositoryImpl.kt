@@ -69,4 +69,25 @@ class SignRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    override suspend fun checkDuplicatedId(userProviderId: String): Flow<Result<Boolean>> = flow {
+        when (val response = safeApiCall {
+            signDataSource.checkDuplicatedId(userProviderId)
+        }) {
+            is ResultWrapper.Success -> {
+                emit(Result.success(response.data))
+                Timber.d("성공")
+            }
+
+            is ResultWrapper.GenericError -> {
+                emit(Result.failure(Exception(response.message)))
+                Timber.d("실패")
+            }
+
+            is ResultWrapper.NetworkError -> {
+                emit(Result.failure(Exception("네트워크 에러")))
+                Timber.d("네트워크 에러")
+            }
+        }
+    }
 }

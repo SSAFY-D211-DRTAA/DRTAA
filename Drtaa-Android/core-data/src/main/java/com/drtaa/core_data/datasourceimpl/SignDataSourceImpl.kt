@@ -26,4 +26,8 @@ class SignDataSourceImpl @Inject constructor(
         return signAPI.signUp(requestSignUp, image)
     }
 
+    override suspend fun checkDuplicatedId(userProviderId: String): Boolean {
+        return signAPI.checkDuplicatedId(userProviderId)
+    }
+
 }

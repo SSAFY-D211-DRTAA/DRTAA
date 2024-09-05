@@ -128,19 +128,9 @@
             android:id="@+id/sign_up_nickname_et"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintEnd_toStartOf="@+id/sign_up_nickname_chk_btn"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/sign_up_nickname_tv" />
-
-        <Button
-            android:id="@+id/sign_up_nickname_chk_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="중복확인"
-            app:layout_constraintBottom_toBottomOf="@+id/sign_up_nickname_et"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/sign_up_nickname_et"
-            app:layout_constraintTop_toTopOf="@+id/sign_up_nickname_et" />
 
         <TextView
             android:id="@+id/sign_up_nickname_help_tv"

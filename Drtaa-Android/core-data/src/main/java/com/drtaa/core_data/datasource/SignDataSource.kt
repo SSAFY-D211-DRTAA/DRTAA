@@ -8,4 +8,5 @@ import okhttp3.RequestBody
 interface SignDataSource {
     suspend fun getTokens(userLoginInfo: UserLoginInfo): ResponseLogin
     suspend fun signUp(requestSignUp: RequestBody, image: MultipartBody.Part?): String
+    suspend fun checkDuplicatedId(userProviderId: String): Boolean
 }

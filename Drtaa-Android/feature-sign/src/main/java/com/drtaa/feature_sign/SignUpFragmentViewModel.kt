@@ -8,6 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -17,6 +18,9 @@ class SignUpFragmentViewModel @Inject constructor(
 
     private val _isSignUpSuccess = MutableStateFlow(false)
     val isSignUpSuccess: StateFlow<Boolean> = _isSignUpSuccess
+
+    private val _isDuplicatedId = MutableStateFlow(true)
+    val isDuplicatedId: StateFlow<Boolean> = _isDuplicatedId
 
 
     fun signUp(id: String, pw: String, nickname: String) {
@@ -35,6 +39,19 @@ class SignUpFragmentViewModel @Inject constructor(
                     _isSignUpSuccess.emit(false)
                 }
 
+            }
+        }
+    }
+
+    fun checkDuplicatedId(id: String) {
+        viewModelScope.launch {
+            signRepository.checkDuplicatedId(id).collect { result ->
+                result.onSuccess { data ->
+                    Timber.d("중복 체크 $data")
+                    _isDuplicatedId.emit(data)
+                }.onFailure {
+                    _isDuplicatedId.emit(true)
+                }
             }
         }
     }

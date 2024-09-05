@@ -1,21 +1,22 @@
 package com.drtaa.core_network.api
 
 import com.drtaa.core_model.network.RequestFormLogin
-import com.drtaa.core_model.network.RequestSignUp
 import com.drtaa.core_model.network.RequestSocialLogin
 import com.drtaa.core_model.network.ResponseLogin
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
+import retrofit2.http.Path
 
 interface SignAPI {
     @Multipart
     @POST("user/signup")
     suspend fun signUp(
-        @Part ("formSignUpRequestDTO") requestSignUp: RequestBody,
+        @Part("formSignUpRequestDTO") requestSignUp: RequestBody,
         @Part image: MultipartBody.Part?
     ): String
 
@@ -28,4 +29,10 @@ interface SignAPI {
     suspend fun formLogin(
         @Body requestFormLogin: RequestFormLogin
     ): ResponseLogin
+
+    @GET("user/signup/{userProviderId}")
+    suspend fun checkDuplicatedId(
+        @Path("userProviderId") userProviderId: String
+    ): Boolean
+
 }

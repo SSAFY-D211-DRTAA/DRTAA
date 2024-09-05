@@ -14,4 +14,6 @@ interface SignRepository {
         requestSignUp: RequestSignUp,
         image: File?
     ): Flow<Result<String>>
+    suspend fun checkDuplicatedId(userProviderId: String): Flow<Result<Boolean>>
+
 }

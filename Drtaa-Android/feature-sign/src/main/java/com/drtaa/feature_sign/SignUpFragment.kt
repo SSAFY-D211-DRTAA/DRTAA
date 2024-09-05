@@ -3,10 +3,13 @@ package com.drtaa.feature_sign
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.drtaa.core_ui.base.BaseFragment
 import com.drtaa.feature_sign.databinding.FragmentSignUpBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import timber.log.Timber
 
 @AndroidEntryPoint
 class SignUpFragment : BaseFragment<FragmentSignUpBinding>(R.layout.fragment_sign_up) {
@@ -21,11 +24,7 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>(R.layout.fragment_sig
 
     private fun initEvent() {
         binding.signUpIdChkBtn.setOnClickListener {
-
-        }
-
-        binding.signUpNicknameChkBtn.setOnClickListener {
-
+            signUpFragmentViewModel.checkDuplicatedId(binding.signUpIdEt.text.toString())
         }
 
         binding.signUpBtn.setOnClickListener {
@@ -46,7 +45,18 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>(R.layout.fragment_sig
 
                 }
 
-            }
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+        signUpFragmentViewModel.isDuplicatedId.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach { isDuplicatedId ->
+                if (isDuplicatedId) {
+                    Timber.d("옵저버")
+                    binding.signUpIdHelpTv.text = "이미 사용중인 아이디입니다."
+                } else {
+                    binding.signUpIdHelpTv.text = "사용 가능한 아이디입니다."
+                }
+
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
 }
