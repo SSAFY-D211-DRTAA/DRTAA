@@ -8,14 +8,13 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <com.naver.maps.map.MapView
-            android:id="@+id/map_naver"
+
+        <TextView
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-        </com.naver.maps.map.MapView>
+            android:layout_height="match_parent"
+            android:text="티켓입니다" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 
 
 </layout>
