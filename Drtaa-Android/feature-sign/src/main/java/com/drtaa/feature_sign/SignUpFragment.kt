@@ -9,8 +9,9 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.drtaa.core_ui.base.BaseFragment
+import com.drtaa.core_ui.checkValidPassword
+import com.drtaa.core_ui.showSnackBar
 import com.drtaa.feature_sign.databinding.FragmentSignUpBinding
-import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -59,9 +60,8 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>(R.layout.fragment_sig
         binding.signUpPwEt.addTextChangedListener { text ->
             val inputText = text.toString()
 
-            val passwordRegex = Regex("^(?=.*[a-zA-Z0-9])(?=.*[\\W_])[a-zA-Z0-9\\W_]{8,20}\$")
             signUpFragmentViewModel.setIsValidPw(
-                if (inputText.isEmpty()) null else inputText.matches(passwordRegex)
+                if (inputText.isEmpty()) null else checkValidPassword(inputText)
             )
 
             signUpFragmentViewModel.setIsEqualPw(
@@ -123,7 +123,7 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>(R.layout.fragment_sig
                 if (isSignUpSuccess) {
                     navigatePopBackStack()
                 } else {
-                    Snackbar.make(binding.signUpBtn, "회원가입 실패", Snackbar.LENGTH_SHORT).show()
+                    showSnackBar("회원가입 실패,")
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
 
