@@ -64,7 +64,7 @@ dependencies {
     implementation(project(":core-ui"))
     implementation(project(":core-model"))
     implementation(project(":feature-main"))
-    implementation(project(":feature-map"))
+    implementation(project(":feature-ticket"))
     implementation(project(":feature-mypage"))
     implementation(project(":feature-home"))
     implementation(project(":feature-sign"))

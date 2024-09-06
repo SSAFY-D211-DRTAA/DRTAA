@@ -11,7 +11,7 @@ enum class Page(val hideBottomNav: Boolean) {
 
     val id: Int
         get() = when (this) {
-            MAP -> com.drtaa.feature_map.R.id.mapFragment
+            MAP -> com.drtaa.feature_ticket.R.id.mapFragment
             MY_PAGE -> com.drtaa.feature_mypage.R.id.myPageFragment
         }
 }

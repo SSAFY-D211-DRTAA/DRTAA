@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.drtaa.feature_map"
+    namespace = "com.drtaa.feature_ticket"
     compileSdk = 34
 
     defaultConfig {
@@ -40,5 +40,5 @@ android {
 }
 
 dependencies {
-    implementation(libs.map.sdk)
+
 }
