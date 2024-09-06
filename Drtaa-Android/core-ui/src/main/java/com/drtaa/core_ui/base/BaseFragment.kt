@@ -35,7 +35,7 @@ abstract class BaseFragment<T : ViewDataBinding>(private val layoutResId: Int) :
 
     abstract fun initView()
 
-    //Navigation 이동
+    // Navigation 이동
     fun navigateDestination(@IdRes action: Int) {
         findNavController().navigate(action)
     }
@@ -44,12 +44,12 @@ abstract class BaseFragment<T : ViewDataBinding>(private val layoutResId: Int) :
         findNavController().navigate(action, bundle)
     }
 
-    //Navigation safe args 이동
+    // Navigation safe args 이동
     fun navigateDestination(action: NavDirections) {
         findNavController().navigate(action)
     }
 
-    //popBackstack
+    // popBackstack
     fun navigatePopBackStack() {
         findNavController().popBackStack()
     }

@@ -3,6 +3,7 @@ import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    id("drtaa.plugin.detekt")
     id("drtaa.plugin.network")
     id("drtaa.plugin.common")
     id("drtaa.plugin.hilt")
@@ -79,4 +80,5 @@ dependencies {
     implementation(libs.coroutines.core)
     //Sign
     implementation(libs.naver.oauth)
+    detektPlugins(libs.detekt.formatting)
 }

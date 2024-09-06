@@ -58,11 +58,7 @@ class SignInFragment : BaseFragment<FragmentSignInBinding>(R.layout.fragment_sig
                 result.onSuccess {
                     startActivity(Intent(requireContext(), MainActivity::class.java))
                     requireActivity().finish()
-                }.onFailure {
-
-                }
-
+                }.onFailure {}
             }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
-
 }

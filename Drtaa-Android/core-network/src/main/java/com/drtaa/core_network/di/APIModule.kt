@@ -25,5 +25,4 @@ object APIModule {
         @DefaultRetrofit
         retrofit: Retrofit
     ): SignAPI = retrofit.create(SignAPI::class.java)
-
 }

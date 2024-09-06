@@ -47,9 +47,9 @@ object NetworkModule {
     @Provides
     fun provideOkHttpClient() = OkHttpClient.Builder().run {
         HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
-        connectTimeout(120, TimeUnit.SECONDS)
-        readTimeout(120, TimeUnit.SECONDS)
-        writeTimeout(120, TimeUnit.SECONDS)
+        connectTimeout(NETWORK_TIMEOUT, TimeUnit.SECONDS)
+        readTimeout(NETWORK_TIMEOUT, TimeUnit.SECONDS)
+        writeTimeout(NETWORK_TIMEOUT, TimeUnit.SECONDS)
         build()
     }
 
@@ -59,9 +59,11 @@ object NetworkModule {
     fun provideAuthOkHttpClient(interceptor: AccessTokenInterceptor) = OkHttpClient.Builder().run {
         HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
         addInterceptor(interceptor)
-        connectTimeout(120, TimeUnit.SECONDS)
-        readTimeout(120, TimeUnit.SECONDS)
-        writeTimeout(120, TimeUnit.SECONDS)
+        connectTimeout(NETWORK_TIMEOUT, TimeUnit.SECONDS)
+        readTimeout(NETWORK_TIMEOUT, TimeUnit.SECONDS)
+        writeTimeout(NETWORK_TIMEOUT, TimeUnit.SECONDS)
         build()
     }
+
+    const val NETWORK_TIMEOUT = 120L
 }
