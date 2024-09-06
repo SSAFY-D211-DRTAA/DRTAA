@@ -1,3 +1,4 @@
+import com.android.build.gradle.AppExtension
 import extenstion.libs
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
@@ -32,10 +33,15 @@ class DetektConventionPlugin : Plugin<Project> {
                     sarif.required.set(true)
                 }
                 jvmTarget = "17"
+                ignoreFailures = false
             }
 
             tasks.withType<DetektCreateBaselineTask>().configureEach {
                 jvmTarget = "17"
+            }
+
+            tasks.named("check") {
+                dependsOn(tasks.withType<Detekt>())
             }
         }
     }
