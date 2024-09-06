@@ -3,9 +3,8 @@ package com.drtaa.feature_sign
 import android.content.Context
 import android.net.Uri
 import android.os.Environment
-import android.text.Editable
-import android.text.TextWatcher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
@@ -15,6 +14,7 @@ import com.drtaa.feature_sign.databinding.FragmentSignUpBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
 
@@ -54,19 +54,37 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>(R.layout.fragment_sig
     }
 
     private fun initEditTextEvent() {
-        binding.signUpIdEt.addTextChangedListener(object : TextWatcher {
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                signUpFragmentViewModel.setIsDuplicatedId(null)
-            }
+        binding.signUpIdEt.addTextChangedListener { _ ->
+            signUpFragmentViewModel.setIsDuplicatedId(null)
+        }
 
-            override fun afterTextChanged(s: Editable?) {
+        binding.signUpPwEt.addTextChangedListener { text ->
+            val inputText = text.toString()
 
-            }
+            val passwordRegex = Regex("^(?=.*[a-zA-Z0-9])(?=.*[\\W_])[a-zA-Z0-9\\W_]{8,20}\$")
+            signUpFragmentViewModel.setIsValidPw(
+                if (inputText.isEmpty()) null else inputText.matches(passwordRegex)
+            )
 
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            signUpFragmentViewModel.setIsEqualPw(
+                if (inputText.isEmpty() && binding.signUpChkPwEt.text.toString().isEmpty()) null
+                else inputText == binding.signUpChkPwEt.text.toString()
+            )
+        }
 
-            }
-        })
+        binding.signUpChkPwEt.addTextChangedListener { text ->
+            val inputText = text.toString()
+            signUpFragmentViewModel.setIsEqualPw(
+                if (inputText.isEmpty() && binding.signUpPwEt.text.toString().isEmpty()) null
+                else inputText == binding.signUpPwEt.text.toString()
+            )
+        }
+
+        binding.signUpNicknameEt.addTextChangedListener { text ->
+            val inputText = text.toString()
+            signUpFragmentViewModel.setIsEmptyNickname(inputText.isEmpty())
+        }
+
     }
 
     private fun openImagePicker() {
@@ -114,12 +132,47 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>(R.layout.fragment_sig
                     true -> "이미 사용중인 아이디입니다."
                     false -> "사용 가능한 아이디입니다."
                 }
+                signUpFragmentViewModel.setIsPossibleSignUp()
             }.launchIn(viewLifecycleOwner.lifecycleScope)
 
         signUpFragmentViewModel.profileImageUri.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { imageUri ->
                 binding.signUpProfileIv.setImageURI(imageUri)
             }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+        signUpFragmentViewModel.isValidPw.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach { isValidPw ->
+                binding.signUpPwHelpTv.text = when (isValidPw) {
+                    null -> ""
+                    true -> ""
+                    false -> "비밀번호 형식을 확인해주세요."
+                }
+                Timber.d("isValidPw: $isValidPw")
+                signUpFragmentViewModel.setIsPossibleSignUp()
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+        signUpFragmentViewModel.isEqualPw.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach { isEqualPw ->
+                binding.signUpChkPwHelpTv.text = when (isEqualPw) {
+                    null -> ""
+                    true -> ""
+                    false -> "비밀번호가 일치하지 않습니다."
+                }
+                Timber.d("isValidPw: $isEqualPw")
+                signUpFragmentViewModel.setIsPossibleSignUp()
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+        signUpFragmentViewModel.isEmptyNickname.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach { isEmptyNickname ->
+                binding.signUpNicknameHelpTv.text = if (isEmptyNickname) "닉네임을 설정해주세요." else ""
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+        signUpFragmentViewModel.isPossibleSignUp.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach { isPossibleSignUp ->
+                binding.signUpBtn.isEnabled = isPossibleSignUp
+                Timber.d("isPossibleSignUp: $isPossibleSignUp")
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
+
     }
 
 }

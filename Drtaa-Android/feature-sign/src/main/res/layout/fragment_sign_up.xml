@@ -28,6 +28,7 @@
                 android:id="@+id/sign_up_profile_iv"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
+                android:scaleType="centerCrop"
                 android:src="@drawable/ic_launcher_foreground" />
         </androidx.cardview.widget.CardView>
 
@@ -43,6 +44,7 @@
             android:id="@+id/sign_up_id_et"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:maxLines="1"
             app:layout_constraintEnd_toStartOf="@+id/sign_up_id_chk_btn"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/sign_up_id_tv" />
@@ -78,15 +80,18 @@
             android:id="@+id/sign_up_pw_et"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:inputType="textPassword"
+            android:maxLines="1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
+
             app:layout_constraintTop_toBottomOf="@+id/sign_up_pw_tv" />
 
         <TextView
             android:id="@+id/sign_up_pw_help_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="비밀번호 형식 관련 메세지 띄울 예정"
+            android:text=""
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/sign_up_pw_et" />
 
@@ -103,6 +108,8 @@
             android:id="@+id/sign_up_chk_pw_et"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:inputType="textPassword"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/sign_up_chk_pw_tv" />
@@ -111,7 +118,7 @@
             android:id="@+id/sign_up_chk_pw_help_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="비밀번호 일치 관련 메세지 띄울 예정"
+            android:text=""
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/sign_up_chk_pw_et" />
 
@@ -128,6 +135,7 @@
             android:id="@+id/sign_up_nickname_et"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:maxLines="1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/sign_up_nickname_tv" />
@@ -145,6 +153,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
+            android:enabled="false"
             android:text="회원가입"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
