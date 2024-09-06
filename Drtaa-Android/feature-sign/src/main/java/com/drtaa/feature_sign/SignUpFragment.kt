@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import java.io.File
 import java.io.FileOutputStream
+import java.security.SecureRandom
 
 @AndroidEntryPoint
 class SignUpFragment : BaseFragment<FragmentSignUpBinding>(R.layout.fragment_sign_up) {
@@ -103,7 +104,10 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>(R.layout.fragment_sig
     private fun uriToFile(context: Context, uri: Uri): File {
         val contentResolver = context.contentResolver
         val file =
-            File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "temp_image.jpg")
+            File(
+                context.getExternalFilesDir(Environment.DIRECTORY_PICTURES),
+                "${SecureRandom.getInstanceStrong().nextDouble()}.jpg"
+            )
 
         contentResolver.openInputStream(uri)?.use { inputStream ->
             FileOutputStream(file).use { outputStream ->
