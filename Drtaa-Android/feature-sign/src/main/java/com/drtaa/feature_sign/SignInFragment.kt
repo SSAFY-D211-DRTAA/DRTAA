@@ -47,6 +47,7 @@ class SignInFragment : BaseFragment<FragmentSignInBinding>(R.layout.fragment_sig
                 result.onSuccess { data ->
                     Timber.tag("login success").d("$data")
 
+
                     signViewModel.getTokens(data)
                 }.onFailure {
                     Timber.tag("login fail").d("$result")
