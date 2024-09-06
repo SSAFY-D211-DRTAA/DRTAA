@@ -23,9 +23,9 @@ class SignRepositoryImpl @Inject constructor(
     private val signDataSource: SignDataSource
 ) : SignRepository {
     override suspend fun getTokens(userLoginInfo: UserLoginInfo): Flow<Result<Tokens>> = flow {
-        when (val response = safeApiCall {
-            signDataSource.getTokens(userLoginInfo)
-        }) {
+        when (
+            val response = safeApiCall { signDataSource.getTokens(userLoginInfo) }
+        ) {
             is ResultWrapper.Success -> {
                 emit(Result.success(response.data.toTokens()))
                 Timber.d("성공")

@@ -51,11 +51,11 @@ object NetworkModule {
     @Singleton
     @DefaultOkHttpClient
     @Provides
-    fun provideOkHttpClient(logger: HttpLoggingInterceptor) = OkHttpClient.Builder().run {
-        connectTimeout(120, TimeUnit.SECONDS)
-        readTimeout(120, TimeUnit.SECONDS)
-        writeTimeout(120, TimeUnit.SECONDS)
-        addInterceptor(logger)
+    fun provideOkHttpClient() = OkHttpClient.Builder().run {
+        HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
+        connectTimeout(NETWORK_TIMEOUT, TimeUnit.SECONDS)
+        readTimeout(NETWORK_TIMEOUT, TimeUnit.SECONDS)
+        writeTimeout(NETWORK_TIMEOUT, TimeUnit.SECONDS)
         build()
     }
 
@@ -68,9 +68,9 @@ object NetworkModule {
     ) = OkHttpClient.Builder().run {
         addInterceptor(logger)
         addInterceptor(interceptor)
-        connectTimeout(120, TimeUnit.SECONDS)
-        readTimeout(120, TimeUnit.SECONDS)
-        writeTimeout(120, TimeUnit.SECONDS)
+        connectTimeout(NETWORK_TIMEOUT, TimeUnit.SECONDS)
+        readTimeout(NETWORK_TIMEOUT, TimeUnit.SECONDS)
+        writeTimeout(NETWORK_TIMEOUT, TimeUnit.SECONDS)
         build()
     }
 
@@ -96,4 +96,6 @@ object NetworkModule {
         loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
         return loggingInterceptor
     }
+
+    const val NETWORK_TIMEOUT = 120L
 }

@@ -40,7 +40,6 @@ object NaverLoginManager {
                     )
                 )
             }
-
         }
 
         override fun onFailure(httpStatus: Int, message: String) {

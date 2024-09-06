@@ -35,8 +35,12 @@ kotlinx-serialization = "1.6.2"
 okhttp = "4.12.0"
 retrofit = "2.11.0"
 jetbrainsKotlinJvm = "1.9.0"
+detekt = "1.23.5"
 
 [libraries]
+detekt-gradle = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt" }
+detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detekt" }
+
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 kotlin-gradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -124,3 +128,4 @@ hilt-gradle-plugin = { id = "com.google.dagger.hilt.android", version.ref = "hil
 navigation-safe-args = { id = "androidx.navigation.safeargs.kotlin", version.ref = "navigation" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }

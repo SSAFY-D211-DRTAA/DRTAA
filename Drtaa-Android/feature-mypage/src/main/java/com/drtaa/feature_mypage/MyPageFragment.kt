@@ -1,8 +1,6 @@
 package com.drtaa.feature_mypage
 
-import android.os.Bundle
 import androidx.fragment.app.viewModels
-import com.drtaa.core_ui.base.BaseDialogFragment
 import com.drtaa.core_ui.base.BaseFragment
 import com.drtaa.feature_mypage.databinding.FragmentMyPageBinding
 import dagger.hilt.android.AndroidEntryPoint
