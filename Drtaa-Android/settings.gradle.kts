@@ -1,4 +1,5 @@
 pluginManagement {
+    includeBuild("build-logic")
     repositories {
         google {
             content {
@@ -16,13 +17,19 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven("https://repository.map.naver.com/archive/maven")
     }
 }
 
 rootProject.name = "DRTAA"
+
 include(":app")
 include(":core-data")
 include(":core-network")
 include(":feature-main")
 include(":core-ui")
 include(":core-model")
+include(":feature-ticket")
+include(":feature-mypage")
+include(":feature-home")
+include(":feature-sign")
