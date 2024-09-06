@@ -34,5 +34,4 @@ interface SignAPI {
     suspend fun checkDuplicatedId(
         @Path("userProviderId") userProviderId: String
     ): Boolean
-
 }

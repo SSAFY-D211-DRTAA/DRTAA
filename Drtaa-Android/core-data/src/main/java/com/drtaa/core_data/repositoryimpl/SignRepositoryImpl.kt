@@ -9,12 +9,9 @@ import com.drtaa.core_model.data.Tokens
 import com.drtaa.core_model.data.UserLoginInfo
 import com.drtaa.core_model.data.toTokens
 import com.drtaa.core_model.network.RequestSignUp
-import com.google.gson.Gson
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
-import okhttp3.RequestBody.Companion.toRequestBody
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -47,12 +44,14 @@ class SignRepositoryImpl @Inject constructor(
         requestSignUp: RequestSignUp,
         image: File?
     ): Flow<Result<String>> = flow {
-        when (val response = safeApiCall {
-            val requestPart = FormDataConverterUtil.getJsonRequestBody(requestSignUp)
-            val filePart: MultipartBody.Part? =
-                FormDataConverterUtil.getNullableMultiPartBody("image", image)
-            signDataSource.signUp(requestPart, filePart)
-        }) {
+        when (
+            val response = safeApiCall {
+                val requestPart = FormDataConverterUtil.getJsonRequestBody(requestSignUp)
+                val filePart: MultipartBody.Part? =
+                    FormDataConverterUtil.getNullableMultiPartBody("image", image)
+                signDataSource.signUp(requestPart, filePart)
+            }
+        ) {
             is ResultWrapper.Success -> {
                 emit(Result.success(response.data))
                 Timber.d("성공")
@@ -71,9 +70,11 @@ class SignRepositoryImpl @Inject constructor(
     }
 
     override suspend fun checkDuplicatedId(userProviderId: String): Flow<Result<Boolean>> = flow {
-        when (val response = safeApiCall {
-            signDataSource.checkDuplicatedId(userProviderId)
-        }) {
+        when (
+            val response = safeApiCall {
+                signDataSource.checkDuplicatedId(userProviderId)
+            }
+        ) {
             is ResultWrapper.Success -> {
                 emit(Result.success(response.data))
                 Timber.d("성공")

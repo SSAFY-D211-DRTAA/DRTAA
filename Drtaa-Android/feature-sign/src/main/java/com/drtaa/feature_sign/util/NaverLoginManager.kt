@@ -30,9 +30,9 @@ object NaverLoginManager {
                     Result.success(
                         SocialUser(
                             userLogin = "Naver",
-                            id = result.profile?.id,
+                            id = result.profile?.id.orEmpty(),
                             name = result.profile?.name,
-                            nickname = result.profile?.nickname,
+                            nickname = result.profile?.nickname.orEmpty(),
                             profileImageUrl = result.profile?.profileImage,
                             accessToken = NaverIdLoginSDK.getAccessToken(),
                             refreshToken = NaverIdLoginSDK.getRefreshToken()

@@ -21,7 +21,7 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
-//    const val BASE_URL = "http://192.168.0.12:8080/" // 나중에 local.properties로 뺼 예정
+    //    const val BASE_URL = "http://192.168.0.12:8080/" // 나중에 local.properties로 뺼 예정
     const val BASE_URL = "http://192.168.100.185:8080/" // 나중에 local.properties로 뺼 예정
 
     @Singleton
@@ -51,8 +51,10 @@ object NetworkModule {
     @Singleton
     @DefaultOkHttpClient
     @Provides
-    fun provideOkHttpClient() = OkHttpClient.Builder().run {
-        HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
+    fun provideOkHttpClient(
+        logger: HttpLoggingInterceptor,
+    ) = OkHttpClient.Builder().run {
+        addInterceptor(logger)
         connectTimeout(NETWORK_TIMEOUT, TimeUnit.SECONDS)
         readTimeout(NETWORK_TIMEOUT, TimeUnit.SECONDS)
         writeTimeout(NETWORK_TIMEOUT, TimeUnit.SECONDS)
@@ -97,5 +99,5 @@ object NetworkModule {
         return loggingInterceptor
     }
 
-    const val NETWORK_TIMEOUT = 120L
+    const val NETWORK_TIMEOUT = 10L
 }

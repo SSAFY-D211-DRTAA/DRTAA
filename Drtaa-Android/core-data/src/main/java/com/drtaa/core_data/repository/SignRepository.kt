@@ -4,8 +4,6 @@ import com.drtaa.core_model.data.Tokens
 import com.drtaa.core_model.data.UserLoginInfo
 import com.drtaa.core_model.network.RequestSignUp
 import kotlinx.coroutines.flow.Flow
-import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import java.io.File
 
 interface SignRepository {
@@ -15,5 +13,4 @@ interface SignRepository {
         image: File?
     ): Flow<Result<String>>
     suspend fun checkDuplicatedId(userProviderId: String): Flow<Result<Boolean>>
-
 }

@@ -20,8 +20,8 @@ class SignUpFragmentViewModel @Inject constructor(
     private val signRepository: SignRepository
 ) : ViewModel() {
 
-    private val _isSignUpSuccess = MutableStateFlow(false)
-    val isSignUpSuccess: StateFlow<Boolean> = _isSignUpSuccess
+    private val _isSignUpSuccess = MutableSharedFlow<Boolean>()
+    val isSignUpSuccess: SharedFlow<Boolean> = _isSignUpSuccess
 
     private val _isDuplicatedId = MutableSharedFlow<Boolean?>()
     val isDuplicatedId: SharedFlow<Boolean?> = _isDuplicatedId
@@ -59,7 +59,6 @@ class SignUpFragmentViewModel @Inject constructor(
                 }.onFailure {
                     _isSignUpSuccess.emit(false)
                 }
-
             }
         }
     }
@@ -121,5 +120,4 @@ class SignUpFragmentViewModel @Inject constructor(
             }
         }
     }
-
 }

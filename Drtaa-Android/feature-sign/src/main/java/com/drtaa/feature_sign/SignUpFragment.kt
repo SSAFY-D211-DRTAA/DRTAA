@@ -5,23 +5,21 @@ import android.net.Uri
 import android.os.Environment
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.widget.addTextChangedListener
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.drtaa.core_ui.base.BaseFragment
 import com.drtaa.feature_sign.databinding.FragmentSignUpBinding
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
 
 @AndroidEntryPoint
 class SignUpFragment : BaseFragment<FragmentSignUpBinding>(R.layout.fragment_sign_up) {
 
-    private val signViewModel: SignViewModel by activityViewModels()
     private val signUpFragmentViewModel: SignUpFragmentViewModel by viewModels()
 
     private val getImageLauncher =
@@ -67,16 +65,22 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>(R.layout.fragment_sig
             )
 
             signUpFragmentViewModel.setIsEqualPw(
-                if (inputText.isEmpty() && binding.signUpChkPwEt.text.toString().isEmpty()) null
-                else inputText == binding.signUpChkPwEt.text.toString()
+                if (inputText.isEmpty() && binding.signUpChkPwEt.text.toString().isEmpty()) {
+                    null
+                } else {
+                    inputText == binding.signUpChkPwEt.text.toString()
+                }
             )
         }
 
         binding.signUpChkPwEt.addTextChangedListener { text ->
             val inputText = text.toString()
             signUpFragmentViewModel.setIsEqualPw(
-                if (inputText.isEmpty() && binding.signUpPwEt.text.toString().isEmpty()) null
-                else inputText == binding.signUpPwEt.text.toString()
+                if (inputText.isEmpty() && binding.signUpPwEt.text.toString().isEmpty()) {
+                    null
+                } else {
+                    inputText == binding.signUpPwEt.text.toString()
+                }
             )
         }
 
@@ -84,7 +88,6 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>(R.layout.fragment_sig
             val inputText = text.toString()
             signUpFragmentViewModel.setIsEmptyNickname(inputText.isEmpty())
         }
-
     }
 
     private fun openImagePicker() {
@@ -104,7 +107,7 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>(R.layout.fragment_sig
 
         contentResolver.openInputStream(uri)?.use { inputStream ->
             FileOutputStream(file).use { outputStream ->
-                val buffer = ByteArray(1024)
+                val buffer = ByteArray(IMAGE_SIZE)
                 var length: Int
                 while (inputStream.read(buffer).also { length = it } > 0) {
                     outputStream.write(buffer, 0, length)
@@ -120,9 +123,8 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>(R.layout.fragment_sig
                 if (isSignUpSuccess) {
                     navigatePopBackStack()
                 } else {
-
+                    Snackbar.make(binding.signUpBtn, "회원가입 실패", Snackbar.LENGTH_SHORT).show()
                 }
-
             }.launchIn(viewLifecycleOwner.lifecycleScope)
 
         signUpFragmentViewModel.isDuplicatedId.flowWithLifecycle(viewLifecycleOwner.lifecycle)
@@ -147,7 +149,6 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>(R.layout.fragment_sig
                     true -> ""
                     false -> "비밀번호 형식을 확인해주세요."
                 }
-                Timber.d("isValidPw: $isValidPw")
                 signUpFragmentViewModel.setIsPossibleSignUp()
             }.launchIn(viewLifecycleOwner.lifecycleScope)
 
@@ -158,7 +159,6 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>(R.layout.fragment_sig
                     true -> ""
                     false -> "비밀번호가 일치하지 않습니다."
                 }
-                Timber.d("isValidPw: $isEqualPw")
                 signUpFragmentViewModel.setIsPossibleSignUp()
             }.launchIn(viewLifecycleOwner.lifecycleScope)
 
@@ -170,9 +170,10 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>(R.layout.fragment_sig
         signUpFragmentViewModel.isPossibleSignUp.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { isPossibleSignUp ->
                 binding.signUpBtn.isEnabled = isPossibleSignUp
-                Timber.d("isPossibleSignUp: $isPossibleSignUp")
             }.launchIn(viewLifecycleOwner.lifecycleScope)
-
     }
 
+    companion object {
+        const val IMAGE_SIZE = 1024
+    }
 }

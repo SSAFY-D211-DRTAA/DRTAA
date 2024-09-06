@@ -8,6 +8,8 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import java.util.Locale
 
+const val RADIUS = 10
+
 @BindingAdapter("app:setTextUppercase")
 fun TextView.setTextUppercase(text: String?) {
     this.text = text?.uppercase(Locale.getDefault())
@@ -18,7 +20,7 @@ fun ImageView.loadImageUrl(imgUrl: String) {
     Glide.with(context)
         .load(imgUrl)
         .fitCenter()
-        .transform(CenterCrop(), RoundedCorners(10))
+        .transform(CenterCrop(), RoundedCorners(RADIUS))
 //        .placeholder()
 //        .error()
 //        .fallback()
