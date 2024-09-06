@@ -21,7 +21,6 @@ abstract class BaseDialogFragment<B : ViewDataBinding>(private val layoutResId: 
     protected val binding get() = _binding!!
     protected var isBackPressedEnabled = true
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NO_FRAME, R.style.FullScreenDialogStyle)
@@ -58,22 +57,21 @@ abstract class BaseDialogFragment<B : ViewDataBinding>(private val layoutResId: 
 
     abstract fun initView(savedInstanceState: Bundle?)
 
-    fun navigateDestination(@IdRes action: Int) { //Navigation 이동
+    fun navigateDestination(@IdRes action: Int) { // Navigation 이동
         findNavController().navigate(action)
     }
 
-    fun navigateDestination(action: NavDirections) { //Navigation 이동
+    fun navigateDestination(action: NavDirections) { // Navigation 이동
         findNavController().navigate(action)
     }
 
-    fun navigatePopBackStack() { //뒤로 가기
+    fun navigatePopBackStack() { // 뒤로 가기
         findNavController().popBackStack()
     }
 
     fun navigateDestinationBundle(@IdRes action: Int, bundle: Bundle) {
         findNavController().navigate(action, bundle)
     }
-
 
     override fun onDestroyView() {
         super.onDestroyView()

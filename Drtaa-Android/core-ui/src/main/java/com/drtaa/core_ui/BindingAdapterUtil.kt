@@ -10,5 +10,4 @@ object BindingAdapterUtil {
     fun setTextUppercase(view: TextView, text: String?) {
         view.text = text?.uppercase(Locale.getDefault())
     }
-
 }

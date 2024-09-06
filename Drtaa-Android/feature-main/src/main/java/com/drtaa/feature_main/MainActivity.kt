@@ -11,7 +11,7 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.drtaa.core_ui.base.BaseActivity
 import com.drtaa.feature_main.databinding.ActivityMainBinding
-import com.drtaa.feature_main.util.Page
+import com.drtaa.feature_main.util.Constant
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
@@ -32,7 +32,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main), 
     }
 
     @SuppressLint("CommitTransaction")
-    private fun initMap(){
+    private fun initMap() {
         val fm = supportFragmentManager
         val mapFragment = fm.findFragmentById(R.id.map) as MapFragment?
             ?: MapFragment.newInstance().also {
@@ -44,7 +44,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main), 
     @UiThread
     override fun onMapReady(naverMap: NaverMap) {
         mapContainer = binding.map
-
     }
 
     private fun initBottomSheet() {
@@ -65,7 +64,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main), 
 
             addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
                 override fun onStateChanged(bottomSheet: View, newState: Int) {
-
+                    // Nothing
                 }
 
                 override fun onSlide(bottomSheet: View, slideOffset: Float) {
@@ -110,18 +109,22 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main), 
 
     private fun navControllerSetting() {
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            val page = Page.fromId(destination.id)
+            val page = Constant.Page.fromId(destination.id)
             binding.llBottomMenu.isVisible = page?.hideBottomNav != true
         }
     }
 
     private fun updateMapViewPadding(bottomSheetTop: Int) {
         val screenHeight = resources.displayMetrics.heightPixels
-        val mapMargin = screenHeight - bottomSheetTop - 200
+        val mapMargin = screenHeight - bottomSheetTop - BOTTOM_MARGIN
 
         (mapContainer.layoutParams as CoordinatorLayout.LayoutParams).apply {
             bottomMargin = mapMargin
             mapContainer.layoutParams = this
         }
+    }
+
+    companion object {
+        private const val BOTTOM_MARGIN = 200
     }
 }

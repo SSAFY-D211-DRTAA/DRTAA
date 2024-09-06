@@ -6,7 +6,6 @@ import com.drtaa.core_model.network.RequestFormLogin
 import com.drtaa.core_model.network.RequestSocialLogin
 import com.drtaa.core_model.network.ResponseLogin
 import com.drtaa.core_network.api.SignAPI
-import timber.log.Timber
 import javax.inject.Inject
 
 class SignDataSourceImpl @Inject constructor(
@@ -19,5 +18,4 @@ class SignDataSourceImpl @Inject constructor(
             else -> return ResponseLogin()
         }
     }
-
 }
