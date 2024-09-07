@@ -9,13 +9,12 @@
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".SignActivity">
 
         <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/sign_nav_host"
+            android:id="@+id/fcv_sign_nav_host"
             android:name="androidx.navigation.fragment.NavHostFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

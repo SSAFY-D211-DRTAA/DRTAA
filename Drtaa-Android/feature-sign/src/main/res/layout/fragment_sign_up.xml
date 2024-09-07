@@ -14,7 +14,7 @@
         tools:context=".SignUpFragment">
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/sign_up_profile_cv"
+            android:id="@+id/cv_sign_up_profile"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="80dp"
@@ -25,7 +25,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
-                android:id="@+id/sign_up_profile_iv"
+                android:id="@+id/iv_sign_up_profile"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:scaleType="centerCrop"
@@ -33,51 +33,51 @@
         </androidx.cardview.widget.CardView>
 
         <TextView
-            android:id="@+id/sign_up_id_tv"
+            android:id="@+id/tv_sign_up_id"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="아이디"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/sign_up_profile_cv" />
+            app:layout_constraintTop_toBottomOf="@+id/cv_sign_up_profile" />
 
         <EditText
-            android:id="@+id/sign_up_id_et"
+            android:id="@+id/et_sign_up_id"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:maxLines="1"
-            app:layout_constraintEnd_toStartOf="@+id/sign_up_id_chk_btn"
+            app:layout_constraintEnd_toStartOf="@+id/btn_sign_up_id_chk_duplicated"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/sign_up_id_tv" />
+            app:layout_constraintTop_toBottomOf="@+id/tv_sign_up_id" />
 
         <TextView
-            android:id="@+id/sign_up_id_help_tv"
+            android:id="@+id/tv_sign_up_id_help"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text=""
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/sign_up_id_et" />
+            app:layout_constraintTop_toBottomOf="@+id/et_sign_up_id" />
 
         <Button
-            android:id="@+id/sign_up_id_chk_btn"
+            android:id="@+id/btn_sign_up_id_chk_duplicated"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="중복확인"
-            app:layout_constraintBottom_toBottomOf="@+id/sign_up_id_et"
+            app:layout_constraintBottom_toBottomOf="@+id/et_sign_up_id"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/sign_up_id_et"
-            app:layout_constraintTop_toTopOf="@+id/sign_up_id_et" />
+            app:layout_constraintStart_toEndOf="@id/et_sign_up_id"
+            app:layout_constraintTop_toTopOf="@+id/et_sign_up_id" />
 
         <TextView
-            android:id="@+id/sign_up_pw_tv"
+            android:id="@+id/tv_sign_up_pw"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:text="비밀번호"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/sign_up_id_help_tv" />
+            app:layout_constraintTop_toBottomOf="@id/tv_sign_up_id_help" />
 
         <EditText
-            android:id="@+id/sign_up_pw_et"
+            android:id="@+id/et_sign_up_pw"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textPassword"
@@ -85,71 +85,71 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
 
-            app:layout_constraintTop_toBottomOf="@+id/sign_up_pw_tv" />
+            app:layout_constraintTop_toBottomOf="@+id/tv_sign_up_pw" />
 
         <TextView
-            android:id="@+id/sign_up_pw_help_tv"
+            android:id="@+id/tv_sign_up_pw_help"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text=""
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/sign_up_pw_et" />
+            app:layout_constraintTop_toBottomOf="@+id/et_sign_up_pw" />
 
         <TextView
-            android:id="@+id/sign_up_chk_pw_tv"
+            android:id="@+id/tv_sign_up_chk_pw"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:text="비밀번호 재입력"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/sign_up_pw_help_tv" />
+            app:layout_constraintTop_toBottomOf="@id/tv_sign_up_pw_help" />
 
         <EditText
-            android:id="@+id/sign_up_chk_pw_et"
+            android:id="@+id/et_sign_up_chk_pw"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:maxLines="1"
             android:inputType="textPassword"
+            android:maxLines="1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/sign_up_chk_pw_tv" />
+            app:layout_constraintTop_toBottomOf="@+id/tv_sign_up_chk_pw" />
 
         <TextView
-            android:id="@+id/sign_up_chk_pw_help_tv"
+            android:id="@+id/tv_sign_up_chk_pw_help"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text=""
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/sign_up_chk_pw_et" />
+            app:layout_constraintTop_toBottomOf="@+id/et_sign_up_chk_pw" />
 
         <TextView
-            android:id="@+id/sign_up_nickname_tv"
+            android:id="@+id/tv_sign_up_nickname"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:text="닉네임"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/sign_up_chk_pw_help_tv" />
+            app:layout_constraintTop_toBottomOf="@+id/tv_sign_up_chk_pw_help" />
 
         <EditText
-            android:id="@+id/sign_up_nickname_et"
+            android:id="@+id/et_sign_up_nickname"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:maxLines="1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/sign_up_nickname_tv" />
+            app:layout_constraintTop_toBottomOf="@+id/tv_sign_up_nickname" />
 
         <TextView
-            android:id="@+id/sign_up_nickname_help_tv"
+            android:id="@+id/tv_sign_up_nickname_help"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="닉네임 관련 메세지 띄울 예정"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/sign_up_nickname_et" />
+            app:layout_constraintTop_toBottomOf="@+id/et_sign_up_nickname" />
 
         <Button
-            android:id="@+id/sign_up_btn"
+            android:id="@+id/btn_sign_up"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
@@ -157,7 +157,7 @@
             android:text="회원가입"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/sign_up_nickname_help_tv" />
+            app:layout_constraintTop_toBottomOf="@+id/tv_sign_up_nickname_help" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

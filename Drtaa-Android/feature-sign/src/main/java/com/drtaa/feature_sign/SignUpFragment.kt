@@ -36,29 +36,29 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>(R.layout.fragment_sig
     }
 
     private fun initButtonEvent() {
-        binding.signUpIdChkBtn.setOnClickListener {
-            signUpFragmentViewModel.checkDuplicatedId(binding.signUpIdEt.text.toString())
+        binding.btnSignUpIdChkDuplicated.setOnClickListener {
+            signUpFragmentViewModel.checkDuplicatedId(binding.etSignUpId.text.toString())
         }
 
-        binding.signUpBtn.setOnClickListener {
+        binding.btnSignUp.setOnClickListener {
             signUpFragmentViewModel.signUp(
-                id = binding.signUpIdEt.text.toString(),
-                pw = binding.signUpPwEt.text.toString(),
-                nickname = binding.signUpNicknameEt.text.toString()
+                id = binding.etSignUpId.text.toString(),
+                pw = binding.etSignUpPw.text.toString(),
+                nickname = binding.etSignUpNickname.text.toString()
             )
         }
 
-        binding.signUpProfileCv.setOnClickListener {
+        binding.cvSignUpProfile.setOnClickListener {
             openImagePicker()
         }
     }
 
     private fun initEditTextEvent() {
-        binding.signUpIdEt.addTextChangedListener { _ ->
+        binding.etSignUpId.addTextChangedListener { _ ->
             signUpFragmentViewModel.setIsDuplicatedId(null)
         }
 
-        binding.signUpPwEt.addTextChangedListener { text ->
+        binding.etSignUpPw.addTextChangedListener { text ->
             val inputText = text.toString()
 
             signUpFragmentViewModel.setIsValidPw(
@@ -66,26 +66,26 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>(R.layout.fragment_sig
             )
 
             signUpFragmentViewModel.setIsEqualPw(
-                if (inputText.isEmpty() && binding.signUpChkPwEt.text.toString().isEmpty()) {
+                if (inputText.isEmpty() && binding.etSignUpChkPw.text.toString().isEmpty()) {
                     null
                 } else {
-                    inputText == binding.signUpChkPwEt.text.toString()
+                    inputText == binding.etSignUpChkPw.text.toString()
                 }
             )
         }
 
-        binding.signUpChkPwEt.addTextChangedListener { text ->
+        binding.etSignUpChkPw.addTextChangedListener { text ->
             val inputText = text.toString()
             signUpFragmentViewModel.setIsEqualPw(
-                if (inputText.isEmpty() && binding.signUpPwEt.text.toString().isEmpty()) {
+                if (inputText.isEmpty() && binding.etSignUpPw.text.toString().isEmpty()) {
                     null
                 } else {
-                    inputText == binding.signUpPwEt.text.toString()
+                    inputText == binding.etSignUpPw.text.toString()
                 }
             )
         }
 
-        binding.signUpNicknameEt.addTextChangedListener { text ->
+        binding.etSignUpNickname.addTextChangedListener { text ->
             val inputText = text.toString()
             signUpFragmentViewModel.setIsEmptyNickname(inputText.isEmpty())
         }
@@ -127,13 +127,13 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>(R.layout.fragment_sig
                 if (isSignUpSuccess) {
                     navigatePopBackStack()
                 } else {
-                    showSnackBar("회원가입 실패,")
+                    showSnackBar("회원가입 실패")
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
 
         signUpFragmentViewModel.isDuplicatedId.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { isDuplicatedId ->
-                binding.signUpIdHelpTv.text = when (isDuplicatedId) {
+                binding.tvSignUpIdHelp.text = when (isDuplicatedId) {
                     null -> ""
                     true -> "이미 사용중인 아이디입니다."
                     false -> "사용 가능한 아이디입니다."
@@ -143,12 +143,12 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>(R.layout.fragment_sig
 
         signUpFragmentViewModel.profileImageUri.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { imageUri ->
-                binding.signUpProfileIv.setImageURI(imageUri)
+                binding.ivSignUpProfile.setImageURI(imageUri)
             }.launchIn(viewLifecycleOwner.lifecycleScope)
 
         signUpFragmentViewModel.isValidPw.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { isValidPw ->
-                binding.signUpPwHelpTv.text = when (isValidPw) {
+                binding.tvSignUpPwHelp.text = when (isValidPw) {
                     null -> ""
                     true -> ""
                     false -> "비밀번호 형식을 확인해주세요."
@@ -158,7 +158,7 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>(R.layout.fragment_sig
 
         signUpFragmentViewModel.isEqualPw.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { isEqualPw ->
-                binding.signUpChkPwHelpTv.text = when (isEqualPw) {
+                binding.tvSignUpChkPwHelp.text = when (isEqualPw) {
                     null -> ""
                     true -> ""
                     false -> "비밀번호가 일치하지 않습니다."
@@ -168,12 +168,12 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>(R.layout.fragment_sig
 
         signUpFragmentViewModel.isEmptyNickname.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { isEmptyNickname ->
-                binding.signUpNicknameHelpTv.text = if (isEmptyNickname) "닉네임을 설정해주세요." else ""
+                binding.tvSignUpNicknameHelp.text = if (isEmptyNickname) "닉네임을 설정해주세요." else ""
             }.launchIn(viewLifecycleOwner.lifecycleScope)
 
         signUpFragmentViewModel.isPossibleSignUp.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { isPossibleSignUp ->
-                binding.signUpBtn.isEnabled = isPossibleSignUp
+                binding.btnSignUp.isEnabled = isPossibleSignUp
             }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
