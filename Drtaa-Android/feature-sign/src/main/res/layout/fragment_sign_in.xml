@@ -14,7 +14,7 @@
         tools:context=".SignInFragment">
 
         <TextView
-            android:id="@+id/signin_id_tv"
+            android:id="@+id/tv_sign_in_id"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="아이디"
@@ -22,40 +22,40 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <EditText
-            android:id="@+id/signin_id_et"
+            android:id="@+id/et_sign_in_id"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/signin_id_tv" />
+            app:layout_constraintTop_toBottomOf="@+id/tv_sign_in_id" />
 
         <TextView
-            android:id="@+id/signin_pw_tv"
+            android:id="@+id/tv_sign_in_pw"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="비밀번호"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/signin_id_et" />
+            app:layout_constraintTop_toBottomOf="@id/et_sign_in_id" />
 
         <EditText
-            android:id="@+id/signin_pw_et"
+            android:id="@+id/et_sign_in_pw"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/signin_pw_tv" />
+            app:layout_constraintTop_toBottomOf="@+id/tv_sign_in_pw" />
 
         <Button
-            android:id="@+id/signin_login_btn"
+            android:id="@+id/btn_sign_in"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="로그인"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/signin_pw_et" />
+            app:layout_constraintTop_toBottomOf="@+id/et_sign_in_pw" />
 
         <Button
-            android:id="@+id/signin_move_to_main_btn"
+            android:id="@+id/btn_sign_in_move_to_main"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="MainActivity로 이동"
@@ -65,12 +65,20 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <com.navercorp.nid.oauth.view.NidOAuthLoginButton
-            android:id="@+id/signin_naver_btn"
+            android:id="@+id/btn_sign_in_naver"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/signin_move_to_main_btn" />
+            app:layout_constraintTop_toBottomOf="@+id/btn_sign_in_move_to_main" />
 
+        <Button
+            android:id="@+id/btn_sign_in_sign_up"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="회원가입"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btn_sign_in_naver" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

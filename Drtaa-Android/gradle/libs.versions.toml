@@ -1,5 +1,6 @@
 [versions]
 agp = "8.5.0"
+gson = "2.10.1"
 kotlin = "1.9.22"
 coreKtx = "1.13.1"
 junit = "4.13.2"
@@ -41,6 +42,7 @@ detekt-gradle = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", v
 detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detekt" }
 
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 kotlin-gradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }

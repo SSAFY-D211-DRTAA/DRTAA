@@ -24,20 +24,24 @@ class SignInFragment : BaseFragment<FragmentSignInBinding>(R.layout.fragment_sig
     }
 
     private fun initEvent() {
-        binding.signinMoveToMainBtn.setOnClickListener {
+        binding.btnSignInMoveToMain.setOnClickListener {
             startActivity(Intent(requireContext(), MainActivity::class.java))
             requireActivity().finish()
         }
 
-        binding.signinNaverBtn.setOnClickListener {
+        binding.btnSignInNaver.setOnClickListener {
             NaverLoginManager.login(requireActivity())
         }
 
-        binding.signinLoginBtn.setOnClickListener {
+        binding.btnSignIn.setOnClickListener {
             signViewModel.formLogin(
-                id = binding.signinIdEt.text.toString(),
-                pw = binding.signinPwEt.text.toString()
+                id = binding.etSignInId.text.toString(),
+                pw = binding.etSignInPw.text.toString()
             )
+        }
+
+        binding.btnSignInSignUp.setOnClickListener {
+            navigateDestination(R.id.action_signInFragment_to_signUpFragment)
         }
     }
 
