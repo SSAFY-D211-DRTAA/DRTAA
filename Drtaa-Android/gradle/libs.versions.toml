@@ -20,7 +20,6 @@ lifecycle-runtime-ktx = "2.8.3"
 lifecycle-extensions = "2.2.0"
 
 # Logging
-oauth = "5.10.0"
 timber = "5.0.1"
 
 # Media
@@ -36,6 +35,11 @@ okhttp = "4.12.0"
 retrofit = "2.11.0"
 jetbrainsKotlinJvm = "1.9.0"
 detekt = "1.23.5"
+
+# Login
+naver = "5.10.0"
+credentials = "1.2.2"
+googleid = "1.1.1"
 
 [libraries]
 detekt-gradle = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt" }
@@ -64,7 +68,10 @@ coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-
 coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 
 # Login
-naver-oauth = { module = "com.navercorp.nid:oauth", version.ref = "oauth" }
+naver-oauth = { module = "com.navercorp.nid:oauth", version.ref = "naver" }
+androidx-credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }
+androidx-credentials-play-services-auth = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }
+googleid = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleid" }
 
 # Logging
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }

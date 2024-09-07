@@ -28,10 +28,9 @@ android {
         buildConfigField("String", "NAVER_MAP_CLIENT_SECRET", getApiKey("NAVER_MAP_CLIENT_SECRET"))
         buildConfigField("String", "NAVER_LOGIN_CLIENT_ID", getApiKey("NAVER_LOGIN_CLIENT_ID"))
         buildConfigField("String", "NAVER_LOGIN_CLIENT_SECRET", getApiKey("NAVER_LOGIN_CLIENT_SECRET"))
+        buildConfigField("String", "GOOGLE_LOGIN_CLIENT_ID", getApiKey("GOOGLE_LOGIN_CLIENT_ID"))
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
-        buildConfigField("String", "NAVER_MAP_CLIENT_ID", getApiKey("NAVER_MAP_CLIENT_ID"))
 
         manifestPlaceholders["NAVER_MAP_CLIENT_ID_MANIFEST"] = getApiKey("NAVER_MAP_CLIENT_ID_MANIFEST")
     }
@@ -80,5 +79,7 @@ dependencies {
     implementation(libs.coroutines.core)
     //Sign
     implementation(libs.naver.oauth)
-    detektPlugins(libs.detekt.formatting)
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.googleid)
 }
