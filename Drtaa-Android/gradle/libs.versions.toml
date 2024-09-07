@@ -40,6 +40,7 @@ detekt = "1.23.5"
 naver = "5.10.0"
 credentials = "1.2.2"
 googleid = "1.1.1"
+playServicesBasement = "18.4.0"
 
 [libraries]
 detekt-gradle = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt" }
@@ -97,6 +98,7 @@ retrofit-converter-kotlinxSerialization = { module = "com.squareup.retrofit2:con
 
 # Media
 glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
+play-services-basement = { group = "com.google.android.gms", name = "play-services-basement", version.ref = "playServicesBasement" }
 
 [bundles]
 network-default = [
