@@ -5,6 +5,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.drtaa.core_ui.base.BaseFragment
+import com.drtaa.core_ui.showSnackBar
 import com.drtaa.feature_main.MainActivity
 import com.drtaa.feature_sign.databinding.FragmentSignInBinding
 import com.drtaa.feature_sign.util.SocialLoginManager
@@ -63,6 +64,7 @@ class SignInFragment : BaseFragment<FragmentSignInBinding>(R.layout.fragment_sig
                     signViewModel.getTokens(data)
                 }.onFailure {
                     Timber.tag("login fail").d("$result")
+                    showSnackBar("로그인에 실패하였습니다.")
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
 
@@ -71,7 +73,9 @@ class SignInFragment : BaseFragment<FragmentSignInBinding>(R.layout.fragment_sig
                 result.onSuccess {
                     startActivity(Intent(requireContext(), MainActivity::class.java))
                     requireActivity().finish()
-                }.onFailure {}
+                }.onFailure {
+                    showSnackBar("로그인에 실패하였습니다.")
+                }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
 }
