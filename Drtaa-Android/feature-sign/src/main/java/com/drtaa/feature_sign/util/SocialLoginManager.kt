@@ -30,8 +30,7 @@ import javax.inject.Singleton
 
 @Singleton
 class SocialLoginManager @Inject constructor(
-    private val credentialManager: CredentialManager,
-    private val googleIdOption: GetGoogleIdOption
+    private val googleIdOption: GetGoogleIdOption,
 ) {
     private val _resultLogin = MutableSharedFlow<Result<SocialUser>>()
     val resultLogin: SharedFlow<Result<SocialUser>> = _resultLogin
@@ -109,16 +108,19 @@ class SocialLoginManager @Inject constructor(
         }
     }
 
-    fun logout(socialType: String) {
+    fun logout(socialType: String, context: Context) {
         when (socialType) {
             NAVER -> NaverIdLoginSDK.logout()
             GOOGLE -> signScope {
+                val credentialManager = CredentialManager.create(context)
                 credentialManager.clearCredentialState(request = ClearCredentialStateRequest())
             }
         }
     }
 
     private suspend fun googleLogin(context: Context) {
+        val credentialManager = CredentialManager.create(context)
+
         val request: GetCredentialRequest = GetCredentialRequest.Builder()
             .addCredentialOption(googleIdOption)
             .build()

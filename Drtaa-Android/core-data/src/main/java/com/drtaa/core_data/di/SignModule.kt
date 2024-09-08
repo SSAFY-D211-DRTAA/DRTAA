@@ -17,12 +17,6 @@ object SignModule {
 
     @Provides
     @Singleton
-    fun provideCredentialManager(@ApplicationContext context: Context): CredentialManager {
-        return CredentialManager.create(context)
-    }
-
-    @Provides
-    @Singleton
     fun provideGoogleIdOption(): GetGoogleIdOption {
         return GetGoogleIdOption.Builder()
             .setFilterByAuthorizedAccounts(false)
