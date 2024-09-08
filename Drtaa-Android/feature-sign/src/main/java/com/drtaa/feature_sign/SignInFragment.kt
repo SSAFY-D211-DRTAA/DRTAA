@@ -1,29 +1,18 @@
 package com.drtaa.feature_sign
 
 import android.content.Intent
-import android.provider.Settings
-import androidx.credentials.CredentialManager
-import androidx.credentials.CustomCredential
-import androidx.credentials.GetCredentialRequest
-import androidx.credentials.GetCredentialResponse
-import androidx.credentials.exceptions.GetCredentialException
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.drtaa.core_ui.base.BaseFragment
 import com.drtaa.feature_main.MainActivity
 import com.drtaa.feature_sign.databinding.FragmentSignInBinding
-import com.drtaa.feature_sign.util.NaverLoginManager
-import com.google.android.libraries.identity.googleid.GetGoogleIdOption
-import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
-import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
+import com.drtaa.feature_sign.util.SocialLoginManager
+import com.drtaa.feature_sign.util.SocialLoginManager.Companion.GOOGLE
+import com.drtaa.feature_sign.util.SocialLoginManager.Companion.NAVER
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -33,7 +22,7 @@ class SignInFragment : BaseFragment<FragmentSignInBinding>(R.layout.fragment_sig
     private val signViewModel: SignViewModel by activityViewModels()
 
     @Inject
-    lateinit var googleIdOption: GetGoogleIdOption
+    lateinit var socialLoginManager: SocialLoginManager
 
     override fun initView() {
         initEvent()
@@ -47,7 +36,7 @@ class SignInFragment : BaseFragment<FragmentSignInBinding>(R.layout.fragment_sig
         }
 
         binding.btnSignInNaver.setOnClickListener {
-            NaverLoginManager.login(requireActivity())
+            socialLoginManager.login(NAVER, requireActivity())
         }
 
         binding.btnSignIn.setOnClickListener {
@@ -62,14 +51,12 @@ class SignInFragment : BaseFragment<FragmentSignInBinding>(R.layout.fragment_sig
         }
 
         binding.btnSignInGoogle.setOnClickListener {
-            CoroutineScope(Dispatchers.IO).launch {
-                googleLogin()
-            }
+            socialLoginManager.login(GOOGLE, requireActivity())
         }
     }
 
     private fun initObserver() {
-        NaverLoginManager.resultLogin.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+        socialLoginManager.resultLogin.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { result ->
                 result.onSuccess { data ->
                     Timber.tag("login success").d("$data")
@@ -86,47 +73,5 @@ class SignInFragment : BaseFragment<FragmentSignInBinding>(R.layout.fragment_sig
                     requireActivity().finish()
                 }.onFailure {}
             }.launchIn(viewLifecycleOwner.lifecycleScope)
-    }
-
-    private suspend fun googleLogin() {
-        val credentialManager = CredentialManager.create(requireActivity())
-
-        val request: GetCredentialRequest = GetCredentialRequest.Builder()
-            .addCredentialOption(googleIdOption)
-            .build()
-
-        coroutineScope {
-            try {
-                val result = credentialManager.getCredential(
-                    request = request,
-                    context = requireActivity()
-                )
-                handleSignIn(result)
-            } catch (e: GetCredentialException) {
-                if (e.type == android.credentials.GetCredentialException.TYPE_NO_CREDENTIAL) {
-                    startActivity(Intent(Settings.ACTION_ADD_ACCOUNT))
-                }
-            }
-        }
-    }
-
-    private fun handleSignIn(result: GetCredentialResponse) {
-        when (val credential = result.credential) {
-            // 구글 아이디 토큰
-            is CustomCredential -> {
-                if (credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
-                    try {
-                        val googleIdTokenCredential = GoogleIdTokenCredential
-                            .createFrom(credential.data)
-                        Timber.d("id : ${googleIdTokenCredential.id}")
-                        Timber.d("idToken : ${googleIdTokenCredential.idToken}")
-                    } catch (e: GoogleIdTokenParsingException) {
-                        Timber.d("Received an invalid google id token response", e)
-                    }
-                } else {
-                    Timber.d("Unexpected type of credential")
-                }
-            }
-        }
     }
 }
