@@ -14,7 +14,6 @@ import com.drtaa.core_ui.base.BaseFragment
 import com.drtaa.feature_main.MainActivity
 import com.drtaa.feature_sign.databinding.FragmentSignInBinding
 import com.drtaa.feature_sign.util.NaverLoginManager
-import com.google.android.gms.common.api.ApiException
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
@@ -104,7 +103,7 @@ class SignInFragment : BaseFragment<FragmentSignInBinding>(R.layout.fragment_sig
                 )
                 handleSignIn(result)
             } catch (e: GetCredentialException) {
-                if(e.type == android.credentials.GetCredentialException.TYPE_NO_CREDENTIAL){
+                if (e.type == android.credentials.GetCredentialException.TYPE_NO_CREDENTIAL) {
                     startActivity(Intent(Settings.ACTION_ADD_ACCOUNT))
                 }
             }

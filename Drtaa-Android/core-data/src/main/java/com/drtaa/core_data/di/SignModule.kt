@@ -1,6 +1,6 @@
-package com.drtaa.android.di
+package com.drtaa.core_data.di
 
-import com.drtaa.android.BuildConfig
+import com.drtaa.core.BuildConfig
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import dagger.Module
 import dagger.Provides
@@ -10,16 +10,15 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object BuildConfigModule {
+object SignModule {
 
-    @Singleton
     @Provides
+    @Singleton
     fun provideGoogleIdOption(): GetGoogleIdOption {
         return GetGoogleIdOption.Builder()
             .setFilterByAuthorizedAccounts(false)
             .setServerClientId(BuildConfig.GOOGLE_LOGIN_CLIENT_ID)
-            .setAutoSelectEnabled(false)
+            .setAutoSelectEnabled(true)
             .build()
     }
-
 }
