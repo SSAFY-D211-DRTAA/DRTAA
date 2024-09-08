@@ -138,20 +138,40 @@ class SocialLoginManager @Inject constructor(
         }
     }
 
-    private fun handleSignIn(result: GetCredentialResponse) {
+    private suspend fun handleSignIn(result: GetCredentialResponse) {
         when (val credential = result.credential) {
             is CustomCredential -> {
                 if (credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
                     try {
                         val googleIdTokenCredential = GoogleIdTokenCredential
                             .createFrom(credential.data)
-                        Timber.d("id : ${googleIdTokenCredential.id}")
-                        Timber.d("idToken : ${googleIdTokenCredential.idToken}")
+
+                        _resultLogin.emit(
+                            Result.success(
+                                SocialUser(
+                                    userLogin = GOOGLE,
+                                    id = googleIdTokenCredential.id,
+                                    name = googleIdTokenCredential.displayName,
+                                    nickname = googleIdTokenCredential.displayName.orEmpty(),
+                                    profileImageUrl = googleIdTokenCredential.profilePictureUri.toString()
+                                )
+                            )
+                        )
                     } catch (e: GoogleIdTokenParsingException) {
                         Timber.d("Received an invalid google id token response", e)
+                        _resultLogin.emit(
+                            Result.failure(
+                                Exception("${e.message}")
+                            )
+                        )
                     }
                 } else {
                     Timber.d("Unexpected type of credential")
+                    _resultLogin.emit(
+                        Result.failure(
+                            Exception("Unexpected type of credential")
+                        )
+                    )
                 }
             }
         }
