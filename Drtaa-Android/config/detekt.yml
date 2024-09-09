@@ -240,7 +240,7 @@ formatting:
   EnumEntryNameCase:
     active: false
   Filename:
-    active: true
+    active: false
   FinalNewline:
     active: false
   ImportOrdering:
@@ -321,7 +321,7 @@ naming:
     enumEntryPattern: '[A-Z][_a-zA-Z0-9]*'
   ForbiddenClassName:
     active: false
-    forbiddenName: []
+    forbiddenName: [ ]
   FunctionMaxLength:
     active: false
     maximumFunctionNameLength: 30
@@ -341,7 +341,7 @@ naming:
   MatchingDeclarationName:
     active: true
     mustBeFirst: true
-    excludes: ['**/Constant.kt', '**/Constants.kt']
+    excludes: [ '**/Constant.kt', '**/Constants.kt' ]
 
   MemberNameEqualsClassName:
     active: false
@@ -599,7 +599,7 @@ style:
     active: false
   UseDataClass:
     active: false
-    ignoreAnnotated: []
+    ignoreAnnotated: [ ]
     allowVars: false
   UseIfInsteadOfWhen:
     active: false

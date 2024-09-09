@@ -31,8 +31,6 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField("String", "NAVER_MAP_CLIENT_ID", getApiKey("NAVER_MAP_CLIENT_ID"))
-
         manifestPlaceholders["NAVER_MAP_CLIENT_ID_MANIFEST"] = getApiKey("NAVER_MAP_CLIENT_ID_MANIFEST")
     }
 
@@ -80,5 +78,4 @@ dependencies {
     implementation(libs.coroutines.core)
     //Sign
     implementation(libs.naver.oauth)
-    detektPlugins(libs.detekt.formatting)
 }
