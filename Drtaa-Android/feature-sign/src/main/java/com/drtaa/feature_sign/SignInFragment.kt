@@ -4,13 +4,12 @@ import android.content.Intent
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.drtaa.core_model.util.Social
 import com.drtaa.core_ui.base.BaseFragment
 import com.drtaa.core_ui.showSnackBar
 import com.drtaa.feature_main.MainActivity
 import com.drtaa.feature_sign.databinding.FragmentSignInBinding
 import com.drtaa.feature_sign.util.SocialLoginManager
-import com.drtaa.feature_sign.util.SocialLoginManager.Companion.GOOGLE
-import com.drtaa.feature_sign.util.SocialLoginManager.Companion.NAVER
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -37,7 +36,7 @@ class SignInFragment : BaseFragment<FragmentSignInBinding>(R.layout.fragment_sig
         }
 
         binding.btnSignInNaver.setOnClickListener {
-            socialLoginManager.login(NAVER, requireActivity())
+            socialLoginManager.login(Social.NAVER.type, requireActivity())
         }
 
         binding.btnSignIn.setOnClickListener {
@@ -52,7 +51,7 @@ class SignInFragment : BaseFragment<FragmentSignInBinding>(R.layout.fragment_sig
         }
 
         binding.btnSignInGoogle.setOnClickListener {
-            socialLoginManager.login(GOOGLE, requireActivity())
+            socialLoginManager.login(Social.GOOGLE.type, requireActivity())
         }
     }
 

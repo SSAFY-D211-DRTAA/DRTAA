@@ -10,6 +10,7 @@ import androidx.credentials.GetCredentialRequest
 import androidx.credentials.GetCredentialResponse
 import androidx.credentials.exceptions.GetCredentialException
 import com.drtaa.core_model.data.SocialUser
+import com.drtaa.core_model.util.Social
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
@@ -47,7 +48,7 @@ class SocialLoginManager @Inject constructor(
                 _resultLogin.emit(
                     Result.success(
                         SocialUser(
-                            userLogin = NAVER,
+                            userLogin = Social.NAVER.type,
                             id = result.profile?.id.orEmpty(),
                             name = result.profile?.name,
                             nickname = result.profile?.nickname.orEmpty(),
@@ -99,8 +100,8 @@ class SocialLoginManager @Inject constructor(
 
     fun login(socialType: String, context: Context) {
         when (socialType) {
-            NAVER -> NaverIdLoginSDK.authenticate(context, oAuthLoginCallback)
-            GOOGLE -> {
+            Social.NAVER.type -> NaverIdLoginSDK.authenticate(context, oAuthLoginCallback)
+            Social.GOOGLE.type -> {
                 signScope {
                     googleLogin(context)
                 }
@@ -110,8 +111,8 @@ class SocialLoginManager @Inject constructor(
 
     fun logout(socialType: String, context: Context) {
         when (socialType) {
-            NAVER -> NaverIdLoginSDK.logout()
-            GOOGLE -> signScope {
+            Social.NAVER.type -> NaverIdLoginSDK.logout()
+            Social.GOOGLE.type -> signScope {
                 val credentialManager = CredentialManager.create(context)
                 credentialManager.clearCredentialState(request = ClearCredentialStateRequest())
             }
@@ -151,7 +152,7 @@ class SocialLoginManager @Inject constructor(
                         _resultLogin.emit(
                             Result.success(
                                 SocialUser(
-                                    userLogin = GOOGLE,
+                                    userLogin = Social.GOOGLE.type,
                                     id = googleIdTokenCredential.id,
                                     name = googleIdTokenCredential.displayName,
                                     nickname = googleIdTokenCredential.displayName.orEmpty(),
@@ -177,10 +178,5 @@ class SocialLoginManager @Inject constructor(
                 }
             }
         }
-    }
-
-    companion object {
-        const val NAVER = "Naver"
-        const val GOOGLE = "Google"
     }
 }
