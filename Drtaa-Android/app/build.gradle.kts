@@ -3,8 +3,6 @@ import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
-    id("drtaa.plugin.detekt")
-    id("drtaa.plugin.network")
     id("drtaa.plugin.common")
     id("drtaa.plugin.hilt")
 }
@@ -57,15 +55,7 @@ android {
 }
 
 dependencies {
-    // modules
-    implementation(project(":core-data"))
-    implementation(project(":core-network"))
-    implementation(project(":core-ui"))
-    implementation(project(":core-model"))
     implementation(project(":feature-main"))
-    implementation(project(":feature-ticket"))
-    implementation(project(":feature-mypage"))
-    implementation(project(":feature-home"))
     implementation(project(":feature-sign"))
 
     // Datastore

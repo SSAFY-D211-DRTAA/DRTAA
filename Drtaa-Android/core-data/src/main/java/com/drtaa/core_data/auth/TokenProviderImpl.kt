@@ -1,4 +1,4 @@
-package com.drtaa.android.di
+package com.drtaa.core_data.auth
 
 import com.drtaa.core_data.repository.TokenRepository
 import com.drtaa.core_model.auth.TokenProvider

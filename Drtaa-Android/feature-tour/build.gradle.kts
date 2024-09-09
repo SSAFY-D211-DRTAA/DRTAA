@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.drtaa.feature_ticket"
+    namespace = "com.drtaa.feature_tour"
     compileSdk = 34
 
     defaultConfig {
