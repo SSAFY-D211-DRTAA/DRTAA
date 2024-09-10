@@ -4,6 +4,13 @@ FROM openjdk:17-alpine
 # tzdata 패키지 설치 및 타임존 설정
 RUN ln -snf /usr/share/zoneinfo/Asia/Seoul /etc/localtime && echo Asia/Seoul > /etc/timezone
 
+# 작업 디렉토리 설정
+WORKDIR = /app
+COPY . .
+
+RUN ls -al
+RUN pwd
+
 # build가 되는 시점에 JAR_FILE 경로에 jar파일 생성
 RUN chmod +x ./gradlew && ./gradlew clean build
 ARG JAR_FILE=/build/libs/Drtaa-0.0.1-SNAPSHOT.jar
