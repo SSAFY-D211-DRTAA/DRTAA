@@ -13,3 +13,6 @@ annotation class DefaultOkHttpClient
 
 @Qualifier
 annotation class DefaultRetrofit
+
+@Qualifier
+annotation class MapRetrofit

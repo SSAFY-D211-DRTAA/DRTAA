@@ -21,8 +21,10 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
-        const val BASE_URL = "http://192.168.0.12:8080/" // 나중에 local.properties로 뺼 예정
-//    const val BASE_URL = "http://192.168.100.185:8080/" // 나중에 local.properties로 뺼 예정
+    const val BASE_URL = "http://192.168.0.12:8080/" // 나중에 local.properties로 뺼 예정
+    //    const val BASE_URL = "http://192.168.100.185:8080/" // 나중에 local.properties로 뺼 예정
+
+    const val MAP_URL = "https://openapi.naver.com/v1/search/" // 나중에 local.properties로 뺼 예정
 
     @Singleton
     @DefaultRetrofit
@@ -44,6 +46,18 @@ object NetworkModule {
             .addConverterFactory(ScalarsConverterFactory.create())
             .addConverterFactory(GsonConverterFactory.create(GsonBuilder().setLenient().create()))
             .baseUrl(BASE_URL)
+            .client(okHttpClient)
+            .build()
+    }
+
+    @Singleton
+    @MapRetrofit
+    @Provides
+    fun provideMapRetrofit(@DefaultOkHttpClient okHttpClient: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+            .addConverterFactory(ScalarsConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(GsonBuilder().setLenient().create()))
+            .baseUrl(MAP_URL)
             .client(okHttpClient)
             .build()
     }

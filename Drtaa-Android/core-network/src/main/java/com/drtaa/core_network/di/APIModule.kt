@@ -1,5 +1,6 @@
 package com.drtaa.core_network.di
 
+import com.drtaa.core_network.api.MapAPI
 import com.drtaa.core_network.api.SignAPI
 import com.drtaa.core_network.api.TestAPI
 import dagger.Module
@@ -25,4 +26,11 @@ object APIModule {
         @DefaultRetrofit
         retrofit: Retrofit
     ): SignAPI = retrofit.create(SignAPI::class.java)
+
+    @Singleton
+    @Provides
+    fun provideMapAPI(
+        @MapRetrofit
+        retrofit: Retrofit
+    ): MapAPI = retrofit.create(MapAPI::class.java)
 }

@@ -14,8 +14,8 @@ class DrtaaApp : Application() {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         NaverIdLoginSDK.initialize(
             this,
-            BuildConfig.NAVER_LOGIN_CLIENT_ID,
-            BuildConfig.NAVER_LOGIN_CLIENT_SECRET,
+            BuildConfig.NAVER_CLIENT_ID,
+            BuildConfig.NAVER_CLIENT_SECRET,
             "DRTAA",
         )
     }
