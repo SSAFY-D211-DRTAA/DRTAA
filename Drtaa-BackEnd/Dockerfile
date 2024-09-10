@@ -11,6 +11,9 @@ COPY . .
 RUN ls -al
 RUN pwd
 
+# Gradle 빌드
+RUN rm -rf .gradle
+
 # build가 되는 시점에 JAR_FILE 경로에 jar파일 생성
 RUN chmod +x ./gradlew && ./gradlew clean build
 ARG JAR_FILE=/build/libs/Drtaa-0.0.1-SNAPSHOT.jar
