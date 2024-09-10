@@ -1,6 +1,6 @@
 package com.drtaa.core_data.di
 
-import com.drtaa.core.BuildConfig
+import com.drtaa.core_data.BuildConfig
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import dagger.Module
 import dagger.Provides

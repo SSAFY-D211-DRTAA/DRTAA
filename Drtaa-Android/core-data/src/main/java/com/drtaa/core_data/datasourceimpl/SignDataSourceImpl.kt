@@ -3,7 +3,7 @@ package com.drtaa.core_data.datasourceimpl
 import com.drtaa.core_data.datasource.SignDataSource
 import com.drtaa.core_model.data.SocialUser
 import com.drtaa.core_model.data.UserLoginInfo
-import com.drtaa.core_model.data.toRequestLogin
+import com.drtaa.core_model.util.toRequestLogin
 import com.drtaa.core_model.network.RequestFormLogin
 import com.drtaa.core_model.network.ResponseLogin
 import com.drtaa.core_network.api.SignAPI
