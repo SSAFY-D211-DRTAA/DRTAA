@@ -1,5 +1,7 @@
-package com.drtaa.core_model.data
+package com.drtaa.core_model.util
 
+import com.drtaa.core_model.data.SocialUser
+import com.drtaa.core_model.data.Tokens
 import com.drtaa.core_model.network.RequestSocialLogin
 import com.drtaa.core_model.network.ResponseLogin
 

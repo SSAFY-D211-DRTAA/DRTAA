@@ -11,7 +11,7 @@ fun getApiKey(propertyKey: String): String {
 }
 
 android {
-    namespace = "com.drtaa.core"
+    namespace = "com.drtaa.core_data"
     compileSdk = 34
 
     defaultConfig {

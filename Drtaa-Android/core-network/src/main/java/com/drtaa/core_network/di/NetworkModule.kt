@@ -1,7 +1,9 @@
 package com.drtaa.core_network.di
 
+import com.drtaa.core_network.BuildConfig
 import com.drtaa.core_network.util.isJsonArray
 import com.drtaa.core_network.util.isJsonObject
+import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonParser
 import com.google.gson.JsonSyntaxException
@@ -21,17 +23,30 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
-        const val BASE_URL = "http://192.168.0.12:8080/" // 나중에 local.properties로 뺼 예정
-//    const val BASE_URL = "http://192.168.100.185:8080/" // 나중에 local.properties로 뺼 예정
+    @Provides
+    @Singleton
+    fun provideGson(): Gson = GsonBuilder().setLenient().create()
+
+    @Provides
+    @Singleton
+    fun provideRetrofitFactory(
+        @DefaultOkHttpClient okHttpClient: OkHttpClient,
+        gson: Gson
+    ): RetrofitFactory {
+        return RetrofitFactory(okHttpClient, gson)
+    }
 
     @Singleton
     @DefaultRetrofit
     @Provides
-    fun provideRetrofit(@DefaultOkHttpClient okHttpClient: OkHttpClient): Retrofit {
+    fun provideRetrofit(
+        @DefaultOkHttpClient okHttpClient: OkHttpClient,
+        gson: Gson
+    ): Retrofit {
         return Retrofit.Builder()
             .addConverterFactory(ScalarsConverterFactory.create())
-            .addConverterFactory(GsonConverterFactory.create(GsonBuilder().setLenient().create()))
-            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create(gson))
+            .baseUrl(BuildConfig.BASE_URL)
             .client(okHttpClient)
             .build()
     }
@@ -39,11 +54,14 @@ object NetworkModule {
     @Singleton
     @AuthRetrofit
     @Provides
-    fun provideAuthRetrofit(@AuthOkHttpClient okHttpClient: OkHttpClient): Retrofit {
+    fun provideAuthRetrofit(
+        @AuthOkHttpClient okHttpClient: OkHttpClient,
+        gson: Gson
+    ): Retrofit {
         return Retrofit.Builder()
             .addConverterFactory(ScalarsConverterFactory.create())
-            .addConverterFactory(GsonConverterFactory.create(GsonBuilder().setLenient().create()))
-            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create(gson))
+            .baseUrl(BuildConfig.BASE_URL)
             .client(okHttpClient)
             .build()
     }

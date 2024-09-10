@@ -1,7 +1,9 @@
 package com.drtaa.core_data.di
 
+import com.drtaa.core_data.datasource.NaverDataSource
 import com.drtaa.core_data.datasource.SignDataSource
 import com.drtaa.core_data.datasource.TokenDataSource
+import com.drtaa.core_data.datasourceimpl.NaverDataSourceImpl
 import com.drtaa.core_data.datasourceimpl.SignDataSourceImpl
 import com.drtaa.core_data.datasourceimpl.TokenDataSourceImpl
 import dagger.Binds
@@ -20,4 +22,8 @@ interface DataSourceModule {
     @Singleton
     @Binds
     fun bindSignDataSource(signDataSourceImpl: SignDataSourceImpl): SignDataSource
+
+    @Singleton
+    @Binds
+    fun bindMapDataSource(mapDataSourceImpl: NaverDataSourceImpl): NaverDataSource
 }

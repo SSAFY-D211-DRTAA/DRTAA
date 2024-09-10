@@ -24,8 +24,8 @@ android {
 
         buildConfigField("String", "NAVER_MAP_CLIENT_ID", getApiKey("NAVER_MAP_CLIENT_ID"))
         buildConfigField("String", "NAVER_MAP_CLIENT_SECRET", getApiKey("NAVER_MAP_CLIENT_SECRET"))
-        buildConfigField("String", "NAVER_LOGIN_CLIENT_ID", getApiKey("NAVER_LOGIN_CLIENT_ID"))
-        buildConfigField("String", "NAVER_LOGIN_CLIENT_SECRET", getApiKey("NAVER_LOGIN_CLIENT_SECRET"))
+        buildConfigField("String", "NAVER_CLIENT_ID", getApiKey("NAVER_CLIENT_ID"))
+        buildConfigField("String", "NAVER_CLIENT_SECRET", getApiKey("NAVER_CLIENT_SECRET"))
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 

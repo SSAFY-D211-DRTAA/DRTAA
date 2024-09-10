@@ -14,5 +14,13 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         binding.apply {
             binding.viewModel = this@HomeFragment.viewModel
         }
+
+        initEvent()
+    }
+
+    private fun initEvent() {
+        binding.btnHomeCarRent.setOnClickListener {
+            navigateDestination(R.id.action_homeFragment_to_rentFragment)
+        }
     }
 }
