@@ -13,6 +13,8 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object APIModule {
+    const val MAP_SEARCH_URL = "https://openapi.naver.com/v1/search/"
+
     @Singleton
     @Provides
     fun provideTestAPI(
@@ -30,7 +32,9 @@ object APIModule {
     @Singleton
     @Provides
     fun provideMapAPI(
-        @MapRetrofit
-        retrofit: Retrofit
-    ): MapAPI = retrofit.create(MapAPI::class.java)
+        retrofitFactory: RetrofitFactory
+    ): MapAPI {
+        return retrofitFactory.create(MAP_SEARCH_URL)
+            .create(MapAPI::class.java)
+    }
 }
