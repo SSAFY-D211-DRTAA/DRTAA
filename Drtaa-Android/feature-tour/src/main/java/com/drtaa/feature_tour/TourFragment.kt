@@ -1,7 +1,6 @@
-package com.drtaa.feature_ticket
+package com.drtaa.feature_tour
 
 import com.drtaa.core_ui.base.BaseFragment
-import com.drtaa.feature_tour.R
 import com.drtaa.feature_tour.databinding.FragmentTourBinding
 import dagger.hilt.android.AndroidEntryPoint
 

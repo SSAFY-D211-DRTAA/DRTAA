@@ -1,4 +1,4 @@
-package com.drtaa.feature_ticket
+package com.drtaa.feature_tour
 
 import org.junit.Test
 

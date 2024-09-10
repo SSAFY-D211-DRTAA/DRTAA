@@ -1,4 +1,4 @@
-package com.drtaa.feature_ticket
+package com.drtaa.feature_tour
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

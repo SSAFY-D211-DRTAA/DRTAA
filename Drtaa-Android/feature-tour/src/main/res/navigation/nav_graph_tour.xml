@@ -6,6 +6,6 @@
 
     <fragment
         android:id="@+id/tourFragment"
-        android:name="com.drtaa.feature_ticket.TourFragment"
+        android:name="com.drtaa.feature_tour.TourFragment"
         android:label="TourFragment" />
 </navigation>
