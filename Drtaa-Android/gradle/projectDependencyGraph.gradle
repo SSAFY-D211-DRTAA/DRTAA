@@ -1,6 +1,9 @@
-task projectDependencyGraph {
+// from: https://github.com/DroidKaigi/conference-app-2021/blob/main/gradle/dependencyGraph.gradle
+// from: https://github.com/JakeWharton/SdkSearch/blob/3351cad9bfacb0a364858e843774147143f58c7a/gradle/projectDependencyGraph.gradle
+tasks.register('projectDependencyGraph') {
     doLast {
-        def dot = new File(rootProject.rootDir, 'project.dot')
+        def dotFileName = 'project.dot'
+        def dot = new File(rootProject.rootDir, dotFileName)
         dot.parentFile.mkdirs()
         dot.delete()
 
@@ -22,6 +25,7 @@ task projectDependencyGraph {
         def multiplatformProjects = []
         def jsProjects = []
         def androidProjects = []
+        def androidLibraryProjects = []
         def androidDynamicFeatureProjects = []
         def javaProjects = []
 
@@ -36,9 +40,11 @@ task projectDependencyGraph {
             if (project.plugins.hasPlugin('kotlin2js')) {
                 jsProjects.add(project)
             }
-            if (project.plugins.hasPlugin('com.android.library') ||
-                    project.plugins.hasPlugin('com.android.application')) {
+            if (project.plugins.hasPlugin('com.android.application')) {
                 androidProjects.add(project)
+            }
+            if (project.plugins.hasPlugin('com.android.library')) {
+                androidLibraryProjects.add(project)
             }
             if (project.plugins.hasPlugin('com.android.dynamic-feature')) {
                 androidDynamicFeatureProjects.add(project)
@@ -47,7 +53,7 @@ task projectDependencyGraph {
                 javaProjects.add(project)
             }
 
-            project.configurations.all { config ->
+            project.configurations.configureEach { config ->
                 if (config.name.toLowerCase().contains("test")) return
                 config.dependencies
                         .withType(ProjectDependency)
@@ -83,6 +89,8 @@ task projectDependencyGraph {
                 traits.add('fillcolor="#ffffba"')
             } else if (androidProjects.contains(project)) {
                 traits.add('fillcolor="#baffc9"')
+            } else if (androidLibraryProjects.contains(project)) {
+                traits.add('fillcolor="#81D4FA"')
             } else if (androidDynamicFeatureProjects.contains(project)) {
                 traits.add('fillcolor="#c9baff"')
             } else if (javaProjects.contains(project)) {
@@ -113,7 +121,7 @@ task projectDependencyGraph {
 
         dot << '}\n'
 
-        def p = 'dot -Tpng -O project.dot'.execute([], dot.parentFile)
+        def p = "dot -Tpng -O ${dotFileName}".execute([], dot.parentFile)
         p.waitFor()
         if (p.exitValue() != 0) {
             throw new RuntimeException(p.errorStream.text)

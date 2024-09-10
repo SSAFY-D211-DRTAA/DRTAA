@@ -784,7 +784,9 @@ class MGeo():
         if not os.path.isdir(folder_path):
             folder_path = os.path.dirname(folder_path)
 
-        global_info, node_set, link_set, junction_set = MGeo.load_node_and_link(folder_path)
+
+        global_info, node_set, link_set, junction_set = MGeo.load_node_and_link(folder_path) # print
+
         lane_boundary_set, lane_node_set = MGeo.load_lane_boundary(folder_path)
         
         # lane_marking_set이 있으면 link_set에다가 연결

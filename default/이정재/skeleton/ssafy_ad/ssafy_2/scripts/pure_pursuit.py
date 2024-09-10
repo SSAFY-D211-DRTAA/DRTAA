@@ -46,6 +46,9 @@ class pure_pursuit :
         self.ctrl_cmd_pub = 
 
         '''
+        rospy.Subscriber("local_path", Path, self.path_callback)
+        rospy.Subscriber("odom", Odometry, self.odom_callback)
+        self.ctrl_cmd_pub = rospy.Publisher('/ctrl_cmd', CtrlCmd, queue_size=1)
 
         self.ctrl_cmd_msg=CtrlCmd()
         self.ctrl_cmd_msg.longlCmdType=2
@@ -69,8 +72,8 @@ class pure_pursuit :
                 steering = self.calc_pure_pursuit()
                 if self.is_look_forward_point :
                     self.ctrl_cmd_msg.steering = steering
-                    self.ctrl_cmd_msg.velocity = 20.0
-                    print(self.ctrl_cmd_msg.steering)
+                    self.ctrl_cmd_msg.velocity = 10.0
+                    print(f'steer:{self.ctrl_cmd_msg.steering:.3f}')
                 else : 
                     print("no found forward point")
                     self.ctrl_cmd_msg.steering = 0.0
@@ -82,6 +85,7 @@ class pure_pursuit :
                 self.ctrl_cmd_pub.
                 
                 '''
+                self.ctrl_cmd_pub.publish(self.ctrl_cmd_msg)
 
             rate.sleep()
 
@@ -132,6 +136,24 @@ class pure_pursuit :
                     break
 
         '''
+        trans_matrix = np.array([[cos(self.vehicle_yaw)  ,-sin(self.vehicle_yaw) ,translation[0]],
+                                 [sin(self.vehicle_yaw)  ,cos(self.vehicle_yaw)  ,translation[1]],
+                                 [0                      ,0                      ,1             ]])
+
+        det_trans_matrix = np.linalg.inv(trans_matrix)
+
+        for num, i in enumerate(self.path.poses) :
+            path_point = i.pose.position
+
+            global_path_point = [path_point.x, path_point.y, 1]
+            local_path_point = det_trans_matrix.dot(global_path_point)    
+
+            if local_path_point[0] > 0:
+                dis = sqrt(local_path_point[0]**2 + local_path_point[1]**2)
+                if dis >= self.lfd :
+                    self.forward_point = local_path_point
+                    self.is_look_forward_point = True
+                    break
         
         #TODO: (3) Steering 각도 계산
         '''
@@ -142,6 +164,8 @@ class pure_pursuit :
         steering = 
 
         '''
+        theta = atan2(local_path_point[1], local_path_point[0])
+        steering = atan2(2 * self.vehicle_length * sin(theta), self.lfd)
 
         return steering
 

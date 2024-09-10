@@ -19,7 +19,7 @@ import os
 
 
 class global_path_pub :
-    def __init__(self, pkg_name = 'ssafy_2', path_name = 'kcity'):
+    def __init__(self, pkg_name = 'ssafy_2', path_name = 'KATRI'):
         rospy.init_node('global_path_pub', anonymous = True)
 
         #TODO: (1) Global Path publisher 선언 및 Global Path 변수 생성 
@@ -49,7 +49,7 @@ class global_path_pub :
         '''
         rospack = rospkg.RosPack()
         pkg_path = rospack.get_path(pkg_name)
-        full_path = os.path.join(pkg_path, 'KIAPI')
+        full_path = os.path.join(pkg_path, 'path', 'KATRI.txt')
         self.f = open(full_path, 'r')   
         lines = self.f.readlines()
 

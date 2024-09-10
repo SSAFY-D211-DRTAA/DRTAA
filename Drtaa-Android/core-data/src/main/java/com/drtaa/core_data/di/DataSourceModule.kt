@@ -1,6 +1,8 @@
 package com.drtaa.core_data.di
 
+import com.drtaa.core_data.datasource.SignDataSource
 import com.drtaa.core_data.datasource.TokenDataSource
+import com.drtaa.core_data.datasourceimpl.SignDataSourceImpl
 import com.drtaa.core_data.datasourceimpl.TokenDataSourceImpl
 import dagger.Binds
 import dagger.Module
@@ -14,4 +16,8 @@ interface DataSourceModule {
     @Singleton
     @Binds
     fun bindTokenDataSource(tokenDataSourceImpl: TokenDataSourceImpl): TokenDataSource
+
+    @Singleton
+    @Binds
+    fun bindSignDataSource(signDataSourceImpl: SignDataSourceImpl): SignDataSource
 }
