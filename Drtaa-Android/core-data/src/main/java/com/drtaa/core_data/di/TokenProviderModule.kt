@@ -1,5 +1,6 @@
-package com.drtaa.android.di
+package com.drtaa.core_data.di
 
+import com.drtaa.core_data.auth.TokenProviderImpl
 import com.drtaa.core_model.auth.TokenProvider
 import dagger.Module
 import dagger.Provides

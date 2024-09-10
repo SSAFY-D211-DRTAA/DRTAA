@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.drtaa.feature_main"
+    namespace = "com.drtaa.feature_car"
     compileSdk = 34
 
     defaultConfig {
@@ -33,23 +33,9 @@ android {
     }
     buildFeatures{
         dataBinding = true
-        buildConfig = true
-    }
-    sourceSets {
-        getByName("main") {
-            res {
-                srcDirs("src\\main\\res", "src\\main\\res")
-            }
-        }
     }
 }
 
 dependencies {
-    // modules
-    implementation(project(":feature-mypage"))
-    implementation(project(":feature-home"))
-    implementation(project(":feature-tour"))
-    implementation(project(":feature-car"))
 
-    implementation(libs.map.sdk)
 }
