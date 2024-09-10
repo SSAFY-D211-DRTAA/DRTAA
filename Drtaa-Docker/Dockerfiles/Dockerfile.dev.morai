@@ -35,11 +35,16 @@ RUN apt-get update && apt-get install -y \
     # 트리 구조 보기 도구
     tree \
     \
+    # libpcap-dev 설치
+    libpcap-dev \
+    \
     # 클린업
     && rm -rf /var/lib/apt/lists/*
 
 # 라이브러리 설치
-RUN pip3 install --no-cache-dir pyproj
+RUN pip3 install --no-cache-dir pyproj && \
+    pip3 install scikit-learn && \
+    pip install "numpy>=1.19.5,<1.27.0"
 
 # Step 3: catkin workspace 디렉토리 생성
 RUN mkdir -p /root/catkin_ws/src
@@ -60,7 +65,6 @@ RUN echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc && \
 # Step 7: catkin workspace 빌드
 WORKDIR /root/catkin_ws
 RUN /bin/bash -c "source /opt/ros/noetic/setup.bash && catkin_make"
-
 
 # 기본 개발 환경 이미지를 위한 CMD 설정 (roslaunch 실행)
 # CMD ["roslaunch", "rosbridge_server", "rosbridge_websocket.launch"]
