@@ -16,10 +16,11 @@ RUN rm -rf .gradle
 
 # build가 되는 시점에 JAR_FILE 경로에 jar파일 생성
 RUN chmod +x ./gradlew && ./gradlew clean build
-ARG JAR_FILE=/build/libs/Drtaa-0.0.1-SNAPSHOT.jar
+ARG JAR_FILE=./build/libs/Drtaa-0.0.1-SNAPSHOT.jar
 
 # JAR_FILE을 sanmulproject.jar로 복사
-COPY ${JAR_FILE} /drtaa.jar
+COPY ${JAR_FILE} ./drtaa.jar
 
 # 운영 및 개발에서 사용되는 환경 설정을 분리
-ENTRYPOINT ["java","-jar","-Dspring.profiles.active=prod", "-Duser.timezone=Asia/Seoul", "/drtaa.jar"]
+ENV TZ=Asia/Seoul
+ENTRYPOINT ["java", "-jar", "./drtaa.jar"]
