@@ -13,7 +13,7 @@ import javax.inject.Named
 class TokenDataSourceImpl @Inject constructor(
     @Named("USER_DATASTORE")
     private val dataStore: DataStore<Preferences>
-): TokenDataSource {
+) : TokenDataSource {
     override suspend fun getAccessToken(): String {
         return dataStore.data.map { prefs ->
             prefs[ACCESS_TOKEN_KEY] ?: ""

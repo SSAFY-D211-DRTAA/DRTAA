@@ -45,9 +45,11 @@ class get_mgeo :
         # MGeo에 정의되어 있는 데이터를 활용해 각 Node 와 Link 간 연결 성을 나타낼 수 있습니다.
         
         '''
-        load_path = os.path.normpath(os.path.join(current_path, 'lib/mgeo_data/R_KR_PG_K-City'))
+        # load_path = os.path.normpath(os.path.join(current_path, 'lib/mgeo_data/R_KR_PG_K-City/'))
+        # load_path = os.path.join(current_path, 'lib/mgeo_data/R_KR_PG_KIAPI/')
+        load_path = os.path.join(current_path, 'lib/mgeo_data/R_KR_PG_KATRI/')
         mgeo_planner_map = MGeo.create_instance_from_json(load_path)
-
+        
         node_set = mgeo_planner_map.node_set
         link_set = mgeo_planner_map.link_set
 
@@ -60,7 +62,7 @@ class get_mgeo :
         print('# of nodes: ', len(node_set.nodes))
         print('# of links: ', len(link_set.lines))
 
-        rate = rospy.Rate(1) 
+        rate = rospy.Rate(30) # 30 Hz
         while not rospy.is_shutdown():
 
             #TODO: (4) 변환한 Link, Node 정보 Publish
@@ -70,7 +72,8 @@ class get_mgeo :
             self.node_pub.
             
             '''
-                
+            self.link_pub.publish(self.link_msg)
+            self.node_pub.publish(self.node_msg)
             rate.sleep()
 
 
@@ -88,6 +91,13 @@ class get_mgeo :
 
         
         '''
+        for link_idx in self.links:
+            for point in self.links[link_idx].points:
+                p = Point32()
+                p.x = point[0]
+                p.y = point[1]
+                p.z = point[2]
+                all_link.points.append(p)
 
         return all_link
     
@@ -103,6 +113,13 @@ class get_mgeo :
         for node_idx in self.nodes :
 
         '''
+        for node_idx in self.nodes :
+            tmp = self.nodes[node_idx].point
+            p = Point32()
+            p.x = tmp[0]
+            p.y = tmp[1]
+            p.z = tmp[2]
+            all_node.points.append(p)
 
         return all_node
 

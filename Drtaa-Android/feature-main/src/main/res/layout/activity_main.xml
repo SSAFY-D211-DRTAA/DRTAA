@@ -13,14 +13,30 @@
         android:layout_height="match_parent"
         tools:context="com.drtaa.feature_main.MainActivity">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Hello World!"
-            app:layout_constraintBottom_toBottomOf="parent"
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/nav_host"
+            android:name="androidx.navigation.fragment.NavHostFragment"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:defaultNavHost="true"
+            app:layout_constraintBottom_toTopOf="@+id/bottom_navigation_bar"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:navGraph="@navigation/nav_graph" />
+
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottom_navigation_bar"
+            android:layout_width="match_parent"
+            android:layout_height="68dp"
+            android:layout_marginEnd="16dp"
+            android:background="@android:color/transparent"
+            android:paddingVertical="4dp"
+            app:itemIconSize="24dp"
+            app:itemRippleColor="@android:color/transparent"
+            app:labelVisibilityMode="labeled"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:menu="@menu/menu_bottom_nav" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

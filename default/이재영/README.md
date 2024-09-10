@@ -61,3 +61,12 @@
     - 각 Ego별 /ego ~ 로 topic이 생성됨 => 이를 활용해서 각 Ego 차량 로직 제어 가능할 듯?
 2. **Scenario**
     - 시뮬레이터 상에서 직접 load 하는 것이 편한 듯.
+
+## 8/30 Fri.
+1. **MORAI-Sim과 Rviz 연동 - 시각화**
+    - 전역 경로: 초록, 지역 경로: 빨간, 차량의 위치 실시간으로 확인 
+
+## 8/31 Sat.
+1. **Sub PJT 2 완료**
+    - Adaptive_Cruise_Control
+![acc-ezgif.com-optimize](/uploads/bcb93704d377391e96ff6055813aa813/acc-ezgif.com-optimize.gif)

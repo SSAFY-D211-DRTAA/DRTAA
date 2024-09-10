@@ -14,13 +14,14 @@
       1452.4479978005402,
       1.6659995880126957
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": 73.4126176156147
   },
   {
     "idx": "B119BS010003",
@@ -37,13 +38,14 @@
       1657.1229978012852,
       1.8840000000000003
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": 90.3029186410083
   },
   {
     "idx": "B119BS010004",
@@ -60,13 +62,14 @@
       1852.677997797262,
       1.88199919128418
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": 86.11581176670073
   },
   {
     "idx": "B119BS010005",
@@ -83,13 +86,14 @@
       1866.9769977983087,
       1.7499992218017582
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": 0.2754370035432532
   },
   {
     "idx": "B119BS010006",
@@ -106,13 +110,14 @@
       1852.46599779604,
       1.6750003662109378
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": -83.69730017509245
   },
   {
     "idx": "B119BS010007",
@@ -129,13 +134,14 @@
       1839.0039977999404,
       1.7739993896484378
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": -174.96287618969257
   },
   {
     "idx": "B119BS010008",
@@ -152,13 +158,14 @@
       1007.848997799214,
       1.8399993743896488
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": 6.292746485104404
   },
   {
     "idx": "B119BS010009",
@@ -175,13 +182,14 @@
       1099.8499977989122,
       3.0480014648437503
     ],
+    "value": 60,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": -117.28825571915522
   },
   {
     "idx": "B119BS010010",
@@ -198,13 +206,14 @@
       1154.4329978013411,
       1.845999893188477
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": -29.065765028210816
   },
   {
     "idx": "B119BS010011",
@@ -221,13 +230,14 @@
       1157.285997800529,
       1.8739997711181644
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": 108.77058428661577
   },
   {
     "idx": "B119BS010012",
@@ -244,13 +254,14 @@
       1245.886997799389,
       1.6430007781982425
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": 150.92422624132362
   },
   {
     "idx": "B119BS010013",
@@ -267,13 +278,14 @@
       1242.132997800596,
       1.8790008392333988
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": -67.2733603274252
   },
   {
     "idx": "B119BS010014",
@@ -290,13 +302,14 @@
       1198.5769977993332,
       1.5640003051757816
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": -69.43530411515889
   },
   {
     "idx": "B119BS010015",
@@ -313,13 +326,14 @@
       1505.1479978007264,
       2.8469993438720707
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.73,
     "width": 0.9,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": 90.22449583181027
   },
   {
     "idx": "B119BS010016",
@@ -336,13 +350,14 @@
       1480.007997799199,
       1.8679992523193363
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": -179.6937952951085
   },
   {
     "idx": "B119BS010017",
@@ -359,13 +374,14 @@
       1480.0889977989718,
       1.8310005035400394
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": -179.8313362194913
   },
   {
     "idx": "B119BS010018",
@@ -382,13 +398,14 @@
       1510.136997799389,
       2.204999145507813
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": 64.97219235280976
   },
   {
     "idx": "B119BS010019",
@@ -405,13 +422,14 @@
       1558.4139977986924,
       1.790000137329102
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": 90.25636530786308
   },
   {
     "idx": "B119BS010020",
@@ -428,13 +446,14 @@
       1576.198997800704,
       2.4590007629394535
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": 89.08567119885099
   },
   {
     "idx": "B119BS010021",
@@ -451,13 +470,14 @@
       1500.7009978001006,
       1.9689990844726566
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": -53.200202031632166
   },
   {
     "idx": "B119BS010022",
@@ -474,13 +494,14 @@
       1633.6669978010468,
       2.1039993133544925
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": -63.93299654894185
   },
   {
     "idx": "B119BS010023",
@@ -497,13 +518,14 @@
       1750.5339977983385,
       1.977000411987305
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": 116.68226787377942
   },
   {
     "idx": "B119BS010024",
@@ -520,13 +542,14 @@
       1505.1479978007264,
       2.446999725341797
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": 90.22449583181027
   },
   {
     "idx": "B119BS010025",
@@ -543,13 +566,14 @@
       1576.198997800704,
       2.859000381469727
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.73,
     "width": 0.9,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": 89.08567119885099
   },
   {
     "idx": "B119BS010026",
@@ -566,13 +590,14 @@
       1402.5809977995232,
       2.8499996032714847
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.73,
     "width": 0.9,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": -38.01991234982864
   },
   {
     "idx": "B119BS010027",
@@ -589,13 +614,14 @@
       1402.578997798264,
       2.3639995422363285
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": -38.01991234982864
   },
   {
     "idx": "B119BS010030",
@@ -612,13 +638,14 @@
       1099.808997798711,
       2.4259998168945316
     ],
+    "value": 60,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": -117.28825571915522
   },
   {
     "idx": "B119BS010031",
@@ -635,13 +662,14 @@
       1110.4789978023618,
       2.651000198364258
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.73,
     "width": 0.9,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": 80.56780786032215
   },
   {
     "idx": "B119BS010032",
@@ -658,13 +686,14 @@
       1110.4119978030212,
       2.200999435424805
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": 80.56780786032215
   },
   {
     "idx": "B119BS010162",
@@ -681,13 +710,14 @@
       1021.5249977991916,
       1.7349998321533207
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": 6.292746485104404
   },
   {
     "idx": "B119BS010163",
@@ -704,13 +734,14 @@
       1077.4349977998063,
       1.8009998168945316
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": -117.28825571915522
   },
   {
     "idx": "B119BS010164",
@@ -727,13 +758,14 @@
       1179.606997798197,
       2.0190002288818363
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": -158.33727029080634
   },
   {
     "idx": "B119BS010165",
@@ -750,13 +782,14 @@
       1186.5489978021942,
       2.4530002441406253
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.73,
     "width": 0.9,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": -158.33727029080634
   },
   {
     "idx": "B119BS010166",
@@ -773,13 +806,14 @@
       1188.9259978001937,
       5.7780010070800785
     ],
+    "value": 60,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": -158.33727029080634
   },
   {
     "idx": "B119BS010167",
@@ -796,13 +830,14 @@
       1189.2469978011213,
       6.29800146484375
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": -158.33727029080634
   },
   {
     "idx": "B119BS010168",
@@ -819,13 +854,14 @@
       1227.0789978001267,
       2.095999893188477
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": -159.2179765631723
   },
   {
     "idx": "B119BS010169",
@@ -842,13 +878,14 @@
       1260.1589978025295,
       5.91899984741211
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": -118.96007889307697
   },
   {
     "idx": "B119BS010170",
@@ -865,13 +902,14 @@
       1219.1429978008382,
       4.771001037597657
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.4,
     "width": 0.4,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": -119.00764397989605
   },
   {
     "idx": "B119BS010171",
@@ -888,13 +926,14 @@
       1339.0549978003837,
       1.9250003662109378
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": -108.23721994652075
   },
   {
     "idx": "B119BS010172",
@@ -911,13 +950,14 @@
       1371.466997798998,
       5.1530010070800785
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": 0.054565864003188864
   },
   {
     "idx": "B119BS010173",
@@ -934,13 +974,14 @@
       1402.4059977992438,
       2.263999160766602
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.4,
     "width": 0.4,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": -89.71180808656901
   },
   {
     "idx": "B119BS010174",
@@ -957,13 +998,14 @@
       1411.9039978012443,
       1.9700004425048832
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": -89.69284375870538
   },
   {
     "idx": "B119BS010175",
@@ -980,13 +1022,14 @@
       1505.1629978008568,
       4.228001770019532
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.4,
     "width": 0.4,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": -53.200202031632166
   },
   {
     "idx": "B119BS010176",
@@ -1003,13 +1046,14 @@
       1261.6499977996573,
       1.7820007171630863
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": 69.75744366368163
   },
   {
     "idx": "B119BS010177",
@@ -1026,13 +1070,14 @@
       1221.0229978007264,
       1.7839996185302738
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": 60.97936083017594
   },
   {
     "idx": "B119BS010178",
@@ -1049,13 +1094,14 @@
       1143.1979977972806,
       2.2520000305175785
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.4,
     "width": 0.4,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": 53.47416423531923
   },
   {
     "idx": "B119BS010179",
@@ -1072,13 +1118,14 @@
       1062.6749978000298,
       1.717000183105469
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.73,
     "width": 0.9,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": 53.47416423531923
   },
   {
     "idx": "B119BS010180",
@@ -1095,13 +1142,14 @@
       1062.6439977977425,
       1.2219993438720707
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": 53.47416423531923
   },
   {
     "idx": "B119BS010181",
@@ -1118,13 +1166,14 @@
       1206.046997799538,
       1.763999160766602
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": 151.02204824312363
   },
   {
     "idx": "B119BS010182",
@@ -1141,13 +1190,14 @@
       1201.9169977996498,
       1.6860000457763675
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": 105.35409671738763
   },
   {
     "idx": "B119BS010183",
@@ -1164,13 +1214,14 @@
       1208.538997799158,
       1.9119998779296878
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": -159.09893610938408
   },
   {
     "idx": "B119BS010184",
@@ -1187,13 +1238,14 @@
       1208.5699977995828,
       1.056000885009766
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.73,
     "width": 0.9,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": -159.09893610938408
   },
   {
     "idx": "B119BS010185",
@@ -1210,13 +1262,14 @@
       1239.828997798264,
       1.950999435424805
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": 60.93037529106787
   },
   {
     "idx": "B119BS010186",
@@ -1233,13 +1286,14 @@
       1239.8199977995828,
       1.2259990539550785
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.73,
     "width": 0.9,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": 60.93037529106787
   },
   {
     "idx": "B119BS010187",
@@ -1256,13 +1310,14 @@
       1247.7209978015162,
       1.8089992370605472
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": -161.16368158971886
   },
   {
     "idx": "B119BS010188",
@@ -1279,13 +1334,14 @@
       1211.7189978011884,
       1.5810005035400394
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.73,
     "width": 0.9,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": 107.52885456939137
   },
   {
     "idx": "B119BS010189",
@@ -1302,13 +1358,14 @@
       1213.5609978027642,
       5.499001678466797
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": 107.52885456939137
   },
   {
     "idx": "B119BS010190",
@@ -1325,13 +1382,14 @@
       1213.1659977999516,
       5.496998962402344
     ],
+    "value": 60,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": 107.52885456939137
   },
   {
     "idx": "B119BS010191",
@@ -1348,13 +1406,14 @@
       1190.3369978009723,
       2.206999954223633
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": 24.444228382572792
   },
   {
     "idx": "B119BS010192",
@@ -1371,13 +1430,14 @@
       1197.302997798659,
       1.9989997711181644
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": -69.43530411515889
   },
   {
     "idx": "B119BS010193",
@@ -1394,13 +1454,14 @@
       1160.2259978004731,
       1.9660007324218753
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": -119.08236299050618
   },
   {
     "idx": "B119BS010194",
@@ -1417,13 +1478,14 @@
       1143.7269977983087,
       1.8599998321533207
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": 151.19777138542938
   },
   {
     "idx": "B119BS010195",
@@ -1440,13 +1502,14 @@
       1500.0959977996536,
       1.9880000915527347
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": -13.608685193412066
   },
   {
     "idx": "B119BS010196",
@@ -1463,13 +1526,14 @@
       1580.2049978002906,
       2.154000457763672
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.4,
     "width": 0.4,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": 73.4126176156147
   },
   {
     "idx": "B119BS010197",
@@ -1486,13 +1550,14 @@
       1474.0789978019893,
       1.8140003051757816
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": -103.07514080353201
   },
   {
     "idx": "B119BS010198",
@@ -1509,12 +1574,13 @@
       1469.1379978000186,
       1.9730007019042972
     ],
+    "value": 0,
     "country": "KR",
     "z_offset": 2.1,
     "height": 0.6,
     "width": 0.6,
-    "type_def": "",
+    "type_def": "ngii_model2",
     "ref_crosswalk_id": "",
-    "heading": 0
+    "heading": -115.11296489384743
   }
 ]
