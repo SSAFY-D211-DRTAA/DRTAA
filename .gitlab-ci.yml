@@ -70,6 +70,4 @@ detekt:
 # 오직 android 브랜치와 merge requests에서만 실행
 workflow:
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH =~ /^and/
-    - if: $CI_MERGE_REQUEST_ID
+    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "android"
