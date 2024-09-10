@@ -13,7 +13,11 @@ RUN rm -rf .gradle
 
 RUN chmod +x ./gradlew && ./gradlew clean build
 
+RUN ls -al build/libs
+
 ARG JAR_FILE=./build/libs/Drtaa-0.0.1-SNAPSHOT.jar
 COPY ${JAR_FILE} ./app.jar
+
 ENV TZ=Asia/Seoul
+
 ENTRYPOINT ["java", "-jar", "./app.jar"]
