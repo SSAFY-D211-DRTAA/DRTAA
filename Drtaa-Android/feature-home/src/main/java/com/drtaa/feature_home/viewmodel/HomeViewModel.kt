@@ -2,8 +2,8 @@ package com.drtaa.feature_home.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.drtaa.core_data.repository.MapRepository
-import com.drtaa.core_model.network.ResponseSearch
+import com.drtaa.core_data.repository.NaverRepository
+import com.drtaa.core_model.data.Search
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -13,14 +13,14 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val mapRepository: MapRepository
+    private val naverRepository: NaverRepository
 ) : ViewModel() {
-    private val _searchList = MutableSharedFlow<Result<ResponseSearch>>()
-    val searchList: SharedFlow<Result<ResponseSearch>> = _searchList
+    private val _searchList = MutableSharedFlow<Result<List<Search>>>()
+    val searchList: SharedFlow<Result<List<Search>>> = _searchList
 
     fun getSearchList(keyword: String) {
         viewModelScope.launch {
-            mapRepository.getSearchList(keyword).collect { result ->
+            naverRepository.getSearchList(keyword).collect { result ->
                 result.onSuccess { data ->
                     Timber.tag("tokens").d("success $data")
                     _searchList.emit(Result.success(data))

@@ -1,24 +1,27 @@
 package com.drtaa.core_data.repositoryimpl
 
-import com.drtaa.core_data.datasource.MapDataSource
-import com.drtaa.core_data.repository.MapRepository
+import com.drtaa.core_data.datasource.NaverDataSource
+import com.drtaa.core_data.repository.NaverRepository
 import com.drtaa.core_data.util.ResultWrapper
 import com.drtaa.core_data.util.safeApiCall
-import com.drtaa.core_model.network.ResponseSearch
+import com.drtaa.core_model.data.Search
+import com.drtaa.core_model.util.toSearch
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import timber.log.Timber
 import javax.inject.Inject
 
-class MapRepositoryImpl @Inject constructor(
-    private val mapDataSource: MapDataSource
-) : MapRepository {
-    override suspend fun getSearchList(keyword: String): Flow<Result<ResponseSearch>> = flow {
+class NaverRepositoryImpl @Inject constructor(
+    private val naverDataSource: NaverDataSource
+) : NaverRepository {
+    override suspend fun getSearchList(keyword: String): Flow<Result<List<Search>>> = flow {
         when (
-            val response = safeApiCall { mapDataSource.getSearchList(keyword) }
+            val response = safeApiCall { naverDataSource.getSearchList(keyword) }
         ) {
             is ResultWrapper.Success -> {
-                emit(Result.success(response.data))
+                emit(
+                    Result.success(response.data.items.map { it.toSearch() })
+                )
                 Timber.d("성공")
             }
 

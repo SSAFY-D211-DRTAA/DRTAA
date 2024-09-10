@@ -1,4 +1,4 @@
-package com.drtaa.core
+package com.drtaa.core_data
 
 import org.junit.Test
 
