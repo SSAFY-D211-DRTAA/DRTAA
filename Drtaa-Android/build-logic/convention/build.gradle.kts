@@ -18,6 +18,7 @@ kotlin {
 }
 
 dependencies {
+    implementation(libs.detekt.gradle)
     compileOnly(libs.android.gradlePlugin)
     compileOnly(libs.kotlin.gradlePlugin)
 }
@@ -34,6 +35,10 @@ gradlePlugin {
         register("AndroidHiltPlugin") {
             id = "drtaa.plugin.hilt"
             implementationClass = "AndroidHiltConventionPlugin"
+        }
+        register("DeteKtPlugin") {
+            id = "drtaa.plugin.detekt"
+            implementationClass = "DetektConventionPlugin"
         }
         register("AndroidCorePlugin") {
             id = "drtaa.plugin.core"

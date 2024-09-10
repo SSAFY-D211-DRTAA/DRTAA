@@ -46,8 +46,10 @@ android {
 
 dependencies {
     // modules
-    implementation(project(":feature-ticket"))
     implementation(project(":feature-mypage"))
     implementation(project(":feature-home"))
+    implementation(project(":feature-tour"))
+    implementation(project(":feature-car"))
+
     implementation(libs.map.sdk)
 }

@@ -6,6 +6,9 @@ import org.gradle.kotlin.dsl.dependencies
 internal class AndroidCommonConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
+            with(pluginManager){
+                apply("drtaa.plugin.detekt")
+            }
             dependencies {
                 add("implementation", libs.findLibrary("androidx.core.ktx").get())
                 add("implementation", libs.findLibrary("androidx.appcompat").get())

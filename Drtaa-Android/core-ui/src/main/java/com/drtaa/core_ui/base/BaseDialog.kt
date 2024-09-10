@@ -9,7 +9,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 
-
 abstract class BaseDialog<T : ViewDataBinding>(
     private val context: Context,
     @LayoutRes private val layoutResId: Int

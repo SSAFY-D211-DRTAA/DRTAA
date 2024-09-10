@@ -1,5 +1,6 @@
 [versions]
 agp = "8.5.0"
+gson = "2.10.1"
 kotlin = "1.9.22"
 coreKtx = "1.13.1"
 junit = "4.13.2"
@@ -19,7 +20,6 @@ lifecycle-runtime-ktx = "2.8.3"
 lifecycle-extensions = "2.2.0"
 
 # Logging
-oauth = "5.10.0"
 timber = "5.0.1"
 
 # Media
@@ -34,9 +34,20 @@ kotlinx-serialization = "1.6.2"
 okhttp = "4.12.0"
 retrofit = "2.11.0"
 jetbrainsKotlinJvm = "1.9.0"
+detekt = "1.23.5"
+
+# Login
+naver = "5.10.0"
+credentials = "1.2.2"
+googleid = "1.1.1"
+playServicesBasement = "18.4.0"
 
 [libraries]
+detekt-gradle = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt" }
+detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detekt" }
+
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 kotlin-gradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -58,7 +69,10 @@ coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-
 coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 
 # Login
-naver-oauth = { module = "com.navercorp.nid:oauth", version.ref = "oauth" }
+naver-oauth = { module = "com.navercorp.nid:oauth", version.ref = "naver" }
+androidx-credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }
+androidx-credentials-play-services-auth = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }
+googleid = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleid" }
 
 # Logging
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
@@ -84,6 +98,7 @@ retrofit-converter-kotlinxSerialization = { module = "com.squareup.retrofit2:con
 
 # Media
 glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
+play-services-basement = { group = "com.google.android.gms", name = "play-services-basement", version.ref = "playServicesBasement" }
 
 [bundles]
 network-default = [
@@ -122,3 +137,4 @@ hilt-gradle-plugin = { id = "com.google.dagger.hilt.android", version.ref = "hil
 navigation-safe-args = { id = "androidx.navigation.safeargs.kotlin", version.ref = "navigation" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }

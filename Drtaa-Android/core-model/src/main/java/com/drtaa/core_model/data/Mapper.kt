@@ -12,8 +12,9 @@ fun ResponseLogin.toTokens(): Tokens {
 
 fun SocialUser.toRequestLogin(): RequestSocialLogin {
     return RequestSocialLogin(
-        userLogin = this.userLogin!!,
-        userProviderId = this.id!!,
-        userNickname = this.nickname!!
+        userLogin = this.userLogin,
+        userProviderId = this.id,
+        userNickname = this.nickname,
+        userProfileImg = this.profileImageUrl
     )
 }

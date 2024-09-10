@@ -8,6 +8,31 @@ plugins {
     alias(libs.plugins.kotlinx.serialization) apply false
     alias(libs.plugins.navigation.safe.args) apply false
     alias(libs.plugins.jetbrains.kotlin.jvm) apply false
+    alias(libs.plugins.detekt) apply false
 }
 
 apply(from = "gradle/projectDependencyGraph.gradle")
+apply(plugin = "io.gitlab.arturbosch.detekt")
+
+val reportMerge by tasks.registering(io.gitlab.arturbosch.detekt.report.ReportMergeTask::class) {
+    output.set(layout.buildDirectory.file("reports/detekt/detekt.sarif"))
+}
+
+subprojects {
+    apply(plugin = "io.gitlab.arturbosch.detekt")
+
+    plugins.withType<io.gitlab.arturbosch.detekt.DetektPlugin>().configureEach {
+        tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach detekt@{
+            reports {
+                md.required.set(true)
+                html.required.set(true)
+            }
+
+            finalizedBy(reportMerge)
+
+            reportMerge.configure {
+                input.from(this@detekt.sarifReportFile)
+            }
+        }
+    }
+}

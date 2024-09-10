@@ -6,7 +6,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-
-) : ViewModel(){
+    // 뭐 들어갈지 생각하기
+) : ViewModel() {
     val hometext = "홈 입니다 ㅎㅎ"
 }

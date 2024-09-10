@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--    text style    -->
+    <style name="jua" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">@font/jua</item>
+    </style>
+
+    <style name="h1" parent="TextAppearance.MaterialComponents.Headline3">
+        <item name="fontFamily">@font/ptd_extra_bold</item>
+        <item name="android:fontFamily">@font/ptd_extra_bold</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="h2" parent="TextAppearance.M3.Sys.Typescale.HeadlineMedium">
+        <item name="fontFamily">@font/ptd_semi_bold</item>
+        <item name="android:fontFamily">@font/ptd_semi_bold</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="h3" parent="TextAppearance.MaterialComponents.Headline5">
+        <item name="fontFamily">@font/ptd_semi_bold</item>
+        <item name="android:fontFamily">@font/ptd_semi_bold</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="h4" parent="Base.TextAppearance.MaterialComponents.Headline6">
+        <item name="fontFamily">@font/ptd_semi_bold</item>
+        <item name="android:fontFamily">@font/ptd_semi_bold</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="h5" parent="TextAppearance.MaterialComponents.Subtitle1">
+        <item name="fontFamily">@font/ptd_semi_bold</item>
+        <item name="android:fontFamily">@font/ptd_semi_bold</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="b1" parent="TextAppearance.MaterialComponents.Subtitle1">
+        <item name="fontFamily">@font/ptd_medium</item>
+        <item name="android:fontFamily">@font/ptd_medium</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="b2" parent="TextAppearance.MaterialComponents.Subtitle2">
+        <item name="fontFamily">@font/ptd_regular</item>
+        <item name="android:fontFamily">@font/ptd_regular</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="b3" parent="TextAppearance.MaterialComponents.Subtitle2">
+        <item name="fontFamily">@font/ptd_regular</item>
+        <item name="android:fontFamily">@font/ptd_regular</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="l1" parent="TextAppearance.MaterialComponents.Body2">
+        <item name="fontFamily">@font/ptd_light</item>
+        <item name="android:fontFamily">@font/ptd_light</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="l2" parent="TextAppearance.M3.Sys.Typescale.BodySmall">
+        <item name="fontFamily">@font/ptd_light</item>
+        <item name="android:fontFamily">@font/ptd_light</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="l3" parent="TextAppearance.M3.Sys.Typescale.BodySmall">
+        <item name="fontFamily">@font/ptd_light</item>
+        <item name="android:fontFamily">@font/ptd_light</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="l4" parent="TextAppearance.M3.Sys.Typescale.BodySmall">
+        <item name="fontFamily">@font/ptd_light</item>
+        <item name="android:fontFamily">@font/ptd_light</item>
+        <item name="android:textSize">10sp</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="button1" parent="TextAppearance.MaterialComponents.Subtitle1">
+        <item name="fontFamily">@font/ptd_semi_bold</item>
+        <item name="android:fontFamily">@font/ptd_semi_bold</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="caption1" parent="TextAppearance.MaterialComponents.Subtitle1">
+        <item name="fontFamily">@font/ptd_extra_bold</item>
+        <item name="android:fontFamily">@font/ptd_extra_bold</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="caption2" parent="TextAppearance.M3.Sys.Typescale.BodySmall">
+        <item name="fontFamily">@font/ptd_semi_bold</item>
+        <item name="android:fontFamily">@font/ptd_semi_bold</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="caption3" parent="TextAppearance.M3.Sys.Typescale.BodySmall">
+        <item name="fontFamily">@font/ptd_light</item>
+        <item name="android:fontFamily">@font/ptd_light</item>
+        <item name="android:textSize">8sp</item>
+        <item name="android:lineSpacingExtra">2sp</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+</resources>
