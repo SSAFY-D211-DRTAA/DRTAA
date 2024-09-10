@@ -55,7 +55,7 @@ public class UserController {
 
     @GetMapping("/signup/{userProviderId}")
     @Operation(summary = "아이디 중복 체크", description = "회원가입 시 아이디 중복 체크(소셜 로그인은 중복 위험 미존재)")
-    public ResponseEntity checkNickname(@RequestParam("userProviderId") String userProviderId) {
+    public ResponseEntity checkNickname(@PathVariable("userProviderId") String userProviderId) {
         try {
             boolean chk = userService.chkuserProviderId(userProviderId);
 
