@@ -36,7 +36,6 @@ abstract class BaseMapFragment<T : ViewDataBinding>(private val layoutResId: Int
         _binding = DataBindingUtil.inflate(inflater, layoutResId, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
         initMapView()
-        mapView?.getMapAsync(this)
         locationSource = FusedLocationSource(this, LOCATION_PERMISSION_REQUEST_CODE)
         return binding.root
     }
