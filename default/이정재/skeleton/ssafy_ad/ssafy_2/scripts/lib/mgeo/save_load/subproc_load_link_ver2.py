@@ -47,9 +47,12 @@ def load_node_and_link(node_save_info_list, line_save_info_list, global_info):
         if file_ver >= Version(2,5):
             junction_list = save_info.get('junction') # 딕셔너리 키 에러 수정
 
+            # if junction_list is None:
+            #     continue
+            # elif len(junction_list) == 0:
+            #     node.junctions = list()
+
             if junction_list is None:
-                continue
-            elif len(junction_list) == 0:
                 node.junctions = list()
             else:
                 for junction_id in junction_list:
@@ -75,7 +78,6 @@ def load_node_and_link(node_save_info_list, line_save_info_list, global_info):
 
                     junction_set.append_junction(new_junction)
                     
-
         node_set.append_node(node, create_new_key=False)
 
     # 링크 생성하기
