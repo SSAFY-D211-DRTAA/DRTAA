@@ -1,4 +1,4 @@
-package com.d211.drtaa.domain.user.controller;
+package com.d211.drtaa.domain.test;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +14,6 @@ public class TestController {
 
     @GetMapping
     public String test() {
-        return "plz";
+        return "GitLab - Jenkins - MM Webhook 테스트 중";
     }
 }

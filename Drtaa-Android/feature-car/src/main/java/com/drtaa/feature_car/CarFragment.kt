@@ -19,7 +19,6 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
     private var isTouching: Boolean = false
     private var isNeko: Boolean = true
     private var touchStartTime: Long = 0
-    private val touchPressTime = 100
 
     override fun initView() {
         binding.apply {
@@ -40,32 +39,14 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
                     touchStartTime = System.currentTimeMillis()
                     true
                 }
-                MotionEvent.ACTION_MOVE -> {  // 이동했을 때
-                    if (isTouching && System.currentTimeMillis() - touchStartTime > touchPressTime) {
-                        val x = event.x
-                        val y = event.y
 
-                        val centerX = v.width / 2f
-                        val centerY = v.height / 2f
+                MotionEvent.ACTION_MOVE -> handleActionMove(v, event) // 이동했을 때
 
-                        val rotateX = (centerY - y) / centerY * 10
-                        val rotateY = (x - centerX) / centerX * 10
-
-                        cardView.animate()
-                            .rotationX(rotateX)
-                            .rotationY(rotateY)
-                            .setDuration(0)
-                            .start()
-
-                        updateOverlay(x / v.width, y / v.height)
-                        updateReflection(y / v.height)
-                    }
-                    true
-                }
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                    if (isTouching && System.currentTimeMillis() - touchStartTime <= touchPressTime) {
+                    if (isTouching && isShortTouch()) {
                         isNeko = !isNeko // true false 전환
-                        val newImageResource = if (isNeko) R.drawable.kanna else R.drawable.kanna //이미지 전환, 나중에는 view 전환으로 하면 될 듯?
+                        val newImageResource =
+                            if (isNeko) R.drawable.kanna else R.drawable.kanna // 이미지 전환, 나중에는 view 전환으로 하면 될 듯?
                         cardImage.setImageResource(newImageResource) // 칸나칸나 이미지 적용
                     }
 
@@ -73,33 +54,63 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
                     cardView.animate()
                         .rotationX(0f)
                         .rotationY(0f)
-                        .setDuration(300)
+                        .setDuration(DURATION)
                         .start()
 
                     resetOverlay()
                     resetReflection()
                     true
                 }
+
                 else -> false
             }
         }
     }
 
+    private fun isLongTouch() = System.currentTimeMillis() - touchStartTime > TOUCH_PRESS_TIME
+    private fun isShortTouch() = System.currentTimeMillis() - touchStartTime <= TOUCH_PRESS_TIME
+
+    private fun handleActionMove(v: View, event: MotionEvent): Boolean {
+        if (isTouching && isLongTouch()) {
+            val (x, y) = event.x to event.y
+            rotateCard(v, x, y)
+            updateOverlayAndReflection(v, x, y)
+        }
+        return true
+    }
+
+    private fun rotateCard(v: View, x: Float, y: Float) {
+        val (centerX, centerY) = v.width / HALF to v.height / HALF
+        val rotateX = (centerY - y) / centerY * PER
+        val rotateY = (x - centerX) / centerX * PER
+
+        cardView.animate()
+            .rotationX(rotateX)
+            .rotationY(rotateY)
+            .setDuration(0)
+            .start()
+    }
+
+    private fun updateOverlayAndReflection(v: View, x: Float, y: Float) {
+        updateOverlay(x / v.width, y / v.height)
+        updateReflection(y / v.height)
+    }
+
     private fun updateOverlay(percentX: Float, percentY: Float) {
         val gradient = overlayView.background as GradientDrawable
         gradient.setGradientCenter(percentX, percentY)
-        overlayView.alpha = 0.6f
+        overlayView.alpha = OVERLAY_VIEW
     }
 
     private fun resetOverlay() {
         overlayView.animate()
             .alpha(0f)
-            .setDuration(300)
+            .setDuration(DURATION)
             .start()
     }
 
     private fun updateReflection(percentY: Float) {
-        val translationY = (percentY - 0.5f) * 2 * reflectionView.height
+        val translationY = (percentY - POINT_XY) * 2 * reflectionView.height
         ObjectAnimator.ofFloat(reflectionView, "translationY", translationY).apply {
             duration = 0
             start()
@@ -107,9 +118,19 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
     }
 
     private fun resetReflection() {
-        ObjectAnimator.ofFloat(reflectionView, "translationY", reflectionView.height.toFloat()).apply {
-            duration = 300
-            start()
-        }
+        ObjectAnimator.ofFloat(reflectionView, "translationY", reflectionView.height.toFloat())
+            .apply {
+                duration = DURATION
+                start()
+            }
+    }
+
+    companion object {
+        const val OVERLAY_VIEW = 0.6f
+        const val POINT_XY = 0.5f
+        const val HALF = 2f
+        const val PER = 10
+        const val DURATION = 300L
+        const val TOUCH_PRESS_TIME = 100
     }
 }
