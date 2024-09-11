@@ -60,9 +60,8 @@ class RentSearchFragment :
                 } else {
                     binding.layoutRentSearchBottomSheet.tvSearchNothing.visibility = View.GONE
                 }
-
             }.onFailure {
-
+                // 실패 메세지 추가
             }
         }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
@@ -70,11 +69,10 @@ class RentSearchFragment :
     private fun initEvent() {
         binding.layoutRentSearchBottomSheet.apply {
             this.ivSearchLocation.setOnClickListener {
-                if(this.etSearchLocation.text.isEmpty()){
+                if (this.etSearchLocation.text.isEmpty()) {
                     showSnackBar("검색어를 입력해주세요.")
                     return@setOnClickListener
                 }
-
                 viewModel.getSearchList(this.etSearchLocation.text.toString())
             }
         }
@@ -85,9 +83,9 @@ class RentSearchFragment :
 
         behavior = BottomSheetBehavior.from(binding.clRentSearchBottomSheet)
         behavior.state = BottomSheetBehavior.STATE_EXPANDED
-        behavior.isHideable = false  // 완전히 숨길 수 없도록 설정
+        behavior.isHideable = false // 완전히 숨길 수 없도록 설정
 
-        behavior.peekHeight = 500 // 바텀시트가 접혔을 때의 높이 (적절하게 설정)
+        behavior.peekHeight = BOTTOM_SHEET_PEEK_HEIGHT // 바텀시트가 접혔을 때의 높이 (적절하게 설정)
 
         behavior.addBottomSheetCallback(object : BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
@@ -118,5 +116,9 @@ class RentSearchFragment :
 //                Timber.d("드래그 중")
             }
         })
+    }
+
+    companion object {
+        const val BOTTOM_SHEET_PEEK_HEIGHT = 500
     }
 }

@@ -8,7 +8,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
 import timber.log.Timber
 
-class SearchBottomSheetDialogFragment() :
+class SearchBottomSheetDialogFragment :
     BaseBottomSheetDialogFragment<FragmentSearchBottomSheetBinding>(R.layout.fragment_search_bottom_sheet) {
 
     lateinit var behavior: BottomSheetBehavior<ConstraintLayout>

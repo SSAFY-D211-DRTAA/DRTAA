@@ -26,7 +26,5 @@ class SearchListAdapter :
             binding.search = search
 //            binding.executePendingBindings()
         }
-
     }
-
 }
