@@ -5,14 +5,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.IdRes
+import androidx.annotation.UiThread
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavDirections
 import androidx.navigation.fragment.findNavController
+import com.drtaa.core_map.LOCATION_PERMISSION_REQUEST_CODE
+import com.drtaa.core_map.setup
 import com.naver.maps.map.MapView
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
+import com.naver.maps.map.util.FusedLocationSource
 
 abstract class BaseMapFragment<T : ViewDataBinding>(private val layoutResId: Int) :
     Fragment(),
@@ -22,6 +26,7 @@ abstract class BaseMapFragment<T : ViewDataBinding>(private val layoutResId: Int
     val binding get() = _binding!!
 
     abstract var mapView: MapView?
+    private lateinit var locationSource: FusedLocationSource
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -30,22 +35,37 @@ abstract class BaseMapFragment<T : ViewDataBinding>(private val layoutResId: Int
     ): View {
         _binding = DataBindingUtil.inflate(inflater, layoutResId, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
-        initOnCreateView()
+        initMapView()
+        mapView?.getMapAsync(this)
+        locationSource = FusedLocationSource(this, LOCATION_PERMISSION_REQUEST_CODE)
         return binding.root
     }
 
-    abstract fun initOnCreateView()
+    /**
+     * mapView 바인딩해주세요
+     */
+    abstract fun initMapView()
 
-    override fun onMapReady(naverMap: NaverMap) = initOnMapReady(naverMap)
+    @UiThread
+    override fun onMapReady(naverMap: NaverMap) {
+        naverMap.setup(locationSource)
+        initOnMapReady(naverMap)
+    }
 
+    /**
+     * onMapReady와 동일
+     */
     abstract fun initOnMapReady(naverMap: NaverMap)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        iniViewCreated()
+        iniView()
     }
 
-    abstract fun iniViewCreated()
+    /**
+     * Fragment onViewCreated 이후에 호출되는 메서드
+     */
+    abstract fun iniView()
 
     fun navigateDestination(@IdRes action: Int) { // Navigation 이동
         findNavController().navigate(action)
@@ -91,4 +111,5 @@ abstract class BaseMapFragment<T : ViewDataBinding>(private val layoutResId: Int
         super.onLowMemory()
         mapView?.onLowMemory()
     }
+
 }

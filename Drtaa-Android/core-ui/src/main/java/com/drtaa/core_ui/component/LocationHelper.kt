@@ -17,7 +17,6 @@ import com.google.android.gms.location.Granularity
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
-import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -32,7 +31,8 @@ import kotlin.coroutines.suspendCoroutine
 
 @Singleton
 class LocationHelper @Inject constructor(
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
+    private val fusedLocationClient: FusedLocationProviderClient
 ) {
 
     private val locationRequest =
@@ -41,10 +41,6 @@ class LocationHelper @Inject constructor(
             setGranularity(Granularity.GRANULARITY_PERMISSION_LEVEL)
             setWaitForAccurateLocation(true)
         }.build()
-
-    private val fusedLocationClient: FusedLocationProviderClient by lazy {
-        LocationServices.getFusedLocationProviderClient(context)
-    }
 
     private var lastLocation: Location? = null
 
@@ -69,7 +65,7 @@ class LocationHelper @Inject constructor(
     @SuppressLint("MissingPermission")
     suspend fun getLastLocation(): Location? {
         if (!isLocationPermissionGranted()) {
-            throw LocationException("위치 권한이 없습니다.")
+            throw LocationException(GPS_NEED)
         }
 
         return suspendCoroutine { continuation ->
@@ -89,14 +85,14 @@ class LocationHelper @Inject constructor(
     }
 
 
-    private fun isLocationPermissionGranted(): Boolean {
+    fun isLocationPermissionGranted(): Boolean {
         return ContextCompat.checkSelfPermission(
             context,
             Manifest.permission.ACCESS_FINE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED
     }
 
-    private suspend fun requestLocationPermission(activity: AppCompatActivity) =
+    suspend fun requestLocationPermission(activity: AppCompatActivity) =
         suspendCoroutine { continuation ->
             val requestPermissionLauncher = activity.registerForActivityResult(
                 ActivityResultContracts.RequestPermission()
@@ -110,7 +106,10 @@ class LocationHelper @Inject constructor(
             requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         }
 
-    private fun isLocationEnabled(): Boolean {
+    /**
+     * API 28 대응
+     */
+    fun isLocationEnabled(): Boolean {
         val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
                 locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
@@ -140,7 +139,7 @@ class LocationHelper @Inject constructor(
     @SuppressLint("MissingPermission")
     fun getLocationUpdates(): Flow<Location> = callbackFlow {
         if (!isLocationPermissionGranted()) {
-            throw LocationException("위치 권한이 없습니다.")
+            throw LocationException(GPS_NEED)
         }
 
         if (!isLocationEnabled()) {
@@ -179,5 +178,6 @@ class LocationHelper @Inject constructor(
 
     companion object {
         const val GPS_NOT_ALLOWED = "위치 서비스가 비활성화되어 있습니다."
+        const val GPS_NEED = "위치 권한이 필요합니다"
     }
 }

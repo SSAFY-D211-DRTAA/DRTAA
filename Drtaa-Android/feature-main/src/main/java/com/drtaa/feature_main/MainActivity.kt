@@ -31,23 +31,18 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
 
     private fun initLocationPermission() {
         lifecycleScope.launch {
-            try {
+            if (!locationHelper.isLocationEnabled()) {
+                showToast(LocationHelper.GPS_NOT_ALLOWED)
+                locationHelper.openLocationSettings(this@MainActivity)
+            } else if (!locationHelper.isLocationPermissionGranted()) {
+                showToast(LocationHelper.GPS_NEED)
+                locationHelper.requestLocationPermission(this@MainActivity)
+            } else {
                 locationHelper.getLocationUpdates().flowWithLifecycle(lifecycle)
                     .onEach { location ->
                         Timber.tag("location")
                             .d("Lat: ${location.latitude}, Lng: ${location.longitude}")
                     }.launchIn(lifecycleScope)
-            } catch (e: LocationHelper.LocationException) {
-                when (e.message) {
-                    "위치 서비스가 비활성화되어 있습니다." -> {
-                        showToast("위치 서비스가 비활성화되어 있습니다.")
-                        locationHelper.openLocationSettings(this@MainActivity)
-                    }
-
-                    else -> {
-                        showToast("위치 권한이 필요합니다.")
-                    }
-                }
             }
         }
     }
