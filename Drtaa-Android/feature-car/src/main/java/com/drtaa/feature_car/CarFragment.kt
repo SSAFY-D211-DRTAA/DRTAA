@@ -22,11 +22,12 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
     private val touchPressTime = 100
 
     override fun initView() {
-        cardView = binding.viewTourCard
-        overlayView = binding.viewTicketOverlay
-        reflectionView = binding.viewTicketReflection
-        cardImage = binding.ivTicketCard
-
+        binding.apply {
+            cardView = cvTourCard
+            overlayView = viewTourOverlay
+            reflectionView = viewTourReflection
+            cardImage = ivTourCard
+        }
         setupCardTouchListener()
     }
 
