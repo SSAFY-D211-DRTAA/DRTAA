@@ -13,6 +13,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.navigation.NavDirections
 import androidx.navigation.fragment.findNavController
 import com.drtaa.core_ui.R
+import com.drtaa.core_ui.component.LoadingDialog
 
 abstract class BaseDialogFragment<B : ViewDataBinding>(private val layoutResId: Int) :
     DialogFragment() {
@@ -20,6 +21,18 @@ abstract class BaseDialogFragment<B : ViewDataBinding>(private val layoutResId: 
     private var _binding: B? = null
     protected val binding get() = _binding!!
     protected var isBackPressedEnabled = true
+
+    private val loading by lazy {
+        LoadingDialog(requireActivity())
+    }
+
+    fun dismissLoading() {
+        loading.dismiss()
+    }
+
+    fun showLoading() {
+        loading.show()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
