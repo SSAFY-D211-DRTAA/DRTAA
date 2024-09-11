@@ -20,7 +20,7 @@ class RentLocationFragment :
     }
 
     override fun initOnMapReady(naverMap: NaverMap) {
-
+        // 지도 작업
     }
 
     override fun iniView() {

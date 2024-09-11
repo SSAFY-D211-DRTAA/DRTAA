@@ -5,7 +5,6 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LifecycleCoroutineScope
 import com.google.android.material.snackbar.Snackbar
 
 fun Fragment.showSnackBar(message: String, view: View = requireView()) {
@@ -15,8 +14,9 @@ fun Fragment.showSnackBar(message: String, view: View = requireView()) {
 /**
  * 키보드 내리기
  */
-fun Context.hideKeyboard(view : View){
-    val imm: InputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+fun Context.hideKeyboard(view: View) {
+    val imm: InputMethodManager =
+        getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     imm.hideSoftInputFromWindow(view.windowToken, 0)
 }
 

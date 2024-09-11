@@ -1,18 +1,11 @@
 package com.drtaa.core_map
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.view.MotionEvent
-import android.view.View
-import android.widget.Toast
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
-import com.google.android.material.snackbar.Snackbar
 import com.naver.maps.map.LocationTrackingMode
 import com.naver.maps.map.MapView
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.util.FusedLocationSource
-
 
 const val LOCATION_PERMISSION_REQUEST_CODE = 1000
 

@@ -84,7 +84,6 @@ class LocationHelper @Inject constructor(
         }
     }
 
-
     fun isLocationPermissionGranted(): Boolean {
         return ContextCompat.checkSelfPermission(
             context,
