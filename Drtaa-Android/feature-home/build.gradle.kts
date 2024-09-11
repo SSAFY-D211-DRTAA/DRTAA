@@ -40,5 +40,6 @@ android {
 }
 
 dependencies {
-    implementation("com.naver.maps:map-sdk:3.19.1")
+    implementation(libs.map.sdk)
+    implementation(project(":core-map"))
 }

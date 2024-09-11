@@ -10,10 +10,23 @@ import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavDirections
 import androidx.navigation.fragment.findNavController
+import com.drtaa.core_ui.component.LoadingDialog
 
 abstract class BaseFragment<T : ViewDataBinding>(private val layoutResId: Int) : Fragment() {
     private var _binding: T? = null
     val binding get() = _binding!!
+
+    private val loading by lazy {
+        LoadingDialog(requireActivity())
+    }
+
+    fun dismissLoading() {
+        loading.dismiss()
+    }
+
+    fun showLoading() {
+        loading.show()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,

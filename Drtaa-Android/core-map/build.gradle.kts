@@ -3,10 +3,11 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
     id("drtaa.plugin.common")
     id("drtaa.plugin.hilt")
+    id("drtaa.plugin.detekt")
 }
 
 android {
-    namespace = "com.drtaa.core_ui"
+    namespace = "com.drtaa.core_map"
     compileSdk = 34
 
     defaultConfig {
@@ -32,27 +33,19 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
-
-    buildFeatures{
+    buildFeatures {
         dataBinding = true
     }
 }
 
 dependencies {
-    // Navigation
-    implementation(libs.navigation.ui.ktx)
-    implementation(libs.navigation.fragment.ktx)
-    // Datastore
-    implementation(libs.datastore.preferences)
+    implementation(libs.map.sdk)
     // Lifecycle
     implementation(libs.lifecycle.runtime.ktx)
     implementation(libs.lifecycle.extensions)
-    // Media
-    implementation(libs.glide)
+    implementation(libs.navigation.fragment.ktx)
+    implementation(libs.navigation.ui.ktx)
     // Coroutine
     implementation(libs.coroutines.android)
     implementation(libs.coroutines.core)
-    // DI
-    implementation(libs.androidx.hilt.navigation.fragment)
-    implementation(libs.play.services.location)
 }
