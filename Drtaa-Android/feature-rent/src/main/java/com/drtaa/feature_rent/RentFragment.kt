@@ -7,6 +7,12 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class RentFragment : BaseFragment<FragmentRentBinding>(R.layout.fragment_rent) {
     override fun initView() {
-        // Rent
+        initEvent()
+    }
+
+    private fun initEvent() {
+        binding.btnHomeCarRent.setOnClickListener {
+            navigateDestination(R.id.action_rentFragment_to_rentLocationFragment)
+        }
     }
 }

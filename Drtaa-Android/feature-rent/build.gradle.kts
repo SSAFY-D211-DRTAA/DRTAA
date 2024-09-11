@@ -39,5 +39,6 @@ android {
 }
 
 dependencies {
+    implementation(libs.map.sdk)
     implementation(project(":core-map"))
 }

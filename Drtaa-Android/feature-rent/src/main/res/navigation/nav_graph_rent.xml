@@ -9,12 +9,15 @@
         android:id="@+id/rentFragment"
         android:name="com.drtaa.feature_rent.RentFragment"
         android:label="RentFragment"
-        tools:layout="@layout/fragment_rent" />
-
+        tools:layout="@layout/fragment_rent">
+        <action
+            android:id="@+id/action_rentFragment_to_rentLocationFragment"
+            app:destination="@id/rentLocationFragment" />
+    </fragment>
     <fragment
-        android:id="@+id/testFragment"
-        android:name="com.drtaa.feature_rent.TestFragment"
-        android:label="TestFragment" />
-
+        android:id="@+id/rentLocationFragment"
+        android:name="com.drtaa.feature_rent.RentSearchFragment"
+        android:label="RentLocationFragment"
+        tools:layout="@layout/fragment_rent_search" />
 
 </navigation>
