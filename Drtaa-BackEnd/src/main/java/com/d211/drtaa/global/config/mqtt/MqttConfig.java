@@ -41,6 +41,7 @@ public class MqttConfig {
     @ServiceActivator(inputChannel = "mqttOutboundChannel")
     public MessageHandler mqttOutbound(){
         MqttPahoMessageHandler messageHandler = new MqttPahoMessageHandler(cliendId,mqttPahoClientFactory());
+        //te
     }
 
 }
