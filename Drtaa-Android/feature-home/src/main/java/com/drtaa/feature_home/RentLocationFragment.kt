@@ -27,5 +27,8 @@ class RentLocationFragment :
         binding.btnRentLocationSearch.setOnClickListener {
             viewModel.getSearchList(binding.etRentLocationSearch.text.toString())
         }
+
+        val bottomSheet = SearchBottomSheetDialogFragment()
+        bottomSheet.show(childFragmentManager, bottomSheet.tag)
     }
 }
