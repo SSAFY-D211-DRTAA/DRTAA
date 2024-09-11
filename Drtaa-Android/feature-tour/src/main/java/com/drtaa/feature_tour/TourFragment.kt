@@ -7,6 +7,6 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class TourFragment : BaseFragment<FragmentTourBinding>(R.layout.fragment_tour) {
     override fun initView() {
-        // 뭐하지
+        // 투어 입니당
     }
 }

@@ -368,12 +368,13 @@ class Link(Line):
 
         # 거리 계산
         # TODO: 해당 차로의 속도를 생각해서, 시간을 기준으로 고려할 것
-        if self.is_it_for_lane_change():
+        lane_ch_pair_list = self.get_lane_change_pair_list()
+        if self.is_it_for_lane_change() and lane_ch_pair_list:
             # 변경해서 들어갈 마지막 차선의 distance로 계산한다
             # NOTE: 중요한 가정이 있음. 차선 변경 진입 전후의 링크 길이가 거의 같아야 한다
             # 차선 변경 진입 후 링크가 너무 길다거나 하면 차선 변경 링크 생성 이전에 편집이 필요
 
-            lane_ch_pair_list = self.get_lane_change_pair_list()
+            # lane_ch_pair_list = self.get_lane_change_pair_list()
             last_to_link = lane_ch_pair_list[-1]['to']
             distance = last_to_link.get_total_distance()
         else:
@@ -389,10 +390,12 @@ class Link(Line):
             return np.interp(x, x_org, y_org, left=float('inf'), right=y_org[-1])
 
         lane_ch_pair_list = self.get_lane_change_pair_list()
-        if self.is_it_for_lane_change():
+        lc_num = self.get_number_of_lane_change()
+
+        if self.is_it_for_lane_change() and lc_num:
             # 차선 변경이 3번이면, 전체 링크 길이를 L이라 할 때
             # L/3 인 차선 변경 cost를 계산한 다음, 3을 곱하여 전체 차선 변경 penalty를 계산
-            lc_num = self.get_number_of_lane_change()
+            # lc_num = self.get_number_of_lane_change()
             unit_distance = distance / lc_num
             lane_change_penalty = lc_num * calc_lane_change_cost(unit_distance)
         else:

@@ -50,6 +50,7 @@ dependencies {
     implementation(project(":feature-home"))
     implementation(project(":feature-tour"))
     implementation(project(":feature-car"))
+    implementation(project(":feature-rent"))
 
     implementation(libs.map.sdk)
 }
