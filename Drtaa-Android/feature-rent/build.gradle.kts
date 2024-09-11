@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.drtaa.feature_home"
+    namespace = "com.drtaa.feature_rent"
     compileSdk = 34
 
     defaultConfig {
@@ -32,15 +32,12 @@ android {
         jvmTarget = "1.8"
     }
 
-    buildFeatures{
+    buildFeatures {
         dataBinding = true
         buildConfig = true
     }
-
 }
 
 dependencies {
-    implementation(libs.map.sdk)
     implementation(project(":core-map"))
-    implementation(project(":feature-rent"))
 }
