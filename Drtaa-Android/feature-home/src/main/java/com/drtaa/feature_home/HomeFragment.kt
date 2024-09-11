@@ -1,6 +1,7 @@
 package com.drtaa.feature_home
 
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.drtaa.core_ui.base.BaseFragment
 import com.drtaa.feature_home.databinding.FragmentHomeBinding
 import com.drtaa.feature_home.viewmodel.HomeViewModel
@@ -20,7 +21,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
 
     private fun initEvent() {
         binding.btnHomeCarRent.setOnClickListener {
-            navigateDestination(R.id.action_homeFragment_to_rentFragment)
+            findNavController().navigate(R.id.action_home_to_rent)
+//            navigateDestination(R.id.action_homeFragment_to_rentFragment)
         }
     }
 }
