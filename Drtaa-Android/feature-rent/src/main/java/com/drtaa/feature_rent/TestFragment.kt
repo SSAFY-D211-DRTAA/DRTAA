@@ -7,6 +7,6 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class TestFragment : BaseFragment<FragmentTestBinding>(R.layout.fragment_test) {
     override fun initView() {
-
+        // Test
     }
 }

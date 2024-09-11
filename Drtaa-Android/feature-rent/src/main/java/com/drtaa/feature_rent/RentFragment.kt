@@ -7,6 +7,6 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class RentFragment : BaseFragment<FragmentRentBinding>(R.layout.fragment_rent) {
     override fun initView() {
-
+        // Rent
     }
 }
