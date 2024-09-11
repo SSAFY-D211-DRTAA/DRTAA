@@ -1,5 +1,6 @@
 package com.d211.drtaa.domain.user.service;
 
+import com.d211.drtaa.domain.user.dto.request.PasswordChangeRequestDTO;
 import com.d211.drtaa.global.service.s3.S3Service;
 import com.d211.drtaa.domain.user.dto.request.FormSignUpRequestDTO;
 import com.d211.drtaa.domain.user.dto.request.SocialSignUpRequestDTO;
