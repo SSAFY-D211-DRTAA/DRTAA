@@ -18,6 +18,4 @@ interface TourAPI {
         @Query("mapY") mapY: String,
         @Query("radius") radius: String,
     ): ResponseTour
-
-
 }

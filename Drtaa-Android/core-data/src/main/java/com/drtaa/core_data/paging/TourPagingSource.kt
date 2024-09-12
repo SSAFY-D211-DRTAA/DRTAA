@@ -33,7 +33,6 @@ class TourPagingSource(
             mapY = mapY,
             radius = radius
         ).response.body
-        Timber.tag("tour_pager").d("${response}")
 
         return when (val result = safeApiCall { response }) {
             is ResultWrapper.Success -> {

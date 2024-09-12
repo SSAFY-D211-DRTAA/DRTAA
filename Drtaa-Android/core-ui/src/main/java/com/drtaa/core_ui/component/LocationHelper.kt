@@ -58,7 +58,7 @@ class LocationHelper @Inject constructor(
         if (!isLocationEnabled()) {
             throw LocationException(GPS_NOT_ALLOWED)
         }
-        if(isLocationEnabled() && isLocationPermissionGranted()){
+        if (isLocationEnabled() && isLocationPermissionGranted()) {
             Timber.e("LocationHelper 권한은 다 있음")
         }
         return getLocation()

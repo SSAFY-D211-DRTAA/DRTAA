@@ -8,7 +8,7 @@ import com.drtaa.feature_tour.databinding.ItemTourBinding
 
 class TourViewHolder(
     private val binding: ItemTourBinding,
-    private val onTourClickListener: (Int) -> Unit,
+    private val onTourClickListener: (TourItem) -> Unit,
 ) : ViewHolder(binding.root) {
 
     fun bind(data: TourItem) {
@@ -21,6 +21,9 @@ class TourViewHolder(
                 ivTour.centerCrop(data.firstimage, binding.root.context)
             } else {
                 ivTour.visibility = View.GONE
+            }
+            itemView.setOnClickListener {
+                onTourClickListener(data)
             }
         }
     }

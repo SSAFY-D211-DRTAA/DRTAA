@@ -41,8 +41,8 @@ class TourFragment : BaseFragment<FragmentTourBinding>(R.layout.fragment_tour) {
             locationHelper.getLastLocation().let { location ->
                 location?.let {
                     viewModel.getLocationBasedList(
-//                        location.longitude.toString(),
-                        (128.4164712).toString(),
+                        location.longitude.toString(),
+//                        (128.4164712).toString(),
                         location.latitude.toString(),
                         "20000" // 반경 2키로 검색
                     )

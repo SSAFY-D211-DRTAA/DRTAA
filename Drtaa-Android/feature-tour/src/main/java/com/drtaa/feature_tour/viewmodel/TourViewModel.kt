@@ -30,5 +30,4 @@ class TourViewModel @Inject constructor(
                 }
         }
     }
-
 }

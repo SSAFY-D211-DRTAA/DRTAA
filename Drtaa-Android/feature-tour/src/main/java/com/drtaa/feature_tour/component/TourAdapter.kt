@@ -9,7 +9,7 @@ import com.drtaa.core_ui.base.BaseDiffUtil
 import com.drtaa.feature_tour.databinding.ItemTourBinding
 
 class TourAdapter(
-    private val onTourClickListener: (Int) -> Unit,
+    private val onTourClickListener: (TourItem) -> Unit,
 ) : PagingDataAdapter<TourItem, ViewHolder>(BaseDiffUtil<TourItem>()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
