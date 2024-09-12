@@ -1,17 +1,22 @@
 package com.drtaa.feature_rent
 
+import android.view.KeyEvent
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.drtaa.core_map.base.BaseMapFragment
+import com.drtaa.core_ui.hideKeyboard
 import com.drtaa.core_ui.showSnackBar
 import com.drtaa.feature_rent.adapter.SearchListAdapter
 import com.drtaa.feature_rent.databinding.FragmentRentSearchBinding
 import com.drtaa.feature_rent.viewmodel.RentViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
+import com.naver.maps.map.CameraAnimation
+import com.naver.maps.map.CameraUpdate
+import com.naver.maps.map.LocationTrackingMode
 import com.naver.maps.map.MapView
 import com.naver.maps.map.NaverMap
 import dagger.hilt.android.AndroidEntryPoint
@@ -35,7 +40,10 @@ class RentSearchFragment :
     }
 
     override fun initOnMapReady(naverMap: NaverMap) {
-        // 지도 작업
+        naverMap.uiSettings.isLocationButtonEnabled = false
+        binding.ivRentSearchCurrentLocation.setOnClickListener {
+            moveToCurrentLocation(naverMap)
+        }
     }
 
     override fun iniView() {
@@ -46,7 +54,6 @@ class RentSearchFragment :
     }
 
     private fun initRV() {
-
         binding.layoutRentSearchBottomSheet.rvSearchResult.adapter = searchListAdapter
     }
 
@@ -74,6 +81,18 @@ class RentSearchFragment :
                     return@setOnClickListener
                 }
                 viewModel.getSearchList(this.etSearchLocation.text.toString())
+                requireActivity().hideKeyboard(requireView())
+                behavior.state = BottomSheetBehavior.STATE_EXPANDED
+            }
+
+            this.etSearchLocation.setOnKeyListener { _, keyCode, keyEvent ->
+                var handle = false
+                if (keyEvent.action == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
+                    handle = true
+                    this.ivSearchLocation.callOnClick()
+                }
+
+                handle
             }
         }
     }
@@ -82,10 +101,11 @@ class RentSearchFragment :
         binding.layoutRentSearchBottomSheet.tvSearchNothing.visibility = View.GONE
 
         behavior = BottomSheetBehavior.from(binding.clRentSearchBottomSheet)
-        behavior.state = BottomSheetBehavior.STATE_EXPANDED
-        behavior.isHideable = false // 완전히 숨길 수 없도록 설정
+        behavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        behavior.isHideable = false
 
-        behavior.peekHeight = BOTTOM_SHEET_PEEK_HEIGHT // 바텀시트가 접혔을 때의 높이 (적절하게 설정)
+        behavior.peekHeight = BOTTOM_SHEET_PEEK_HEIGHT
+        behavior.maxHeight = BOTTOM_SHEET_PEEK_HEIGHT * 2
 
         behavior.addBottomSheetCallback(object : BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
@@ -116,6 +136,20 @@ class RentSearchFragment :
 //                Timber.d("드래그 중")
             }
         })
+    }
+
+    private fun moveToCurrentLocation(naverMap: NaverMap) {
+        naverMap.locationTrackingMode = LocationTrackingMode.Follow
+        val locationOverlay = naverMap.locationOverlay
+        if (locationOverlay.isVisible) {
+            // 현재 위치로 이동
+            val currentLocation = locationOverlay.position
+            val cameraUpdate = CameraUpdate.scrollTo(currentLocation)
+                .animate(CameraAnimation.Easing) // 부드럽게 애니메이션으로 이동
+            naverMap.moveCamera(cameraUpdate)
+        } else {
+            showSnackBar("현재 위치를 확인할 수 없습니다.")
+        }
     }
 
     companion object {

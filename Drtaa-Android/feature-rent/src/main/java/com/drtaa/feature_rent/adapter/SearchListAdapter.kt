@@ -1,6 +1,7 @@
 package com.drtaa.feature_rent.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -17,14 +18,21 @@ class SearchListAdapter :
     }
 
     override fun onBindViewHolder(holder: SearchViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        val isLastItem = position == itemCount - 1
+        holder.bind(getItem(position), isLastItem)
     }
 
     class SearchViewHolder(private val binding: ItemSearchBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(search: Search) {
+        fun bind(search: Search, isLastItem: Boolean) {
             binding.search = search
-//            binding.executePendingBindings()
+
+            if (isLastItem) {
+                binding.viewSearchItemDivider.visibility = View.GONE
+            } else {
+                binding.viewSearchItemDivider.visibility = View.VISIBLE
+            }
+            binding.executePendingBindings()
         }
     }
 }

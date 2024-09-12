@@ -12,12 +12,12 @@
         tools:layout="@layout/fragment_rent">
         <action
             android:id="@+id/action_rentFragment_to_rentLocationFragment"
-            app:destination="@id/rentLocationFragment" />
+            app:destination="@id/rentSearchFragment" />
     </fragment>
     <fragment
-        android:id="@+id/rentLocationFragment"
+        android:id="@+id/rentSearchFragment"
         android:name="com.drtaa.feature_rent.RentSearchFragment"
-        android:label="RentLocationFragment"
+        android:label="RentSearchFragment"
         tools:layout="@layout/fragment_rent_search" />
 
 </navigation>
