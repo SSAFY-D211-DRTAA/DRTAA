@@ -6,7 +6,9 @@ import com.drtaa.core_data.repository.NaverRepository
 import com.drtaa.core_model.data.Search
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -17,6 +19,15 @@ class RentSearchViewModel @Inject constructor(
 ) : ViewModel() {
     private val _searchList = MutableSharedFlow<Result<List<Search>>>()
     val searchList: SharedFlow<Result<List<Search>>> = _searchList
+
+    private val _selectedSearchItem = MutableStateFlow<Search?>(null)
+    val selectedSearchItem: StateFlow<Search?> = _selectedSearchItem
+
+    fun setSelectedSearchItem(search: Search) {
+        viewModelScope.launch {
+            _selectedSearchItem.emit(search)
+        }
+    }
 
     fun getSearchList(keyword: String) {
         viewModelScope.launch {

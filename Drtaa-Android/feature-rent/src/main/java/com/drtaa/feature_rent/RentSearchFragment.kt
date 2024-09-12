@@ -8,6 +8,7 @@ import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.drtaa.core_map.base.BaseMapFragment
+import com.drtaa.core_map.setCustomLocationButton
 import com.drtaa.core_model.data.Search
 import com.drtaa.core_ui.hideKeyboard
 import com.drtaa.core_ui.showSnackBar
@@ -17,9 +18,6 @@ import com.drtaa.feature_rent.viewmodel.RentSearchViewModel
 import com.drtaa.feature_rent.viewmodel.RentViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
-import com.naver.maps.map.CameraAnimation
-import com.naver.maps.map.CameraUpdate
-import com.naver.maps.map.LocationTrackingMode
 import com.naver.maps.map.MapView
 import com.naver.maps.map.NaverMap
 import dagger.hilt.android.AndroidEntryPoint
@@ -46,9 +44,9 @@ class RentSearchFragment :
 
     override fun initOnMapReady(naverMap: NaverMap) {
         naverMap.uiSettings.isLocationButtonEnabled = false
-        binding.ivRentSearchCurrentLocation.setOnClickListener {
-            moveToCurrentLocation(naverMap)
-        }
+        naverMap.setCustomLocationButton(binding.ivRentSearchCurrentLocation)
+
+        initObserve(naverMap)
     }
 
     override fun iniView() {
@@ -62,10 +60,21 @@ class RentSearchFragment :
         searchListAdapter.setItemClickListener(object : SearchListAdapter.ItemClickListener {
             override fun onItemClicked(search: Search) {
                 rentViewModel.setRentStartLocation(search)
+                rentSearchViewModel.setSelectedSearchItem(search)
             }
         })
 
         binding.layoutRentSearchBottomSheet.rvSearchResult.adapter = searchListAdapter
+    }
+
+    private fun initObserve(naverMap: NaverMap) {
+        rentSearchViewModel.selectedSearchItem.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach { selectedSearchItem ->
+                Timber.d("selectedSearchItem $selectedSearchItem")
+                selectedSearchItem?.let {
+                    naverMap.setMarker(selectedSearchItem.lat, selectedSearchItem.lng)
+                }
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
     private fun initObserve() {
@@ -81,7 +90,7 @@ class RentSearchFragment :
                         binding.layoutRentSearchBottomSheet.tvSearchNothing.visibility = View.GONE
                     }
                 }.onFailure {
-                    // 실패 메세지 추가
+                    showSnackBar("오류가 발생했습니다. 다시 시도해주세요.")
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
@@ -149,20 +158,6 @@ class RentSearchFragment :
 //                Timber.d("드래그 중")
             }
         })
-    }
-
-    private fun moveToCurrentLocation(naverMap: NaverMap) {
-        naverMap.locationTrackingMode = LocationTrackingMode.Follow
-        val locationOverlay = naverMap.locationOverlay
-        if (locationOverlay.isVisible) {
-            // 현재 위치로 이동
-            val currentLocation = locationOverlay.position
-            val cameraUpdate = CameraUpdate.scrollTo(currentLocation)
-                .animate(CameraAnimation.Easing) // 부드럽게 애니메이션으로 이동
-            naverMap.moveCamera(cameraUpdate)
-        } else {
-            showSnackBar("현재 위치를 확인할 수 없습니다.")
-        }
     }
 
     companion object {

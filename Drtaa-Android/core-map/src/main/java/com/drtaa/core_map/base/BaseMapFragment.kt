@@ -13,9 +13,11 @@ import androidx.navigation.NavDirections
 import androidx.navigation.fragment.findNavController
 import com.drtaa.core_map.LOCATION_PERMISSION_REQUEST_CODE
 import com.drtaa.core_map.setup
+import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.MapView
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
+import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.util.FusedLocationSource
 
 abstract class BaseMapFragment<T : ViewDataBinding>(private val layoutResId: Int) :
@@ -27,6 +29,12 @@ abstract class BaseMapFragment<T : ViewDataBinding>(private val layoutResId: Int
 
     abstract var mapView: MapView?
     private lateinit var locationSource: FusedLocationSource
+
+    private val _markerList = mutableListOf<Marker>()
+    val markerList get() = _markerList
+
+    private val _marker = Marker()
+    val marker get() = _marker
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -65,6 +73,43 @@ abstract class BaseMapFragment<T : ViewDataBinding>(private val layoutResId: Int
      * Fragment onViewCreated 이후에 호출되는 메서드
      */
     abstract fun iniView()
+
+    /**
+     * 단일 마커 설정
+     */
+    fun NaverMap.setMarker(lat: Double, lng: Double) {
+        marker.map = null
+        marker.position = LatLng(lat, lng)
+        marker.map = this
+    }
+
+    /**
+     * 마커 리스트 추가
+     */
+    fun NaverMap.addMarker(lat: Double, lng: Double) {
+        val marker = Marker()
+        marker.position = LatLng(lat, lng)
+        marker.map = this
+
+        _markerList.add(marker)
+    }
+
+    /**
+     * 단일 마커 삭제
+     */
+    fun NaverMap.cleatMarker() {
+        marker.map = null
+    }
+
+    /**
+     * 마커 리스트 삭제
+     */
+    fun NaverMap.clearMarkerList() {
+        _markerList.forEach { marker ->
+            marker.map = null
+        }
+        _markerList.clear()
+    }
 
     fun navigateDestination(@IdRes action: Int) { // Navigation 이동
         findNavController().navigate(action)

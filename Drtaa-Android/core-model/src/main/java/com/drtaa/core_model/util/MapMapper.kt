@@ -8,8 +8,8 @@ fun SearchItem.toSearch(): Search {
         title = this.title.removeHtmlTags(),
         category = this.category.removeTextBeforeArrow(),
         roadAddress = this.roadAddress,
-        mapx = this.mapx,
-        mapy = this.mapy
+        lng = this.mapx.toDouble() / 10000000,
+        lat = this.mapy.toDouble() / 10000000
     )
 }
 
