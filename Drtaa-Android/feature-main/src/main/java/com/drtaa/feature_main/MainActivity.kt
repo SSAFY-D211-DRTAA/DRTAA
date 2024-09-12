@@ -38,6 +38,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
                 showToast(LocationHelper.GPS_NEED)
                 locationHelper.requestLocationPermission(this@MainActivity)
             } else {
+                locationHelper.getCurrentLocation(this@MainActivity)
                 locationHelper.getLocationUpdates().flowWithLifecycle(lifecycle)
                     .onEach { location ->
                         Timber.tag("location")
