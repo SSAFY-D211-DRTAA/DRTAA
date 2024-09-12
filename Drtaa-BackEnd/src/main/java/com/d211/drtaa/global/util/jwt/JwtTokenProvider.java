@@ -1,5 +1,6 @@
 package com.d211.drtaa.global.util.jwt;
 
+import com.d211.drtaa.global.exception.auth.InvalidTokenException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -34,7 +35,7 @@ public class JwtTokenProvider {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    // AccessToken, RefreshToken 생성 메소드 - 폼 로그인
+    // AccessToken, RefreshToken 생성 메소드
     public JwtToken generateToken(Authentication authentication) {
         // 권한 가져오기
         String authorities = authentication.getAuthorities().stream()
@@ -86,23 +87,26 @@ public class JwtTokenProvider {
     }
 
     // 토큰 정보 검증 메소드
-    public boolean validateToken(String token) {
+    public void validateToken(String token) throws InvalidTokenException {
         try {
             Jwts.parserBuilder()
                     .setSigningKey(key)
                     .build()
                     .parseClaimsJws(token);
-            return true;
+
         } catch (SecurityException | MalformedJwtException e) {
-            log.info("Invalid JWT RefreshToken", e);
+            log.info("Invalid JWT Token", e);
+            throw new InvalidTokenException("유효하지 않은 토큰입니다.");
         } catch (ExpiredJwtException e) {
-            log.info("Expired JWT RefreshToken", e);
+            log.info("Expired JWT Token", e);
+            throw new InvalidTokenException("만료된 토큰입니다. 재발급 해주세요.");
         } catch (UnsupportedJwtException e) {
-            log.info("Unsupported JWT RefreshToken", e);
+            log.info("Unsupported JWT Token", e);
+            throw new InvalidTokenException("지원되지 않는 토큰입니다.");
         } catch (IllegalArgumentException e) {
             log.info("JWT claims string is empty.", e);
+            throw new InvalidTokenException("토큰이 비어있습니다.");
         }
-        return false;
     }
 
     private Claims parseClaims(String accessToken) {

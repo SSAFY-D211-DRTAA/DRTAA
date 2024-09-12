@@ -1,6 +1,8 @@
 package com.d211.drtaa.domain.user.service;
 
+import com.d211.drtaa.global.exception.auth.InvalidTokenException;
 import com.d211.drtaa.global.service.jwt.JwtTokenService;
+import com.d211.drtaa.global.service.redis.RedisService;
 import com.d211.drtaa.global.service.s3.S3Service;
 import com.d211.drtaa.domain.user.dto.request.FormLoginRequestDTO;
 import com.d211.drtaa.domain.user.dto.request.SocialLoginRequestDTO;
@@ -10,7 +12,10 @@ import com.d211.drtaa.global.util.jwt.JwtToken;
 import com.d211.drtaa.domain.user.entity.User;
 import com.d211.drtaa.domain.user.repository.UserRepository;
 import com.d211.drtaa.global.exception.user.UserNicknameDuplicateException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -22,10 +27,12 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService{
 
+    private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenService jwtTokenService;
     private final CustomUserDetailsService userDetailsService;
     private final S3Service s3Service;
+    private final RedisService redisService;
     private final UserRepository userRepository;
 
     @Override
@@ -38,7 +45,7 @@ public class UserServiceImpl implements UserService{
             throw new BadCredentialsException("유효하지 않은 비밀번호입니다.");
 
         // JWT 토큰 발급
-        JwtToken tokens = jwtTokenService.generateToken(request.getUserProviderId(), request.getUserPassword());
+        JwtToken tokens = jwtTokenService.generateToken(request.getUserProviderId(), request.getUserPassword(), request.getUserLogin());
 
         return tokens;
     }
@@ -66,9 +73,28 @@ public class UserServiceImpl implements UserService{
         }
 
         // JWT 토큰 발급
-        JwtToken tokens = jwtTokenService.generateToken(request.getUserProviderId(), "");
+        JwtToken tokens = jwtTokenService.generateToken(request.getUserProviderId(), "", request.getUserLogin());
 
         return tokens;
+    }
+
+    @Override
+    @Transactional
+    public JwtToken updateToken(String userRefreshToken) {
+        // 사용자 찾기
+        User user = userRepository.findByUserRefreshToken(userRefreshToken)
+                .orElseThrow(() -> new UsernameNotFoundException("해당 userRefreshToken의 맞는 회원을 찾을 수 없습니다."));
+
+        // 사용자 검증
+        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUserProviderId());
+
+        // 토큰 확인
+        if (redisService.getRefreshToken(user.getUserProviderId()).equals(userRefreshToken)) {
+            // JWT 토큰 재발급, 재발급이므로 isLogin을 null로 설정
+            return jwtTokenService.generateToken(user.getUserProviderId(), userDetails.getPassword(), null);
+        } else {
+            throw new InvalidTokenException("유효하지 않은 토큰입니다.");
+        }
     }
 
     @Override
@@ -84,17 +110,23 @@ public class UserServiceImpl implements UserService{
                 .userProfileImg(user.getUserProfileImg())
                 .userLogin(user.getUserLogin())
                 .userIsAdmin(user.isUserIsAdmin())
+                .userSiginupDate(user.getUserSiginupDate())
                 .build();
 
         return userInfo;
     }
 
     @Override
+    @Transactional
     public void delete(String userProviderId) {
+        // Redis에서 refreshToken 삭제
+        redisService.deleteRefreshToken(userProviderId);
+        // DB에서 회원 삭제
         userRepository.deleteByUserProviderId(userProviderId);
     }
 
     @Override
+    @Transactional
     public void updateImg(String userName, MultipartFile image) throws Exception {
         // 사용자 조회
         User user = userRepository.findByUserProviderId(userName)
@@ -134,6 +166,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    @Transactional
     public void updateNickname(String userName, String nickName) {
         if (!userRepository.existsByUserNickname(nickName)) {
             // 사용자 조회

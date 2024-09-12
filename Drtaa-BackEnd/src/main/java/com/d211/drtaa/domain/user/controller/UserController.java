@@ -5,9 +5,11 @@ import com.d211.drtaa.domain.user.dto.request.*;
 import com.d211.drtaa.domain.user.dto.response.UserInfoResponseDTO;
 import com.d211.drtaa.domain.user.service.CustomUserDetailsService;
 import com.d211.drtaa.domain.user.service.UserService;
+import com.d211.drtaa.global.exception.auth.InvalidTokenException;
 import com.d211.drtaa.global.util.jwt.JwtToken;
 import com.d211.drtaa.global.exception.user.UserCreationException;
 import com.d211.drtaa.global.exception.user.UserNicknameDuplicateException;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -104,6 +106,25 @@ public class UserController {
         }
     }
 
+    @PostMapping("/token")
+    @Operation(summary = "토큰 재발급", description = "유효기간 만료로 인한 JWT 토큰 재발급")
+    public ResponseEntity<?> updateToken(@RequestParam String userRefreshToken) {
+        try {
+            JwtToken tokens = userService.updateToken(userRefreshToken);
+
+            return ResponseEntity.ok(tokens);
+        } catch (InvalidTokenException e) {
+            // 리프레시 토큰이 만료된 경우
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("리프레시 토큰이 만료되었습니다. 다시 로그인해주세요.");
+        } catch (UsernameNotFoundException e) {
+            // 사용자 없음
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            // 기타 예외
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     @GetMapping("/info")
     @Operation(summary = "회원 정보 조회", description = "액세스 토큰을 사용해 회원 정보 조회")
     public ResponseEntity info(Authentication authentication) {
@@ -113,8 +134,11 @@ public class UserController {
             // 200, 클라이언트 요청 성공
             return ResponseEntity.ok(response);
         } catch (UsernameNotFoundException e) {
-            // 401, 클라이언트 인증 실패
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+            // 404, 사용자 정보가 없음
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (ExpiredJwtException e) {
+            // 400, 잘못된 요청
+            return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
             // 400, 잘못된 요청
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -197,6 +221,18 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         } catch (Exception e) {
             // 400, 잘못된 요청
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping
+    @Operation(summary = "회원 탈퇴", description = "회월 탈퇴 시행")
+    public ResponseEntity deleteUser(Authentication authentication) {
+        try {
+            userService.delete(authentication.getName());
+
+            return ResponseEntity.ok("회원 탈퇴 성공");
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }

@@ -3,12 +3,15 @@ package com.d211.drtaa.domain.user.entity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.redis.core.RedisHash;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 
 @Entity
 @Table(name = "user")
@@ -26,11 +29,11 @@ public class User implements UserDetails {
     private long userId;
 
     @Column(name = "user_provider_id", nullable = false)
-    @Schema(description = "회원 고유 번호", example = "1")
+    @Schema(description = "회원 아이디", example = "1")
     private String userProviderId;
 
     @Column(name = "user_password", nullable = false)
-    @Schema(description = "회원 PW", example = "암호화된 내용")
+    @Schema(description = "회원 비밀번호", example = "암호화된 내용")
     private String userPassword;
 
     @Column(name = "user_nickname", nullable = false)
@@ -52,6 +55,10 @@ public class User implements UserDetails {
     @Column(name = "user_is_admin", nullable = false)
     @Schema(description = "회원 관리자 유무", example = "false")
     private boolean userIsAdmin;
+
+    @Column(name = "user_signup_date")
+    @Schema(description = "회원 가입 일자", example = "2024.09.12 14:00:00")
+    private LocalDateTime userSiginupDate;
 
 
     @Override

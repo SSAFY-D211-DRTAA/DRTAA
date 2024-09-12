@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -83,6 +84,7 @@ public class CustomUserDetailsServiceImpl implements CustomUserDetailsService {
                 .userRefreshToken("")
                 .userLogin("Form")
                 .userIsAdmin(request.isUserIsAdmin())
+                .userSiginupDate(LocalDateTime.now())
                 .build();
 
         createUser(user); // 기존 createUser(UserDetails user) 호출
@@ -98,6 +100,7 @@ public class CustomUserDetailsServiceImpl implements CustomUserDetailsService {
                 .userRefreshToken("")
                 .userLogin(request.getUserLogin())
                 .userIsAdmin(false)
+                .userSiginupDate(LocalDateTime.now())
                 .build();
 
         createUser(user); // 기존 createUser(UserDetails user) 호출
