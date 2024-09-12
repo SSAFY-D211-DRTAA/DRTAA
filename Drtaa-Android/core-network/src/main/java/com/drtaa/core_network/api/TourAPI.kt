@@ -7,6 +7,7 @@ import retrofit2.http.Query
 interface TourAPI {
     @GET("locationBasedList1")
     suspend fun getLocationBasedList(
+        @Query("arrange") arrange: String = "R",
         @Query("serviceKey") serviceKey: String,
         @Query("numOfRows") numOfRows: Int,
         @Query("pageNo") pageNo: Int,

@@ -6,6 +6,7 @@ import com.drtaa.core_data.datasource.TourDataSource
 import com.drtaa.core_data.util.ResultWrapper
 import com.drtaa.core_data.util.safeApiCall
 import com.drtaa.core_model.data.TourItem
+import com.drtaa.core_model.network.ResponseTour
 import com.drtaa.core_model.util.toEntity
 import timber.log.Timber
 
@@ -15,9 +16,6 @@ class TourPagingSource(
     private val mapY: String,
     private val radius: String
 ) : PagingSource<Int, TourItem>() {
-    init {
-        Timber.tag("pager").d("${mapX} ${mapY} ${radius}")
-    }
 
     override fun getRefreshKey(state: PagingState<Int, TourItem>): Int? {
         return state.anchorPosition?.let { anchorPosition ->
@@ -37,16 +35,14 @@ class TourPagingSource(
         ).response.body
         Timber.tag("tour_pager").d("${response}")
 
-        return when (val result =
-            safeApiCall { response }) {
+        return when (val result = safeApiCall { response }) {
             is ResultWrapper.Success -> {
                 val entity = result.data.items.item.map { it.toEntity() }
                 Timber.tag("tour_pager").d("${result.data}")
-                Timber.tag("tour_pager").d("${response}")
                 LoadResult.Page(
                     data = entity,
-                    prevKey = if (nextPage == 0) null else nextPage - 1,
-                    nextKey = if (response.items.item.isEmpty() || result.data.pageNo == nextPage - 1) null else nextPage + 1
+                    prevKey = if (nextPage == 1) null else nextPage - 1,
+                    nextKey = if (isNextExist(response, result, nextPage)) null else nextPage + 1
                 )
             }
 
@@ -62,4 +58,11 @@ class TourPagingSource(
         }
     }
 
+    private fun isNextExist(
+        response: ResponseTour.Response.Body,
+        result: ResultWrapper.Success<ResponseTour.Response.Body>,
+        nextPage: Int
+    ): Boolean {
+        return response.items.item.isEmpty() || result.data.pageNo == nextPage - 1
+    }
 }

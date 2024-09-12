@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">DRTAA</string>
+    <string name="tour_empty">일정이 비어있어요...</string>
+    <string name="tour_around">주변 정보</string>
 </resources>

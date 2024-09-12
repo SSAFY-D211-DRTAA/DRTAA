@@ -32,5 +32,4 @@ interface RepositoryModule {
     @Singleton
     @Binds
     fun bindTourRepository(tourRepositoryImpl: TourRepositoryImpl): TourRepository
-
 }
