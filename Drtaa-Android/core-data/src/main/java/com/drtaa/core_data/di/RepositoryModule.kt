@@ -3,9 +3,11 @@ package com.drtaa.core_data.di
 import com.drtaa.core_data.repository.NaverRepository
 import com.drtaa.core_data.repository.SignRepository
 import com.drtaa.core_data.repository.TokenRepository
+import com.drtaa.core_data.repository.TourRepository
 import com.drtaa.core_data.repositoryimpl.NaverRepositoryImpl
 import com.drtaa.core_data.repositoryimpl.SignRepositoryImpl
 import com.drtaa.core_data.repositoryimpl.TokenRepositoryImpl
+import com.drtaa.core_data.repositoryimpl.TourRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -26,4 +28,9 @@ interface RepositoryModule {
     @Singleton
     @Binds
     fun bindMapRepository(mapRepositoryImpl: NaverRepositoryImpl): NaverRepository
+
+    @Singleton
+    @Binds
+    fun bindTourRepository(tourRepositoryImpl: TourRepositoryImpl): TourRepository
+
 }

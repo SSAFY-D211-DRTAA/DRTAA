@@ -18,6 +18,7 @@ navigation = "2.7.7"
 datastore = "1.1.1"
 lifecycle-runtime-ktx = "2.8.3"
 lifecycle-extensions = "2.2.0"
+pagingRuntimeKtx = "3.3.2"
 
 # Logging
 timber = "5.0.1"
@@ -43,6 +44,9 @@ googleid = "1.1.1"
 playServicesBasement = "18.4.0"
 playServicesLocation = "21.3.0"
 
+ted-permission = "3.3.0"
+
+
 [libraries]
 detekt-gradle = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt" }
 detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detekt" }
@@ -50,6 +54,7 @@ detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", 
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 kotlin-gradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+androidx-paging-runtime-ktx = { module = "androidx.paging:paging-runtime-ktx", version.ref = "pagingRuntimeKtx" }
 
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -101,6 +106,11 @@ retrofit-converter-kotlinxSerialization = { module = "com.squareup.retrofit2:con
 glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
 play-services-basement = { group = "com.google.android.gms", name = "play-services-basement", version.ref = "playServicesBasement" }
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
+
+# Permission
+ted-permission-normal = { group = "io.github.ParkSangGwon", name = "tedpermission-normal", version.ref = "ted-permission" }
+ted-permission-coroutine = { group = "io.github.ParkSangGwon", name = "tedpermission-coroutine", version.ref = "ted-permission" }
+
 
 [bundles]
 network-default = [

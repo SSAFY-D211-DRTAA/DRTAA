@@ -40,5 +40,6 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.paging.runtime.ktx)
 
 }
