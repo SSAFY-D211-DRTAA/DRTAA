@@ -28,7 +28,7 @@
             android:id="@+id/cl_rent_search_bottom_sheet"
             android:layout_width="match_parent"
             android:layout_height="700dp"
-            android:background="@drawable/rec_white_rad30"
+            android:background="@drawable/rec_white_top_rad30"
             android:clickable="true"
             app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 

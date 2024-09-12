@@ -4,13 +4,16 @@ import android.view.KeyEvent
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.viewModels
+import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.drtaa.core_map.base.BaseMapFragment
+import com.drtaa.core_model.data.Search
 import com.drtaa.core_ui.hideKeyboard
 import com.drtaa.core_ui.showSnackBar
 import com.drtaa.feature_rent.adapter.SearchListAdapter
 import com.drtaa.feature_rent.databinding.FragmentRentSearchBinding
+import com.drtaa.feature_rent.viewmodel.RentSearchViewModel
 import com.drtaa.feature_rent.viewmodel.RentViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
@@ -27,7 +30,9 @@ import timber.log.Timber
 @AndroidEntryPoint
 class RentSearchFragment :
     BaseMapFragment<FragmentRentSearchBinding>(R.layout.fragment_rent_search) {
-    private val viewModel: RentViewModel by viewModels()
+    private val rentViewModel: RentViewModel by hiltNavGraphViewModels(R.id.nav_graph_rent)
+    private val rentSearchViewModel: RentSearchViewModel by viewModels()
+
     override var mapView: MapView? = null
 
     private lateinit var behavior: BottomSheetBehavior<ConstraintLayout>
@@ -54,23 +59,31 @@ class RentSearchFragment :
     }
 
     private fun initRV() {
+        searchListAdapter.setItemClickListener(object : SearchListAdapter.ItemClickListener {
+            override fun onItemClicked(search: Search) {
+                rentViewModel.setRentStartLocation(search)
+            }
+        })
+
         binding.layoutRentSearchBottomSheet.rvSearchResult.adapter = searchListAdapter
     }
 
     private fun initObserve() {
-        viewModel.searchList.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach { result ->
-            result.onSuccess { data ->
-                binding.layoutRentSearchBottomSheet.tvSearchBefore.visibility = View.GONE
-                searchListAdapter.submitList(data)
-                if (data.isEmpty()) {
-                    binding.layoutRentSearchBottomSheet.tvSearchNothing.visibility = View.VISIBLE
-                } else {
-                    binding.layoutRentSearchBottomSheet.tvSearchNothing.visibility = View.GONE
+        rentSearchViewModel.searchList.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach { result ->
+                result.onSuccess { data ->
+                    binding.layoutRentSearchBottomSheet.tvSearchBefore.visibility = View.GONE
+                    searchListAdapter.submitList(data)
+                    if (data.isEmpty()) {
+                        binding.layoutRentSearchBottomSheet.tvSearchNothing.visibility =
+                            View.VISIBLE
+                    } else {
+                        binding.layoutRentSearchBottomSheet.tvSearchNothing.visibility = View.GONE
+                    }
+                }.onFailure {
+                    // 실패 메세지 추가
                 }
-            }.onFailure {
-                // 실패 메세지 추가
-            }
-        }.launchIn(viewLifecycleOwner.lifecycleScope)
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
     private fun initEvent() {
@@ -80,7 +93,7 @@ class RentSearchFragment :
                     showSnackBar("검색어를 입력해주세요.")
                     return@setOnClickListener
                 }
-                viewModel.getSearchList(this.etSearchLocation.text.toString())
+                rentSearchViewModel.getSearchList(this.etSearchLocation.text.toString())
                 requireActivity().hideKeyboard(requireView())
                 behavior.state = BottomSheetBehavior.STATE_EXPANDED
             }

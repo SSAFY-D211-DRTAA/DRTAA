@@ -22,7 +22,7 @@ class SearchListAdapter :
         holder.bind(getItem(position), isLastItem)
     }
 
-    class SearchViewHolder(private val binding: ItemSearchBinding) :
+    inner class SearchViewHolder(private val binding: ItemSearchBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(search: Search, isLastItem: Boolean) {
             binding.search = search
@@ -33,6 +33,20 @@ class SearchListAdapter :
                 binding.viewSearchItemDivider.visibility = View.VISIBLE
             }
             binding.executePendingBindings()
+
+            binding.root.setOnClickListener {
+                itemClickListener.onItemClicked(search)
+            }
         }
+    }
+
+    interface ItemClickListener {
+        fun onItemClicked(search: Search)
+    }
+
+    private lateinit var itemClickListener: ItemClickListener
+
+    fun setItemClickListener(itemClickListener: ItemClickListener) {
+        this.itemClickListener = itemClickListener
     }
 }
