@@ -59,7 +59,6 @@ class RentSearchFragment :
     private fun initRV() {
         searchListAdapter.setItemClickListener(object : SearchListAdapter.ItemClickListener {
             override fun onItemClicked(search: Search) {
-                rentViewModel.setRentStartLocation(search)
                 rentSearchViewModel.setSelectedSearchItem(search)
             }
         })
@@ -86,8 +85,11 @@ class RentSearchFragment :
                     if (data.isEmpty()) {
                         binding.layoutRentSearchBottomSheet.tvSearchNothing.visibility =
                             View.VISIBLE
+                        binding.layoutRentSearchBottomSheet.btnSearchSelect.visibility = View.GONE
                     } else {
                         binding.layoutRentSearchBottomSheet.tvSearchNothing.visibility = View.GONE
+                        binding.layoutRentSearchBottomSheet.btnSearchSelect.visibility =
+                            View.VISIBLE
                     }
                 }.onFailure {
                     showSnackBar("오류가 발생했습니다. 다시 시도해주세요.")
@@ -116,11 +118,21 @@ class RentSearchFragment :
 
                 handle
             }
+
+            this.btnSearchSelect.setOnClickListener {
+                if (rentSearchViewModel.selectedSearchItem.value != null) {
+                    rentViewModel.setRentStartLocation(rentSearchViewModel.selectedSearchItem.value!!)
+                    navigatePopBackStack()
+                } else {
+                    showSnackBar("장소를 선택해주세요.")
+                }
+            }
         }
     }
 
     private fun initBottomSheet() {
         binding.layoutRentSearchBottomSheet.tvSearchNothing.visibility = View.GONE
+        binding.layoutRentSearchBottomSheet.btnSearchSelect.visibility = View.GONE
 
         behavior = BottomSheetBehavior.from(binding.clRentSearchBottomSheet)
         behavior.state = BottomSheetBehavior.STATE_COLLAPSED

@@ -97,7 +97,7 @@ abstract class BaseMapFragment<T : ViewDataBinding>(private val layoutResId: Int
     /**
      * 단일 마커 삭제
      */
-    fun NaverMap.cleatMarker() {
+    fun NaverMap.clearMarker() {
         marker.map = null
     }
 
@@ -117,6 +117,10 @@ abstract class BaseMapFragment<T : ViewDataBinding>(private val layoutResId: Int
 
     fun navigateDestination(action: NavDirections) { // Navigation 이동
         findNavController().navigate(action)
+    }
+
+    fun navigatePopBackStack() { // 뒤로 가기
+        findNavController().popBackStack()
     }
 
     override fun onStart() {
