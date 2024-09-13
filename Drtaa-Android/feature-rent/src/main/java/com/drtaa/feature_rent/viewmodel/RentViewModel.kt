@@ -14,9 +14,22 @@ class RentViewModel @Inject constructor() : ViewModel() {
     private val _rentStartLocation = MutableStateFlow<Search?>(null)
     val rentStartLocation: StateFlow<Search?> = _rentStartLocation
 
+    private val _rentStartDate = MutableStateFlow<String?>(null)
+    val rentStartDate: StateFlow<String?> = _rentStartDate
+
+    private val _rentEndDate = MutableStateFlow<String?>(null)
+    val rentEndDate: StateFlow<String?> = _rentEndDate
+
     fun setRentStartLocation(search: Search) {
         viewModelScope.launch {
-            _rentStartLocation.emit(search)
+            _rentStartLocation.value = search
+        }
+    }
+
+    fun setRentDate(startDate: String, endDate: String) {
+        viewModelScope.launch {
+            _rentStartDate.value = startDate
+            _rentEndDate.value = endDate
         }
     }
 }

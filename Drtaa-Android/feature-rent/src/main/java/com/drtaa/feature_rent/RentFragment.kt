@@ -29,11 +29,36 @@ class RentFragment : BaseFragment<FragmentRentBinding>(R.layout.fragment_rent) {
                     binding.tvRentStartLocation.hint = "강남역"
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+        rentViewModel.rentStartDate.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach { rentStartDate ->
+                if (rentStartDate != null) {
+                    binding.tvRentStartSchedule.text = rentStartDate
+                } else {
+                    binding.tvRentStartSchedule.hint = "09.09 (월) 20:00"
+                }
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+        rentViewModel.rentEndDate.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach { rentEndDate ->
+                if (rentEndDate != null) {
+                    binding.tvRentEndSchedule.text = rentEndDate
+                } else {
+                    binding.tvRentEndSchedule.hint = "09.09 (월) 20:00"
+                }
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
     private fun initEvent() {
         binding.clRentStartLocation.setOnClickListener {
             navigateDestination(R.id.action_rentFragment_to_rentLocationFragment)
+        }
+
+        binding.clRentSchedule.setOnClickListener {
+            CalendarBottomSheetDialogFragment().show(
+                requireActivity().supportFragmentManager,
+                "CalendarBottomSheetDialogFragment"
+            )
         }
     }
 }

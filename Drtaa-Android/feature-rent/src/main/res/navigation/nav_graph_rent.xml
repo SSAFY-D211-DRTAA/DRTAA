@@ -19,5 +19,10 @@
         android:name="com.drtaa.feature_rent.RentSearchFragment"
         android:label="RentSearchFragment"
         tools:layout="@layout/fragment_rent_search" />
+    <dialog
+        android:id="@+id/calendarBottomSheetDialogFragment"
+        android:name="com.drtaa.feature_rent.CalendarBottomSheetDialogFragment"
+        android:label="CalendarBottomSheetDialogFragment"
+        tools:layout="@layout/fragment_calendar_bottom_sheet" />
 
 </navigation>
