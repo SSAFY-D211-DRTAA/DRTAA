@@ -3,11 +3,11 @@ package com.drtaa.core_mqtt
 import com.hivemq.client.mqtt.MqttClient
 import com.hivemq.client.mqtt.mqtt5.Mqtt5AsyncClient
 import com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5Publish
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.suspendCancellableCoroutine
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.coroutines.resume
 
 private const val TAG = "MQTT"
 
@@ -15,26 +15,28 @@ private const val TAG = "MQTT"
 class MqttManager @Inject constructor() {
     private lateinit var client: Mqtt5AsyncClient
 
-    suspend fun setupMqttClient() {
-        client = MqttClient.builder()
-            .useMqttVersion5()
-            .serverHost(MQTT_SERVER)
-            .serverPort(PORT)
-            .buildAsync()
+    suspend fun setupMqttClient(): Result<Unit> {
+        return try {
+            client = MqttClient.builder()
+                .useMqttVersion5()
+                .serverHost(MQTT_SERVER)
+                .serverPort(PORT)
+                .buildAsync()
 
-        try {
-            withContext(Dispatchers.IO) {
+            suspendCancellableCoroutine { continuation ->
                 client.connect().whenComplete { _, throwable ->
                     if (throwable != null) {
-                        Timber.tag(TAG).e("MQTT 연결실패", throwable)
+                        Timber.tag(TAG).e(throwable, "MQTT 연결실패")
+                        continuation.resume(Result.failure(throwable))
                     } else {
                         Timber.tag(TAG).d("MQTT 연결성공")
-                        subscribeToTopic()
+                        continuation.resume(Result.success(Unit))
                     }
                 }
             }
         } catch (e: Exception) {
-            Timber.tag(TAG).e("MQTT 연결실패", e)
+            Timber.tag(TAG).e(e, "MQTT 클라이언트 설정 실패")
+            Result.failure(e)
         }
     }
 
@@ -48,7 +50,7 @@ class MqttManager @Inject constructor() {
             .send()
             .whenComplete { connAck, throwable ->
                 if (throwable != null) {
-                    Timber.tag(TAG).e("구독 실패", throwable)
+                    Timber.tag(TAG).e(throwable, "구독 실패")
                 } else {
                     Timber.tag(TAG).d("구독 성공 $connAck")
                 }
@@ -62,7 +64,7 @@ class MqttManager @Inject constructor() {
             .send()
             .whenComplete { connAck, throwable ->
                 if (throwable != null) {
-                    Timber.tag(TAG).e("발행 실패", throwable)
+                    Timber.tag(TAG).e(throwable, "발행 실패")
                 } else {
                     Timber.tag(TAG).d("발행 성공 $connAck")
                 }

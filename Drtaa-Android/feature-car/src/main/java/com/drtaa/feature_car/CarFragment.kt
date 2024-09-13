@@ -12,6 +12,7 @@ import com.drtaa.core_ui.base.BaseFragment
 import com.drtaa.feature_car.databinding.FragmentCarBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -35,10 +36,14 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
             cardImage = ivTourCard
 
             viewLifecycleOwner.lifecycleScope.launch {
-                mqttManager.setupMqttClient()
-            }
-            btnMqtt.setOnClickListener {
-                mqttManager.publishMessage("GPS")
+                val result = mqttManager.setupMqttClient()
+                btnMqtt.setOnClickListener {
+                    result.onSuccess {
+                        mqttManager.publishMessage("GPS")
+                    }.onFailure {
+                        Timber.tag("mqtt").d("아직 연결 안됐음")
+                    }
+                }
             }
         }
         setupCardTouchListener()
