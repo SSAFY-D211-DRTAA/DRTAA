@@ -55,4 +55,6 @@ dependencies {
     // DI
     implementation(libs.androidx.hilt.navigation.fragment)
     implementation(libs.play.services.location)
+    //Calendar
+    implementation("com.github.prolificinteractive:material-calendarview:2.0.1")
 }

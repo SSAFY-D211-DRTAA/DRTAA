@@ -23,7 +23,11 @@ class RentFragment : BaseFragment<FragmentRentBinding>(R.layout.fragment_rent) {
     private fun initObserve() {
         rentViewModel.rentStartLocation.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { rentStartLocation ->
-                binding.tvRentStartLocation.text = rentStartLocation?.title
+                if (rentStartLocation != null) {
+                    binding.tvRentStartLocation.text = rentStartLocation.title
+                } else {
+                    binding.tvRentStartLocation.hint = "강남역"
+                }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
