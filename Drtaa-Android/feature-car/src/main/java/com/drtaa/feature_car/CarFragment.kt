@@ -34,15 +34,12 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
             reflectionView = viewTourReflection
             cardImage = ivTourCard
 
-
-
             viewLifecycleOwner.lifecycleScope.launch {
                 mqttManager.setupMqttClient()
             }
             btnMqtt.setOnClickListener {
                 mqttManager.publishMessage("GPS")
             }
-
         }
         setupCardTouchListener()
     }

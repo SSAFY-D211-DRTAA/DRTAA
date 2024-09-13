@@ -19,7 +19,7 @@ class MqttManager @Inject constructor() {
         client = MqttClient.builder()
             .useMqttVersion5()
             .serverHost(MQTT_SERVER)
-            .serverPort(1883)
+            .serverPort(PORT)
             .buildAsync()
 
         try {
@@ -75,9 +75,10 @@ class MqttManager @Inject constructor() {
 
     companion object {
         private const val MQTT_SERVER = "192.168.100.199"
+        private const val PORT = 1883
         private const val GPS_SUB = "gps/data/v1/subscribe"
         private const val GPS_PUB = "gps/data/v1/publish"
-        private const val GPS_CMD_SUB = "cmd/data/v1/subscribe"
-        private const val GPS_CMD_PUB = "cmd/data/v1/publish"
+//        private const val GPS_CMD_SUB = "cmd/data/v1/subscribe"
+//        private const val GPS_CMD_PUB = "cmd/data/v1/publish"
     }
 }
