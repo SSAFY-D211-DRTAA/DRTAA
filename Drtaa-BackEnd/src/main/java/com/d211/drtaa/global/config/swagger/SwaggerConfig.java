@@ -27,10 +27,10 @@ public class SwaggerConfig {
                 .addList("bearerAuth");
 
         return new OpenAPI()
+                .addServersItem(new Server().url("j11d211.p.ssafy.io") // 배포한 서버
+                        .description("Default Server URL"))
                 .addServersItem(new Server().url("http://localhost:8080")
                         .description("Local Development Server"))
-//                .addServersItem(new Server().url("") // 배포한 서버
-//                        .description("Default Server URL"))
                 .components(new Components().addSecuritySchemes("bearerAuth", securityScheme))
                 .addSecurityItem(securityRequirement)
                 .info(apiInfo());
@@ -57,6 +57,16 @@ public class SwaggerConfig {
         return GroupedOpenApi.builder()
                 .group("User")
                 .pathsToMatch("/user/**")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi rentApi() {
+        return GroupedOpenApi.builder()
+                .group("Rent")
+                .pathsToMatch("/rent/**")
+                .pathsToMatch("/rent-car/**")
+                .pathsToMatch("/rent-history/**")
                 .build();
     }
 
