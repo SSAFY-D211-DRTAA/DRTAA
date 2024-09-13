@@ -6,9 +6,14 @@ import android.graphics.drawable.GradientDrawable
 import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
+import androidx.lifecycle.lifecycleScope
+import com.drtaa.core_mqtt.MqttManager
 import com.drtaa.core_ui.base.BaseFragment
 import com.drtaa.feature_car.databinding.FragmentCarBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import timber.log.Timber
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
@@ -20,12 +25,22 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
     private var isNeko: Boolean = true
     private var touchStartTime: Long = 0
 
+    @Inject
+    lateinit var mqttManager: MqttManager
+
     override fun initView() {
         binding.apply {
             cardView = cvTourCard
             overlayView = viewTourOverlay
             reflectionView = viewTourReflection
             cardImage = ivTourCard
+
+            viewLifecycleOwner.lifecycleScope.launch {
+                mqttManager.setupMqttClient()
+            }
+            btnMqtt.setOnClickListener {
+                mqttManager.publishMessage("GPS")
+            }
         }
         setupCardTouchListener()
     }
@@ -62,7 +77,9 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
                     true
                 }
 
-                else -> false
+                else -> {
+                    false
+                }
             }
         }
     }
