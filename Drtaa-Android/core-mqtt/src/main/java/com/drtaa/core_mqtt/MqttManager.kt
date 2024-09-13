@@ -3,11 +3,11 @@ package com.drtaa.core_mqtt
 import com.hivemq.client.mqtt.MqttClient
 import com.hivemq.client.mqtt.mqtt5.Mqtt5AsyncClient
 import com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5Publish
-import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.coroutines.resume
 
 private const val TAG = "MQTT"
 
@@ -15,28 +15,26 @@ private const val TAG = "MQTT"
 class MqttManager @Inject constructor() {
     private lateinit var client: Mqtt5AsyncClient
 
-    suspend fun setupMqttClient(): Result<Unit> {
-        return try {
-            client = MqttClient.builder()
-                .useMqttVersion5()
-                .serverHost(MQTT_SERVER)
-                .serverPort(PORT)
-                .buildAsync()
+    suspend fun setupMqttClient() {
+        client = MqttClient.builder()
+            .useMqttVersion5()
+            .serverHost(MQTT_SERVER)
+            .serverPort(PORT)
+            .buildAsync()
 
-            suspendCancellableCoroutine { continuation ->
+        try {
+            withContext(Dispatchers.IO) {
                 client.connect().whenComplete { _, throwable ->
                     if (throwable != null) {
                         Timber.tag(TAG).e(throwable, "MQTT 연결실패")
-                        continuation.resume(Result.failure(throwable))
                     } else {
                         Timber.tag(TAG).d("MQTT 연결성공")
-                        continuation.resume(Result.success(Unit))
+                        subscribeToTopic()
                     }
                 }
             }
         } catch (e: Exception) {
-            Timber.tag(TAG).e(e, "MQTT 클라이언트 설정 실패")
-            Result.failure(e)
+            Timber.tag(TAG).e("MQTT 연결실패", e)
         }
     }
 

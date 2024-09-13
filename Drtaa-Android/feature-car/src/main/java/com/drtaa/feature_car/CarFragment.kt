@@ -36,14 +36,10 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
             cardImage = ivTourCard
 
             viewLifecycleOwner.lifecycleScope.launch {
-                val result = mqttManager.setupMqttClient()
-                btnMqtt.setOnClickListener {
-                    result.onSuccess {
-                        mqttManager.publishMessage("GPS")
-                    }.onFailure {
-                        Timber.tag("mqtt").d("아직 연결 안됐음")
-                    }
-                }
+                mqttManager.setupMqttClient()
+            }
+            btnMqtt.setOnClickListener {
+                mqttManager.publishMessage("GPS")
             }
         }
         setupCardTouchListener()
