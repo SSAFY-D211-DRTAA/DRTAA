@@ -1,11 +1,11 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
-    id("drtaa.plugin.feature")
+    id("drtaa.plugin.core")
 }
 
 android {
-    namespace = "com.drtaa.feature_car"
+    namespace = "com.drtaa.core_mqtt"
     compileSdk = 34
 
     defaultConfig {
@@ -31,9 +31,6 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
-    buildFeatures {
-        dataBinding = true
-    }
     packaging {
         resources {
             excludes += setOf("META-INF/INDEX.LIST", "META-INF/io.netty.versions.properties")
@@ -42,6 +39,5 @@ android {
 }
 
 dependencies {
-    implementation(project(":core-mqtt"))
     implementation(libs.hivemq.mqtt.client)
 }
