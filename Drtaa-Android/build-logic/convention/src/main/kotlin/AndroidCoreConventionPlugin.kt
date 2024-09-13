@@ -15,6 +15,7 @@ internal class AndroidCoreConventionPlugin : Plugin<Project> {
                 add("implementation", libs.findLibrary("coroutines.android").get())
                 add("implementation", libs.findLibrary("coroutines.core").get())
                 add("implementation", libs.findLibrary("datastore.preferences").get())
+                add("implementation", libs.findLibrary("androidx.paging.runtime.ktx").get())
             }
         }
     }

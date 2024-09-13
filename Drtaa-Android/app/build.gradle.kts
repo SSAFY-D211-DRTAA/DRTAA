@@ -68,4 +68,5 @@ dependencies {
     implementation(libs.coroutines.core)
     //Sign
     implementation(libs.naver.oauth)
+    implementation(libs.play.services.location)
 }

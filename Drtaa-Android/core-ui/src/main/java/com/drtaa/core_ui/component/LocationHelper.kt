@@ -12,6 +12,7 @@ import android.provider.Settings
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentActivity
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.Granularity
 import com.google.android.gms.location.LocationCallback
@@ -23,6 +24,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.suspendCancellableCoroutine
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.resume
@@ -48,12 +51,15 @@ class LocationHelper @Inject constructor(
      * 현재 사용자 위치 가져오기 (일회성)
      * @param activity : 권한 요청을 위한 액티비티
      */
-    suspend fun getCurrentLocation(activity: AppCompatActivity): Location {
+    suspend fun getCurrentLocation(activity: FragmentActivity): Location {
         if (!isLocationPermissionGranted()) {
             requestLocationPermission(activity)
         }
         if (!isLocationEnabled()) {
             throw LocationException(GPS_NOT_ALLOWED)
+        }
+        if (isLocationEnabled() && isLocationPermissionGranted()) {
+            Timber.e("LocationHelper 권한은 다 있음")
         }
         return getLocation()
     }
@@ -91,7 +97,7 @@ class LocationHelper @Inject constructor(
         ) == PackageManager.PERMISSION_GRANTED
     }
 
-    suspend fun requestLocationPermission(activity: AppCompatActivity) =
+    suspend fun requestLocationPermission(activity: FragmentActivity) =
         suspendCoroutine { continuation ->
             val requestPermissionLauncher = activity.registerForActivityResult(
                 ActivityResultContracts.RequestPermission()
@@ -115,14 +121,20 @@ class LocationHelper @Inject constructor(
     }
 
     @SuppressLint("MissingPermission")
-    private suspend fun getLocation(): Location = suspendCoroutine { continuation ->
+    private suspend fun getLocation(): Location = suspendCancellableCoroutine { continuation ->
         val cancellationTokenSource = CancellationTokenSource()
+
+        continuation.invokeOnCancellation {
+            cancellationTokenSource.cancel()
+        }
+
         fusedLocationClient.getCurrentLocation(
             Priority.PRIORITY_HIGH_ACCURACY,
             cancellationTokenSource.token
         ).addOnSuccessListener { location ->
             if (location != null) {
                 lastLocation = location
+                Timber.tag("location").d(location.toString())
                 continuation.resume(location)
             } else {
                 continuation.resumeWithException(LocationException("위치를 가져올 수 없습니다."))
