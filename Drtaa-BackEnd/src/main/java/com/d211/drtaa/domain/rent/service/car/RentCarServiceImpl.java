@@ -1,5 +1,7 @@
 package com.d211.drtaa.domain.rent.service.car;
 
+import com.d211.drtaa.domain.rent.dto.request.RentCarDispatchStatusRequestDTO;
+import com.d211.drtaa.domain.rent.dto.request.RentCarDriveStatusRequestDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentCarDispatchStatusResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentCarDriveStatusResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentCarResponseDTO;
@@ -106,5 +108,31 @@ public class RentCarServiceImpl implements RentCarService {
                 .build();
 
         return response;
+    }
+
+    @Override
+    public void updateDispatchStatus(RentCarDispatchStatusRequestDTO rentCarDispatchStatusRequestDTO) {
+        // rentCarId에 해당하는 렌트 차량 찾기
+        RentCar car = rentCarRepository.findByRentCarId(rentCarDispatchStatusRequestDTO.getRentCarId())
+                .orElseThrow(() -> new RentCarNotFoundException("해당 rentCarId의 맞는 차량을 찾을 수 없습니다."));
+
+        // 상태 변경
+        car.setRentCarIsDispatch(rentCarDispatchStatusRequestDTO.isRentCarIsDispatch());
+
+        // 저장
+        rentCarRepository.save(car);
+    }
+
+    @Override
+    public void updateDriveStatus(RentCarDriveStatusRequestDTO rentCarDriveStatusRequestDTO) {
+        // rentCarId에 해당하는 렌트 차량 찾기
+        RentCar car = rentCarRepository.findByRentCarId(rentCarDriveStatusRequestDTO.getRentCarId())
+                .orElseThrow(() -> new RentCarNotFoundException("해당 rentCarId의 맞는 차량을 찾을 수 없습니다."));
+
+        // 상태 변경
+        car.setRentCarDrivingStatus(rentCarDriveStatusRequestDTO.getRentCarDrivingStatus());
+
+        // 저장
+        rentCarRepository.save(car);
     }
 }
