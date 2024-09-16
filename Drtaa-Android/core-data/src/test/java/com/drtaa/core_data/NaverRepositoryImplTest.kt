@@ -1,28 +1,47 @@
 package com.drtaa.core_data
 
 import com.drtaa.core_data.datasource.NaverDataSource
+import com.drtaa.core_data.repository.NaverRepository
 import com.drtaa.core_data.repositoryimpl.NaverRepositoryImpl
 import com.drtaa.core_model.network.ResponseSearch
 import com.drtaa.core_model.network.SearchItem
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
+import dagger.hilt.android.testing.HiltTestApplication
+import io.mockk.clearAllMocks
 import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 import java.time.LocalDate
+import javax.inject.Inject
 
+@HiltAndroidTest
+@Config(application = HiltTestApplication::class)
+@RunWith(RobolectricTestRunner::class)
 class NaverRepositoryImplTest {
 
-    private lateinit var naverDataSource: NaverDataSource
-    private lateinit var naverRepository: NaverRepositoryImpl
+    @get:Rule
+    var hiltRule = HiltAndroidRule(this)
+
+    @Inject
+    lateinit var naverRepository: NaverRepository
+    @Inject
+    lateinit var naverDataSource: NaverDataSource
 
     @Before
     fun setup() {
-        naverDataSource = mockk()
-        naverRepository = NaverRepositoryImpl(naverDataSource)
+        hiltRule.inject()
+        clearAllMocks()
     }
 
     @Test

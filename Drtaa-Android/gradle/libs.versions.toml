@@ -25,6 +25,7 @@ lifecycle-extensions = "2.2.0"
 pagingRuntimeKtx = "3.3.2"
 
 # Logging
+robolectric = "4.10.3"
 timber = "5.0.1"
 
 # Media
@@ -92,6 +93,7 @@ androidx-credentials-play-services-auth = { module = "androidx.credentials:crede
 googleid = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleid" }
 
 # Logging
+robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 
 # DI
