@@ -29,11 +29,11 @@ public class RentHistoryServiceImpl implements RentHistoryService{
                 .orElseThrow(() -> new UsernameNotFoundException("해당 userProviderId의 맞는 회원을 찾을 수 없습니다."));
 
         // 해당 사용자의 렌트 기록 찾기
-        RentHistory history = rentHistoryRepository.findByUserId(user.getUserId())
+        RentHistory history = rentHistoryRepository.findByUser_UserId(user.getUserId())
                 .orElseThrow(() -> new RentHistoryNotFoundException("해당 userId의 맞는 기록을 찾을 수 없습니다."));
 
         UserHistoryResponseDTO response = UserHistoryResponseDTO.builder()
-                .renHistoryId(history.getRenHistoryId())
+                .renHistoryId(history.getRentHistoryId())
                 .rentStartTime(history.getRent().getRentStartTime())
                 .rentPrice(history.getRent().getRentPrice())
                 .build();

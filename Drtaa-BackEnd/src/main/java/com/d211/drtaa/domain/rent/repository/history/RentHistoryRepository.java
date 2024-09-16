@@ -7,6 +7,6 @@ import java.util.Optional;
 
 public interface RentHistoryRepository extends JpaRepository<RentHistory, Long> {
     // find
-    Optional<RentHistory> findByUserId(Long userId);
+    Optional<RentHistory> findByUser_UserId(Long userId);
     Optional<RentHistory> findByRentHistoryId(Long rentHistoryId);
 }

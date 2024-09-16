@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/rent-history")
 @RequiredArgsConstructor
 @Log4j2
-@Tag(name = "렌트기록 컨트롤러", description = "렌트 기록 관련 기능 수행")
+@Tag(name = "렌트 기록 컨트롤러", description = "렌트 기록 관련 기능 수행")
 public class RentHistoryController {
 
     private final RentHistoryService rentHistoryService;
