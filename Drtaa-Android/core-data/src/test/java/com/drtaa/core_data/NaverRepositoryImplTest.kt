@@ -2,7 +2,6 @@ package com.drtaa.core_data
 
 import com.drtaa.core_data.datasource.NaverDataSource
 import com.drtaa.core_data.repository.NaverRepository
-import com.drtaa.core_data.repositoryimpl.NaverRepositoryImpl
 import com.drtaa.core_model.network.ResponseSearch
 import com.drtaa.core_model.network.SearchItem
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -10,8 +9,6 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
-import io.mockk.every
-import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.flow.toList

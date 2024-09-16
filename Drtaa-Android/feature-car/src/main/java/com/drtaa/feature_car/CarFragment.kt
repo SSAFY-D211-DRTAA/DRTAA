@@ -12,7 +12,6 @@ import com.drtaa.core_ui.base.BaseFragment
 import com.drtaa.feature_car.databinding.FragmentCarBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
