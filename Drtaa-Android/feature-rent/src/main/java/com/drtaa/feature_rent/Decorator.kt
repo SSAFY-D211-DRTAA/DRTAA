@@ -8,41 +8,91 @@ import com.prolificinteractive.materialcalendarview.CalendarDay
 import com.prolificinteractive.materialcalendarview.DayViewDecorator
 import com.prolificinteractive.materialcalendarview.DayViewFacade
 import org.threeten.bp.DayOfWeek
-import timber.log.Timber
 
 /* 선택된 날짜의 background를 설정하는 클래스 */
-class DayDecorator(context: Context, private var dateRange: List<CalendarDay>) : DayViewDecorator {
-    private val drawable = ContextCompat.getDrawable(context, R.drawable.selector_calendar_start_end)
+class SingleDayDecorator(context: Context, private var date: CalendarDay? = null) :
+    DayViewDecorator {
+    private val drawableSingle =
+        ContextCompat.getDrawable(context, R.drawable.selector_calendar_single)
+    private val color = ContextCompat.getColor(context, com.drtaa.core_ui.R.color.white)
 
     // true를 리턴 시 모든 요일에 내가 설정한 드로어블이 적용된다
     override fun shouldDecorate(day: CalendarDay): Boolean {
-        Timber.d("$day ${dateRange.contains(day)}")
-        return dateRange.contains(day)
+        return date == day
     }
 
     // 일자 선택 시 내가 정의한 드로어블이 적용되도록 한다
     override fun decorate(view: DayViewFacade) {
-        view.setSelectionDrawable(drawable!!)
+        view.setSelectionDrawable(drawableSingle!!)
+        view.addSpan(object : ForegroundColorSpan(color) {})
     }
 
-    fun setDateRange(dateRange: List<CalendarDay>) {
-        this.dateRange = dateRange
+    fun setDate(date: CalendarDay) {
+        this.date = date
+    }
+}
+
+/* 선택된 날짜의 background를 설정하는 클래스 */
+class StartDayDecorator(context: Context, private var date: CalendarDay? = null) :
+    DayViewDecorator {
+    private val drawableStart =
+        ContextCompat.getDrawable(context, R.drawable.selector_calendar_start)
+    private val color = ContextCompat.getColor(context, com.drtaa.core_ui.R.color.white)
+
+    // true를 리턴 시 모든 요일에 내가 설정한 드로어블이 적용된다
+    override fun shouldDecorate(day: CalendarDay): Boolean {
+        return date == day
+    }
+
+    // 일자 선택 시 내가 정의한 드로어블이 적용되도록 한다
+    override fun decorate(view: DayViewFacade) {
+        view.setSelectionDrawable(drawableStart!!)
+        view.addSpan(object : ForegroundColorSpan(color) {})
+    }
+
+    fun setDate(date: CalendarDay) {
+        this.date = date
+    }
+}
+
+/* 선택된 날짜의 background를 설정하는 클래스 */
+class EndDayDecorator(context: Context, private var date: CalendarDay? = null) :
+    DayViewDecorator {
+    private val drawableEnd =
+        ContextCompat.getDrawable(context, R.drawable.selector_calendar_end)
+    private val color = ContextCompat.getColor(context, com.drtaa.core_ui.R.color.white)
+
+    // true를 리턴 시 모든 요일에 내가 설정한 드로어블이 적용된다
+    override fun shouldDecorate(day: CalendarDay): Boolean {
+        return date == day
+    }
+
+    // 일자 선택 시 내가 정의한 드로어블이 적용되도록 한다
+    override fun decorate(view: DayViewFacade) {
+        view.setSelectionDrawable(drawableEnd!!)
+        view.addSpan(object : ForegroundColorSpan(color) {})
+    }
+
+    fun setDate(date: CalendarDay) {
+        this.date = date
     }
 }
 
 /* 선택된 날짜 사이의 background를 설정하는 클래스 */
-class MiddleDayDecorator(context: Context, private var dateRange: List<CalendarDay>) : DayViewDecorator {
+class MiddleDayDecorator(context: Context, private var dateRange: List<CalendarDay>) :
+    DayViewDecorator {
     private val drawable = ContextCompat.getDrawable(context, R.drawable.shape_calendar_middle)
+    private val color = ContextCompat.getColor(context, com.drtaa.core_ui.R.color.white)
 
     // true를 리턴 시 모든 요일에 내가 설정한 드로어블이 적용된다
     override fun shouldDecorate(day: CalendarDay): Boolean {
-        Timber.d("$day ${dateRange.contains(day)}")
         return dateRange.contains(day)
     }
 
     // 일자 선택 시 내가 정의한 드로어블이 적용되도록 한다
     override fun decorate(view: DayViewFacade) {
         view.setSelectionDrawable(drawable!!)
+        view.addSpan(object : ForegroundColorSpan(color) {})
     }
 
     fun setDateRange(dateRange: List<CalendarDay>) {

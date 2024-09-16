@@ -7,7 +7,6 @@ import com.drtaa.feature_rent.viewmodel.RentViewModel
 import com.prolificinteractive.materialcalendarview.CalendarDay
 import com.prolificinteractive.materialcalendarview.format.ArrayWeekDayFormatter
 import org.threeten.bp.format.DateTimeFormatter
-import timber.log.Timber
 
 class CalendarBottomSheetDialogFragment :
     BaseBottomSheetDialogFragment<FragmentCalendarBottomSheetBinding>(R.layout.fragment_calendar_bottom_sheet) {
@@ -17,7 +16,9 @@ class CalendarBottomSheetDialogFragment :
     private var selectedStartDate = ""
     private var selectedEndDate = ""
 
-    private lateinit var dayDecorator: DayDecorator
+    private lateinit var singleDayDecorator: SingleDayDecorator
+    private lateinit var startDayDecorator: StartDayDecorator
+    private lateinit var endDayDecorator: EndDayDecorator
     private lateinit var middleDayDecorator: MiddleDayDecorator
     private lateinit var todayDecorator: TodayDecorator
     private lateinit var sundayDecorator: SundayDecorator
@@ -37,17 +38,19 @@ class CalendarBottomSheetDialogFragment :
 
         // 시작, 종료 범위가 설정되었을 때 리스너
         binding.cvRentCalendar.setOnRangeSelectedListener { _, dates ->
-            binding.cvRentCalendar.removeDecorator(dayDecorator)
+            binding.cvRentCalendar.removeDecorator(singleDayDecorator)
             binding.cvRentCalendar.removeDecorator(middleDayDecorator)
+            binding.cvRentCalendar.removeDecorator(startDayDecorator)
+            binding.cvRentCalendar.removeDecorator(endDayDecorator)
 
-            val startEndRange =
-                listOf(dates.first(), dates.last()).map { CalendarDay.from(it.date) }
             val middleRange = dates.subList(1, dates.size - 1).map { CalendarDay.from(it.date) }
 
-            dayDecorator.setDateRange(startEndRange)
+            startDayDecorator.setDate(dates.first())
+            endDayDecorator.setDate(dates.last())
             middleDayDecorator.setDateRange(middleRange)
             binding.cvRentCalendar.addDecorators(
-                dayDecorator,
+                startDayDecorator,
+                endDayDecorator,
                 middleDayDecorator
             )
 
@@ -58,15 +61,14 @@ class CalendarBottomSheetDialogFragment :
 
         // 날짜가 단일 선택되었을 때 리스너
         binding.cvRentCalendar.setOnDateChangedListener { widget, date, selected ->
-            binding.cvRentCalendar.removeDecorator(dayDecorator)
+            binding.cvRentCalendar.removeDecorator(singleDayDecorator)
             binding.cvRentCalendar.removeDecorator(middleDayDecorator)
+            binding.cvRentCalendar.removeDecorator(startDayDecorator)
+            binding.cvRentCalendar.removeDecorator(endDayDecorator)
 
-            val dateRange = listOf(date.date).map {
-                CalendarDay.from(it)
-            }
-            dayDecorator.setDateRange(dateRange)
+            singleDayDecorator.setDate(date)
             binding.cvRentCalendar.addDecorators(
-                dayDecorator
+                singleDayDecorator
             )
 
             selectedStartDate = date.date.format(DateTimeFormatter.ofPattern("MM.dd (E)"))
@@ -74,17 +76,20 @@ class CalendarBottomSheetDialogFragment :
 
             if (!selected) {
                 selectedStartDate = ""
+                binding.cvRentCalendar.removeDecorator(singleDayDecorator)
             }
-
-            Timber.d("dateRange: $dateRange")
         }
     }
 
     private fun initBottomSheet() {
         // 요일을 한글로 보이게 설정 월..일 순서로 배치해서 캘린더에는 일..월 순서로 보이도록 설정
-        binding.cvRentCalendar.setWeekDayFormatter(ArrayWeekDayFormatter(resources.getTextArray(R.array.custom_weekdays)));
+        binding.cvRentCalendar.setWeekDayFormatter(
+            ArrayWeekDayFormatter(resources.getTextArray(R.array.custom_weekdays))
+        )
 
-        dayDecorator = DayDecorator(requireActivity(), listOf())
+        singleDayDecorator = SingleDayDecorator(requireActivity())
+        startDayDecorator = StartDayDecorator(requireActivity())
+        endDayDecorator = EndDayDecorator(requireActivity())
         middleDayDecorator = MiddleDayDecorator(requireActivity(), listOf())
         todayDecorator = TodayDecorator(requireActivity())
         sundayDecorator = SundayDecorator()
@@ -99,7 +104,9 @@ class CalendarBottomSheetDialogFragment :
             selectedMonthDecorator,
             todayDecorator,
             middleDayDecorator,
-            dayDecorator
+            startDayDecorator,
+            endDayDecorator,
+            singleDayDecorator
         )
 
         // 좌우 화살표 가운데의 연/월이 보이는 방식 지정
@@ -128,7 +135,9 @@ class CalendarBottomSheetDialogFragment :
                 selectedMonthDecorator,
                 todayDecorator,
                 middleDayDecorator,
-                dayDecorator
+                startDayDecorator,
+                endDayDecorator,
+                singleDayDecorator
             )
         }
     }

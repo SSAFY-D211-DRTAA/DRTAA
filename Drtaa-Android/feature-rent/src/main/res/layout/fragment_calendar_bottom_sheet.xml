@@ -12,7 +12,7 @@
         android:id="@+id/cl_calendar_bottom_sheet"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/rec_white_top_rad30"
+        android:background="@drawable/rect_white_top_rad30"
         android:paddingHorizontal="20dp"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
         app:layout_constraintBottom_toBottomOf="parent"
