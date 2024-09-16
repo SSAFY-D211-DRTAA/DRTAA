@@ -5,12 +5,15 @@ import com.d211.drtaa.domain.rent.dto.response.UserHistoryResponseDTO;
 import com.d211.drtaa.domain.rent.entity.history.RentHistory;
 import com.d211.drtaa.domain.rent.repository.history.RentHistoryRepository;
 import com.d211.drtaa.domain.rent.service.history.RentHistoryService;
+import com.d211.drtaa.global.exception.rent.RentHistoryNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,10 +33,12 @@ public class RentHistoryController {
     public ResponseEntity myHistory(Authentication authentication) {
         try{
             UserHistoryResponseDTO responseDTO = rentHistoryService.getHistory(authentication.getName());
-            
-            return ResponseEntity.ok().body(responseDTO);
+
+            return ResponseEntity.ok().body(responseDTO); // 200
+        } catch (UsernameNotFoundException | RentHistoryNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage()); // 400
         }
     }
 
@@ -43,9 +48,11 @@ public class RentHistoryController {
         try {
             UserDetailHistoryResponseDTO responseDTO = rentHistoryService.getDetailHistory(rentHistoryId);
 
-            return ResponseEntity.ok().body(responseDTO);
+            return ResponseEntity.ok().body(responseDTO); // 200
+        } catch (RentHistoryNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage()); // 400
         }
     }
 }
