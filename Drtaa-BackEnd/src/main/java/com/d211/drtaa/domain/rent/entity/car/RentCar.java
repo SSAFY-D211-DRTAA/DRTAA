@@ -39,6 +39,6 @@ public class RentCar {
 
     @Column(name = "rent_car_driving_status", nullable = false)
     @ColumnDefault("PARKED")
-    @Schema(description = "렌트 차량 주행 상태", example = "0")
+    @Schema(description = "렌트 차량 주행 상태", example = "parked")
     private RentDrivingStatus rentCarDrivingStatus;
 }

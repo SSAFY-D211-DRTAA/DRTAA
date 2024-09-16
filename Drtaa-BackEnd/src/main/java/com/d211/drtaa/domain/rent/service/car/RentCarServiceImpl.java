@@ -1,6 +1,7 @@
 package com.d211.drtaa.domain.rent.service.car;
 
 import com.d211.drtaa.domain.rent.dto.response.RentCarDispatchStatusResponseDTO;
+import com.d211.drtaa.domain.rent.dto.response.RentCarDriveStatusResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentCarResponseDTO;
 import com.d211.drtaa.domain.rent.entity.car.RentCar;
 import com.d211.drtaa.domain.rent.repository.car.RentCarRepository;
@@ -45,6 +46,7 @@ public class RentCarServiceImpl implements RentCarService {
 
         RentCarDispatchStatusResponseDTO response = RentCarDispatchStatusResponseDTO.builder()
                 .rentCarId(car.getRentCarId())
+                .rentCarNumber(car.getRentCarNumber())
                 .rentCarIsDispatch(car.isRentCarIsDispatch())
                 .build();
 
@@ -87,6 +89,21 @@ public class RentCarServiceImpl implements RentCarService {
 
             response.add(dto);
         }
+
+        return response;
+    }
+
+    @Override
+    public RentCarDriveStatusResponseDTO getDriveStatus(Long rentCarId) {
+        // rentCarId에 해당하는 렌트 차량 찾기
+        RentCar car = rentCarRepository.findByRentCarId(rentCarId)
+                .orElseThrow(() -> new RentCarNotFoundException("해당 rentCarId의 맞는 차량을 찾을 수 없습니다."));
+
+        RentCarDriveStatusResponseDTO response = RentCarDriveStatusResponseDTO.builder()
+                .rentCarId(car.getRentCarId())
+                .rentCarNumber(car.getRentCarNumber())
+                .rentCarDrivingStatus(car.getRentCarDrivingStatus())
+                .build();
 
         return response;
     }

@@ -1,6 +1,7 @@
 package com.d211.drtaa.domain.rent.service.car;
 
 import com.d211.drtaa.domain.rent.dto.response.RentCarDispatchStatusResponseDTO;
+import com.d211.drtaa.domain.rent.dto.response.RentCarDriveStatusResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentCarResponseDTO;
 
 import java.util.List;
@@ -17,4 +18,7 @@ public interface RentCarService {
 
     // 배차 상태 렌트 차량 조회
     List<RentCarResponseDTO> getAssignedDispatchStatus();
+
+    // rentCarId의 맞는 렌트 차량 주행 상태 조회
+    RentCarDriveStatusResponseDTO getDriveStatus(Long rentCarId);
 }
