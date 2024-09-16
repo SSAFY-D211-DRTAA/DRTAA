@@ -56,5 +56,7 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.hilt.android.testing)
     testImplementation(libs.robolectric)
-
+    // MQTT
+    implementation(project(":core-mqtt"))
+    implementation(libs.hivemq.mqtt.client)
 }
