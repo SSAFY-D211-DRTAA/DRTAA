@@ -51,4 +51,10 @@ dependencies {
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
     implementation(libs.androidx.paging.runtime.ktx)
+    //Test
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.hilt.android.testing.v244)
+    kaptTest(libs.hilt.android.compiler)
+
 }
