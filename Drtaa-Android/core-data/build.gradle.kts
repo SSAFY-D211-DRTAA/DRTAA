@@ -54,7 +54,5 @@ dependencies {
     //Test
     testImplementation(libs.mockk)
     testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.hilt.android.testing.v244)
-    kaptTest(libs.hilt.android.compiler)
-
+    testImplementation(libs.hilt.android.testing)
 }
