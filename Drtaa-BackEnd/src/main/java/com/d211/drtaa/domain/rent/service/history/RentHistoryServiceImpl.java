@@ -14,6 +14,9 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Log4j2
@@ -23,20 +26,24 @@ public class RentHistoryServiceImpl implements RentHistoryService{
     private final RentHistoryRepository rentHistoryRepository;
 
     @Override
-    public UserHistoryResponseDTO getHistory(String userProviderId) {
+    public List<UserHistoryResponseDTO> getHistory(String userProviderId) {
         // 사용자 찾기
         User user = userRepository.findByUserProviderId(userProviderId)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 userProviderId의 맞는 회원을 찾을 수 없습니다."));
 
         // 해당 사용자의 렌트 기록 찾기
-        RentHistory history = rentHistoryRepository.findByUser_UserId(user.getUserId())
-                .orElseThrow(() -> new RentHistoryNotFoundException("해당 userId의 맞는 기록을 찾을 수 없습니다."));
+        List<RentHistory> rentHistories = rentHistoryRepository.findByUser(user);
 
-        UserHistoryResponseDTO response = UserHistoryResponseDTO.builder()
-                .renHistoryId(history.getRentHistoryId())
-                .rentStartTime(history.getRent().getRentStartTime())
-                .rentPrice(history.getRent().getRentPrice())
-                .build();
+        List<UserHistoryResponseDTO> response = new ArrayList<>();
+        for(RentHistory rentHistory : rentHistories){
+            UserHistoryResponseDTO dto = UserHistoryResponseDTO.builder()
+                    .renHistoryId(rentHistory.getRentHistoryId())
+                    .rentStartTime(rentHistory.getRent().getRentStartTime())
+                    .rentPrice(rentHistory.getRent().getRentPrice())
+                    .build();
+
+            response.add(dto);
+        }
 
         return response;
     }

@@ -11,11 +11,14 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/rent-history")
@@ -30,11 +33,13 @@ public class RentHistoryController {
     @Operation(summary = "렌트 기록 조회", description = "사용자의 전체 렌트 기록을 조회")
     public ResponseEntity myHistory(Authentication authentication) {
         try{
-            UserHistoryResponseDTO responseDTO = rentHistoryService.getHistory(authentication.getName());
+            List<UserHistoryResponseDTO> responseDTO = rentHistoryService.getHistory(authentication.getName());
 
             return ResponseEntity.ok().body(responseDTO); // 200
-        } catch (UsernameNotFoundException | RentHistoryNotFoundException e) {
+        } catch (UsernameNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
+        } catch (AuthenticationException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("권한 인증에 실패하였습니다."); // 401
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage()); // 400
         }
