@@ -1,6 +1,5 @@
 package com.d211.drtaa.domain.rent.dto.response;
 
-import com.d211.drtaa.domain.rent.entity.car.RentDrivingStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

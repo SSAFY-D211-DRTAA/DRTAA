@@ -2,8 +2,6 @@ package com.d211.drtaa.domain.rent.controller.history;
 
 import com.d211.drtaa.domain.rent.dto.response.UserDetailHistoryResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.UserHistoryResponseDTO;
-import com.d211.drtaa.domain.rent.entity.history.RentHistory;
-import com.d211.drtaa.domain.rent.repository.history.RentHistoryRepository;
 import com.d211.drtaa.domain.rent.service.history.RentHistoryService;
 import com.d211.drtaa.global.exception.rent.RentHistoryNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
