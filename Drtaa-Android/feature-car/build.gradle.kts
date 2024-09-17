@@ -42,6 +42,5 @@ android {
 }
 
 dependencies {
-    implementation(project(":core-mqtt"))
-    implementation(libs.hivemq.mqtt.client)
+
 }
