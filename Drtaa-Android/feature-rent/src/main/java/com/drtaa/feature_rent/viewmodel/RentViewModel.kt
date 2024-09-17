@@ -3,6 +3,7 @@ package com.drtaa.feature_rent.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.drtaa.core_model.data.RentInfo
+import com.drtaa.core_model.data.RentSchedule
 import com.drtaa.core_model.data.Search
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,11 +17,11 @@ class RentViewModel @Inject constructor() : ViewModel() {
     private val _rentStartLocation = MutableStateFlow<Search?>(null)
     val rentStartLocation: StateFlow<Search?> = _rentStartLocation
 
-    private val _rentStartDate = MutableStateFlow<String?>(null)
-    val rentStartDate: StateFlow<String?> = _rentStartDate
+    private val _rentStartSchedule = MutableStateFlow<RentSchedule?>(null)
+    val rentStartSchedule: StateFlow<RentSchedule?> = _rentStartSchedule
 
-    private val _rentEndDate = MutableStateFlow<String?>(null)
-    val rentEndDate: StateFlow<String?> = _rentEndDate
+    private val _rentEndSchedule = MutableStateFlow<RentSchedule?>(null)
+    val rentEndSchedule: StateFlow<RentSchedule?> = _rentEndSchedule
 
     private val _rentPeople = MutableStateFlow(1)
     val rentPeople: StateFlow<Int> = _rentPeople
@@ -31,16 +32,25 @@ class RentViewModel @Inject constructor() : ViewModel() {
     private val _rentInfo = MutableStateFlow<Result<RentInfo>?>(null)
     val rentInfo: StateFlow<Result<RentInfo>?> = _rentInfo
 
+    init {
+        setRentValid()
+    }
+
     fun setRentStartLocation(search: Search) {
         viewModelScope.launch {
             _rentStartLocation.value = search
         }
     }
 
-    fun setRentDate(startDate: String, endDate: String) {
+    fun setRentStartSchedule(startSchedule: RentSchedule) {
         viewModelScope.launch {
-            _rentStartDate.value = startDate
-            _rentEndDate.value = endDate
+            _rentStartSchedule.value = startSchedule
+        }
+    }
+
+    fun setRentEndSchedule(endSchedule: RentSchedule) {
+        viewModelScope.launch {
+            _rentEndSchedule.value = endSchedule
         }
     }
 
@@ -67,15 +77,15 @@ class RentViewModel @Inject constructor() : ViewModel() {
         return result
     }
 
-    fun setRentValid() {
+    private fun setRentValid() {
         viewModelScope.launch {
             combine(
                 rentStartLocation,
-                rentStartDate,
-                rentEndDate,
+                rentStartSchedule,
+                rentEndSchedule,
                 rentPeople
-            ) { rentStartLocation, rentStartDate, rentEndDate, rentPeople ->
-                rentStartLocation != null && rentStartDate != null && rentEndDate != null && rentPeople > 0
+            ) { rentStartLocation, rentStartSchedule, rentEndSchedule, rentPeople ->
+                rentStartLocation != null && rentStartSchedule != null && rentEndSchedule != null && rentPeople > 0
             }.collect { isValid ->
                 _isRentValid.value = isValid
             }

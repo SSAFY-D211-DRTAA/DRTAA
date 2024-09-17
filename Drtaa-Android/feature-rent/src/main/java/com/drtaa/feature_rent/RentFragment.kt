@@ -24,7 +24,6 @@ class RentFragment : BaseFragment<FragmentRentBinding>(R.layout.fragment_rent) {
     private fun initObserve() {
         rentViewModel.rentStartLocation.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { rentStartLocation ->
-                rentViewModel.setRentValid()
                 if (rentStartLocation != null) {
                     binding.tvRentStartLocation.text = rentStartLocation.title
                 } else {
@@ -32,21 +31,19 @@ class RentFragment : BaseFragment<FragmentRentBinding>(R.layout.fragment_rent) {
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
 
-        rentViewModel.rentStartDate.flowWithLifecycle(viewLifecycleOwner.lifecycle)
-            .onEach { rentStartDate ->
-                rentViewModel.setRentValid()
-                if (rentStartDate != null) {
-                    binding.tvRentStartSchedule.text = rentStartDate
+        rentViewModel.rentStartSchedule.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach { rentStartSchedule ->
+                if (rentStartSchedule != null) {
+                    binding.tvRentStartSchedule.text = rentStartSchedule.toString()
                 } else {
                     binding.tvRentStartSchedule.hint = "09.09 (월) 20:00"
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
 
-        rentViewModel.rentEndDate.flowWithLifecycle(viewLifecycleOwner.lifecycle)
-            .onEach { rentEndDate ->
-                rentViewModel.setRentValid()
-                if (rentEndDate != null) {
-                    binding.tvRentEndSchedule.text = rentEndDate
+        rentViewModel.rentEndSchedule.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach { rentEndSchedule ->
+                if (rentEndSchedule != null) {
+                    binding.tvRentEndSchedule.text = rentEndSchedule.toString()
                 } else {
                     binding.tvRentEndSchedule.hint = "09.09 (월) 20:00"
                 }
@@ -54,7 +51,6 @@ class RentFragment : BaseFragment<FragmentRentBinding>(R.layout.fragment_rent) {
 
         rentViewModel.rentPeople.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { rentPeople ->
-                rentViewModel.setRentValid()
                 binding.tvRentPeople.text = rentPeople.toString()
             }.launchIn(viewLifecycleOwner.lifecycleScope)
 
