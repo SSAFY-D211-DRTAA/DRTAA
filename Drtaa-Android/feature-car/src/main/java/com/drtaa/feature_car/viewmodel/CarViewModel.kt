@@ -19,6 +19,7 @@ class CarViewModel @Inject constructor(
 
     init {
         initMQTT()
+        observeMqttMessages()
     }
 
     private fun initMQTT() {
@@ -31,7 +32,7 @@ class CarViewModel @Inject constructor(
         gpsRepository.publishGpsData(data)
     }
 
-    fun observeMqttMessages() {
+    private fun observeMqttMessages() {
         viewModelScope.launch {
             gpsRepository.observeMqttMessages().collectLatest {
                 _gpsData.emit(it)
