@@ -11,4 +11,7 @@ public interface RentHistoryService {
 
     // rentHistoryId의 해당하는 상세 렌트 기록 조회
     UserDetailHistoryResponseDTO getDetailHistory(Long rentHistoryId);
+
+    // 렌트 기록 생성
+    UserDetailHistoryResponseDTO createHistory(String userProviderId, Long rentId);
 }

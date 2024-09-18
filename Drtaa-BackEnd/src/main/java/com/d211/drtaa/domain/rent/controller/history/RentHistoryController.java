@@ -4,6 +4,7 @@ import com.d211.drtaa.domain.rent.dto.response.UserDetailHistoryResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.UserHistoryResponseDTO;
 import com.d211.drtaa.domain.rent.service.history.RentHistoryService;
 import com.d211.drtaa.global.exception.rent.RentHistoryNotFoundException;
+import com.d211.drtaa.global.exception.rent.RentNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -13,10 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -56,6 +54,23 @@ public class RentHistoryController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage()); // 400
+        }
+    }
+
+    @PostMapping("/{rentId}")
+    @Operation(summary = "렌트 기록 생성",  description = "사용자의 새로운 렌트 기록 생성")
+    public ResponseEntity createHistory
+            (Authentication authentication, @PathVariable("rentId") Long rentId) {
+        try {
+            UserDetailHistoryResponseDTO responseDTO = rentHistoryService.createHistory(authentication.getName(), rentId);
+
+            return ResponseEntity.ok().body(responseDTO); // 200
+        } catch (UsernameNotFoundException | RentNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
+        } catch (AuthenticationException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("권한 인증에 실패하였습니다."); // 401
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
         }
     }
 }
