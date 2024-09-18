@@ -1,9 +1,11 @@
 package com.d211.drtaa.domain.rent.controller;
 
+import com.d211.drtaa.domain.rent.dto.request.RentRequestDTO;
+import com.d211.drtaa.domain.rent.dto.request.RentStatusRequestDTO;
+import com.d211.drtaa.domain.rent.dto.request.RentTimeRequestDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentDetailResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentResponseDTO;
 import com.d211.drtaa.domain.rent.service.RentService;
-import com.d211.drtaa.global.exception.rent.RentHistoryNotFoundException;
 import com.d211.drtaa.global.exception.rent.RentNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -14,10 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -56,6 +55,54 @@ public class RentController {
         } catch(RentNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
         } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
+        }
+    }
+
+    @PatchMapping
+    @Operation(summary = "렌트 변경", description = "렌트 인원, 장소 변경")
+    public ResponseEntity updateRent(@RequestBody RentRequestDTO rentRequestDTO) {
+        try {
+            rentService.updateRent(rentRequestDTO);
+
+            return ResponseEntity.ok("Success"); //200
+        } catch(RentNotFoundException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
+        }
+    }
+
+    @PatchMapping("/status")
+    @Operation(summary = "렌트 상태 변경", description = "렌트 상태 변경")
+    public ResponseEntity updateRentStatus(@RequestBody RentStatusRequestDTO rentStatusRequestDTO)  {
+        try {
+            rentService.updateRentStatus(rentStatusRequestDTO);
+
+            return ResponseEntity.ok("Success"); //200
+        } catch(RentNotFoundException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
+        }
+    }
+
+    @PatchMapping("/time")
+    @Operation(summary = "렌트 시간 연장", description = "렌트 연장된 이용 시간 변경")
+    public ResponseEntity updateRentTime(@RequestBody RentTimeRequestDTO rentTimeRequestDTO) {
+        try {
+            rentService.updateRentTime(rentTimeRequestDTO);
+
+            return ResponseEntity.ok("Success"); //200
+        } catch(RentNotFoundException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
+        } catch (Exception e) {
+            log.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
         }
     }
