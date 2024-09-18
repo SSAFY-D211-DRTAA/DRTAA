@@ -11,6 +11,15 @@
         android:layout_height="match_parent"
         android:background="#1A1A1A">
 
+        <Button
+            android:id="@+id/btn_mqtt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="MQTT"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <androidx.cardview.widget.CardView
             android:id="@+id/cv_tour_card"
             android:layout_width="220dp"
@@ -38,7 +47,6 @@
                     android:layout_height="match_parent"
                     android:scaleType="centerCrop"
                     android:src="@drawable/kanna" />
-
 
 
                 <View

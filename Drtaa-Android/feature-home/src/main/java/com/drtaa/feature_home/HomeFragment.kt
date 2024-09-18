@@ -22,7 +22,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
     private fun initEvent() {
         binding.btnHomeCarRent.setOnClickListener {
             findNavController().navigate(R.id.action_home_to_rent)
-//            navigateDestination(R.id.action_homeFragment_to_rentFragment)
         }
     }
 }

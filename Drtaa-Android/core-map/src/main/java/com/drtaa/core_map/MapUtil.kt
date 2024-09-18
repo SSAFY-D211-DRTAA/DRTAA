@@ -2,6 +2,10 @@ package com.drtaa.core_map
 
 import android.annotation.SuppressLint
 import android.view.MotionEvent
+import android.view.View
+import com.google.android.material.snackbar.Snackbar
+import com.naver.maps.map.CameraAnimation
+import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.LocationTrackingMode
 import com.naver.maps.map.MapView
 import com.naver.maps.map.NaverMap
@@ -36,4 +40,23 @@ fun NaverMap.setup(fusedLocationSource: FusedLocationSource) {
     locationTrackingMode = LocationTrackingMode.Follow
     uiSettings.isZoomControlEnabled = false // Zoom 컨트롤러 사용유무
     uiSettings.isLocationButtonEnabled = true // 현재위치 사용유무
+}
+
+/**
+ * 커스텀 현재 위치 버튼 지정
+ */
+fun NaverMap.setCustomLocationButton(view: View) {
+    view.setOnClickListener {
+        this.locationTrackingMode = LocationTrackingMode.Follow
+        val locationOverlay = this.locationOverlay
+        if (locationOverlay.isVisible) {
+            // 현재 위치로 이동
+            val currentLocation = locationOverlay.position
+            val cameraUpdate = CameraUpdate.scrollTo(currentLocation)
+                .animate(CameraAnimation.Easing) // 부드럽게 애니메이션으로 이동
+            this.moveCamera(cameraUpdate)
+        } else {
+            Snackbar.make(view, "현재 위치를 확인할 수 없습니다.", Snackbar.LENGTH_SHORT).show()
+        }
+    }
 }
