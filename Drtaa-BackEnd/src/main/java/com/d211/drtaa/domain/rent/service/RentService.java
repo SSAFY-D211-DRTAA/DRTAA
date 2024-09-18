@@ -23,4 +23,7 @@ public interface RentService {
 
     // rentId의 렌트 시간 변경
     void updateRentTime(RentTimeRequestDTO rentTimeRequestDTO);
+
+    // rentId의 렌트 취소
+    void deleteRent(Long rentId);
 }

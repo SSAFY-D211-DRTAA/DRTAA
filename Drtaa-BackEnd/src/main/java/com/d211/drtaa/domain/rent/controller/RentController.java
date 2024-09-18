@@ -106,4 +106,21 @@ public class RentController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
         }
     }
+
+    @DeleteMapping("/{rentId}")
+    @Operation(summary = "렌트 취소", description = "렌트 취소")
+    public ResponseEntity deleteRent(@PathVariable("rentId") Long rentId) {
+        try {
+            rentService.deleteRent(rentId);
+
+            return ResponseEntity.ok("Success");
+        } catch(RentNotFoundException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
+        }
+    }
+
 }

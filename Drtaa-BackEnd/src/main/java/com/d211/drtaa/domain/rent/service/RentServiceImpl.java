@@ -6,6 +6,7 @@ import com.d211.drtaa.domain.rent.dto.request.RentTimeRequestDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentDetailResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentResponseDTO;
 import com.d211.drtaa.domain.rent.entity.Rent;
+import com.d211.drtaa.domain.rent.entity.RentStatus;
 import com.d211.drtaa.domain.rent.entity.car.RentCar;
 import com.d211.drtaa.domain.rent.repository.RentRepository;
 import com.d211.drtaa.domain.user.entity.User;
@@ -120,6 +121,24 @@ public class RentServiceImpl implements RentService{
         rent.setRentTime(rentTimeRequestDTO.getRentTime());
 
         // 변경 상태 저장
+        rentRepository.save(rent);
+    }
+
+    @Override
+    @Transactional
+    public void deleteRent(Long rentId) {
+        // 렌트 찾기
+        Rent rent = rentRepository.findByRentId(rentId)
+                .orElseThrow(() -> new RentNotFoundException("해당 rentId의 맞는 렌트를 찾을 수 없습니다."));
+
+        // 1. DB에서 삭제하기
+        // rentRepository.delete(rent);
+
+        // 2. 상태만 변경하기
+        // 2-1. 상태 변경
+        rent.setRentStatus(RentStatus.CANCELLED);
+
+        // 2-2. 변경 상태 저장
         rentRepository.save(rent);
     }
 }
