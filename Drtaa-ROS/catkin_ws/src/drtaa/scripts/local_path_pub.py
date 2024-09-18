@@ -28,7 +28,7 @@ class local_path_pub:
         self.is_path = False
         self.x = 0
         self.y = 0
-        self.local_path_size = 30
+        self.local_path_size = 70
         self.prev_current_waypoint = 0
         self.smoothing_factor = 0.8  # 경로 평활화 계수
 

@@ -1,47 +1,59 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import os
+import json
+import numpy as np
+import tf
 import rospy
 import rospkg
 from math import cos, sin, pi, sqrt, pow, atan2
 from geometry_msgs.msg import Point, PoseWithCovarianceStamped
 from nav_msgs.msg import Odometry, Path
 from morai_msgs.msg import CtrlCmd, EgoVehicleStatus, ObjectStatusList, GetTrafficLightStatus
-import numpy as np
-import tf
 from tf.transformations import euler_from_quaternion, quaternion_from_euler
+from std_msgs.msg import Bool
 
 class TrafficLightManager:
     def __init__(self):
         self.traffic_light_status = -1
         self.traffic_light_type = -1
+        self.last_update_time = rospy.Time.now()
+        self.timeout_duration = rospy.Duration(1.0)  # 1초 타임아웃
         rospy.Subscriber("/GetTrafficLightStatus", GetTrafficLightStatus, self.traffic_light_callback)
 
     def traffic_light_callback(self, data):
         self.traffic_light_status = data.trafficLightStatus
         self.traffic_light_type = data.trafficLightType
+        self.last_update_time = rospy.Time.now()
+    
+    def is_data_available(self):
+        return (rospy.Time.now() - self.last_update_time) < self.timeout_duration
 
     def can_turn_left(self):
-        # 좌회전 화살표가 켜져 있는 경우
-        return (self.traffic_light_status & 32) != 0
+        # Check if a left turn is allowed
+        return (self.traffic_light_status & 32) != 0 and (self.traffic_light_type in [1, 2])
 
     def can_go_straight(self):
-        # 직진 신호가 켜져 있는 경우
+        # Check if going straight is allowed
         return (self.traffic_light_status & 16) != 0
 
 class pure_pursuit:
     def __init__(self):
         rospy.init_node('pure_pursuit', anonymous=True)
 
-        # Subscribers
         rospy.Subscriber("/global_path", Path, self.global_path_callback)
         rospy.Subscriber("/local_path", Path, self.path_callback)
         rospy.Subscriber("/odom", Odometry, self.odom_callback)
         rospy.Subscriber("/Ego_topic", EgoVehicleStatus, self.status_callback)
+
+
         rospy.Subscriber("/Object_topic", ObjectStatusList, self.object_info_callback)
         # rospy.Subscriber("/Object_topic_to_lidar", ObjectStatusList, self.object_info_callback) => 추후에 npc, ped, obs 구별하는 로직 및 기둥, 중앙분리대 같은 것은 해당 리스트에 포함 안되도록 해야함!!!
 
-        # Publisher
+        # 좌회전 여부 확인
+        rospy.Subscriber("/is_left_turn", Bool, self.turning_left_callback)
+
         self.ctrl_cmd_pub = rospy.Publisher('/ctrl_cmd', CtrlCmd, queue_size=1)
 
         self.ctrl_cmd_msg = CtrlCmd()
@@ -58,57 +70,64 @@ class pure_pursuit:
 
         self.vehicle_length = 2.7
         self.lfd = 8
-        self.min_lfd=5
-        self.max_lfd=15
+        self.min_lfd = 5
+        self.max_lfd = 15
         self.lfd_gain = 0.78
-        self.target_velocity = 40
+        self.target_velocity = 35
 
-        self.traffic_light_manager = TrafficLightManager()
+        self.stop_line_threshold = 8  # 예시 값, 적절히 조정 필
+
+        self.nodes = self.load_nodes()
+
         self.pid = pidControl()
         self.adaptive_cruise_control = AdaptiveCruiseControl(velocity_gain=0.5, distance_gain=1, time_gap=0.8, vehicle_length=2.7)
         self.vel_planning = velocityPlanning(self.target_velocity / 3.6, 0.15)
 
+        self.traffic_light_manager = TrafficLightManager()
+
         while True:
             if self.is_global_path:
-                self.velocity_list = self.vel_planning.curvedBaseVelocity(self.global_path, 50)
+                self.velocity_list = self.vel_planning.curvedBaseVelocity(self.global_path, 50) # 경로 상의 waypoint에 대한 속도 계산
                 break
             # else:
             #     rospy.loginfo('Waiting for global path data')
 
         rate = rospy.Rate(30)  # 30hz
         while not rospy.is_shutdown():
-            if self.is_path and self.is_odom and self.is_status:
-                result = self.calc_vaild_obj([self.current_postion.x, self.current_postion.y, self.vehicle_yaw], self.object_data)
+            if self.is_path and self.is_odom and self.is_status: 
+                result = self.calc_vaild_obj([self.current_postion.x, self.current_postion.y, self.vehicle_yaw], self.object_data) # 주변 객체 정보 계산
                 global_npc_info, local_npc_info, global_ped_info, local_ped_info, global_obs_info, local_obs_info = result
 
-                self.current_waypoint = self.get_current_waypoint([self.current_postion.x, self.current_postion.y], self.global_path)
-                self.target_velocity = self.velocity_list[self.current_waypoint] * 3.6
+                self.current_waypoint = self.get_current_waypoint([self.current_postion.x, self.current_postion.y], self.global_path) # 현재 위치에서 가장 가까운 경로 상의 waypoint 인덱스
+                self.target_velocity = self.velocity_list[self.current_waypoint] * 3.6 # 현재 waypoint에 대한 목표 속도
 
-                steering = self.calc_pure_pursuit()
-                if self.is_look_forward_point:
+                steering = self.calc_pure_pursuit() # pure_pursuit 알고리즘을 통해 조향각 계산
+                self.trafficlight_logic() # 신호등 및 좌회전 여부에 따른 제어 로직
+
+                if self.is_look_forward_point: # 전방 경로 상에 waypoint가 존재하는 경우
                     self.ctrl_cmd_msg.steering = steering
                 else:
-                    # rospy.loginfo("No forward point found")
+                    rospy.loginfo("No forward point found")
                     self.ctrl_cmd_msg.steering = 0.0
 
                 self.adaptive_cruise_control.check_object(self.path ,global_npc_info, local_npc_info
                                                                     ,global_ped_info, local_ped_info
-                                                                    ,global_obs_info, local_obs_info)
+                                                                    ,global_obs_info, local_obs_info) # 주변 객체 정보를 통해 ACC를 위한 정보 업데이트
                 self.acc_velocity = self.adaptive_cruise_control.get_target_velocity(local_npc_info, local_ped_info, local_obs_info,
-                                                                                                        self.status_msg.velocity.x, self.target_velocity/3.6)
+                                                                                                        self.status_msg.velocity.x, self.target_velocity/3.6) # ACC를 통한 속도 제어
 
                 # ACC와 조향각 기반 속도 제한 중 더 낮은 값 선택
-                self.target_velocity = min(self.target_velocity, self.acc_velocity)
-                rospy.loginfo(f"Target Velocity: {self.target_velocity}")
-                output = self.pid.pid(self.target_velocity, self.status_msg.velocity.x * 3.6)
+                self.target_velocity = min(self.target_velocity, self.acc_velocity) 
+                # rospy.loginfo(f"Target Velocity: {self.target_velocity}")
+                output = self.pid.pid(self.target_velocity, self.status_msg.velocity.x * 3.6) # PID 제어를 통한 가속도 계산
 
-                if output > 0.0:
+                if output > 0.0: # 가속도
                     self.ctrl_cmd_msg.accel = output
                     self.ctrl_cmd_msg.brake = 0.0
-                else:
+                else: # 감속도
                     self.ctrl_cmd_msg.accel = 0.0
                     self.ctrl_cmd_msg.brake = -output
-
+        
                 self.ctrl_cmd_pub.publish(self.ctrl_cmd_msg)
 
             rate.sleep()
@@ -135,7 +154,36 @@ class pure_pursuit:
     def object_info_callback(self, data):
         self.is_object_info = True
         self.object_data = data
+        # rospy.loginfo(f"Object info updated: {len(self.object_data.npc_list)} NPCs, {len(self.object_data.pedestrian_list)} pedestrians, {len(self.object_data.obstacle_list)} obstacles")
 
+    def turning_left_callback(self, msg):
+        self.is_turning_left = msg.data
+        rospy.loginfo(f"Left turn signal: {self.is_turning_left}")
+    
+    def load_nodes(self): # 노드 정보 로드
+        current_path = os.path.dirname(os.path.abspath(__file__))
+        node_set_path = os.path.join(current_path, 'lib', 'mgeo_data', 'R_KR_PR_Sangam_NoBuildings', 'node_set.json')
+        with open(node_set_path, 'r') as file:
+            return json.load(file)
+    
+    def extract_stop_lines(self): # 정지선 정보 추출
+        self.stop_lines = [node for node in self.nodes if node['on_stop_line']]
+
+    def calculate_distance(self, point1, point2):
+        return sqrt((point1.x - point2[0])**2 + (point1.y - point2[1])**2)
+
+    def update_nearest_stop_line(self): # 가장 가까운 정지선 정보 업데이트
+        self.nearest_stop_line = min(self.stop_lines, key=lambda node: 
+            self.calculate_distance(self.current_position, node['point']))
+
+    def detect_stop_line(self): # 정지선 감지
+        for node in self.nodes:
+            if node.get('on_stop_line'):
+                distance = self.calculate_distance(self.current_postion, node['point'])
+                if distance < self.stop_line_threshold:
+                    return True, distance
+        return False, float('inf')
+    
     def get_current_waypoint(self, ego_status, global_path):
         min_dist = float('inf')
         current_waypoint = -1
@@ -147,12 +195,58 @@ class pure_pursuit:
                 min_dist = dist
                 current_waypoint = i
         return current_waypoint
+        
+    def trafficlight_logic(self):
 
+        try:
+            if not self.traffic_light_manager.is_data_available():
+                rospy.loginfo("No traffic light data available, proceeding with caution")
+                return  # 신호등 정보가 없으면 함수를 종료하고 기본 주행 로직을 따름
+            
+            is_near_stop_line, distance_to_stop_line = self.detect_stop_line()
+            
+            if is_near_stop_line: # 정지선 근처인 경우
+                # rospy.loginfo(f"Near stop line, distance: {distance_to_stop_line:.2f}")
+                
+                if self.is_turning_left: # 좌회전을 해야할 경우
+                    if self.traffic_light_manager.can_turn_left(): # 좌회전 가능
+                        rospy.loginfo("Left turn signal on, proceeding with left turn")
+                    else: # 좌회전 금지
+                        rospy.loginfo("Left turn signal on, but left turn not allowed")
+                        self.target_velocity = self.calculate_approach_velocity(distance_to_stop_line)
+                    #self.target_velocity = self.normal_speed  # Set speed for left turn
+                else: # 직진
+                    if self.traffic_light_manager.traffic_light_status & 1:  # Red light
+                        rospy.loginfo("Red light detected, stopping")
+                        self.target_velocity = self.calculate_approach_velocity(distance_to_stop_line)
+                        
+                    elif self.traffic_light_manager.traffic_light_status & 4:  # Yellow light
+                        rospy.loginfo("Yellow light detected, slowing down")
+                        approach_velocity = self.calculate_approach_velocity(distance_to_stop_line)
+                        self.target_velocity = min(approach_velocity, self.target_velocity)
+                        
+                    elif self.traffic_light_manager.can_go_straight():  # Green light
+                        rospy.loginfo("Green light detected, proceeding")
+        except Exception as e:
+            rospy.logerr(f"Error in trafficlight_logic: {e}")
+            self.target_velocity = 0
+
+    def calculate_approach_velocity(self, distance):
+        max_approach_speed = 15  # km/h
+        min_approach_speed = 0   # km/h
+        deceleration_distance = 15  # meters
+        
+        if distance > deceleration_distance:
+            return max_approach_speed
+        elif distance < 5:
+            return min_approach_speed
+        else:
+            return max(min_approach_speed, (distance / deceleration_distance) * max_approach_speed)
+        
     def calc_vaild_obj(self, status_msg, object_data):
+
         self.all_object = object_data        
-        ego_pose_x = status_msg[0]
-        ego_pose_y = status_msg[1]
-        ego_heading = status_msg[2]
+        ego_pose_x, ego_pose_y, ego_heading = status_msg
         
         global_npc_info = []
         local_npc_info  = []
@@ -164,83 +258,94 @@ class pure_pursuit:
         num_of_object = self.all_object.num_of_npcs + self.all_object.num_of_obstacle + self.all_object.num_of_pedestrian    
 
         if num_of_object > 0:
-
-            #translation
-            tmp_theta=ego_heading
-            tmp_translation=[ego_pose_x, ego_pose_y]
-            tmp_t=np.array([[cos(tmp_theta), -sin(tmp_theta), tmp_translation[0]],
-                            [sin(tmp_theta),  cos(tmp_theta), tmp_translation[1]],
-                            [0             ,               0,                  1]])
-            tmp_det_t=np.array([[tmp_t[0][0], tmp_t[1][0], -(tmp_t[0][0] * tmp_translation[0] + tmp_t[1][0]*tmp_translation[1])],
-                                [tmp_t[0][1], tmp_t[1][1], -(tmp_t[0][1] * tmp_translation[0] + tmp_t[1][1]*tmp_translation[1])],
-                                [0,0,1]])
             
-            #npc vehicle ranslation        
-            for npc_list in self.all_object.npc_list:
-                global_result=np.array([[npc_list.position.x],[npc_list.position.y],[1]])
-                local_result=tmp_det_t.dot(global_result)
-                if local_result[0][0]> 0 :        
-                    global_npc_info.append([npc_list.type,npc_list.position.x,npc_list.position.y,npc_list.velocity.x])
-                    local_npc_info.append([npc_list.type,local_result[0][0],local_result[1][0],npc_list.velocity.x])
+            # 변환 행렬 계산 (한 번만 수행)
+            cos_theta = np.cos(ego_heading)
+            sin_theta = np.sin(ego_heading)
+            tmp_det_t = np.array([
+                [cos_theta, sin_theta, -(cos_theta * ego_pose_x + sin_theta * ego_pose_y)],
+                [-sin_theta, cos_theta, (sin_theta * ego_pose_x - cos_theta * ego_pose_y)],
+                [0, 0, 1]
+            ])
 
-            #ped translation
-            for ped_list in self.all_object.pedestrian_list:
-                global_result=np.array([[ped_list.position.x],[ped_list.position.y],[1]])
-                local_result=tmp_det_t.dot(global_result)
-                if local_result[0][0]> 0 and local_result[0][0] < 50:
-                    global_ped_info.append([ped_list.type,ped_list.position.x,ped_list.position.y,ped_list.velocity.x])
-                    local_ped_info.append([ped_list.type,local_result[0][0],local_result[1][0],ped_list.velocity.x])
+            # NPC 차량 변환
+            if self.all_object.npc_list:
+                npc_positions = np.array([[npc.position.x, npc.position.y, 1] for npc in self.all_object.npc_list]).T
+                local_results = tmp_det_t.dot(npc_positions)
+                for i, npc in enumerate(self.all_object.npc_list):
+                    if local_results[0, i] > 0:
+                        global_npc_info.append([npc.type, npc.position.x, npc.position.y, npc.velocity.x])
+                        local_npc_info.append([npc.type, local_results[0, i], local_results[1, i], npc.velocity.x])
 
-            #obs translation
-            for obs_list in self.all_object.obstacle_list:
-                global_result=np.array([[obs_list.position.x],[obs_list.position.y],[1]])
-                local_result=tmp_det_t.dot(global_result)
-                if local_result[0][0]> 0 and local_result[0][0] < 50:
-                    global_obs_info.append([obs_list.type,obs_list.position.x,obs_list.position.y,obs_list.velocity.x])
-                    local_obs_info.append([obs_list.type,local_result[0][0],local_result[1][0],obs_list.velocity.x])
-                
+            # 보행자 변환
+            if self.all_object.pedestrian_list:
+                ped_positions = np.array([[ped.position.x, ped.position.y, 1] for ped in self.all_object.pedestrian_list]).T
+                local_results = tmp_det_t.dot(ped_positions)
+                for i, ped in enumerate(self.all_object.pedestrian_list):
+                    if 0 < local_results[0, i] < 50:
+                        global_ped_info.append([ped.type, ped.position.x, ped.position.y, ped.velocity.x])
+                        local_ped_info.append([ped.type, local_results[0, i], local_results[1, i], ped.velocity.x])
+
+            # 장애물 변환
+            if self.all_object.obstacle_list:
+                obs_positions = np.array([[obs.position.x, obs.position.y, 1] for obs in self.all_object.obstacle_list]).T
+                local_results = tmp_det_t.dot(obs_positions)
+                for i, obs in enumerate(self.all_object.obstacle_list):
+                    if 0 < local_results[0, i] < 50:
+                        global_obs_info.append([obs.type, obs.position.x, obs.position.y, obs.velocity.x])
+                        local_obs_info.append([obs.type, local_results[0, i], local_results[1, i], obs.velocity.x])
+
         return global_npc_info, local_npc_info, global_ped_info, local_ped_info, global_obs_info, local_obs_info
     
     def calc_pure_pursuit(self):
-        self.lfd = self.status_msg.velocity.x * self.lfd_gain
-        self.lfd = max(self.min_lfd, min(self.lfd, self.max_lfd))
-        # rospy.loginfo(f"Look-ahead Distance: {self.lfd}")
+        try:
+            # self.lfd = self.status_msg.velocity.x * self.lfd_gain
+            # self.lfd = max(self.min_lfd, min(self.lfd, self.max_lfd))
 
-        vehicle_position = self.current_postion
-        self.is_look_forward_point = False
+            is_near_stop_line, distance_to_stop_line = self.detect_stop_line()
+            if is_near_stop_line:
+                self.lfd = max(self.min_lfd, min(distance_to_stop_line, self.lfd))
+            else:
+                self.lfd = self.status_msg.velocity.x * self.lfd_gain
+            # rospy.loginfo(f"Look-ahead Distance: {self.lfd}")
 
-        translation = [vehicle_position.x, vehicle_position.y]
-        
-        trans_matrix = np.array([
-            [cos(self.vehicle_yaw), -sin(self.vehicle_yaw), translation[0]],
-            [sin(self.vehicle_yaw), cos(self.vehicle_yaw), translation[1]],
-            [0, 0, 1]
-        ])
-        
-        det_trans_matrix = np.linalg.inv(trans_matrix)
+            vehicle_position = self.current_postion
+            self.is_look_forward_point = False
 
-        for num, i in enumerate(self.path.poses):
-            path_point = np.array([i.pose.position.x, i.pose.position.y, 1])
-            local_path_point = det_trans_matrix.dot(path_point)
+            translation = [vehicle_position.x, vehicle_position.y]
             
-            if local_path_point[0] > 0:
-                dis = sqrt(pow(local_path_point[0], 2) + pow(local_path_point[1], 2))
-                if dis >= self.lfd:
-                    self.forward_point = i.pose.position
-                    self.is_look_forward_point = True
-                    break
+            trans_matrix = np.array([
+                [cos(self.vehicle_yaw), -sin(self.vehicle_yaw), translation[0]],
+                [sin(self.vehicle_yaw), cos(self.vehicle_yaw), translation[1]],
+                [0, 0, 1]
+            ])
+            
+            det_trans_matrix = np.linalg.inv(trans_matrix)
 
-        theta = atan2(local_path_point[1], local_path_point[0])
-        steering = atan2(2 * self.vehicle_length * sin(theta), self.lfd)
+            for num, i in enumerate(self.path.poses):
+                path_point = np.array([i.pose.position.x, i.pose.position.y, 1])
+                local_path_point = det_trans_matrix.dot(path_point)
+                
+                if local_path_point[0] > 0:
+                    dis = sqrt(pow(local_path_point[0], 2) + pow(local_path_point[1], 2))
+                    if dis >= self.lfd:
+                        self.forward_point = i.pose.position
+                        self.is_look_forward_point = True
+                        break
 
-        # 조향각에 따른 속도 제한
-        max_steering_angle = pi/4  # 45도
-        steering_ratio = abs(steering) / max_steering_angle
-        if steering_ratio > 0.5:  # 조향각이 최대의 50% 이상일 때
-            self.target_velocity = min(self.target_velocity, 10)  # 10km/h로 제한
+            theta = atan2(local_path_point[1], local_path_point[0])
+            steering = atan2(2 * self.vehicle_length * sin(theta), self.lfd)
 
+            # 조향각에 따른 속도 제한
+            max_steering_angle = pi/4  # 45도
+            steering_ratio = abs(steering) / max_steering_angle
+            if steering_ratio > 0.5:  # 조향각이 최대의 50% 이상일 때
+                self.target_velocity = min(self.target_velocity, 10)  # 10km/h로 제한
+                
+        except Exception as e:
+            rospy.logerr(f"Error in pure pursuit: {e}")
+            return 0.0
         return steering 
-        # if not is_turning_left or self.traffic_light_manager.can_turn_left() else 0
 
 class pidControl:
     def __init__(self):
@@ -302,6 +407,7 @@ class AdaptiveCruiseControl:
         self.object_type = None
         self.object_distance = 0
         self.object_velocity = 0
+        self.emergency_distance = 4  # 비상 정지 거리 (미터)
 
     def check_object(self, ref_path, global_npc_info, local_npc_info, global_ped_info, local_ped_info, global_obs_info, local_obs_info):
         # 주행 경로 상의 장애물 유무 확인
@@ -346,6 +452,8 @@ class AdaptiveCruiseControl:
                                 min_rel_distance = rel_distance
                                 self.object=[True,i] 
 
+        # rospy.loginfo(f"ACC: NPC detected={self.npc_vehicle[0]}, Pedestrian detected={self.Person[0]}, Obstacle detected={self.object[0]}")
+
     def get_target_velocity(self, local_npc_info, local_ped_info, local_obs_info, ego_vel, target_vel): 
         #TODO: (9) 장애물과의 속도와 거리 차이를 이용하여 ACC 를 진행 목표 속도를 설정
         out_vel =  target_vel
@@ -353,50 +461,53 @@ class AdaptiveCruiseControl:
         time_gap = self.time_gap
         v_gain = self.velocity_gain
         x_errgain = self.distance_gain
+        dis_rel = float('inf')  # 초기값 설정
 
-        # if is_turning_left:
-        #     if not self.traffic_light_manager.can_turn_left():
-        #         return 0  # 좌회전 불가능 시 정지
-        # else:
-        #     if not self.traffic_light_manager.can_go_straight():
-        #         return 0  # 직진 불가능 시 정지
+        try:
+            if self.npc_vehicle[0] and len(local_npc_info) != 0: #ACC ON_vehicle   
+                front_vehicle = [local_npc_info[self.npc_vehicle[1]][1], local_npc_info[self.npc_vehicle[1]][2], local_npc_info[self.npc_vehicle[1]][3]]
+                
+                dis_safe = ego_vel * time_gap + default_space
+                dis_rel = sqrt(pow(front_vehicle[0],2) + pow(front_vehicle[1],2))            
+                vel_rel=((front_vehicle[2] / 3.6) - ego_vel)                        
+                acceleration = vel_rel * v_gain - x_errgain * (dis_safe - dis_rel)
 
-        if self.npc_vehicle[0] and len(local_npc_info) != 0: #ACC ON_vehicle   
-            print("ACC ON NPC_Vehicle")         
-            front_vehicle = [local_npc_info[self.npc_vehicle[1]][1], local_npc_info[self.npc_vehicle[1]][2], local_npc_info[self.npc_vehicle[1]][3]]
-            
-            dis_safe = ego_vel * time_gap + default_space
-            dis_rel = sqrt(pow(front_vehicle[0],2) + pow(front_vehicle[1],2))            
-            vel_rel=((front_vehicle[2] / 3.6) - ego_vel)                        
-            acceleration = vel_rel * v_gain - x_errgain * (dis_safe - dis_rel)
+                rospy.loginfo(f"NPC_Vehicle: {front_vehicle}, dis_rel: {dis_rel}, vel_rel: {vel_rel}, acceleration: {acceleration}")
+                out_vel = ego_vel + acceleration      
 
-            rospy.loginfo(f"NPC_Vehicle: {front_vehicle}, dis_rel: {dis_rel}, vel_rel: {vel_rel}, acceleration: {acceleration}")
-            out_vel = ego_vel + acceleration      
+            if self.Person[0] and len(local_ped_info) != 0: #ACC ON_Pedestrian
+                Pedestrian = [local_ped_info[self.Person[1]][1], local_ped_info[self.Person[1]][2], local_ped_info[self.Person[1]][3]]
+                
+                dis_safe = ego_vel* time_gap + default_space
+                dis_rel = sqrt(pow(Pedestrian[0],2) + pow(Pedestrian[1],2))            
+                vel_rel = (Pedestrian[2] - ego_vel)              
+                acceleration = vel_rel * v_gain - x_errgain * (dis_safe - dis_rel)    
 
-        if self.Person[0] and len(local_ped_info) != 0: #ACC ON_Pedestrian
-            Pedestrian = [local_ped_info[self.Person[1]][1], local_ped_info[self.Person[1]][2], local_ped_info[self.Person[1]][3]]
-            
-            dis_safe = ego_vel* time_gap + default_space
-            dis_rel = sqrt(pow(Pedestrian[0],2) + pow(Pedestrian[1],2))            
-            vel_rel = (Pedestrian[2] - ego_vel)              
-            acceleration = vel_rel * v_gain - x_errgain * (dis_safe - dis_rel)    
+                rospy.loginfo(f"Pedestrian: {Pedestrian}, dis_rel: {dis_rel}, vel_rel: {vel_rel}, acceleration: {acceleration}")
+                out_vel = ego_vel + acceleration
+    
+            if self.object[0] and len(local_obs_info) != 0: #ACC ON_obstacle     
+                Obstacle = [local_obs_info[self.object[1]][1], local_obs_info[self.object[1]][2], local_obs_info[self.object[1]][3]]
+                
+                dis_safe = ego_vel* time_gap + default_space
+                dis_rel = sqrt(pow(Obstacle[0],2) + pow(Obstacle[1],2))            
+                vel_rel = (Obstacle[2] - ego_vel)
+                acceleration = vel_rel * v_gain - x_errgain * (dis_safe - dis_rel)    
 
-            rospy.loginfo(f"Pedestrian: {Pedestrian}, dis_rel: {dis_rel}, vel_rel: {vel_rel}, acceleration: {acceleration}")
-            out_vel = ego_vel + acceleration
-   
-        if self.object[0] and len(local_obs_info) != 0: #ACC ON_obstacle     
-            Obstacle = [local_obs_info[self.object[1]][1], local_obs_info[self.object[1]][2], local_obs_info[self.object[1]][3]]
-            
-            dis_safe = ego_vel* time_gap + default_space
-            dis_rel = sqrt(pow(Obstacle[0],2) + pow(Obstacle[1],2))            
-            vel_rel = (Obstacle[2] - ego_vel)
-            acceleration = vel_rel * v_gain - x_errgain * (dis_safe - dis_rel)    
+                rospy.loginfo(f"Obstacle: {Obstacle}, dis_rel: {dis_rel}, vel_rel: {vel_rel}, acceleration: {acceleration}")
+                out_vel = ego_vel + acceleration    
 
-            rospy.loginfo(f"Obstacle: {Obstacle}, dis_rel: {dis_rel}, vel_rel: {vel_rel}, acceleration: {acceleration}")
-            out_vel = ego_vel + acceleration           
+            # 비상 정지 로직
+            if dis_rel <= self.emergency_distance:
+                rospy.logwarn("Emergency stop initiated!")
+                return 0
 
-        return out_vel * 3.6
-
+            return out_vel * 3.6    
+        
+        except Exception as e:
+            rospy.logerr(f"Error in ACC: {e}")
+            return 0
+        
 if __name__ == '__main__':
     try:
         test_track=pure_pursuit()
