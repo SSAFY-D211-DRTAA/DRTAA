@@ -79,5 +79,10 @@ public class Rent {
 
     @Column(name = "rent_created_at", nullable = false)
     @Schema(description = "렌트 예약 생성 일시", example = "2024/01/01 00:00")
-    private LocalDateTime rentCreatedAt= LocalDateTime.now();
+    private LocalDateTime rentCreatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.rentCreatedAt = LocalDateTime.now();
+    }
 }

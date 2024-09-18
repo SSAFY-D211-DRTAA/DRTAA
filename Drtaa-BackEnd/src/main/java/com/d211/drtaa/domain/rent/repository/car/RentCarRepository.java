@@ -11,4 +11,5 @@ public interface RentCarRepository extends JpaRepository<RentCar, Long> {
     Optional<RentCar> findByRentCarId(Long rentCarId);
     List<RentCar> findByRentCarIsDispatchFalse();
     List<RentCar> findByRentCarIsDispatchTrue();
+    Optional<RentCar> findFirstByRentCarIsDispatch(boolean rentCarIsDispatch);
 }

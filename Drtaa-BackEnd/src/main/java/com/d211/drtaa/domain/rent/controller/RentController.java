@@ -1,11 +1,13 @@
 package com.d211.drtaa.domain.rent.controller;
 
-import com.d211.drtaa.domain.rent.dto.request.RentRequestDTO;
+import com.d211.drtaa.domain.rent.dto.request.RentCreateRequestDTO;
+import com.d211.drtaa.domain.rent.dto.request.RentEditRequestDTO;
 import com.d211.drtaa.domain.rent.dto.request.RentStatusRequestDTO;
 import com.d211.drtaa.domain.rent.dto.request.RentTimeRequestDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentDetailResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentResponseDTO;
 import com.d211.drtaa.domain.rent.service.RentService;
+import com.d211.drtaa.global.exception.rent.NoAvailableRentCarException;
 import com.d211.drtaa.global.exception.rent.RentNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -59,11 +61,28 @@ public class RentController {
         }
     }
 
+    @PostMapping
+    @Operation(summary = "렌트 요청", description = "렌트 요청")
+    public ResponseEntity createRent
+            (Authentication authentication, @RequestBody RentCreateRequestDTO rentCreateRequestDTO) {
+        try {
+            RentDetailResponseDTO response = rentService.createRent(authentication.getName(), rentCreateRequestDTO);
+
+            return ResponseEntity.ok(response); // 200
+        } catch (UsernameNotFoundException | NoAvailableRentCarException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
+        } catch (AuthenticationException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("권한 인증에 실패하였습니다."); // 401
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
+        }
+    }
+
     @PatchMapping
     @Operation(summary = "렌트 변경", description = "렌트 인원, 장소 변경")
-    public ResponseEntity updateRent(@RequestBody RentRequestDTO rentRequestDTO) {
+    public ResponseEntity updateRent(@RequestBody RentEditRequestDTO rentEditRequestDTO) {
         try {
-            rentService.updateRent(rentRequestDTO);
+            rentService.updateRent(rentEditRequestDTO);
 
             return ResponseEntity.ok("Success"); //200
         } catch(RentNotFoundException e) {
