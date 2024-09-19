@@ -93,6 +93,7 @@ public class RentCarController {
                             .rentCarNumber("")
                             .rentCarManufacturer("")
                             .rentCarModel("")
+                            .rentCarImg("")
                             .rentCarIsDispatch(true)
                             .rentCarDrivingStatus(RentDrivingStatus.parked)
                             .build())
