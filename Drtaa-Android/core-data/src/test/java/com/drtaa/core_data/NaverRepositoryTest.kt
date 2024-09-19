@@ -23,9 +23,9 @@ import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltAndroidTest
-@Config(application = HiltTestApplication::class)
+@Config(application = HiltTestApplication::class, manifest=Config.NONE)
 @RunWith(RobolectricTestRunner::class)
-class NaverRepositoryImplTest {
+class NaverRepositoryTest {
 
     @get:Rule
     var hiltRule = HiltAndroidRule(this)
