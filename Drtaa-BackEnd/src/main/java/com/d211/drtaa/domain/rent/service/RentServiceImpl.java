@@ -8,9 +8,11 @@ import com.d211.drtaa.domain.rent.dto.response.RentResponseDTO;
 import com.d211.drtaa.domain.rent.entity.Rent;
 import com.d211.drtaa.domain.rent.entity.RentStatus;
 import com.d211.drtaa.domain.rent.entity.car.RentCar;
+import com.d211.drtaa.domain.rent.entity.car.RentCarSchedule;
 import com.d211.drtaa.domain.rent.entity.car.RentDrivingStatus;
 import com.d211.drtaa.domain.rent.repository.RentRepository;
 import com.d211.drtaa.domain.rent.repository.car.RentCarRepository;
+import com.d211.drtaa.domain.rent.repository.car.RentCarScheduleRepository;
 import com.d211.drtaa.domain.rent.service.history.RentHistoryService;
 import com.d211.drtaa.domain.travel.entity.Travel;
 import com.d211.drtaa.domain.travel.entity.TravelDates;
@@ -30,6 +32,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +44,7 @@ public class RentServiceImpl implements RentService{
     private final UserRepository userRepository;
     private final RentRepository rentRepository;
     private final RentCarRepository rentCarRepository;
+    private final RentCarScheduleRepository rentCarScheduleRepository;
     private final TravelRepository travelRepository;
     private final TravelDatesRepository travelDatesRepository;
 
@@ -103,13 +107,31 @@ public class RentServiceImpl implements RentService{
         User user = userRepository.findByUserProviderId(userProviderId)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 userProviderId의 맞는 회원을 찾을 수 없습니다."));
 
-        // 미배차 상태 렌트 차량 탐색
-        RentCar availableCar = rentCarRepository.findFirstByRentCarIsDispatch(false)
-                .orElseThrow(() -> new NoAvailableRentCarException("현재 배정 가능한 차량이 없습니다."));
-
+        // ** 결제 **
         // 시작, 종료 시간
         LocalDate startDate = rentCreateRequestDTO.getRentStartTime().toLocalDate();
         LocalDate endDate = rentCreateRequestDTO.getRentEndTime().toLocalDate();
+
+        // ** 결제 **
+        // 해당 기간에 예약이 없는 차량 찾기
+        LocalDate finalStartDate = startDate;
+        List<RentCar> availableCars = rentCarRepository.findAll().stream()
+                .filter(car -> {
+                    List<RentCarSchedule> schedules = rentCarScheduleRepository.findByRentCar(car);
+                    return schedules.stream().noneMatch(schedule ->
+                            (finalStartDate.isBefore(schedule.getRentCarScheduleEndDate()) || finalStartDate.isEqual(schedule.getRentCarScheduleEndDate())) &&
+                                    (endDate.isAfter(schedule.getRentCarScheduleStartDate()) || endDate.isEqual(schedule.getRentCarScheduleStartDate()))
+                    );
+                })
+                .collect(Collectors.toList());
+
+        // ** 결제 **
+        if (availableCars.isEmpty())
+            throw new RuntimeException("해당 기간에 사용 가능한 차량이 없습니다.");
+
+        // ** 결제 **
+        // 사용 가능한 차량 중 첫 번째 차량 선택
+        RentCar availableCar = availableCars.get(0);
 
         // 여행 생성
         Travel travel = Travel.builder()
@@ -153,13 +175,25 @@ public class RentServiceImpl implements RentService{
         // 생성된 렌트 저장
         rentRepository.save(rent);
 
+        // ** 결제 **
         // 렌트 차량 상태 변경
         availableCar.setRentCarIsDispatch(true); // 배차 상태
         availableCar.setRentCarDrivingStatus(RentDrivingStatus.parked);// 주행 상태
 
+        // ** 결제 **
         // 변경된 렌트 차량 상태 저장
         rentCarRepository.save(availableCar);
-        
+
+        // 렌트 일정 생성
+        RentCarSchedule rentCarSchedule = RentCarSchedule.builder()
+                .rentCar(availableCar)
+                .rentCarScheduleStartDate(startDate)
+                .rentCarScheduleEndDate(endDate)
+                .build();
+
+        // 렌트 일정 저장
+        rentCarScheduleRepository.save(rentCarSchedule);
+
         // 결과
         RentDetailResponseDTO response = RentDetailResponseDTO.builder()
                 // rent

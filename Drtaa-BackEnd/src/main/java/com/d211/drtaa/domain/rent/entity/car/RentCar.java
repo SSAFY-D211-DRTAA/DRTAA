@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
+import java.util.List;
+
 @Entity
 @Table(name = "rent_car")
 @NoArgsConstructor
@@ -46,4 +48,7 @@ public class RentCar {
     @ColumnDefault("parked")
     @Schema(description = "렌트 차량 주행 상태", example = "parked")
     private RentDrivingStatus rentCarDrivingStatus;
+
+    @OneToMany(mappedBy = "rentCar")
+    private List<RentCarSchedule> rentCarSchedule;
 }

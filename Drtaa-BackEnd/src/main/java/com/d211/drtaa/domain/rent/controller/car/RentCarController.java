@@ -109,7 +109,7 @@ public class RentCarController {
     @Operation(summary = "배차 차량 조회", description = "배차 상태인 렌트 차량 조회")
     public ResponseEntity getAssignedDispatchStatus() {
         try {
-            List<RentCar> response = rentCarService.getAssignedDispatchStatus();
+            List<RentCarResponseDTO> response = rentCarService.getAssignedDispatchStatus();
 
             return ResponseEntity.ok(response); // 200
         } catch (NoAvailableRentCarException e) {

@@ -4,6 +4,7 @@ import com.d211.drtaa.domain.rent.dto.request.RentCarDispatchStatusRequestDTO;
 import com.d211.drtaa.domain.rent.dto.request.RentCarDriveStatusRequestDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentCarDispatchStatusResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentCarDriveStatusResponseDTO;
+import com.d211.drtaa.domain.rent.dto.response.RentCarResponseDTO;
 import com.d211.drtaa.domain.rent.entity.car.RentCar;
 import com.d211.drtaa.domain.rent.repository.car.RentCarRepository;
 import com.d211.drtaa.global.exception.rent.NoAvailableRentCarException;
@@ -55,11 +56,28 @@ public class RentCarServiceImpl implements RentCarService {
     }
 
     @Override
-    public List<RentCar> getAssignedDispatchStatus() {
+    public List<RentCarResponseDTO> getAssignedDispatchStatus() {
         // 배차 상태 렌트 차량 검색
-        List<RentCar> rentCar = rentCarRepository.findByRentCarIsDispatchTrue();
+        List<RentCar> rentCarList = rentCarRepository.findByRentCarIsDispatchTrue();
 
-        return rentCar;
+        List<RentCarResponseDTO> responseDTOList = new ArrayList<>();
+        for(RentCar rentCar : rentCarList){
+            RentCarResponseDTO dto = RentCarResponseDTO.builder()
+                    .isAvailable(rentCar.isRentCarIsDispatch())
+                    .rentCar(RentCar.builder()
+                            .rentCarId(rentCar.getRentCarId())
+                            .rentCarNumber(rentCar.getRentCarNumber())
+                            .rentCarManufacturer(rentCar.getRentCarManufacturer())
+                            .rentCarModel(rentCar.getRentCarModel())
+                            .rentCarImg(rentCar.getRentCarImg())
+                            .rentCarDrivingStatus(rentCar.getRentCarDrivingStatus())
+                            .build())
+                    .build();
+
+            responseDTOList.add(dto);
+        }
+
+        return responseDTOList;
     }
 
     @Override
