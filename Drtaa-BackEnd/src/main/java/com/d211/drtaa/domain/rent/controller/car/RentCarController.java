@@ -4,7 +4,7 @@ import com.d211.drtaa.domain.rent.dto.request.RentCarDispatchStatusRequestDTO;
 import com.d211.drtaa.domain.rent.dto.request.RentCarDriveStatusRequestDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentCarDispatchStatusResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentCarDriveStatusResponseDTO;
-import com.d211.drtaa.domain.rent.dto.response.RentCarResponseDTO;
+import com.d211.drtaa.domain.rent.entity.car.RentCar;
 import com.d211.drtaa.domain.rent.service.car.RentCarService;
 import com.d211.drtaa.global.exception.rent.RentCarNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,7 +30,7 @@ public class RentCarController {
     @Operation(summary = "전체 배차 상태 조회", description = "전체 렌트 차량의 배차 상태 조회")
     public ResponseEntity getAllDispatchStatus() {
         try {
-            List<RentCarDispatchStatusResponseDTO> response = rentCarService.getAllDispatchStatus();
+            List<RentCar> response = rentCarService.getAllDispatchStatus();
 
             return ResponseEntity.ok(response); // 200
         } catch (Exception e) {
@@ -73,7 +73,7 @@ public class RentCarController {
     @Operation(summary = "미배차 차량 조회", description = "미배차 상태인 렌트 차량 조회")
     public ResponseEntity getUnassignedDispatchStatus() {
         try {
-            List<RentCarResponseDTO> response = rentCarService.getUnassignedDispatchStatus();
+            List<RentCar> response = rentCarService.getUnassignedDispatchStatus();
 
             return ResponseEntity.ok(response); // 200
         } catch (Exception e) {
@@ -85,7 +85,7 @@ public class RentCarController {
     @Operation(summary = "배차 차량 조회", description = "배차 상태인 렌트 차량 조회")
     public ResponseEntity getAssignedDispatchStatus() {
         try {
-            List<RentCarResponseDTO> response = rentCarService.getAssignedDispatchStatus();
+            List<RentCar> response = rentCarService.getAssignedDispatchStatus();
 
             return ResponseEntity.ok(response); // 200
         } catch (Exception e) {
