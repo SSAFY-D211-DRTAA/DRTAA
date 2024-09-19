@@ -5,7 +5,6 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.drtaa.core_data.datasource.SignDataSource
-import com.drtaa.core_data.datasourceimpl.TokenDataSourceImpl.Companion.ACCESS_TOKEN_KEY
 import com.drtaa.core_model.data.SocialUser
 import com.drtaa.core_model.data.UserLoginInfo
 import com.drtaa.core_model.network.RequestFormLogin
@@ -59,7 +58,6 @@ class SignDataSourceImpl @Inject constructor(
             preferences[USER_PROFILE_IMAGE] = user.profileImageUrl ?: ""
             preferences[USER_LOGIN_TYPE] = user.userLogin
         }
-
     }
 
     override suspend fun clearUserData() {
