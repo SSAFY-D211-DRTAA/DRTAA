@@ -41,9 +41,9 @@ public class Rent {
     private Travel travel;
 
     @Column(name = "rent_status", nullable = false)
-    @ColumnDefault("RESERVED")
+    @ColumnDefault("reserved")
     @Enumerated(EnumType.STRING)
-    @Schema(description = "렌트 상태", example = "RESERVED")
+    @Schema(description = "렌트 상태", example = "reserved")
     private RentStatus rentStatus;
 
     @Column(name = "rent_head_count", nullable = false)
