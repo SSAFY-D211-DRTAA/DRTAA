@@ -10,7 +10,4 @@ import java.util.Optional;
 public interface RentCarRepository extends JpaRepository<RentCar, Long> {
     // find
     Optional<RentCar> findByRentCarId(Long rentCarId);
-    Optional<RentCar> findFirstByRentCarIsDispatchFalse();
-    List<RentCar> findByRentCarIsDispatchTrue();
-    List<RentCar> findByRentCarSchedule_RentCarScheduleStartDateGreaterThanEqualAndRentCarSchedule_RentCarScheduleEndDateLessThanEqual(LocalDate startDate, LocalDate endDate);
 }

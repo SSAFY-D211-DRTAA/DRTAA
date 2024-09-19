@@ -1,5 +1,6 @@
 package com.d211.drtaa.domain.rent.controller;
 
+import com.d211.drtaa.domain.rent.dto.request.RentCompletedRequestDTO;
 import com.d211.drtaa.domain.rent.dto.request.RentCreateRequestDTO;
 import com.d211.drtaa.domain.rent.dto.request.RentEditRequestDTO;
 import com.d211.drtaa.domain.rent.dto.request.RentTimeRequestDTO;
@@ -110,11 +111,11 @@ public class RentController {
         }
     }
 
-    @PatchMapping("/status/{rentId}/completed")
+    @PatchMapping("/status/completed")
     @Operation(summary = "렌트 상태 변경(반납)", description = "렌트 취소")
-    public ResponseEntity rentStatusCompleted(@PathVariable("rentId") Long rentId) {
+    public ResponseEntity rentStatusCompleted(@RequestBody RentCompletedRequestDTO requestDTO) {
         try {
-            rentService.rentStatusCompleted(rentId);
+            rentService.rentStatusCompleted(requestDTO);
 
             return ResponseEntity.ok("Success");
         } catch(RentNotFoundException | RentCarNotFoundException e) {

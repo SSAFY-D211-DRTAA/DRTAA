@@ -41,4 +41,6 @@ public class RentDetailResponseDTO {
     private String rentCarManufacturer;
     @Schema(description = "렌트 차량 모델 이름", example = "K5")
     private String rentCarModel;
+    @Schema(description = "렌트 차량 일정 고유 번호", example = "1")
+    private long rentCarScheduleId;
 }

@@ -38,17 +38,12 @@ public class RentCar {
     @Schema(description = "렌트 차량 예시 사진", example = "https://myd211s3bucket.s3.ap-northeast-2.amazonaws.com/profileImg/Niro.png")
     private String rentCarImg;
 
-    @Column(name = "rent_car_is_dispatch", nullable = false)
-    @ColumnDefault("0")
-    @Schema(description = "렌트 차량 배차 상태", example = "0")
-    private boolean rentCarIsDispatch;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "rent_car_driving_status", nullable = false)
     @ColumnDefault("parked")
     @Schema(description = "렌트 차량 주행 상태", example = "parked")
     private RentDrivingStatus rentCarDrivingStatus;
 
-    @OneToMany(mappedBy = "rentCar")
+    @OneToMany(mappedBy = "rentCar", fetch = FetchType.LAZY)
     private List<RentCarSchedule> rentCarSchedule;
 }

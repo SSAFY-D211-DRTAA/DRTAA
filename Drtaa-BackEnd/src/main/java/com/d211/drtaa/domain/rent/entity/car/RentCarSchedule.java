@@ -31,6 +31,10 @@ public class RentCarSchedule {
     private LocalDate rentCarScheduleStartDate;
 
     @Column(name = "rent_car_schedule_end_date", nullable = false)
-    @Schema(description = "렌트 차량 종료 시작 일자", example = "2024/01/02")
+    @Schema(description = "렌트 차량 일정 종료 일자", example = "2024/01/02")
     private LocalDate rentCarScheduleEndDate;
+
+    @Column(name = "rent_car_schedule_is_done", nullable = false)
+    @Schema(description = "렌트 차량 일정 종료 여부", example = "true")
+    private boolean rentCarScheduleIsDone;
 }
