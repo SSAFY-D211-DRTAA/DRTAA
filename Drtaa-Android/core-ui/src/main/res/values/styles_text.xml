@@ -3,6 +3,44 @@
     <!--    text style    -->
     <style name="jua" parent="TextAppearance.AppCompat">
         <item name="android:fontFamily">@font/jua</item>
+        <item name="android:breakStrategy">balanced</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="ptd_regular" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">@font/ptd_regular</item>
+        <item name="android:breakStrategy">balanced</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="ptd_medium" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">@font/ptd_medium</item>
+        <item name="android:breakStrategy">balanced</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="ptd_light" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">@font/ptd_light</item>
+        <item name="android:breakStrategy">balanced</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="ptd_bold" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">@font/ptd_bold</item>
+        <item name="android:breakStrategy">balanced</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="ptd_semi_bold" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">@font/ptd_semi_bold</item>
+        <item name="android:breakStrategy">balanced</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="ptd_extra_bold" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">@font/ptd_extra_bold</item>
+        <item name="android:breakStrategy">balanced</item>
+        <item name="android:textColor">@color/black</item>
     </style>
 
     <style name="h1" parent="TextAppearance.MaterialComponents.Headline3">
