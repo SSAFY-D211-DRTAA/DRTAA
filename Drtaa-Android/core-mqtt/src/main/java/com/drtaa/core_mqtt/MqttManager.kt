@@ -3,7 +3,12 @@ package com.drtaa.core_mqtt
 import com.hivemq.client.mqtt.MqttClient
 import com.hivemq.client.mqtt.mqtt5.Mqtt5AsyncClient
 import com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5Publish
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
@@ -14,6 +19,8 @@ private const val TAG = "MQTT"
 @Singleton
 class MqttManager @Inject constructor() {
     private lateinit var client: Mqtt5AsyncClient
+    private val _receivedMessages = MutableSharedFlow<String>()
+    val receivedMessages: SharedFlow<String> = _receivedMessages.asSharedFlow()
 
     suspend fun setupMqttClient() {
         client = MqttClient.builder()
@@ -43,6 +50,9 @@ class MqttManager @Inject constructor() {
             .topicFilter(GPS_PUB)
             .callback { publish: Mqtt5Publish ->
                 val message = String(publish.payloadAsBytes)
+                CoroutineScope(Dispatchers.IO).launch {
+                    _receivedMessages.emit(message)
+                }
                 Timber.tag(TAG).d("MQTT 응답: $message")
             }
             .send()

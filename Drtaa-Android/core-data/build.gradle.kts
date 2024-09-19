@@ -51,4 +51,12 @@ dependencies {
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
     implementation(libs.androidx.paging.runtime.ktx)
+    //Test
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.hilt.android.testing)
+    testImplementation(libs.robolectric)
+    // MQTT
+    implementation(project(":core-mqtt"))
+    implementation(libs.hivemq.mqtt.client)
 }
