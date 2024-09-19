@@ -8,6 +8,7 @@ import com.d211.drtaa.domain.rent.entity.car.RentCar;
 import com.d211.drtaa.domain.rent.entity.car.RentCarSchedule;
 import com.d211.drtaa.domain.rent.repository.car.RentCarRepository;
 import com.d211.drtaa.domain.rent.repository.car.RentCarScheduleRepository;
+import com.d211.drtaa.global.exception.rent.NoAvailableRentCarException;
 import com.d211.drtaa.global.exception.rent.RentCarNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -53,6 +54,8 @@ public class RentCarServiceImpl implements RentCarService {
     public RentCarResponseDTO getUnassignedDispatchStatus(RentCarUnassignedDispatchStatusRequestDTO requestDTO) {
         LocalDate finalStartDate = requestDTO.getRentCarScheduleStartDate();
         LocalDate endDate = requestDTO.getRentCarScheduleEndDate();
+        
+        // 가능한 차량 확인
         List<RentCar> availableCars = rentCarRepository.findAll().stream()
                 .filter(car -> {
                     List<RentCarSchedule> schedules = rentCarScheduleRepository.findByRentCar(car);
@@ -64,10 +67,10 @@ public class RentCarServiceImpl implements RentCarService {
                 .collect(Collectors.toList());
 
         if (availableCars.isEmpty())
-            throw new RuntimeException("해당 기간에 사용 가능한 차량이 없습니다.");
-
+            throw new NoAvailableRentCarException("해당 기간에 사용 가능한 차량이 없습니다.");
+        
+        // 가능한 차량중 가장 첫번째 선택
         RentCar availableCar = availableCars.get(0);
-        List<RentCarSchedule> schedules = rentCarScheduleRepository.findByRentCar(availableCar);
 
         RentCarResponseDTO responseDTO = RentCarResponseDTO.builder()
                 .isAvailable(true)

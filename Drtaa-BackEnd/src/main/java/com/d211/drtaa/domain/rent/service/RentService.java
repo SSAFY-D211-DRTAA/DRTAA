@@ -1,6 +1,6 @@
 package com.d211.drtaa.domain.rent.service;
 
-import com.d211.drtaa.domain.rent.dto.request.RentCompletedRequestDTO;
+import com.d211.drtaa.domain.rent.dto.request.RentStatusRequestDTO;
 import com.d211.drtaa.domain.rent.dto.request.RentCreateRequestDTO;
 import com.d211.drtaa.domain.rent.dto.request.RentEditRequestDTO;
 import com.d211.drtaa.domain.rent.dto.request.RentTimeRequestDTO;
@@ -26,10 +26,10 @@ public interface RentService {
     void rentStatusInProgress(long rentId);
 
     // rentId의 렌트 상태: 반납
-    void rentStatusCompleted(RentCompletedRequestDTO requestDTO);
+    void rentStatusCompleted(RentStatusRequestDTO requestDTO);
 
     // rentId의 렌트 상태: 취소
-    void rentStatusCanceld(long rentId);
+    void rentStatusCanceld(RentStatusRequestDTO requestDTO);
 
     // rentId의 렌트 시간 변경
     void updateRentTime(RentTimeRequestDTO rentTimeRequestDTO);
