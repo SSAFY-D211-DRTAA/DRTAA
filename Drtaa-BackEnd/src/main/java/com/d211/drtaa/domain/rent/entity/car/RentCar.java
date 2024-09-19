@@ -37,8 +37,9 @@ public class RentCar {
     @Schema(description = "렌트 차량 배차 상태", example = "0")
     private boolean rentCarIsDispatch;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "rent_car_driving_status", nullable = false)
-    @ColumnDefault("PARKED")
+    @ColumnDefault("parked")
     @Schema(description = "렌트 차량 주행 상태", example = "parked")
     private RentDrivingStatus rentCarDrivingStatus;
 }

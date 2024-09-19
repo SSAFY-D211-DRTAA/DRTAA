@@ -41,6 +41,7 @@ public class Rent {
 
     @Column(name = "rent_status", nullable = false)
     @ColumnDefault("RESERVED")
+    @Enumerated(EnumType.STRING)
     @Schema(description = "렌트 상태", example = "RESERVED")
     private RentStatus rentStatus;
 
