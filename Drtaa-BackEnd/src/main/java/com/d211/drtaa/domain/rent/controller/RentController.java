@@ -2,12 +2,12 @@ package com.d211.drtaa.domain.rent.controller;
 
 import com.d211.drtaa.domain.rent.dto.request.RentCreateRequestDTO;
 import com.d211.drtaa.domain.rent.dto.request.RentEditRequestDTO;
-import com.d211.drtaa.domain.rent.dto.request.RentStatusRequestDTO;
 import com.d211.drtaa.domain.rent.dto.request.RentTimeRequestDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentDetailResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentResponseDTO;
 import com.d211.drtaa.domain.rent.service.RentService;
 import com.d211.drtaa.global.exception.rent.NoAvailableRentCarException;
+import com.d211.drtaa.global.exception.rent.RentCarNotFoundException;
 import com.d211.drtaa.global.exception.rent.RentNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -94,14 +94,46 @@ public class RentController {
         }
     }
 
-    @PatchMapping("/status")
-    @Operation(summary = "렌트 상태 변경", description = "렌트 상태 변경")
-    public ResponseEntity updateRentStatus(@RequestBody RentStatusRequestDTO rentStatusRequestDTO)  {
+    @PatchMapping("/status/{rentId}/in-progress")
+    @Operation(summary = "렌트 상태 변경(탑승)", description = "렌트 취소")
+    public ResponseEntity rentStatusInProgress(@PathVariable("rentId") Long rentId) {
         try {
-            rentService.updateRentStatus(rentStatusRequestDTO);
+            rentService.rentStatusInProgress(rentId);
 
-            return ResponseEntity.ok("Success"); //200
+            return ResponseEntity.ok("Success");
         } catch(RentNotFoundException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
+        }
+    }
+
+    @PatchMapping("/status/{rentId}/completed")
+    @Operation(summary = "렌트 상태 변경(반납)", description = "렌트 취소")
+    public ResponseEntity rentStatusCompleted(@PathVariable("rentId") Long rentId) {
+        try {
+            rentService.rentStatusCompleted(rentId);
+
+            return ResponseEntity.ok("Success");
+        } catch(RentNotFoundException | RentCarNotFoundException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
+        }
+    }
+
+    @PatchMapping("/status/{rentId}/canceled")
+    @Operation(summary = "렌트 상태 변경(취소)", description = "렌트 취소")
+    public ResponseEntity rentStatusCanceld(@PathVariable("rentId") Long rentId) {
+        try {
+            rentService.rentStatusCanceld(rentId);
+
+            return ResponseEntity.ok("Success");
+        } catch(RentNotFoundException | RentCarNotFoundException e) {
             log.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
         } catch (Exception e) {
@@ -125,21 +157,4 @@ public class RentController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
         }
     }
-
-    @DeleteMapping("/{rentId}")
-    @Operation(summary = "렌트 취소", description = "렌트 취소")
-    public ResponseEntity deleteRent(@PathVariable("rentId") Long rentId) {
-        try {
-            rentService.deleteRent(rentId);
-
-            return ResponseEntity.ok("Success");
-        } catch(RentNotFoundException e) {
-            log.error(e.getMessage());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
-        }
-    }
-
 }

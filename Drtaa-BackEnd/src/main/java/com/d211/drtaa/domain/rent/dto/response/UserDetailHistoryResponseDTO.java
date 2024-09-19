@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -34,4 +35,10 @@ public class UserDetailHistoryResponseDTO {
     private String rentCarModel;
 
     // travel
+    @Schema(description = "여행 이름", example = "서울 여행")
+    private String travelName;
+    @Schema(description = "여행 시작 일정", example = "2024/01/01")
+    private LocalDate travelStartDate;
+    @Schema(description = "여행 종료 일정", example = "2024/01/02")
+    private LocalDate travelEndDate;
 }
