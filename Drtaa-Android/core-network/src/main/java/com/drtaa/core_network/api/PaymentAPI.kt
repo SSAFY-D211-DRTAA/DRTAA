@@ -16,5 +16,4 @@ interface PaymentAPI {
 
     @GET("payment/{receiptId}")
     suspend fun getPaymentInfo(@Path("receiptId") receiptId: String): PaymentCompletionInfo
-
 }

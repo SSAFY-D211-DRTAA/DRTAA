@@ -5,6 +5,7 @@ import androidx.fragment.app.viewModels
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.drtaa.core_model.network.RequestUnassignedCar
 import com.drtaa.core_ui.base.BaseFragment
 import com.drtaa.feature_rent.databinding.FragmentRentSummaryBinding
 import com.drtaa.feature_rent.viewmodel.RentSummaryViewModel
@@ -26,7 +27,15 @@ class RentSummaryFragment :
         initEvent()
         initObserve()
 
-        rentSummaryViewModel.getUnAssignedCar()
+        initData()
+    }
+
+    private fun initData() {
+        val rentSchedule = RequestUnassignedCar(
+            rentCarScheduleStartDate = rentViewModel.rentStartSchedule.value!!.toRequestUnassignedCar(),
+            rentCarScheduleEndDate = rentViewModel.rentEndSchedule.value!!.toRequestUnassignedCar(),
+        )
+        rentSummaryViewModel.getUnAssignedCar(rentSchedule)
         rentViewModel.getRentInfo()
     }
 
@@ -39,7 +48,7 @@ class RentSummaryFragment :
                 } else if (!result.available) {
                     binding.tvSummaryNoCar.visibility = View.VISIBLE
                 } else {
-                    binding.rentCar = result.rentCar
+                    binding.rentCar = result
                     binding.svSummary.visibility = View.VISIBLE
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)

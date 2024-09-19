@@ -2,24 +2,20 @@ package com.drtaa.feature_payment
 
 import android.util.Log
 import androidx.fragment.app.viewModels
-import kr.co.bootpay.android.*
+import androidx.lifecycle.lifecycleScope
 import com.drtaa.core_ui.base.BaseFragment
 import com.drtaa.feature_payment.databinding.FragmentPaymentBinding
 import com.drtaa.feature_payment.viewmodel.PaymentViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import kr.co.bootpay.android.Bootpay
 import kr.co.bootpay.android.events.BootpayEventListener
 import kr.co.bootpay.android.models.BootExtra
 import kr.co.bootpay.android.models.BootItem
 import kr.co.bootpay.android.models.BootUser
 import kr.co.bootpay.android.models.Payload
-import androidx.lifecycle.lifecycleScope
-import com.drtaa.core_data.datasourceimpl.SignDataSourceImpl
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
-import timber.log.Timber
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class PaymentFragment : BaseFragment<FragmentPaymentBinding>(R.layout.fragment_payment) {
@@ -62,9 +58,17 @@ class PaymentFragment : BaseFragment<FragmentPaymentBinding>(R.layout.fragment_p
         viewModel.paymentStatus
             .onEach { status ->
                 binding.tvPaymentStatus.text = when (status) {
-                    is PaymentViewModel.PaymentStatus.Success -> { "성공: ${status.message}" }
-                    is PaymentViewModel.PaymentStatus.Error -> { "오류: ${status.message}" }
-                    is PaymentViewModel.PaymentStatus.PaymentInfoRetrieved -> { "ㅇㅇㅇ" }
+                    is PaymentViewModel.PaymentStatus.Success -> {
+                        "성공: ${status.message}"
+                    }
+
+                    is PaymentViewModel.PaymentStatus.Error -> {
+                        "오류: ${status.message}"
+                    }
+
+                    is PaymentViewModel.PaymentStatus.PaymentInfoRetrieved -> {
+                        "ㅇㅇㅇ"
+                    }
                 }
             }
             .launchIn(viewLifecycleOwner.lifecycleScope)
@@ -77,7 +81,10 @@ class PaymentFragment : BaseFragment<FragmentPaymentBinding>(R.layout.fragment_p
             .setCardQuota("0,2,3")
 
         val items = ArrayList<BootItem>().apply {
-            add(BootItem().setName("아이템").setId("ITEM_CODE").setQty(count).setPrice(pricePerItem.toDouble()))
+            add(
+                BootItem().setName("아이템").setId("ITEM_CODE").setQty(count)
+                    .setPrice(pricePerItem.toDouble())
+            )
         }
 
         val payload = Payload().apply {

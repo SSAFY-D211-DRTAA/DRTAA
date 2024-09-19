@@ -23,6 +23,10 @@ data class RentSchedule(
         return format(Locale.ROOT, "%04d.%02d.%02d(%s)", year, month, date, day)
     }
 
+    fun toRequestUnassignedCar(): String {
+        return format(Locale.ROOT, "%04d-%02d-%02d", year, month, date)
+    }
+
     override fun toString(): String {
         return format(
             Locale.ROOT,
