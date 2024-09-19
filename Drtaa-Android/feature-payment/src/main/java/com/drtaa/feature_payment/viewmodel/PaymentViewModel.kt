@@ -1,0 +1,94 @@
+package com.drtaa.feature_payment.viewmodel
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.drtaa.core_data.auth.UserManager
+import com.drtaa.core_data.repository.PaymentRepository
+import com.drtaa.core_model.data.PaymentCompletionInfo
+import com.drtaa.core_model.data.SocialUser
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.launch
+import org.json.JSONObject
+import timber.log.Timber
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import javax.inject.Inject
+
+@HiltViewModel
+class PaymentViewModel @Inject constructor(
+    private val paymentRepository: PaymentRepository,
+    private val userManager: UserManager
+) : ViewModel() {
+
+    private val _paymentStatus = MutableSharedFlow<PaymentStatus>()
+    val paymentStatus: SharedFlow<PaymentStatus> = _paymentStatus
+
+    fun processBootpayPayment(data: String) {
+        viewModelScope.launch {
+            try {
+                val currentUser = userManager.currentUser.firstOrNull()
+                if (currentUser == null) {
+                    _paymentStatus.emit(PaymentStatus.Error("사용자 정보를 찾을 수 없습니다. 다시 로그인해 주세요."))
+                    return@launch
+                }
+
+                val paymentInfo = parseBootpayData(data, currentUser)
+                val paymentRequest = paymentInfo.toPaymentRequest()
+                paymentRepository.savePaymentInfo(paymentRequest).collect { result ->
+                    result.onSuccess {
+                        _paymentStatus.emit(PaymentStatus.Success("결제가 성공적으로 처리되었습니다."))
+                    }.onFailure { error ->
+                        _paymentStatus.emit(PaymentStatus.Error("결제 저장 중 오류가 발생했습니다: ${error.message}"))
+                    }
+                }
+            } catch (e: Exception) {
+                _paymentStatus.emit(PaymentStatus.Error("결제 데이터 파싱 중 오류가 발생했습니다: ${e.message}"))
+            }
+        }
+    }
+
+    private fun parseBootpayData(data: String, currentUser: SocialUser): PaymentCompletionInfo {
+        val jsonObject = JSONObject(data)
+        val dataObject = jsonObject.getJSONObject("data")
+
+        val price = dataObject.getInt("price")
+        val count = price / 50
+        Timber.d("결제 금액: $price, 수량: $count")
+
+        return PaymentCompletionInfo(
+            receiptId = dataObject.getString("receipt_id"),
+            orderId = dataObject.getString("order_id"),
+            price = dataObject.getInt("price"),
+            paymentMethod = dataObject.getString("method_origin"),
+            purchasedAt = Date(),
+            userId = currentUser.id,
+            carId = 1,
+            headCount = count, // 수량을 headCount로 사용
+            rentStartTime = Date(),
+            rentEndTime = Date(System.currentTimeMillis() + 3600000)
+        )
+    }
+
+    fun getUserPayments() {
+        viewModelScope.launch {
+            paymentRepository.getUserPayments().collect { result ->
+                result.onSuccess { payments ->
+                    _paymentStatus.emit(PaymentStatus.PaymentInfoRetrieved(payments.firstOrNull() ?: return@collect))
+                }.onFailure { error ->
+                    _paymentStatus.emit(PaymentStatus.Error("결제 내역 조회 중 오류가 발생했습니다: ${error.message}"))
+                }
+            }
+        }
+    }
+
+    sealed class PaymentStatus {
+        data class Success(val message: String) : PaymentStatus()
+        data class Error(val message: String) : PaymentStatus()
+        data class PaymentInfoRetrieved(val paymentInfo: PaymentCompletionInfo) : PaymentStatus()
+    }
+
+}
