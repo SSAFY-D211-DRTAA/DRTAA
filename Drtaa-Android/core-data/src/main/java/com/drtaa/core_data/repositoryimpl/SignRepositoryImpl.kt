@@ -6,7 +6,7 @@ import com.drtaa.core_data.util.FormDataConverterUtil
 import com.drtaa.core_data.util.ResultWrapper
 import com.drtaa.core_data.util.safeApiCall
 import com.drtaa.core_model.data.Tokens
-import com.drtaa.core_model.data.UserLoginInfo
+import com.drtaa.core_model.sign.UserLoginInfo
 import com.drtaa.core_model.util.toTokens
 import com.drtaa.core_model.network.RequestSignUp
 import kotlinx.coroutines.flow.Flow

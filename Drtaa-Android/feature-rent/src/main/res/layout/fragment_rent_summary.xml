@@ -8,7 +8,7 @@
 
         <variable
             name="rentInfo"
-            type="com.drtaa.core_model.data.RentInfo" />
+            type="com.drtaa.core_model.rent.RentInfo" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

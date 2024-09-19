@@ -4,7 +4,7 @@ import androidx.fragment.app.viewModels
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.drtaa.core_model.data.RentSchedule
+import com.drtaa.core_model.rent.RentSchedule
 import com.drtaa.core_ui.base.BaseBottomSheetDialogFragment
 import com.drtaa.feature_rent.databinding.FragmentCalendarBottomSheetBinding
 import com.drtaa.feature_rent.util.formatToYearMonthDay

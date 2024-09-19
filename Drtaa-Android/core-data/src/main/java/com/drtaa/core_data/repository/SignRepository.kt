@@ -1,7 +1,7 @@
 package com.drtaa.core_data.repository
 
 import com.drtaa.core_model.data.Tokens
-import com.drtaa.core_model.data.UserLoginInfo
+import com.drtaa.core_model.sign.UserLoginInfo
 import com.drtaa.core_model.network.RequestSignUp
 import kotlinx.coroutines.flow.Flow
 import java.io.File

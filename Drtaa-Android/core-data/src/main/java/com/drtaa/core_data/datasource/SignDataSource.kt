@@ -1,6 +1,6 @@
 package com.drtaa.core_data.datasource
 
-import com.drtaa.core_model.data.UserLoginInfo
+import com.drtaa.core_model.sign.UserLoginInfo
 import com.drtaa.core_model.network.ResponseLogin
 import okhttp3.MultipartBody
 import okhttp3.RequestBody

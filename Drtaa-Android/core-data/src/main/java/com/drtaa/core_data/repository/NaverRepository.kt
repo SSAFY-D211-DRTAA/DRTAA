@@ -1,6 +1,6 @@
 package com.drtaa.core_data.repository
 
-import com.drtaa.core_model.data.Search
+import com.drtaa.core_model.map.Search
 import kotlinx.coroutines.flow.Flow
 
 interface NaverRepository {

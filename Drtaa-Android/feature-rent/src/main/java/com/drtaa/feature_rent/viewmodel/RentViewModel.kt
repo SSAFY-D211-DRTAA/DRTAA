@@ -2,9 +2,9 @@ package com.drtaa.feature_rent.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.drtaa.core_model.data.RentInfo
-import com.drtaa.core_model.data.RentSchedule
-import com.drtaa.core_model.data.Search
+import com.drtaa.core_model.rent.RentInfo
+import com.drtaa.core_model.rent.RentSchedule
+import com.drtaa.core_model.map.Search
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
