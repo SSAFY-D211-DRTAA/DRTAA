@@ -24,9 +24,6 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class PaymentFragment : BaseFragment<FragmentPaymentBinding>(R.layout.fragment_payment) {
 
-    @Inject
-    lateinit var signDataSourceImpl: SignDataSourceImpl
-
     private val viewModel: PaymentViewModel by viewModels()
 
     private var count = 1
@@ -53,13 +50,6 @@ class PaymentFragment : BaseFragment<FragmentPaymentBinding>(R.layout.fragment_p
         }
 
         updateCountAndPrice()
-
-        lifecycleScope.launch {
-           val currentUser = signDataSourceImpl.getUserData()
-            Timber.d("최근 유저 확인: $currentUser")
-
-        }
-
         observeViewModel()
     }
 
@@ -145,15 +135,16 @@ class PaymentFragment : BaseFragment<FragmentPaymentBinding>(R.layout.fragment_p
             }).requestPayment()
     }
 
-    private suspend fun getBootUser(): BootUser? {
-        val currentUser = signDataSourceImpl.getUserData()
-        return BootUser().apply {
-            id = currentUser.id
-            username = currentUser.nickname
-            email = "abc@naver.com"
-            phone = ""
-            area = ""
-            gender = 0
+    private fun getBootUser(): BootUser? {
+        return viewModel.currentUser.value?.let { currentUser ->
+            BootUser().apply {
+                id = currentUser.id
+                username = currentUser.nickname
+                email = "abc@naver.com"
+                phone = ""
+                area = ""
+                gender = 0
+            }
         }
     }
 }
