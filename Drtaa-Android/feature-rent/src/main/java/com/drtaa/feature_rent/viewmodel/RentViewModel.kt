@@ -5,11 +5,13 @@ import androidx.lifecycle.viewModelScope
 import com.drtaa.core_model.rent.RentInfo
 import com.drtaa.core_model.rent.RentSchedule
 import com.drtaa.core_model.map.Search
+import com.drtaa.core_model.util.toLocalDateTime
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import java.time.Duration
 import javax.inject.Inject
 
 @HiltViewModel
@@ -25,9 +27,6 @@ class RentViewModel @Inject constructor() : ViewModel() {
 
     private val _rentPeople = MutableStateFlow(1)
     val rentPeople: StateFlow<Int> = _rentPeople
-
-    private val _rentIsHour = MutableStateFlow<Boolean?>(null)
-    val rentIsHour: StateFlow<Boolean?> = _rentIsHour
 
     private val _isRentValid = MutableStateFlow(false)
     val isRentValid: StateFlow<Boolean> = _isRentValid
@@ -80,10 +79,6 @@ class RentViewModel @Inject constructor() : ViewModel() {
         return result
     }
 
-    fun setRentIsHour(isHour: Boolean) {
-        _rentIsHour.value = isHour
-    }
-
     private fun setRentValid() {
         viewModelScope.launch {
             combine(
@@ -101,14 +96,24 @@ class RentViewModel @Inject constructor() : ViewModel() {
 
     fun getRentInfo() {
         viewModelScope.launch {
+            // 총 시간 (분단위 포함)
+            val hours = calculateHours()
+            // 할인전 금액 :
+            val price = (hours * PRICE_PER_HOUR).toInt()
+
+            // 24시간 단위 할인 금액
+            val discount = ((hours / 24) * DISCOUNT_PER_DAY).toInt()
+
+            // 할인된 금액
+            val finalPrice = price - discount
+
             _rentInfo.emit(
                 RentInfo(
                     carInfo = null,
-                    isHour = _rentIsHour.value!!,
-                    fareCount = 8,
-                    price = 120000,
-                    discount = 5000,
-                    totalPrice = 115000,
+                    hours = hours,
+                    price = price,
+                    discount = discount,
+                    finalPrice = finalPrice,
                     people = _rentPeople.value,
                     startLocation = _rentStartLocation.value!!,
                     startSchedule = _rentStartSchedule.value!!,
@@ -118,8 +123,23 @@ class RentViewModel @Inject constructor() : ViewModel() {
         }
     }
 
+    private fun calculateHours(): Double {
+        val startDateTime = _rentStartSchedule.value!!.toLocalDateTime()
+        val endDateTime = _rentEndSchedule.value!!.toLocalDateTime()
+
+        val duration = Duration.between(startDateTime, endDateTime)
+        val hours = duration.toHours()
+        val minutes = duration.toMinutes() % 60 / 60.0
+
+        return hours.toInt() + minutes
+    }
+
     companion object {
         private const val MIN_PEOPLE = 1
         private const val MAX_PEOPLE = 8
+
+        private const val PRICE_PER_HOUR = 20000
+        private const val PRICE_PER_DAY = 200000
+        private const val DISCOUNT_PER_DAY = 40000
     }
 }

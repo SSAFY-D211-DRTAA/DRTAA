@@ -101,38 +101,34 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <TextView
-                        android:id="@+id/tv_summary_fare_type"
+                        android:id="@+id/tv_summary_fare_total"
                         style="@style/ptd_regular"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
-                        android:text='@{rentInfo.isHour? "1시간권" : "종일권"}'
+                        android:text="총 "
                         app:layout_constraintStart_toStartOf="@+id/tv_summary_price_title"
-                        app:layout_constraintTop_toBottomOf="@+id/tv_summary_price_title"
-                        tools:text="1시간권" />
-
-                    <TextView
-                        android:id="@+id/tv_summary_fare_x"
-                        style="@style/ptd_regular"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="5dp"
-                        android:layout_marginTop="10dp"
-                        android:text="x"
-                        app:layout_constraintStart_toEndOf="@+id/tv_summary_fare_type"
                         app:layout_constraintTop_toBottomOf="@+id/tv_summary_price_title" />
 
                     <TextView
-                        android:id="@+id/tv_summary_fare_count"
+                        android:id="@+id/tv_summary_fare_time"
                         style="@style/ptd_regular"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="5dp"
                         android:layout_marginTop="10dp"
-                        android:text='@{rentInfo.fareCount + " "}'
-                        app:layout_constraintStart_toEndOf="@+id/tv_summary_fare_x"
+                        android:text='@{rentInfo.hours + ""}'
+                        app:layout_constraintStart_toEndOf="@+id/tv_summary_fare_total"
                         app:layout_constraintTop_toBottomOf="@+id/tv_summary_price_title"
-                        tools:text="8" />
+                        tools:text="1" />
+
+                    <TextView
+                        style="@style/ptd_regular"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="시간"
+                        app:layout_constraintStart_toEndOf="@+id/tv_summary_fare_time"
+                        app:layout_constraintTop_toBottomOf="@+id/tv_summary_price_title" />
 
                     <TextView
                         android:id="@+id/tv_summary_price"
@@ -140,9 +136,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text='@{rentInfo.price + "원"}'
-                        app:layout_constraintBottom_toBottomOf="@+id/tv_summary_fare_type"
+                        app:layout_constraintBottom_toBottomOf="@+id/tv_summary_fare_total"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="@+id/tv_summary_fare_type"
+                        app:layout_constraintTop_toTopOf="@+id/tv_summary_fare_total"
                         tools:text="120,000원" />
 
                     <TextView
@@ -153,7 +149,7 @@
                         android:layout_marginTop="5dp"
                         android:text="할인 금액"
                         app:layout_constraintStart_toStartOf="@+id/tv_summary_price_title"
-                        app:layout_constraintTop_toBottomOf="@+id/tv_summary_fare_type" />
+                        app:layout_constraintTop_toBottomOf="@+id/tv_summary_fare_total" />
 
                     <TextView
                         android:id="@+id/tv_summary_discount_price"
@@ -189,7 +185,7 @@
                         style="@style/ptd_regular"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text='@{rentInfo.totalPrice + "원"}'
+                        android:text='@{rentInfo.finalPrice + "원"}'
                         app:layout_constraintBottom_toBottomOf="@+id/tv_summary_total"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="@+id/tv_summary_total"
