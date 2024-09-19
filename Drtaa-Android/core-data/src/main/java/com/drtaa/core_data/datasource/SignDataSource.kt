@@ -1,5 +1,6 @@
 package com.drtaa.core_data.datasource
 
+import com.drtaa.core_model.data.SocialUser
 import com.drtaa.core_model.data.UserLoginInfo
 import com.drtaa.core_model.network.ResponseLogin
 import okhttp3.MultipartBody
@@ -9,4 +10,7 @@ interface SignDataSource {
     suspend fun getTokens(userLoginInfo: UserLoginInfo): ResponseLogin
     suspend fun signUp(requestSignUp: RequestBody, image: MultipartBody.Part?): String
     suspend fun checkDuplicatedId(userProviderId: String): Boolean
+    suspend fun getUserData(): SocialUser
+    suspend fun setUserData(user: SocialUser)
+    suspend fun clearUserData()
 }

@@ -6,8 +6,7 @@ import android.graphics.drawable.GradientDrawable
 import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
-import androidx.lifecycle.lifecycleScope
-import com.drtaa.core_mqtt.MqttManager
+import androidx.fragment.app.viewModels
 import com.drtaa.core_ui.base.BaseFragment
 import com.drtaa.feature_car.databinding.FragmentCarBinding
 import com.drtaa.feature_car.viewmodel.CarViewModel
