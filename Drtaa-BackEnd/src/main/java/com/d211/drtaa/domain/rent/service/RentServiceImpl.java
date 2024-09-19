@@ -1,6 +1,6 @@
 package com.d211.drtaa.domain.rent.service;
 
-import com.d211.drtaa.domain.rent.dto.request.RentCompletedRequestDTO;
+import com.d211.drtaa.domain.rent.dto.request.RentStatusRequestDTO;
 import com.d211.drtaa.domain.rent.dto.request.RentCreateRequestDTO;
 import com.d211.drtaa.domain.rent.dto.request.RentEditRequestDTO;
 import com.d211.drtaa.domain.rent.dto.request.RentTimeRequestDTO;
@@ -21,7 +21,6 @@ import com.d211.drtaa.domain.travel.repository.TravelDatesRepository;
 import com.d211.drtaa.domain.travel.repository.TravelRepository;
 import com.d211.drtaa.domain.user.entity.User;
 import com.d211.drtaa.domain.user.repository.UserRepository;
-import com.d211.drtaa.global.exception.rent.NoAvailableRentCarException;
 import com.d211.drtaa.global.exception.rent.RentCarNotFoundException;
 import com.d211.drtaa.global.exception.rent.RentCarScheduleNotFoundException;
 import com.d211.drtaa.global.exception.rent.RentNotFoundException;
@@ -206,7 +205,6 @@ public class RentServiceImpl implements RentService{
         return response;
     }
 
-
     @Override
     @Transactional
     public void updateRent(RentEditRequestDTO rentEditRequestDTO) {
@@ -239,7 +237,7 @@ public class RentServiceImpl implements RentService{
 
     @Override
     @Transactional
-    public void rentStatusCompleted(RentCompletedRequestDTO requestDTO) {
+    public void rentStatusCompleted(RentStatusRequestDTO requestDTO) {
         // 렌트 찾기
         Rent rent = rentRepository.findByRentId(requestDTO.getRentId())
                 .orElseThrow(() -> new RentNotFoundException("해당 rentId의 맞는 렌트를 찾을 수 없습니다."));
@@ -261,28 +259,31 @@ public class RentServiceImpl implements RentService{
 
         // 변경 상태 저장
         rentRepository.save(rent);
-        rentCarRepository.save(car);
         rentCarScheduleRepository.save(carSchedule);
     }
 
     @Override
     @Transactional
-    public void rentStatusCanceld(long rentId) {
+    public void rentStatusCanceld(RentStatusRequestDTO requestDTO) {
         // 렌트 찾기
-        Rent rent = rentRepository.findByRentId(rentId)
+        Rent rent = rentRepository.findByRentId(requestDTO.getRentId())
                 .orElseThrow(() -> new RentNotFoundException("해당 rentId의 맞는 렌트를 찾을 수 없습니다."));
 
         // 렌트 차량 탐색
         RentCar car = rentCarRepository.findByRentCarId(rent.getRentCar().getRentCarId())
                 .orElseThrow(() -> new RentCarNotFoundException("해당 rentCarId의 맞는 차량을 찾을 수 없습니다."));
 
+        // 렌트 차량 일정 탐색
+        RentCarSchedule carSchedule = rentCarScheduleRepository.findByRentCarScheduleId(requestDTO.getRentCarScheduleId())
+                .orElseThrow(() -> new RentCarScheduleNotFoundException("해당 렌트에 맞는 차량 일정을 찾을 수 없습니다."));
+
         // 상태 변경
         rent.setRentStatus(RentStatus.canceled); // 취소
-//        car.setRentCarIsDispatch(false); // 미배차
+        carSchedule.setRentCarScheduleIsDone(true); // 완료
 
         // 변경 상태 저장
         rentRepository.save(rent);
-        rentCarRepository.save(car);
+        rentCarScheduleRepository.save(carSchedule);
     }
 
     @Override

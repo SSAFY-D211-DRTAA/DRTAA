@@ -1,6 +1,6 @@
 package com.d211.drtaa.domain.rent.controller;
 
-import com.d211.drtaa.domain.rent.dto.request.RentCompletedRequestDTO;
+import com.d211.drtaa.domain.rent.dto.request.RentStatusRequestDTO;
 import com.d211.drtaa.domain.rent.dto.request.RentCreateRequestDTO;
 import com.d211.drtaa.domain.rent.dto.request.RentEditRequestDTO;
 import com.d211.drtaa.domain.rent.dto.request.RentTimeRequestDTO;
@@ -113,7 +113,7 @@ public class RentController {
 
     @PatchMapping("/status/completed")
     @Operation(summary = "렌트 상태 변경(반납)", description = "렌트 취소")
-    public ResponseEntity rentStatusCompleted(@RequestBody RentCompletedRequestDTO requestDTO) {
+    public ResponseEntity rentStatusCompleted(@RequestBody RentStatusRequestDTO requestDTO) {
         try {
             rentService.rentStatusCompleted(requestDTO);
 
@@ -127,11 +127,11 @@ public class RentController {
         }
     }
 
-    @PatchMapping("/status/{rentId}/canceled")
+    @PatchMapping("/status/canceled")
     @Operation(summary = "렌트 상태 변경(취소)", description = "렌트 취소")
-    public ResponseEntity rentStatusCanceld(@PathVariable("rentId") Long rentId) {
+    public ResponseEntity rentStatusCanceld(@RequestBody RentStatusRequestDTO requestDTO) {
         try {
-            rentService.rentStatusCanceld(rentId);
+            rentService.rentStatusCanceld(requestDTO);
 
             return ResponseEntity.ok("Success");
         } catch(RentNotFoundException | RentCarNotFoundException e) {
