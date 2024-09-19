@@ -10,12 +10,13 @@ import androidx.lifecycle.lifecycleScope
 import com.drtaa.core_mqtt.MqttManager
 import com.drtaa.core_ui.base.BaseFragment
 import com.drtaa.feature_car.databinding.FragmentCarBinding
+import com.drtaa.feature_car.viewmodel.CarViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
+
+    private val viewModel: CarViewModel by viewModels()
     private lateinit var cardView: View
     private lateinit var overlayView: View
     private lateinit var reflectionView: View
@@ -24,9 +25,6 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
     private var isNeko: Boolean = true
     private var touchStartTime: Long = 0
 
-    @Inject
-    lateinit var mqttManager: MqttManager
-
     override fun initView() {
         binding.apply {
             cardView = cvTourCard
@@ -34,11 +32,8 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
             reflectionView = viewTourReflection
             cardImage = ivTourCard
 
-            viewLifecycleOwner.lifecycleScope.launch {
-                mqttManager.setupMqttClient()
-            }
             btnMqtt.setOnClickListener {
-                mqttManager.publishMessage("GPS")
+                viewModel.publish()
             }
         }
         setupCardTouchListener()
