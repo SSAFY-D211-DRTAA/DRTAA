@@ -1,6 +1,9 @@
 package com.drtaa.core_mqtt
 
+import com.drtaa.core_model.map.ResponseGPS
+import com.google.gson.Gson
 import com.hivemq.client.mqtt.MqttClient
+import com.hivemq.client.mqtt.datatypes.MqttQos
 import com.hivemq.client.mqtt.mqtt5.Mqtt5AsyncClient
 import com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5Publish
 import kotlinx.coroutines.CoroutineScope
@@ -19,8 +22,9 @@ private const val TAG = "MQTT"
 @Singleton
 class MqttManager @Inject constructor() {
     private lateinit var client: Mqtt5AsyncClient
-    private val _receivedMessages = MutableSharedFlow<String>()
-    val receivedMessages: SharedFlow<String> = _receivedMessages.asSharedFlow()
+    private val gson = Gson()
+    private val _receivedMessages = MutableSharedFlow<ResponseGPS>()
+    val receivedMessages: SharedFlow<ResponseGPS> = _receivedMessages.asSharedFlow()
 
     suspend fun setupMqttClient() {
         client = MqttClient.builder()
@@ -41,7 +45,7 @@ class MqttManager @Inject constructor() {
                 }
             }
         } catch (e: Exception) {
-            Timber.tag(TAG).e("MQTT 연결실패", e)
+            Timber.tag(TAG).e(e, "MQTT 연결실패")
         }
     }
 
@@ -51,9 +55,10 @@ class MqttManager @Inject constructor() {
             .callback { publish: Mqtt5Publish ->
                 val message = String(publish.payloadAsBytes)
                 CoroutineScope(Dispatchers.IO).launch {
-                    _receivedMessages.emit(message)
+                    val parsedMessage = gson.fromJson(message, ResponseGPS::class.java)
+                    _receivedMessages.emit(parsedMessage)
+                    Timber.tag(TAG).d("MQTT 응답: $parsedMessage")
                 }
-                Timber.tag(TAG).d("MQTT 응답: $message")
             }
             .send()
             .whenComplete { connAck, throwable ->
@@ -68,6 +73,7 @@ class MqttManager @Inject constructor() {
     fun publishMessage(message: String) {
         client.publishWith()
             .topic(GPS_SUB)
+            .qos(MqttQos.EXACTLY_ONCE)
             .payload(message.toByteArray())
             .send()
             .whenComplete { connAck, throwable ->

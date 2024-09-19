@@ -6,7 +6,7 @@ import android.graphics.drawable.GradientDrawable
 import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
-import androidx.fragment.app.viewModels
+import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import com.drtaa.core_ui.base.BaseFragment
 import com.drtaa.feature_car.databinding.FragmentCarBinding
 import com.drtaa.feature_car.viewmodel.CarViewModel
@@ -15,7 +15,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
 
-    private val viewModel: CarViewModel by viewModels()
+    private val viewModel: CarViewModel by hiltNavGraphViewModels<CarViewModel>(R.id.nav_graph_car)
     private lateinit var cardView: View
     private lateinit var overlayView: View
     private lateinit var reflectionView: View
@@ -32,7 +32,11 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
             cardImage = ivTourCard
 
             btnMqtt.setOnClickListener {
-                viewModel.publish()
+                viewModel.startPublish()
+            }
+
+            btnTrackingCar.setOnClickListener {
+                navigateDestination(R.id.action_carFragment_to_carTrackingFragment)
             }
         }
         setupCardTouchListener()
