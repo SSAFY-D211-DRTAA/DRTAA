@@ -115,7 +115,9 @@ public class RentHistoryServiceImpl implements RentHistoryService{
                 .rentCarManufacturer(history.getRent().getRentCar().getRentCarManufacturer())
                 .rentCarModel(history.getRent().getRentCar().getRentCarModel())
                 //travel
-
+                .travelName(history.getRent().getTravel().getTravelName())
+                .travelStartDate(history.getRent().getTravel().getTravelStartDate())
+                .travelEndDate(history.getRent().getTravel().getTravelEndDate())
                 .build();
 
         return response;
