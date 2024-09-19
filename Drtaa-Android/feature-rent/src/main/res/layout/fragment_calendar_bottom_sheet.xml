@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_calendar_bottom_sheet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rect_white_top_rad30"
+        android:paddingHorizontal="20dp"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            android:id="@+id/tv_rent_date"
+            style="@style/ptd_medium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="20dp"
+            android:text="대여/반납 일시"
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.prolificinteractive.materialcalendarview.MaterialCalendarView
+            android:id="@+id/cv_rent_calendar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            app:layout_constraintBottom_toTopOf="@+id/cl_rent_summary"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_rent_date"
+            app:mcv_dateTextAppearance="@style/CalenderViewDateCustomText"
+            app:mcv_firstDayOfWeek="sunday"
+            app:mcv_selectionMode="range"
+            app:mcv_showOtherDates="all"
+            app:mcv_weekDayTextAppearance="@style/CalenderViewWeekCustomText" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_rent_summary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:paddingHorizontal="10dp"
+            app:layout_constraintBottom_toTopOf="@+id/btn_calendar_select">
+
+            <LinearLayout
+                android:id="@+id/ll_rent_summary_start"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
+                android:background="@drawable/rect_stroke_graya3a3_rad20"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:paddingVertical="10dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/ll_rent_summary_end"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    style="@style/ptd_regular"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="대여일시" />
+
+                <TextView
+                    android:id="@+id/tv_rent_summary_start_date"
+                    style="@style/ptd_regular"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:hint="일정을 선택해주세요."
+                    android:textAlignment="center"
+                    tools:text="2024.08.17 (목)" />
+
+                <TextView
+                    android:id="@+id/tv_rent_summary_start_time"
+                    style="@style/ptd_regular"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:background="@drawable/rect_stroke_graya3a3_rad20"
+                    android:hint="09:00"
+                    android:paddingHorizontal="20dp"
+                    android:paddingVertical="5dp"
+                    tools:text="09:00" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_rent_summary_end"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:background="@drawable/rect_stroke_graya3a3_rad20"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:paddingVertical="10dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/ll_rent_summary_start"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    style="@style/ptd_regular"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="반납일시" />
+
+                <TextView
+                    android:id="@+id/tv_rent_summary_end_date"
+                    style="@style/ptd_regular"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:hint="일정을 선택해주세요."
+                    android:textAlignment="center"
+                    tools:text="2024.08.17 (목)" />
+
+                <TextView
+                    android:id="@+id/tv_rent_summary_end_time"
+                    style="@style/ptd_regular"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:background="@drawable/rect_stroke_graya3a3_rad20"
+                    android:hint="09:00"
+                    android:paddingHorizontal="20dp"
+                    android:paddingVertical="5dp"
+                    tools:text="09:00" />
+
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_calendar_select"
+            style="@style/btn_long_black"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:text="선택"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

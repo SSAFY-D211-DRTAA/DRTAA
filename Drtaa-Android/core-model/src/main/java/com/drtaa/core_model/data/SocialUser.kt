@@ -8,4 +8,8 @@ data class SocialUser(
     val profileImageUrl: String? = null,
     val accessToken: String? = null,
     val refreshToken: String? = null,
-) : UserLoginInfo
+) : UserLoginInfo {
+    fun isVaild(): Boolean {
+        return userLogin.isNotEmpty() && id.isNotEmpty() && nickname.isNotEmpty()
+    }
+}
