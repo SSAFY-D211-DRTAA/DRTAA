@@ -5,7 +5,7 @@ import androidx.paging.PagingState
 import com.drtaa.core_data.datasource.TourDataSource
 import com.drtaa.core_data.util.ResultWrapper
 import com.drtaa.core_data.util.safeApiCall
-import com.drtaa.core_model.data.TourItem
+import com.drtaa.core_model.tour.TourItem
 import com.drtaa.core_model.network.ResponseTour
 import com.drtaa.core_model.util.toEntity
 import timber.log.Timber
