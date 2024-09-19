@@ -1,9 +1,9 @@
 package com.drtaa.core_data.repository
 
-import com.drtaa.core_model.data.SocialUser
 import com.drtaa.core_model.data.Tokens
 import com.drtaa.core_model.sign.UserLoginInfo
 import com.drtaa.core_model.network.RequestSignUp
+import com.drtaa.core_model.sign.SocialUser
 import kotlinx.coroutines.flow.Flow
 import java.io.File
 

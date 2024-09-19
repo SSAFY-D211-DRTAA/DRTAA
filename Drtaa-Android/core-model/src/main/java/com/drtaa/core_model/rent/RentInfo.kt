@@ -1,18 +1,16 @@
 package com.drtaa.core_model.rent
 
+import com.drtaa.core_model.map.Search
+
 data class RentInfo(
-    val isAvailable: Boolean,
-    val carName: String,
-    val carImg: String,
-    val fareType: String,
+    val carInfo: RentCar?,
+    val isHour: Boolean,
     val fareCount: Int,
-    val price: String,
-    val discount: String,
-    val totalPrice: String,
-    val startLocation: String,
-    val startDate: String,
-    val endDate: String,
-    val startTime: String,
-    val endTime: String,
+    val price: Int,
+    val discount: Int,
+    val totalPrice: Int = price - discount,
+    val startLocation: Search,
+    val startSchedule: RentSchedule,
+    val endSchedule: RentSchedule,
     val people: Int
 )
