@@ -4,8 +4,11 @@ import com.d211.drtaa.domain.rent.dto.request.RentCarDispatchStatusRequestDTO;
 import com.d211.drtaa.domain.rent.dto.request.RentCarDriveStatusRequestDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentCarDispatchStatusResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentCarDriveStatusResponseDTO;
+import com.d211.drtaa.domain.rent.dto.response.RentCarResponseDTO;
 import com.d211.drtaa.domain.rent.entity.car.RentCar;
+import com.d211.drtaa.domain.rent.entity.car.RentDrivingStatus;
 import com.d211.drtaa.domain.rent.service.car.RentCarService;
+import com.d211.drtaa.global.exception.rent.NoAvailableRentCarException;
 import com.d211.drtaa.global.exception.rent.RentCarNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -73,7 +76,27 @@ public class RentCarController {
     @Operation(summary = "미배차 차량 조회", description = "미배차 상태인 렌트 차량 조회")
     public ResponseEntity getUnassignedDispatchStatus() {
         try {
-            List<RentCar> response = rentCarService.getUnassignedDispatchStatus();
+            RentCar car = rentCarService.getUnassignedDispatchStatus();
+
+            RentCarResponseDTO response =  RentCarResponseDTO.builder()
+                    .isAvailable(true)
+                    .rentCar(car)
+                    .build();
+
+            return ResponseEntity.ok(response); // 200
+        } catch (NoAvailableRentCarException e) {
+            RentCarResponseDTO response =  RentCarResponseDTO.builder()
+                    .isAvailable(false)
+                    // 빈 객체로 응답
+                    .rentCar(RentCar.builder()
+                            .rentCarId(0)
+                            .rentCarNumber("")
+                            .rentCarManufacturer("")
+                            .rentCarModel("")
+                            .rentCarIsDispatch(true)
+                            .rentCarDrivingStatus(RentDrivingStatus.parked)
+                            .build())
+                    .build();
 
             return ResponseEntity.ok(response); // 200
         } catch (Exception e) {
@@ -88,6 +111,8 @@ public class RentCarController {
             List<RentCar> response = rentCarService.getAssignedDispatchStatus();
 
             return ResponseEntity.ok(response); // 200
+        } catch (NoAvailableRentCarException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage()); // 400
         }

@@ -16,7 +16,7 @@ public interface RentCarService {
     RentCarDispatchStatusResponseDTO getDispatchStatus(Long rentCarId);
 
     // 미배차 상태 렌트 차량 조회
-    List<RentCar> getUnassignedDispatchStatus();
+    RentCar getUnassignedDispatchStatus();
 
     // 배차 상태 렌트 차량 조회
     List<RentCar> getAssignedDispatchStatus();

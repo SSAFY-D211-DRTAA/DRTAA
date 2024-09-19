@@ -6,6 +6,7 @@ import com.d211.drtaa.domain.rent.dto.response.RentCarDispatchStatusResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentCarDriveStatusResponseDTO;
 import com.d211.drtaa.domain.rent.entity.car.RentCar;
 import com.d211.drtaa.domain.rent.repository.car.RentCarRepository;
+import com.d211.drtaa.global.exception.rent.NoAvailableRentCarException;
 import com.d211.drtaa.global.exception.rent.RentCarNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -45,19 +46,20 @@ public class RentCarServiceImpl implements RentCarService {
     }
 
     @Override
-    public List<RentCar> getUnassignedDispatchStatus() {
+    public RentCar getUnassignedDispatchStatus() {
         // 미배차 상태 렌트 차량 검색
-        List<RentCar> rentCarsList = rentCarRepository.findByRentCarIsDispatchFalse();
+        RentCar rentCar = rentCarRepository.findFirstByRentCarIsDispatchFalse()
+                .orElseThrow(() -> new NoAvailableRentCarException("현재 배차 가능한 차량이 없습니다."));
 
-        return rentCarsList;
+        return rentCar;
     }
 
     @Override
     public List<RentCar> getAssignedDispatchStatus() {
         // 배차 상태 렌트 차량 검색
-        List<RentCar> rentCarsList = rentCarRepository.findByRentCarIsDispatchTrue();
+        List<RentCar> rentCar = rentCarRepository.findByRentCarIsDispatchTrue();
 
-        return rentCarsList;
+        return rentCar;
     }
 
     @Override

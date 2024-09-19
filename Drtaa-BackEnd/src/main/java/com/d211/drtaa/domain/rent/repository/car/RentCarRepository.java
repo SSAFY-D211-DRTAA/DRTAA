@@ -9,7 +9,7 @@ import java.util.Optional;
 public interface RentCarRepository extends JpaRepository<RentCar, Long> {
     // find
     Optional<RentCar> findByRentCarId(Long rentCarId);
-    List<RentCar> findByRentCarIsDispatchFalse();
-    List<RentCar> findByRentCarIsDispatchTrue();
     Optional<RentCar> findFirstByRentCarIsDispatch(boolean rentCarIsDispatch);
+    Optional<RentCar> findFirstByRentCarIsDispatchFalse();
+    List<RentCar> findByRentCarIsDispatchTrue();
 }
