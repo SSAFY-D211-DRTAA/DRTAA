@@ -5,14 +5,12 @@ import androidx.lifecycle.viewModelScope
 import com.drtaa.core_data.repository.PaymentRepository
 import com.drtaa.core_data.repository.SignRepository
 import com.drtaa.core_model.data.PaymentCompletionInfo
-import com.drtaa.core_model.data.SocialUser
+import com.drtaa.core_model.sign.SocialUser
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import timber.log.Timber

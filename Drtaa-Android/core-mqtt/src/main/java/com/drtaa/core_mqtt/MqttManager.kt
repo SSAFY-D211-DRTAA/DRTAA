@@ -1,6 +1,6 @@
 package com.drtaa.core_mqtt
 
-import com.drtaa.core_model.ResponseGPS
+import com.drtaa.core_model.map.ResponseGPS
 import com.google.gson.Gson
 import com.hivemq.client.mqtt.MqttClient
 import com.hivemq.client.mqtt.datatypes.MqttQos

@@ -1,4 +1,4 @@
-package com.drtaa.core_model
+package com.drtaa.core_model.map
 
 data class ResponseGPS(
     val header: Header,

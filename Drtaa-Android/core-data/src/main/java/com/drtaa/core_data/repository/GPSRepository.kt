@@ -1,6 +1,6 @@
 package com.drtaa.core_data.repository
 
-import com.drtaa.core_model.ResponseGPS
+import com.drtaa.core_model.map.ResponseGPS
 import kotlinx.coroutines.flow.Flow
 
 interface GPSRepository {
