@@ -1,0 +1,55 @@
+# Step 1: ROS Noetic을 포함한 기본 이미지 설정
+FROM ros:noetic-ros-core-focal
+
+# Step 2: 필수 패키지 및 빌드 도구 설치
+RUN apt-get update && apt-get install -y \
+    # ROS 패키지 (GUI 도구 제외)
+    ros-noetic-image-transport \
+    ros-noetic-compressed-image-transport \
+    ros-noetic-rosserial \
+    \
+    # 개발 도구 및 빌드 필수 패키지
+    build-essential \
+    cmake \
+    python3-catkin-tools \
+    git \
+    \
+    # Python 및 기타 유틸리티
+    python3-opencv \
+    python3-pip \
+    python3-venv \
+    \
+    # 디버깅 및 성능 분석 도구
+    gdb \
+    valgrind \
+    htop \
+    \
+    # 코드 품질 및 형상 관리 도구
+    clang-format \
+    cppcheck \
+    git-lfs \
+    \
+    # 트리 구조 보기 도구
+    tree \
+    \
+    # 클린업
+    && rm -rf /var/lib/apt/lists/*
+
+# Step 3: 작업 디렉토리 설정
+WORKDIR /root/catkin_ws
+
+# Step 4: catkin workspace 디렉토리 생성
+RUN mkdir -p /root/catkin_ws/src
+
+# Step 5: 소스 파일 복사
+COPY ./catkin_ws/src /root/catkin_ws/src
+
+# Step 6: 기본 환경 설정
+RUN echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
+RUN echo "source /root/catkin_ws/devel/setup.bash" >> ~/.bashrc
+
+# Step 7: 기본 catkin workspace 빌드
+RUN /bin/bash -c "source /opt/ros/noetic/setup.bash && cd /root/catkin_ws && catkin_make"
+
+# 기본 개발 환경 이미지를 위한 CMD 설정 (bash 쉘 실행)
+CMD ["bash"]

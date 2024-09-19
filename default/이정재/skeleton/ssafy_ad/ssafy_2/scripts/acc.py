@@ -56,6 +56,12 @@ class pure_pursuit :
         self.ctrl_cmd_pub = 
 
         '''
+        rospy.Subscriber("/global_path", Path, self.global_path_callback)
+        rospy.Subscriber("local_path", Path, self.path_callback)
+        rospy.Subscriber("odom", Odometry, self.odom_callback)
+        rospy.Subscriber("/Ego_topic", EgoVehicleStatus, self.status_callback)
+        rospy.Subscriber("/Object_topic", ObjectStatusList, self.object_info_callback)
+        self.ctrl_cmd_pub = rospy.Publisher('/ctrl_cmd', CtrlCmd, queue_size=1)
 
         self.ctrl_cmd_msg = CtrlCmd()
         self.ctrl_cmd_msg.longlCmdType = 1
@@ -70,7 +76,7 @@ class pure_pursuit :
         self.forward_point = Point()
         self.current_postion = Point()
 
-        self.vehicle_length = 2.6
+        self.vehicle_length = 3.01
         self.lfd = 8
         self.min_lfd=5
         self.max_lfd=30
@@ -90,7 +96,7 @@ class pure_pursuit :
 
         rate = rospy.Rate(30) # 30hz
         while not rospy.is_shutdown():
-
+            # print(f'debug flag path: {self.is_path}, odom: {self.is_odom}, status: {self.is_status}')
             if self.is_path == True and self.is_odom == True and self.is_status == True:
 
                 # global_obj,local_obj
@@ -106,7 +112,7 @@ class pure_pursuit :
                 self.current_waypoint = self.get_current_waypoint([self.current_postion.x,self.current_postion.y],self.global_path)
                 self.target_velocity = self.velocity_list[self.current_waypoint]*3.6
 
-                steering = self.calc_pure_pursuit()
+                steering = self.calc_pure_pursuit(self.target_velocity)
                 if self.is_look_forward_point :
                     self.ctrl_cmd_msg.steering = steering
                 else : 
@@ -134,6 +140,8 @@ class pure_pursuit :
                 self.ctrl_cmd_pub.
                 
                 '''
+                self.ctrl_cmd_pub.publish(self.ctrl_cmd_msg)
+                # print(f'debug publish: {self.ctrl_cmd_msg}')
 
             rate.sleep()
 
@@ -230,7 +238,7 @@ class pure_pursuit :
                 
         return global_npc_info, local_npc_info, global_ped_info, local_ped_info, global_obs_info, local_obs_info
 
-    def calc_pure_pursuit(self,):
+    def calc_pure_pursuit(self, vel):
 
         #TODO: (2) 속도 비례 Look Ahead Distance 값 설정
         '''
@@ -245,6 +253,10 @@ class pure_pursuit :
         rospy.loginfo(self.lfd)
 
         '''
+        self.lfd = self.lfd_gain * vel
+        
+        self.lfd = min(max(self.lfd, self.min_lfd), self.max_lfd)
+        rospy.loginfo(self.lfd)
         
         vehicle_position=self.current_postion
         self.is_look_forward_point= False
@@ -281,6 +293,25 @@ class pure_pursuit :
                     break
 
         '''
+        trans_matrix = np.array([[cos(self.vehicle_yaw)  ,-sin(self.vehicle_yaw) ,translation[0]],
+                                 [sin(self.vehicle_yaw)  ,cos(self.vehicle_yaw)  ,translation[1]],
+                                 [0                      ,0                      ,1             ]])
+
+        det_trans_matrix = np.linalg.inv(trans_matrix)
+
+        for num, i in enumerate(self.path.poses) :
+            path_point = i.pose.position
+
+            global_path_point = [path_point.x, path_point.y, 1]
+            local_path_point = det_trans_matrix.dot(global_path_point)    
+
+            if local_path_point[0] > 0:
+                dis = sqrt(local_path_point[0]**2 + local_path_point[1]**2)
+                if dis >= self.lfd :
+                    self.forward_point = local_path_point
+                    self.is_look_forward_point = True
+                    break
+
         #TODO: (4) Steering 각도 계산
         '''
         # 제어 입력을 위한 Steering 각도를 계산 합니다.
@@ -290,6 +321,8 @@ class pure_pursuit :
         steering = 
 
         '''
+        theta = atan2(local_path_point[1], local_path_point[0])
+        steering = atan2(2 * self.vehicle_length * sin(theta), self.lfd)
 
         return steering
 
@@ -319,6 +352,12 @@ class pidControl:
         self.prev_error = 
 
         '''
+        p_control = self.p_gain * error
+        self.i_control += self.i_gain * error * self.controlTime
+        d_control = self.d_gain * (error - self.prev_error) / self.controlTime
+
+        output = p_control + self.i_control + d_control
+        self.prev_error = error
 
         return output
 
@@ -352,6 +391,13 @@ class velocityPlanning:
             r = 
 
             '''
+            A = np.array(x_list)
+            B = np.array(y_list)
+            # print(f'debug A: {A}')
+            a, b, c = np.linalg.lstsq(A, B, rcond=None)[0]
+            # print(f'debug a: {a}, b: {b}, c: {c}')
+            r = np.sqrt(a**2 + b**2 - c)
+            # print(f'debug r: {r}')
 
             #TODO: (7) 곡률 기반 속도 계획
             '''
@@ -361,6 +407,8 @@ class velocityPlanning:
             v_max = 
 
             '''
+            v_max = sqrt(r * 9.81 * self.road_friction)
+
             if v_max > self.car_max_speed:
                 v_max = self.car_max_speed
             out_vel_plan.append(v_max)
@@ -417,6 +465,19 @@ class AdaptiveCruiseControl:
                                 self.Person=[True,i]
 
         '''
+        min_rel_distance=float('inf')
+        if len(global_ped_info) > 0 :        
+            for i in range(len(global_ped_info)):
+                for path in ref_path.poses :      
+                    # print(f'debug path: {path}')
+                    if global_ped_info[i][0] == 0 : # type=0 [pedestrian]
+                        # print(f'debug ped_info: {global_ped_info[i]}')
+                        dis = sqrt((path.pose.position.x - global_ped_info[i][1])**2 + (path.pose.position.y - global_ped_info[i][2])**2)
+                        if dis < 2.35:                            
+                            rel_distance = dis
+                            if rel_distance < min_rel_distance:
+                                min_rel_distance = rel_distance
+                                self.Person=[True,i]
 
         '''
         # 주행 경로 상 NPC 차량 유무 파악
@@ -432,6 +493,16 @@ class AdaptiveCruiseControl:
                                 self.npc_vehicle=[True,i]
         
         '''
+        if len(global_npc_info) > 0 :            
+            for i in range(len(global_npc_info)):
+                for path in ref_path.poses :      
+                    if global_npc_info[i][0] == 1 : # type=1 [npc_vehicle] 
+                        dis = sqrt((path.pose.position.x - global_npc_info[i][1])**2 + (path.pose.position.y - global_npc_info[i][2])**2)
+                        if dis < 2.35:
+                            rel_distance = dis
+                            if rel_distance < min_rel_distance:
+                                min_rel_distance = rel_distance
+                                self.npc_vehicle=[True,i]
 
         '''
         # 주행 경로 상 Obstacle 유무 파악
@@ -451,6 +522,16 @@ class AdaptiveCruiseControl:
                                 # self.object=[True,i] 
         
         '''
+        if len(global_obs_info) > 0 :            
+            for i in range(len(global_obs_info)):
+                for path in ref_path.poses :      
+                    if global_obs_info[i][0] == 2 : # type=1 [obstacle] 
+                        dis = sqrt((path.pose.position.x - global_obs_info[i][1])**2 + (path.pose.position.y - global_obs_info[i][2])**2)
+                        if dis < 2.35:
+                            rel_distance= dis
+                            if rel_distance < min_rel_distance:
+                                min_rel_distance = rel_distance
+                                self.object=[True,i] 
 
     def get_target_velocity(self, local_npc_info, local_ped_info, local_obs_info, ego_vel, target_vel): 
         #TODO: (9) 장애물과의 속도와 거리 차이를 이용하여 ACC 를 진행 목표 속도를 설정

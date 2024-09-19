@@ -1,5 +1,7 @@
 package com.drtaa.core_network.di
 
+import com.drtaa.core_network.api.MapAPI
+import com.drtaa.core_network.api.SignAPI
 import com.drtaa.core_network.api.TestAPI
 import dagger.Module
 import dagger.Provides
@@ -11,6 +13,8 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object APIModule {
+    const val MAP_SEARCH_URL = "https://openapi.naver.com/v1/search/"
+
     @Singleton
     @Provides
     fun provideTestAPI(
@@ -18,4 +22,19 @@ object APIModule {
         retrofit: Retrofit
     ): TestAPI = retrofit.create(TestAPI::class.java)
 
+    @Singleton
+    @Provides
+    fun provideSignAPI(
+        @DefaultRetrofit
+        retrofit: Retrofit
+    ): SignAPI = retrofit.create(SignAPI::class.java)
+
+    @Singleton
+    @Provides
+    fun provideMapAPI(
+        retrofitFactory: RetrofitFactory
+    ): MapAPI {
+        return retrofitFactory.create(MAP_SEARCH_URL)
+            .create(MapAPI::class.java)
+    }
 }

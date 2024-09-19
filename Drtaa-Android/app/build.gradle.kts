@@ -1,9 +1,14 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    id("drtaa.plugin.common")
+    id("drtaa.plugin.hilt")
+}
 
-    alias(libs.plugins.hilt.gradle.plugin)
-    alias(libs.plugins.kotlin.kapt)
+fun getApiKey(propertyKey: String): String {
+    return gradleLocalProperties(rootDir, providers).getProperty(propertyKey)
 }
 
 android {
@@ -17,7 +22,14 @@ android {
         versionCode = 1
         versionName = "1.0"
 
+        buildConfigField("String", "NAVER_MAP_CLIENT_ID", getApiKey("NAVER_MAP_CLIENT_ID"))
+        buildConfigField("String", "NAVER_MAP_CLIENT_SECRET", getApiKey("NAVER_MAP_CLIENT_SECRET"))
+        buildConfigField("String", "NAVER_CLIENT_ID", getApiKey("NAVER_CLIENT_ID"))
+        buildConfigField("String", "NAVER_CLIENT_SECRET", getApiKey("NAVER_CLIENT_SECRET"))
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        manifestPlaceholders["NAVER_MAP_CLIENT_ID_MANIFEST"] = getApiKey("NAVER_MAP_CLIENT_ID_MANIFEST")
     }
 
     buildTypes {
@@ -36,41 +48,24 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
-    buildFeatures{
+    buildFeatures {
         dataBinding = true
         buildConfig = true
     }
 }
 
 dependencies {
-    // modules
-    implementation(project(":core-data"))
-    implementation(project(":core-network"))
-    implementation(project(":core-ui"))
-    implementation(project(":core-model"))
     implementation(project(":feature-main"))
-
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.material)
-    implementation(libs.androidx.activity)
-    implementation(libs.androidx.constraintlayout)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
+    implementation(project(":feature-sign"))
 
     // Datastore
     implementation(libs.datastore.preferences)
     // Lifecycle
     implementation(libs.lifecycle.runtime.ktx)
     implementation(libs.lifecycle.extensions)
-    // Logging
-    implementation(libs.timber)
     // Coroutine
     implementation(libs.coroutines.android)
     implementation(libs.coroutines.core)
-    // DI
-    implementation(libs.hilt.android)
-    kapt(libs.hilt.compiler)
-    kapt(libs.androidx.hilt.compiler)
+    //Sign
+    implementation(libs.naver.oauth)
 }

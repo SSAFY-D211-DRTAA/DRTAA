@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph_home"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.drtaa.feature_home.HomeFragment"
+        android:label="HomeFragment"
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_homeFragment_to_rentFragment"
+            app:destination="@id/rentFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/rentFragment"
+        android:name="com.drtaa.feature_home.RentFragment"
+        android:label="RentFragment"
+        tools:layout="@layout/fragment_rent" >
+        <action
+            android:id="@+id/action_rentFragment_to_rentLocationFragment"
+            app:destination="@id/rentLocationFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/rentLocationFragment"
+        android:name="com.drtaa.feature_home.RentLocationFragment"
+        android:label="RentLocationFragment"
+        tools:layout="@layout/fragment_rent_location" />
+
+</navigation>

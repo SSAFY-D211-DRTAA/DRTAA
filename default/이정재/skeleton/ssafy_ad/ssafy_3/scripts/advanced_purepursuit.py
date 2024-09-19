@@ -70,6 +70,11 @@ class pure_pursuit :
         self.ctrl_cmd_pub = 
 
         '''
+        rospy.Subscriber("/global_path", Path, self.global_path_callback)
+        rospy.Subscriber("/path", Path, self.path_callback)
+        rospy.Subscriber("odom", Odometry, self.odom_callback)
+        rospy.Subscriber("/Ego_topic", EgoVehicleStatus, self.status_callback)
+        self.ctrl_cmd_pub = rospy.Publisher('/ctrl_cmd', CtrlCmd, queue_size=1)
 
         self.ctrl_cmd_msg = CtrlCmd()
         self.ctrl_cmd_msg.longlCmdType = 1
@@ -93,17 +98,17 @@ class pure_pursuit :
 
         self.pid = pidControl()
         self.vel_planning = velocityPlanning(self.target_velocity/3.6, 0.15)
-        while True:
+        while not rospy.is_shutdown():
             if self.is_global_path == True:
                 self.velocity_list = self.vel_planning.curvedBaseVelocity(self.global_path, 50)
                 break
             else:
                 rospy.loginfo('Waiting global path data')
+            time.sleep(0.1)
 
         rate = rospy.Rate(30) # 30hz
         while not rospy.is_shutdown():
             
-
             if self.is_path == True and self.is_odom == True and self.is_status == True:
                 prev_time = time.time()
                 
@@ -111,7 +116,7 @@ class pure_pursuit :
                 self.target_velocity = self.velocity_list[self.current_waypoint]*3.6
                 
 
-                steering = self.calc_pure_pursuit()
+                steering = self.calc_pure_pursuit(self.target_velocity)
                 if self.is_look_forward_point :
                     self.ctrl_cmd_msg.steering = steering
                 else : 
@@ -133,6 +138,7 @@ class pure_pursuit :
                 self.ctrl_cmd_pub.
                 
                 '''
+                self.ctrl_cmd_pub.publish(self.ctrl_cmd_msg)
                 
             rate.sleep()
 
@@ -168,7 +174,7 @@ class pure_pursuit :
                 currnet_waypoint = i
         return currnet_waypoint
 
-    def calc_pure_pursuit(self,):
+    def calc_pure_pursuit(self, vel):
 
         #TODO: (2) 속도 비례 Look Ahead Distance 값 설정
         '''
@@ -183,7 +189,12 @@ class pure_pursuit :
         rospy.loginfo(self.lfd)
 
         '''
+        self.lfd = self.lfd_gain * vel
         
+        self.lfd = min(max(self.lfd, self.min_lfd), self.max_lfd)
+        
+        # rospy.loginfo(self.lfd)
+
         vehicle_position=self.current_postion
         self.is_look_forward_point= False
 
@@ -219,6 +230,25 @@ class pure_pursuit :
                     break
 
         '''
+
+        trans_matrix = np.array([[cos(self.vehicle_yaw)  ,-sin(self.vehicle_yaw) ,translation[0]],
+                            [sin(self.vehicle_yaw)  ,cos(self.vehicle_yaw)  ,translation[1]],
+                            [0                      ,0                      ,1             ]])
+
+        det_trans_matrix = np.linalg.inv(trans_matrix)
+
+        for num, i in enumerate(self.path.poses) :
+            path_point = i.pose.position
+
+            global_path_point = [path_point.x, path_point.y, 1]
+            local_path_point = det_trans_matrix.dot(global_path_point)    
+
+            if local_path_point[0] > 0:
+                dis = sqrt(local_path_point[0]**2 + local_path_point[1]**2)
+                if dis >= self.lfd :
+                    self.forward_point = local_path_point
+                    self.is_look_forward_point = True
+                    break
         
         #TODO: (4) Steering 각도 계산
         '''
@@ -229,6 +259,8 @@ class pure_pursuit :
         steering = 
 
         '''
+        theta = atan2(local_path_point[1], local_path_point[0])
+        steering = atan2(2 * self.vehicle_length * sin(theta), self.lfd)
 
         return steering
 
@@ -258,6 +290,12 @@ class pidControl:
         self.prev_error = 
 
         '''
+        p_control = self.p_gain * error
+        self.i_control += self.i_gain * error * self.controlTime
+        d_control = self.d_gain * (error - self.prev_error) / self.controlTime
+
+        output = p_control + self.i_control + d_control
+        self.prev_error = error
 
         return output
 
@@ -291,6 +329,10 @@ class velocityPlanning:
             r = 
 
             '''
+            A = np.array(x_list)
+            B = np.array(y_list)
+            a, b, c = np.linalg.lstsq(A, B, rcond=None)[0]
+            r = np.sqrt(a**2 + b**2 - c)
 
             #TODO: (7) 곡률 기반 속도 계획
             '''
@@ -300,6 +342,7 @@ class velocityPlanning:
             v_max = 
 
             '''
+            v_max = sqrt(r * 9.81 * self.road_friction)
 
             if v_max > self.car_max_speed:
                 v_max = self.car_max_speed

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/nav_graph_home"
+        android:title="홈"/>
+    <item
+        android:id="@+id/nav_graph_car"
+        android:title="차량내역"/>
+    <item
+        android:id="@+id/nav_graph_tour"
+        android:title="관광" />
+    <item
+        android:id="@+id/nav_graph_my_page"
+        android:title="마이페이지" />
+
+</menu>

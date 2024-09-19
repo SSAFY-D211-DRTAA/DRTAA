@@ -1,9 +1,13 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
+    id("drtaa.plugin.network")
+}
 
-    alias(libs.plugins.hilt.gradle.plugin)
-    alias(libs.plugins.kotlin.kapt)
+fun getApiKey(propertyKey: String): String {
+    return gradleLocalProperties(rootDir, providers).getProperty(propertyKey)
 }
 
 android {
@@ -12,6 +16,10 @@ android {
 
     defaultConfig {
         minSdk = 28
+
+        buildConfigField("String", "NAVER_CLIENT_ID", getApiKey("NAVER_CLIENT_ID"))
+        buildConfigField("String", "NAVER_CLIENT_SECRET", getApiKey("NAVER_CLIENT_SECRET"))
+        buildConfigField("String", "BASE_URL", getApiKey("BASE_URL"))
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
@@ -33,36 +41,11 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+    buildFeatures {
+        buildConfig = true
+    }
 }
 
 dependencies {
-    implementation(project(":core-model"))
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.material)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-
-
-    // DI
-    implementation(libs.hilt.android)
-    kapt(libs.hilt.compiler)
-
-    // Network
-    implementation(libs.retrofit)
-    implementation(libs.retrofit.converter.gson)
-    implementation(libs.retrofit.converter.kotlinxSerialization)
-    implementation(libs.okhttp)
-    implementation(platform(libs.okhttp.bom))
-    implementation(libs.okhttp.loggingInterceptor)
-    implementation(libs.kotlinx.serialization.core)
-    implementation(libs.kotlinx.serialization.json)
-    implementation(libs.retrofit.converter.sclars)
-
-    // Log
-    implementation(libs.timber)
-    // DataStore
-    implementation(libs.datastore.preferences)
-    implementation(libs.androidx.datastore.preferences.core)
+    implementation(libs.gson)
 }
