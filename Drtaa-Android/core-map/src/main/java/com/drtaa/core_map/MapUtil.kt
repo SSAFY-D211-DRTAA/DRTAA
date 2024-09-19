@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.view.MotionEvent
 import android.view.View
 import com.google.android.material.snackbar.Snackbar
+import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraAnimation
 import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.LocationTrackingMode
@@ -59,4 +60,14 @@ fun NaverMap.setCustomLocationButton(view: View) {
             Snackbar.make(view, "현재 위치를 확인할 수 없습니다.", Snackbar.LENGTH_SHORT).show()
         }
     }
+}
+
+/**
+ *  지정한 좌표로 카메라 이동
+ *  @param latitude
+ *  @param longitude
+ */
+fun NaverMap.moveCameraTo(latitude: Double, longitude: Double) {
+    val cameraUpdate = CameraUpdate.scrollTo(LatLng(latitude, longitude))
+    this.moveCamera(cameraUpdate)
 }
