@@ -3,6 +3,8 @@ package com.drtaa.feature_car.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.drtaa.core_data.repository.GPSRepository
+import com.drtaa.core_data.repository.RentRepository
+import com.drtaa.core_model.network.RequestCompleteRent
 import com.naver.maps.geometry.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -11,6 +13,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -21,7 +24,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CarViewModel @Inject constructor(
-    private val gpsRepository: GPSRepository
+    private val gpsRepository: GPSRepository,
+    private val rentRepository: RentRepository
 ) : ViewModel() {
     private var publishJob: Job? = null
     private val mqttScope = CoroutineScope(Dispatchers.IO)
@@ -29,6 +33,9 @@ class CarViewModel @Inject constructor(
     val gpsData = _gpsData.asSharedFlow()
     private val _trackingState = MutableStateFlow<Boolean>(false)
     val trackingState: StateFlow<Boolean> get() = _trackingState
+
+    private val _isSuccessComplete = MutableSharedFlow<Boolean>()
+    val isSuccessComplete: SharedFlow<Boolean> = _isSuccessComplete
 
     init {
         initMQTT()
@@ -65,6 +72,25 @@ class CarViewModel @Inject constructor(
             gpsRepository.observeMqttMessages().collectLatest {
                 Timber.tag("mqtt_viewmodel").d("observeMqttMessages: $it")
                 _gpsData.emit(LatLng(it.latitude, it.longitude))
+            }
+        }
+    }
+
+    fun completeRent(rentId: Int, rentCarScheduleId: Int) {
+        viewModelScope.launch {
+            val requestCompleteRent = RequestCompleteRent(
+                rentId = rentId,
+                rentCarScheduleId = rentCarScheduleId
+            )
+
+            rentRepository.completeRent(requestCompleteRent).collect { result ->
+                result.onSuccess {
+                    Timber.d("성공")
+                    _isSuccessComplete.emit(true)
+                }.onFailure {
+                    Timber.d("실패")
+                    _isSuccessComplete.emit(false)
+                }
             }
         }
     }

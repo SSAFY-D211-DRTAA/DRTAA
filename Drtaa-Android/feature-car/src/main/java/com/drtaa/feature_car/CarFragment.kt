@@ -7,10 +7,16 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.drtaa.core_ui.base.BaseFragment
+import com.drtaa.core_ui.showSnackBar
 import com.drtaa.feature_car.databinding.FragmentCarBinding
 import com.drtaa.feature_car.viewmodel.CarViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import timber.log.Timber
 
 @AndroidEntryPoint
 class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
@@ -38,8 +44,26 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
             btnTrackingCar.setOnClickListener {
                 navigateDestination(R.id.action_carFragment_to_carTrackingFragment)
             }
+
+            btnReturn.setOnClickListener {
+                viewModel.completeRent(1, 1)
+            }
         }
         setupCardTouchListener()
+        initObserve()
+    }
+
+    private fun initObserve() {
+        viewModel.isSuccessComplete.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach { isSuccess ->
+                if (isSuccess) {
+                    Timber.d("반납 성공")
+                    showSnackBar("반납 성공")
+                } else {
+                    Timber.d("반납 실패")
+                    showSnackBar("반납 실패")
+                }
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
     @SuppressLint("ClickableViewAccessibility")

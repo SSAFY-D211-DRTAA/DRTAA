@@ -1,6 +1,7 @@
 package com.drtaa.core_data.datasourceimpl
 
 import com.drtaa.core_data.datasource.RentDataSource
+import com.drtaa.core_model.network.RequestCompleteRent
 import com.drtaa.core_model.network.RequestUnassignedCar
 import com.drtaa.core_model.rent.RentCar
 import com.drtaa.core_network.api.RentAPI
@@ -11,5 +12,9 @@ class RentDataSourceImpl @Inject constructor(
 ) : RentDataSource {
     override suspend fun getUnassignedCar(rentSchedule: RequestUnassignedCar): RentCar {
         return rentAPI.getUnassignedCar(rentSchedule)
+    }
+
+    override suspend fun completeRent(requestCompleteRent: RequestCompleteRent) {
+        rentAPI.completeRent(requestCompleteRent)
     }
 }
