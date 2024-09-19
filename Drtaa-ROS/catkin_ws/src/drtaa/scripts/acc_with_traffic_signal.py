@@ -75,7 +75,9 @@ class pure_pursuit:
         self.lfd_gain = 0.78
         self.target_velocity = 35
 
-        self.stop_line_threshold = 8  # 예시 값, 적절히 조정 필
+        self.stop_line_threshold = 8 
+        self.previous_global_path = None  # 이전 경로 저장 변수 추가
+        self.velocity_list = [] 
 
         self.nodes = self.load_nodes()
 
@@ -85,30 +87,36 @@ class pure_pursuit:
 
         self.traffic_light_manager = TrafficLightManager()
 
-        while True:
-            if self.is_global_path:
-                self.velocity_list = self.vel_planning.curvedBaseVelocity(self.global_path, 50) # 경로 상의 waypoint에 대한 속도 계산
-                break
-            # else:
-            #     rospy.loginfo('Waiting for global path data')
-
         rate = rospy.Rate(30)  # 30hz
+
         while not rospy.is_shutdown():
-            if self.is_path and self.is_odom and self.is_status: 
+            if self.is_path and self.is_odom and self.is_status and len(self.velocity_list) > 0: 
                 result = self.calc_vaild_obj([self.current_postion.x, self.current_postion.y, self.vehicle_yaw], self.object_data) # 주변 객체 정보 계산
                 global_npc_info, local_npc_info, global_ped_info, local_ped_info, global_obs_info, local_obs_info = result
 
                 self.current_waypoint = self.get_current_waypoint([self.current_postion.x, self.current_postion.y], self.global_path) # 현재 위치에서 가장 가까운 경로 상의 waypoint 인덱스
-                self.target_velocity = self.velocity_list[self.current_waypoint] * 3.6 # 현재 waypoint에 대한 목표 속도
+                #self.target_velocity = self.velocity_list[self.current_waypoint] * 3.6 # 현재 waypoint에 대한 목표 속도
+                # current_waypoint가 velocity_list의 범위 내에 있는지 확인
+                if 0 <= self.current_waypoint < len(self.velocity_list):
+                    self.target_velocity = self.velocity_list[self.current_waypoint] * 3.6
+                else:
+                    rospy.logwarn("Current waypoint is out of velocity list range. Stopping vehicle.")
+                    self.ctrl_cmd_msg.accel = 0.0
+                    self.ctrl_cmd_msg.brake = 1.0
+                    self.ctrl_cmd_pub.publish(self.ctrl_cmd_msg)
+                    continue
 
                 steering = self.calc_pure_pursuit() # pure_pursuit 알고리즘을 통해 조향각 계산
                 self.trafficlight_logic() # 신호등 및 좌회전 여부에 따른 제어 로직
 
                 if self.is_look_forward_point: # 전방 경로 상에 waypoint가 존재하는 경우
                     self.ctrl_cmd_msg.steering = steering
-                else:
+                else: # 전방에 waypoint가 없는 경우 (경로 끝에 도달한 경우)
                     rospy.loginfo("No forward point found")
-                    self.ctrl_cmd_msg.steering = 0.0
+                    self.ctrl_cmd_msg.accel = 0.0
+                    self.ctrl_cmd_msg.brake = 1.0  # 브레이크를 최대로 설정하여 차량 정지
+                    self.ctrl_cmd_pub.publish(self.ctrl_cmd_msg)
+                    continue
 
                 self.adaptive_cruise_control.check_object(self.path ,global_npc_info, local_npc_info
                                                                     ,global_ped_info, local_ped_info
@@ -148,8 +156,22 @@ class pure_pursuit:
         self.status_msg = msg
 
     def global_path_callback(self, msg):
-        self.global_path = msg
-        self.is_global_path = True
+        # 새로운 경로와 이전 경로 비교
+        if self.previous_global_path is None or not self.is_same_path(self.previous_global_path, msg):
+            self.global_path = msg
+            self.is_global_path = True
+            self.velocity_list = self.vel_planning.curvedBaseVelocity(self.global_path, 50)
+            rospy.loginfo("Global path updated and velocity list recalculated")
+            self.previous_global_path = msg  # 이전 경로 업데이트
+
+    def is_same_path(self, path1, path2):
+        # 두 경로가 동일한지 비교하는 함수
+        if len(path1.poses) != len(path2.poses):
+            return False
+        for pose1, pose2 in zip(path1.poses, path2.poses):
+            if pose1.pose.position.x != pose2.pose.position.x or pose1.pose.position.y != pose2.pose.position.y:
+                return False
+        return True
 
     def object_info_callback(self, data):
         self.is_object_info = True
@@ -157,8 +179,8 @@ class pure_pursuit:
         # rospy.loginfo(f"Object info updated: {len(self.object_data.npc_list)} NPCs, {len(self.object_data.pedestrian_list)} pedestrians, {len(self.object_data.obstacle_list)} obstacles")
 
     def turning_left_callback(self, msg):
-        self.is_turning_left = msg.data
-        rospy.loginfo(f"Left turn signal: {self.is_turning_left}")
+        self.is_turning_left = msg
+        # rospy.loginfo(f"Left turn signal: {self.is_turning_left}")
     
     def load_nodes(self): # 노드 정보 로드
         current_path = os.path.dirname(os.path.abspath(__file__))
@@ -206,27 +228,23 @@ class pure_pursuit:
             is_near_stop_line, distance_to_stop_line = self.detect_stop_line()
             
             if is_near_stop_line: # 정지선 근처인 경우
-                # rospy.loginfo(f"Near stop line, distance: {distance_to_stop_line:.2f}")
                 
-                if self.is_turning_left: # 좌회전을 해야할 경우
-                    if self.traffic_light_manager.can_turn_left(): # 좌회전 가능
-                        rospy.loginfo("Left turn signal on, proceeding with left turn")
-                    else: # 좌회전 금지
-                        rospy.loginfo("Left turn signal on, but left turn not allowed")
-                        self.target_velocity = self.calculate_approach_velocity(distance_to_stop_line)
-                    #self.target_velocity = self.normal_speed  # Set speed for left turn
-                else: # 직진
-                    if self.traffic_light_manager.traffic_light_status & 1:  # Red light
-                        rospy.loginfo("Red light detected, stopping")
-                        self.target_velocity = self.calculate_approach_velocity(distance_to_stop_line)
-                        
-                    elif self.traffic_light_manager.traffic_light_status & 4:  # Yellow light
-                        rospy.loginfo("Yellow light detected, slowing down")
-                        approach_velocity = self.calculate_approach_velocity(distance_to_stop_line)
-                        self.target_velocity = min(approach_velocity, self.target_velocity)
-                        
-                    elif self.traffic_light_manager.can_go_straight():  # Green light
-                        rospy.loginfo("Green light detected, proceeding")
+                if self.is_turning_left and self.traffic_light_manager.can_turn_left():
+                    rospy.loginfo("Left turn signal on, proceeding with left turn")
+                    return
+                    
+                elif self.traffic_light_manager.traffic_light_status & 1:  # Red light
+                    rospy.loginfo("Red light detected, stopping")
+                    self.target_velocity = self.calculate_approach_velocity(distance_to_stop_line)
+                    
+                elif self.traffic_light_manager.traffic_light_status & 4:  # Yellow light
+                    rospy.loginfo("Yellow light detected, slowing down")
+                    approach_velocity = self.calculate_approach_velocity(distance_to_stop_line)
+                    self.target_velocity = min(approach_velocity, self.target_velocity)
+                    
+                elif self.traffic_light_manager.can_go_straight():  # Green light
+                    rospy.loginfo("Green light detected, proceeding")
+                    return
         except Exception as e:
             rospy.logerr(f"Error in trafficlight_logic: {e}")
             self.target_velocity = 0
@@ -299,9 +317,6 @@ class pure_pursuit:
     
     def calc_pure_pursuit(self):
         try:
-            # self.lfd = self.status_msg.velocity.x * self.lfd_gain
-            # self.lfd = max(self.min_lfd, min(self.lfd, self.max_lfd))
-
             is_near_stop_line, distance_to_stop_line = self.detect_stop_line()
             if is_near_stop_line:
                 self.lfd = max(self.min_lfd, min(distance_to_stop_line, self.lfd))

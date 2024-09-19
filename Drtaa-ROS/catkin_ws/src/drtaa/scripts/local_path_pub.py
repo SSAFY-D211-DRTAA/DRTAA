@@ -45,6 +45,9 @@ class local_path_pub:
     def global_path_callback(self, msg):
         self.is_path = True
         self.global_path_msg = msg
+        if self.is_odom:  # 현재 위치 정보가 있는 경우에만 초기화
+            self.prev_current_waypoint = self.find_closest_waypoint(self.x, self.y)
+            rospy.loginfo(f"Global path updated and prev_current_waypoint set to {self.prev_current_waypoint}")
 
     def update_local_path(self):
         if self.is_odom and self.is_path:

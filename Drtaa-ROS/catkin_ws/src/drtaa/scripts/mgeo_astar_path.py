@@ -8,7 +8,7 @@ import copy
 import numpy as np
 from math import sqrt, pow, atan2
 from geometry_msgs.msg import PoseStamped, PoseWithCovarianceStamped
-from nav_msgs.msg import Path
+from nav_msgs.msg import Path, Odometry
 from queue import PriorityQueue
 
 current_path = os.path.dirname(os.path.realpath(__file__))
@@ -20,7 +20,8 @@ class AStarPathPublisher:
         # ROS 노드 초기화 및 구독자, 발행자 설정
         rospy.init_node('astar_path_pub', anonymous=True)
         rospy.Subscriber('/move_base_simple/goal', PoseStamped, self.goal_callback)
-        rospy.Subscriber('/initialpose', PoseWithCovarianceStamped, self.init_callback)
+        # rospy.Subscriber('/initialpose', PoseWithCovarianceStamped, self.init_callback) 
+        rospy.Subscriber('/odom', Odometry, self.odom_callback)
         self.global_path_pub = rospy.Publisher('/global_path', Path, queue_size=1)
 
         # 초기 상태 변수 설정
@@ -29,7 +30,6 @@ class AStarPathPublisher:
         self.start_node = None
         self.end_node = None
         self.global_path_msg = None
-        self.path_calculated = False
 
         try:
             # MGeo 데이터 로드
@@ -48,27 +48,25 @@ class AStarPathPublisher:
         while not rospy.is_shutdown():
             if self.global_path_msg is not None:
                 self.global_path_pub.publish(self.global_path_msg)
-            else:
-                rospy.loginfo('Waiting for goal and current position data')
+            # else:
+            #     rospy.loginfo('Waiting for goal and current position data')
             rate.sleep()
 
     def goal_callback(self, msg):
-        # 목표 위치 설정
-        if self.nodes is None:
-            rospy.logerr("Nodes data is not available. Cannot process goal.")
-            return
+   
         self.end_node = self.find_closest_node(msg.pose.position)
         self.is_goal_pose = True
-        self.update_path()
-
-    def init_callback(self, msg):
-        # 시작 위치 설정
-        if self.nodes is None:
-            rospy.logerr("Nodes data is not available. Cannot process init pose.")
-            return
-        self.start_node = self.find_closest_node(msg.pose.pose.position)
-        self.is_init_pose = True
-        self.update_path()
+        rospy.logwarn(f"목표 위치 근접 노드: {self.end_node}")
+    
+    def odom_callback(self, msg):
+    
+        if self.is_goal_pose: # 목표 위치가 설정되어 있을 때만 시작 위치 설정
+            self.current_position = msg.pose.pose.position
+            self.start_node = self.find_closest_node(self.current_position)
+            self.is_init_pose = True
+            # rospy.loginfo(f"현재 위치 근접 노드: {self.start_node}")
+            self.update_path()
+                
 
     def find_closest_node(self, position):
         # 주어진 위치에서 가장 가까운 노드 찾기
@@ -80,14 +78,15 @@ class AStarPathPublisher:
                 min_distance = distance
                 closest_node = node_id
         return closest_node
-
+    
     def update_path(self):
         # 시작점과 목표점이 설정되면 경로 계산
-        if self.is_goal_pose and self.is_init_pose and not self.path_calculated:
+        if self.is_goal_pose and self.is_init_pose:
             self.global_path_msg = self.calc_astar_path_node(self.start_node, self.end_node)
+            self.is_goal_pose = False
             if self.global_path_msg is not None:
-                self.path_calculated = True
                 rospy.loginfo("Global path calculated and fixed")
+                return
 
     def calc_astar_path_node(self, start_node, end_node):
         # A* 알고리즘을 사용하여 경로 계산
