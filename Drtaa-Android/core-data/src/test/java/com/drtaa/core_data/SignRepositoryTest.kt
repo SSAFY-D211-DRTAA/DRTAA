@@ -78,4 +78,39 @@ class SignRepositoryTest {
         assertEquals("mingyu", user?.id)
         assertEquals("mingyu", user?.userLogin)
     }
+
+    @Test
+    fun `clearDataStore success`() = runBlocking {
+        // Given
+        val mockResponse = SocialUser(
+            userLogin = "",
+            id = "",
+            name = "",
+            nickname = "",
+            profileImageUrl = null,
+            accessToken = null,
+            refreshToken = null
+        )
+        coEvery {
+            signDataSource.setUserData(
+                SocialUser(
+                    userLogin = "mingyu",
+                    id = "mingyu",
+                    name = "mingyu",
+                    nickname = "mingyu",
+                    profileImageUrl = null,
+                    accessToken = null,
+                    refreshToken = null
+                )
+            )
+            signDataSource.clearUserData()
+            signDataSource.getUserData()
+        } returns mockResponse
+        // When
+        val result = signRepository.getUserData().toList()
+        // Then
+        assertTrue(result.size == 1)
+        assertTrue(result[0].isFailure)
+        assertEquals("유저 정보가 없습니다.", result[0].exceptionOrNull()?.message)
+    }
 }
