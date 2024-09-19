@@ -37,23 +37,27 @@ class CarTrackingFragment :
 
     override fun initOnMapReady(naverMap: NaverMap) {
         carMarker.map = naverMap
-        naverMap.cameraPosition = CameraPosition(LatLng(37.5665, 126.9780), DEFAULT_ZOOM_LEVEL)
-        binding.btnTrackingOn.setOnClickListener {
+        naverMap.cameraPosition = CameraPosition(DEFAULT_LATLNG, DEFAULT_ZOOM_LEVEL)
+        binding.btnTracking.setOnClickListener {
             viewModel.toggleTrackingState()
+        }
+
+        binding.btnReturn.setOnClickListener {
+            // todo
         }
 
         viewModel.gpsData.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach { gps ->
             carMarker.apply {
                 position = gps
-            }
-            if(viewModel.trackingState.value){
-                naverMap.moveCameraTo(carMarker.position.latitude, carMarker.position.longitude)
+                if (viewModel.trackingState.value) {
+                    naverMap.moveCameraTo(position.latitude, position.longitude)
+                }
             }
         }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
     override fun iniView() {
-
+        // todo
     }
 
     override fun onDestroy() {
@@ -64,5 +68,6 @@ class CarTrackingFragment :
     companion object {
         private const val ICON_SIZE = 64
         private const val DEFAULT_ZOOM_LEVEL = 16.0
+        private val DEFAULT_LATLNG = LatLng(37.5665, 126.9780)
     }
 }

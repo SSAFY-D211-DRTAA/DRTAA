@@ -1,6 +1,5 @@
 package com.drtaa.core_model
 
-
 data class ResponseGPS(
     val header: Header,
     val latitude: Double,
