@@ -34,3 +34,8 @@ fun ImageView.loadImageUrl(imgUrl: String?) {
 fun TextView.setTextPrice(price: Int) {
     this.text = format(Locale.KOREA, "%,d원", price)
 }
+
+@BindingAdapter("app:setTextTime")
+fun TextView.setTextTime(time: Double) {
+    this.text = if(time - time.toInt() > 0) time.toString() else time.toInt().toString()
+}
