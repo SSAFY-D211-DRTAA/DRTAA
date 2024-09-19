@@ -98,9 +98,6 @@ public class RentServiceImpl implements RentService{
         RentCar availableCar = rentCarRepository.findFirstByRentCarIsDispatch(false)
                 .orElseThrow(() -> new NoAvailableRentCarException("현재 배정 가능한 차량이 없습니다."));
 
-        // 렌트 종료 시간
-        LocalDateTime rentEndTime = rentCreateRequestDTO.getRentStartTime().plusMinutes(rentCreateRequestDTO.getRentTime());
-
         // 렌트 생성
         Rent rent = Rent.builder()
                 .user(user)
@@ -110,7 +107,7 @@ public class RentServiceImpl implements RentService{
                 .rentPrice(rentCreateRequestDTO.getRentPrice())
                 .rentTime(rentCreateRequestDTO.getRentTime())
                 .rentStartTime(rentCreateRequestDTO.getRentStartTime())
-                .rentEndTime(rentEndTime)
+                .rentEndTime(rentCreateRequestDTO.getRentEndTime())
                 .rentDptLat(rentCreateRequestDTO.getRentDptLat())
                 .rentDptLon(rentCreateRequestDTO.getRentDptLon())
                 .build();
