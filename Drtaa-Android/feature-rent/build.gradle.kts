@@ -44,4 +44,5 @@ dependencies {
     //Calendar
     implementation(libs.material.calendarview)
     implementation(libs.threetenabp)
+    implementation(project(":feature-payment"))
 }
