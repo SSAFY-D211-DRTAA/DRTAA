@@ -1,0 +1,386 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="rentInfo"
+            type="com.drtaa.core_model.data.RentInfo" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/gray_eeee">
+
+        <ScrollView
+            android:id="@+id/sv_summary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:overScrollMode="never"
+            android:scrollbars="none"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="@color/gray_eeee"
+                    android:paddingHorizontal="20dp"
+                    android:paddingTop="30dp">
+
+                    <LinearLayout
+                        android:id="@+id/ll_summary_car_info"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/rect_white_rad30"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical"
+                        android:padding="20dp">
+
+                        <TextView
+                            style="@style/ptd_medium"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="start"
+                            android:text="배정 예정 차량 정보"
+                            android:textSize="16sp" />
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/img_g80" />
+
+                        <TextView
+                            style="@style/ptd_regular"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@{rentInfo.carName}"
+                            tools:text="Genesis G80" />
+
+                        <TextView
+                            style="@style/ptd_regular"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="start"
+                            android:layout_marginTop="5dp"
+                            android:text="차량은 추후 변경될 수 있습니다." />
+                    </LinearLayout>
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/ll_summary_price_info"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="15dp"
+                        android:background="@drawable/rect_white_rad30"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical"
+                        android:padding="20dp">
+
+                        <TextView
+                            android:id="@+id/tv_summary_price_title"
+                            style="@style/ptd_medium"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="start"
+                            android:text="결제 요금"
+                            android:textSize="16sp"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <TextView
+                            android:id="@+id/tv_summary_fare"
+                            style="@style/ptd_regular"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:text='@{rentInfo.fareType + "x" + rentInfo.fareCount}'
+                            app:layout_constraintStart_toStartOf="@+id/tv_summary_price_title"
+                            app:layout_constraintTop_toBottomOf="@+id/tv_summary_price_title"
+                            tools:text="1시간권 x 8" />
+
+                        <TextView
+                            android:id="@+id/tv_summary_price"
+                            style="@style/ptd_regular"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text='@{rentInfo.price + "원"}'
+                            app:layout_constraintBottom_toBottomOf="@+id/tv_summary_fare"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="@+id/tv_summary_fare"
+                            tools:text="120,000원" />
+
+                        <TextView
+                            android:id="@+id/tv_summary_discount"
+                            style="@style/ptd_regular"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:text="할인 금액"
+                            app:layout_constraintStart_toStartOf="@+id/tv_summary_price_title"
+                            app:layout_constraintTop_toBottomOf="@+id/tv_summary_fare" />
+
+                        <TextView
+                            android:id="@+id/tv_summary_discount_price"
+                            style="@style/ptd_regular"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text='@{"-" + rentInfo.discount + "원"}'
+                            app:layout_constraintBottom_toBottomOf="@+id/tv_summary_discount"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="@+id/tv_summary_discount"
+                            tools:text="-5,000원" />
+
+                        <View
+                            android:id="@+id/view_summary_price"
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginTop="5dp"
+                            android:background="@color/gray_d9d9"
+                            app:layout_constraintTop_toBottomOf="@id/tv_summary_discount" />
+
+                        <TextView
+                            android:id="@+id/tv_summary_total"
+                            style="@style/ptd_regular"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:text="총 결제 금액"
+                            app:layout_constraintStart_toStartOf="@+id/tv_summary_price_title"
+                            app:layout_constraintTop_toBottomOf="@+id/view_summary_price" />
+
+                        <TextView
+                            android:id="@+id/tv_summary_total_price"
+                            style="@style/ptd_regular"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text='@{rentInfo.totalPrice + "원"}'
+                            app:layout_constraintBottom_toBottomOf="@+id/tv_summary_total"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="@+id/tv_summary_total"
+                            tools:text="115,000원" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <LinearLayout
+                        android:id="@+id/ll_summary_booking_info"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="15dp"
+                        android:background="@drawable/rect_white_rad30"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="20dp"
+                        android:paddingVertical="20dp">
+
+                        <TextView
+                            android:id="@+id/tv_summary_booking_title"
+                            style="@style/ptd_medium"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="start"
+                            android:text="예약 정보"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:id="@+id/tv_summary_booking_schedule"
+                            style="@style/ptd_regular"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:text="이용 일정" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:gravity="center"
+                            android:orientation="horizontal"
+                            app:layout_constraintTop_toBottomOf="@id/tv_summary_booking_schedule">
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/tv_summary_booking_start_title"
+                                    style="@style/ptd_regular"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="대여" />
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal">
+
+                                    <TextView
+                                        android:id="@+id/tv_summary_booking_start_date"
+                                        style="@style/ptd_regular"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="@{rentInfo.startDate}"
+                                        tools:text="09.17(화)" />
+
+                                    <TextView
+                                        android:id="@+id/tv_summary_booking_start_time"
+                                        style="@style/ptd_regular"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="5dp"
+                                        android:text="@{rentInfo.startTime}"
+                                        tools:text="08:00" />
+                                </LinearLayout>
+                            </LinearLayout>
+
+                            <View
+                                android:layout_width="1dp"
+                                android:layout_height="match_parent"
+                                android:layout_marginHorizontal="15dp"
+                                android:background="@color/gray_d9d9" />
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/tv_summary_booking_end_title"
+                                    style="@style/ptd_regular"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="반납" />
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal">
+
+                                    <TextView
+                                        android:id="@+id/tv_summary_booking_end_date"
+                                        style="@style/ptd_regular"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="@{rentInfo.endDate}"
+                                        tools:text="09.17(화)" />
+
+                                    <TextView
+                                        android:id="@+id/tv_summary_booking_end_time"
+                                        style="@style/ptd_regular"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="5dp"
+                                        android:text="@{rentInfo.endTime}"
+                                        tools:text="16:00" />
+                                </LinearLayout>
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/tv_summary_booking_people_title"
+                            style="@style/ptd_regular"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:text="인원 수" />
+
+                        <TextView
+                            android:id="@+id/tv_summary_booking_people"
+                            style="@style/ptd_regular"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:text='@{rentInfo.people + "명"}'
+                            tools:text="2명" />
+
+                        <TextView
+                            android:id="@+id/tv_summary_booking_location_title"
+                            style="@style/ptd_regular"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:text="대여 위치" />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/ic_pin" />
+
+                            <TextView
+                                android:id="@+id/tv_summary_booking_location"
+                                style="@style/ptd_regular"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="3dp"
+                                android:text="@{rentInfo.startLocation}"
+                                tools:text="강남역" />
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/ll_summary_plan_info"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="15dp"
+                        android:background="@drawable/rect_white_rad30"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="20dp"
+                        android:paddingVertical="20dp">
+
+                        <TextView
+                            style="@style/ptd_regular"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="일정 관련 정보 넣을 예정" />
+                    </LinearLayout>
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/btn_summary_pay"
+                        style="@style/btn_long_black"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginVertical="20dp"
+                        android:text="결제하기" />
+                </LinearLayout>
+        </ScrollView>
+
+        <TextView
+            android:id="@+id/tv_summary_no_car"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:text="예약 가능한 차량이 없습니다."
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_summary_error"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:text="오류가 발생했습니다. 다시 시도해주세요."
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
