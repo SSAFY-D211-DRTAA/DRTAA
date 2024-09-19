@@ -3,7 +3,7 @@ package com.drtaa.feature_rent.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.drtaa.core_data.repository.NaverRepository
-import com.drtaa.core_model.data.Search
+import com.drtaa.core_model.map.Search
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow

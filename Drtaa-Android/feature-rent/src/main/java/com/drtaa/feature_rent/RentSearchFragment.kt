@@ -9,7 +9,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.drtaa.core_map.base.BaseMapFragment
 import com.drtaa.core_map.setCustomLocationButton
-import com.drtaa.core_model.data.Search
+import com.drtaa.core_model.map.Search
 import com.drtaa.core_ui.hideKeyboard
 import com.drtaa.core_ui.showSnackBar
 import com.drtaa.feature_rent.adapter.SearchListAdapter

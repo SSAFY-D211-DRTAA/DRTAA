@@ -1,27 +1,24 @@
 package com.drtaa.core_data.repositoryimpl
 
-import com.drtaa.core_data.datasource.NaverDataSource
-import com.drtaa.core_data.repository.NaverRepository
+import com.drtaa.core_data.datasource.RentDataSource
+import com.drtaa.core_data.repository.RentRepository
 import com.drtaa.core_data.util.ResultWrapper
 import com.drtaa.core_data.util.safeApiCall
-import com.drtaa.core_model.map.Search
-import com.drtaa.core_model.util.toSearch
+import com.drtaa.core_model.network.ResponseRentCar
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import timber.log.Timber
 import javax.inject.Inject
 
-class NaverRepositoryImpl @Inject constructor(
-    private val naverDataSource: NaverDataSource
-) : NaverRepository {
-    override suspend fun getSearchList(keyword: String): Flow<Result<List<Search>>> = flow {
+class RentRepositoryImpl @Inject constructor(
+    private val rentDataSource: RentDataSource
+) : RentRepository {
+    override suspend fun getUnassignedCar(): Flow<Result<ResponseRentCar>> = flow {
         when (
-            val response = safeApiCall { naverDataSource.getSearchList(keyword) }
+            val response = safeApiCall { rentDataSource.getUnassignedCar() }
         ) {
             is ResultWrapper.Success -> {
-                emit(
-                    Result.success(response.data.items.map { it.toSearch() })
-                )
+                emit(Result.success(response.data))
                 Timber.d("성공")
             }
 

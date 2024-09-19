@@ -5,10 +5,10 @@ import com.drtaa.core_data.repository.SignRepository
 import com.drtaa.core_data.util.FormDataConverterUtil
 import com.drtaa.core_data.util.ResultWrapper
 import com.drtaa.core_data.util.safeApiCall
-import com.drtaa.core_model.data.SocialUser
 import com.drtaa.core_model.data.Tokens
-import com.drtaa.core_model.data.UserLoginInfo
 import com.drtaa.core_model.network.RequestSignUp
+import com.drtaa.core_model.sign.SocialUser
+import com.drtaa.core_model.sign.UserLoginInfo
 import com.drtaa.core_model.util.toTokens
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow

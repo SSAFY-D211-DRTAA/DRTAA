@@ -2,9 +2,9 @@ package com.drtaa.feature_rent.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.drtaa.core_model.data.RentInfo
-import com.drtaa.core_model.data.RentSchedule
-import com.drtaa.core_model.data.Search
+import com.drtaa.core_model.rent.RentInfo
+import com.drtaa.core_model.rent.RentSchedule
+import com.drtaa.core_model.map.Search
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,11 +26,14 @@ class RentViewModel @Inject constructor() : ViewModel() {
     private val _rentPeople = MutableStateFlow(1)
     val rentPeople: StateFlow<Int> = _rentPeople
 
+    private val _rentIsHour = MutableStateFlow<Boolean?>(null)
+    val rentIsHour: StateFlow<Boolean?> = _rentIsHour
+
     private val _isRentValid = MutableStateFlow(false)
     val isRentValid: StateFlow<Boolean> = _isRentValid
 
-    private val _rentInfo = MutableStateFlow<Result<RentInfo>?>(null)
-    val rentInfo: StateFlow<Result<RentInfo>?> = _rentInfo
+    private val _rentInfo = MutableStateFlow<RentInfo?>(null)
+    val rentInfo: StateFlow<RentInfo?> = _rentInfo
 
     init {
         setRentValid()
@@ -77,6 +80,10 @@ class RentViewModel @Inject constructor() : ViewModel() {
         return result
     }
 
+    fun setRentIsHour(isHour: Boolean) {
+        _rentIsHour.value = isHour
+    }
+
     private fun setRentValid() {
         viewModelScope.launch {
             combine(
@@ -94,33 +101,20 @@ class RentViewModel @Inject constructor() : ViewModel() {
 
     fun getRentInfo() {
         viewModelScope.launch {
-            // api 작업
             _rentInfo.emit(
-                Result.success(
-                    RentInfo(
-                        isAvailable = true,
-                        carName = "Genesis G80",
-                        fareType = "1시간권",
-                        fareCount = 8,
-                        price = "120,000",
-                        discount = "5,000",
-                        totalPrice = "115,000",
-                        startDate = "09.17(화)",
-                        endDate = "09.21(금)",
-                        startTime = "10:00",
-                        endTime = "18:00",
-                        people = 3,
-                        startLocation = "서울특별시 강남구 역삼동",
-                        carImg = ""
-                    )
+                RentInfo(
+                    carInfo = null,
+                    isHour = _rentIsHour.value!!,
+                    fareCount = 8,
+                    price = 120000,
+                    discount = 5000,
+                    totalPrice = 115000,
+                    people = _rentPeople.value,
+                    startLocation = _rentStartLocation.value!!,
+                    startSchedule = _rentStartSchedule.value!!,
+                    endSchedule = _rentEndSchedule.value!!,
                 )
             )
-
-//            _rentInfo.emit(
-//                Result.failure(
-//                    Exception("api 실패")
-//                )
-//            )
         }
     }
 

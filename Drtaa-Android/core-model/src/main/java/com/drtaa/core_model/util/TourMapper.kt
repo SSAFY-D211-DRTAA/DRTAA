@@ -1,6 +1,6 @@
 package com.drtaa.core_model.util
 
-import com.drtaa.core_model.data.TourItem
+import com.drtaa.core_model.tour.TourItem
 import com.drtaa.core_model.network.ResponseTour
 
 fun (ResponseTour.Response.Body.Items.Item).toEntity(): TourItem {
