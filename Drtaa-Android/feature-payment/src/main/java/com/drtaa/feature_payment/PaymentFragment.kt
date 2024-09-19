@@ -61,24 +61,16 @@ class PaymentFragment : BaseFragment<FragmentPaymentBinding>(R.layout.fragment_p
     private fun observeViewModel() {
         viewModel.paymentStatus
             .onEach { status ->
-                when (status) {
-                    is PaymentViewModel.PaymentStatus.Success -> {
-                        binding.tvPaymentStatus.text = "성공: ${status.message}"
-                    }
-
-                    is PaymentViewModel.PaymentStatus.Error -> {
-                        binding.tvPaymentStatus.text = "오류: ${status.message}"
-                    }
-
-                    is PaymentViewModel.PaymentStatus.PaymentInfoRetrieved -> {
-                        binding.tvPaymentStatus.text = "ㅇㅇㅇ"
-                    }
+                binding.tvPaymentStatus.text = when (status) {
+                    is PaymentViewModel.PaymentStatus.Success -> { "성공: ${status.message}" }
+                    is PaymentViewModel.PaymentStatus.Error -> { "오류: ${status.message}" }
+                    is PaymentViewModel.PaymentStatus.PaymentInfoRetrieved -> { "ㅇㅇㅇ" }
                 }
             }
             .launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
-    private suspend fun requestbootPayment() {
+    private fun requestbootPayment() {
         val bootUser = getBootUser()
 
         val extra = BootExtra()
