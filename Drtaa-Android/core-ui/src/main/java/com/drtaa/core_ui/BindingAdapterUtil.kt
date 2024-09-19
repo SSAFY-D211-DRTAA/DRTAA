@@ -4,6 +4,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
+import java.lang.String.format
 import java.util.Locale
 
 const val RADIUS = 10
@@ -27,4 +28,14 @@ fun ImageView.loadImageUrl(imgUrl: String?) {
         .into(this)
 
     this.adjustViewBounds = true
+}
+
+@BindingAdapter("app:setTextPrice")
+fun TextView.setTextPrice(price: Int) {
+    this.text = format(Locale.KOREA, "%,d원", price)
+}
+
+@BindingAdapter("app:setTextTime")
+fun TextView.setTextTime(time: Double) {
+    this.text = if(time - time.toInt() > 0) time.toString() else time.toInt().toString()
 }
