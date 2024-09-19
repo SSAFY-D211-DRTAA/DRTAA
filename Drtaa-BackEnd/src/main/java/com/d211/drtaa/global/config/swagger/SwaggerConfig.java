@@ -64,9 +64,7 @@ public class SwaggerConfig {
     public GroupedOpenApi rentApi() {
         return GroupedOpenApi.builder()
                 .group("Rent")
-                .pathsToMatch("/rent/**")
-                .pathsToMatch("/rent-car/**")
-                .pathsToMatch("/rent-history/**")
+                .pathsToMatch("/rent/**", "/rent-car/**", "/rent-history/**")
                 .build();
     }
 
