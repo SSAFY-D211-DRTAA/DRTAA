@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
+@RequestMapping("/testt")
 public class TestController {
 
     @GetMapping("/test")
@@ -16,7 +17,7 @@ public class TestController {
         return "GitLab - Jenkins - MM Webhook 테스트 중";
     }
 
-    @GetMapping("/")
+    @GetMapping("/re")
     public String home() {
         return "redirect:/index.html"; // static 폴더의 index.html로 리다이렉트
     }
