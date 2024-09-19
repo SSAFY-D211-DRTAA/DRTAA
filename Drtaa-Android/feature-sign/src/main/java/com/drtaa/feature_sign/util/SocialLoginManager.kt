@@ -10,6 +10,7 @@ import androidx.credentials.GetCredentialRequest
 import androidx.credentials.GetCredentialResponse
 import androidx.credentials.exceptions.GetCredentialException
 import com.drtaa.core_model.sign.SocialUser
+import com.drtaa.core_data.repository.SignRepository
 import com.drtaa.core_model.util.Social
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
@@ -32,6 +33,7 @@ import javax.inject.Singleton
 @Singleton
 class SocialLoginManager @Inject constructor(
     private val googleIdOption: GetGoogleIdOption,
+    private val signRepository: SignRepository
 ) {
     private val _resultLogin = MutableSharedFlow<Result<SocialUser>>()
     val resultLogin: SharedFlow<Result<SocialUser>> = _resultLogin
@@ -45,18 +47,18 @@ class SocialLoginManager @Inject constructor(
     private val profileCallback = object : NidProfileCallback<NidProfileResponse> {
         override fun onSuccess(result: NidProfileResponse) {
             signScope {
+                val userData = SocialUser(
+                    userLogin = Social.NAVER.type,
+                    id = result.profile?.id.orEmpty(),
+                    name = result.profile?.name,
+                    nickname = result.profile?.nickname.orEmpty(),
+                    profileImageUrl = result.profile?.profileImage,
+                    accessToken = NaverIdLoginSDK.getAccessToken(),
+                    refreshToken = NaverIdLoginSDK.getRefreshToken()
+                )
+                signRepository.setUserData(userData)
                 _resultLogin.emit(
-                    Result.success(
-                        SocialUser(
-                            userLogin = Social.NAVER.type,
-                            id = result.profile?.id.orEmpty(),
-                            name = result.profile?.name,
-                            nickname = result.profile?.nickname.orEmpty(),
-                            profileImageUrl = result.profile?.profileImage,
-                            accessToken = NaverIdLoginSDK.getAccessToken(),
-                            refreshToken = NaverIdLoginSDK.getRefreshToken()
-                        )
-                    )
+                    Result.success(userData)
                 )
             }
         }
@@ -110,6 +112,9 @@ class SocialLoginManager @Inject constructor(
     }
 
     fun logout(socialType: String, context: Context) {
+        signScope {
+            signRepository.clearUserData()
+        }
         when (socialType) {
             Social.NAVER.type -> NaverIdLoginSDK.logout()
             Social.GOOGLE.type -> signScope {
@@ -149,16 +154,16 @@ class SocialLoginManager @Inject constructor(
                         val googleIdTokenCredential = GoogleIdTokenCredential
                             .createFrom(credential.data)
 
+                        val userData = SocialUser(
+                            userLogin = Social.GOOGLE.type,
+                            id = googleIdTokenCredential.id,
+                            name = googleIdTokenCredential.displayName,
+                            nickname = googleIdTokenCredential.displayName.orEmpty(),
+                            profileImageUrl = googleIdTokenCredential.profilePictureUri.toString()
+                        )
+                        signRepository.setUserData(userData)
                         _resultLogin.emit(
-                            Result.success(
-                                SocialUser(
-                                    userLogin = Social.GOOGLE.type,
-                                    id = googleIdTokenCredential.id,
-                                    name = googleIdTokenCredential.displayName,
-                                    nickname = googleIdTokenCredential.displayName.orEmpty(),
-                                    profileImageUrl = googleIdTokenCredential.profilePictureUri.toString()
-                                )
-                            )
+                            Result.success(userData)
                         )
                     } catch (e: GoogleIdTokenParsingException) {
                         Timber.d("Received an invalid google id token response", e)

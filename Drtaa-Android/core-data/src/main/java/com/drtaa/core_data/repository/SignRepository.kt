@@ -1,5 +1,6 @@
 package com.drtaa.core_data.repository
 
+import com.drtaa.core_model.data.SocialUser
 import com.drtaa.core_model.data.Tokens
 import com.drtaa.core_model.sign.UserLoginInfo
 import com.drtaa.core_model.network.RequestSignUp
@@ -13,4 +14,7 @@ interface SignRepository {
         image: File?
     ): Flow<Result<String>>
     suspend fun checkDuplicatedId(userProviderId: String): Flow<Result<Boolean>>
+    suspend fun getUserData(): Flow<Result<SocialUser>>
+    suspend fun setUserData(user: SocialUser)
+    suspend fun clearUserData()
 }

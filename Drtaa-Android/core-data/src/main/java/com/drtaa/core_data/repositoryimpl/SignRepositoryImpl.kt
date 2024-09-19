@@ -5,10 +5,12 @@ import com.drtaa.core_data.repository.SignRepository
 import com.drtaa.core_data.util.FormDataConverterUtil
 import com.drtaa.core_data.util.ResultWrapper
 import com.drtaa.core_data.util.safeApiCall
+import com.drtaa.core_model.data.SocialUser
 import com.drtaa.core_model.data.Tokens
 import com.drtaa.core_model.sign.UserLoginInfo
 import com.drtaa.core_model.util.toTokens
 import com.drtaa.core_model.network.RequestSignUp
+import com.drtaa.core_model.util.toTokens
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import okhttp3.MultipartBody
@@ -19,6 +21,7 @@ import javax.inject.Inject
 class SignRepositoryImpl @Inject constructor(
     private val signDataSource: SignDataSource
 ) : SignRepository {
+
     override suspend fun getTokens(userLoginInfo: UserLoginInfo): Flow<Result<Tokens>> = flow {
         when (
             val response = safeApiCall { signDataSource.getTokens(userLoginInfo) }
@@ -90,5 +93,23 @@ class SignRepositoryImpl @Inject constructor(
                 Timber.d("네트워크 에러")
             }
         }
+    }
+
+    override suspend fun getUserData(): Flow<Result<SocialUser>> {
+        return flow {
+            val user = signDataSource.getUserData()
+            when (user.isVaild()) {
+                true -> emit(Result.success(user))
+                false -> emit(Result.failure(Exception("유저 정보가 없습니다.")))
+            }
+        }
+    }
+
+    override suspend fun setUserData(user: SocialUser) {
+        signDataSource.setUserData(user)
+    }
+
+    override suspend fun clearUserData() {
+        signDataSource.clearUserData()
     }
 }
