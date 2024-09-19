@@ -54,4 +54,5 @@ dependencies {
     implementation(libs.coroutines.core)
     // DI
     implementation(libs.androidx.hilt.navigation.fragment)
+    implementation(libs.play.services.location)
 }

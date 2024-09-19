@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.drtaa.core_data.repository.SignRepository
 import com.drtaa.core_data.repository.TokenRepository
 import com.drtaa.core_model.data.Tokens
-import com.drtaa.core_model.data.UserLoginInfo
+import com.drtaa.core_model.sign.UserLoginInfo
 import com.drtaa.core_model.network.RequestFormLogin
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow

@@ -5,7 +5,7 @@ import org.springframework.security.core.Authentication;
 
 public interface JwtTokenService {
     // AccessToken, RefreshToken 발급
-    JwtToken generateToken(String userName, String password);
+    JwtToken generateToken(String userName, String password, String isLogin);
 
     // 사용자 정보 기반 인증
     Authentication authenticate(String userName, String password);

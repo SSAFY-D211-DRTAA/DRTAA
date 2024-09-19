@@ -18,6 +18,7 @@ android {
         minSdk = 28
 
         buildConfigField("String", "GOOGLE_LOGIN_CLIENT_ID", getApiKey("GOOGLE_LOGIN_CLIENT_ID"))
+        buildConfigField("String", "TOUR_API_KEY", getApiKey("TOUR_API_KEY"))
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
@@ -49,4 +50,13 @@ dependencies {
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
+    implementation(libs.androidx.paging.runtime.ktx)
+    //Test
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.hilt.android.testing)
+    testImplementation(libs.robolectric)
+    // MQTT
+    implementation(project(":core-mqtt"))
+    implementation(libs.hivemq.mqtt.client)
 }

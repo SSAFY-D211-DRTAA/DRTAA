@@ -1,5 +1,6 @@
 package com.d211.drtaa.domain.user.service;
 
+import com.d211.drtaa.domain.user.dto.request.PasswordChangeRequestDTO;
 import com.d211.drtaa.global.service.s3.S3Service;
 import com.d211.drtaa.domain.user.dto.request.FormSignUpRequestDTO;
 import com.d211.drtaa.domain.user.dto.request.SocialSignUpRequestDTO;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -82,6 +84,7 @@ public class CustomUserDetailsServiceImpl implements CustomUserDetailsService {
                 .userRefreshToken("")
                 .userLogin("Form")
                 .userIsAdmin(request.isUserIsAdmin())
+                .userSiginupDate(LocalDateTime.now())
                 .build();
 
         createUser(user); // 기존 createUser(UserDetails user) 호출
@@ -97,6 +100,7 @@ public class CustomUserDetailsServiceImpl implements CustomUserDetailsService {
                 .userRefreshToken("")
                 .userLogin(request.getUserLogin())
                 .userIsAdmin(false)
+                .userSiginupDate(LocalDateTime.now())
                 .build();
 
         createUser(user); // 기존 createUser(UserDetails user) 호출

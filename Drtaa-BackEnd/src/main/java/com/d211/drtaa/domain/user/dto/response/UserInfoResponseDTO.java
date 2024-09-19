@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 @AllArgsConstructor
 @Builder
@@ -19,4 +21,6 @@ public class UserInfoResponseDTO {
     private String userLogin;
     @Schema(description = "회원 관리자 유무", example = "false")
     private boolean userIsAdmin;
+    @Schema(description = "회원 가입 일자", example = "2024.09.12 14:00:00")
+    private LocalDateTime userSiginupDate;
 }

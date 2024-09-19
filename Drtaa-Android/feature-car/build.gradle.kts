@@ -31,8 +31,13 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
-    buildFeatures{
+    buildFeatures {
         dataBinding = true
+    }
+    packaging {
+        resources {
+            excludes += setOf("META-INF/INDEX.LIST", "META-INF/io.netty.versions.properties")
+        }
     }
 }
 

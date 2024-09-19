@@ -17,6 +17,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven("https://jitpack.io")
         maven("https://repository.map.naver.com/archive/maven")
     }
 }
@@ -34,3 +35,7 @@ include(":feature-mypage")
 include(":feature-home")
 include(":feature-sign")
 include(":feature-car")
+include(":core-map")
+include(":feature-rent")
+include(":core-mqtt")
+include(":feature-payment")

@@ -5,9 +5,11 @@ import com.d211.drtaa.domain.user.dto.request.*;
 import com.d211.drtaa.domain.user.dto.response.UserInfoResponseDTO;
 import com.d211.drtaa.domain.user.service.CustomUserDetailsService;
 import com.d211.drtaa.domain.user.service.UserService;
+import com.d211.drtaa.global.exception.auth.InvalidTokenException;
 import com.d211.drtaa.global.util.jwt.JwtToken;
 import com.d211.drtaa.global.exception.user.UserCreationException;
 import com.d211.drtaa.global.exception.user.UserNicknameDuplicateException;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +17,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
@@ -71,7 +75,7 @@ public class UserController {
     }
 
     @PostMapping("/login/form")
-    @Operation(summary = "로그인", description = "Form 로그인")
+    @Operation(summary = "폼 로그인", description = "폼 로그인")
     public ResponseEntity login(@RequestBody FormLoginRequestDTO request) {
         try {
             JwtToken tokens = userService.FormLogin(request);
@@ -88,7 +92,7 @@ public class UserController {
     }
 
     @PostMapping("/login/social")
-    @Operation(summary = "로그인", description = "Social 로그인")
+    @Operation(summary = "소셜 로그인", description = "소셜 로그인")
     public ResponseEntity login(@RequestBody SocialLoginRequestDTO request) {
         try {
             
@@ -102,6 +106,25 @@ public class UserController {
         }
     }
 
+    @PostMapping("/token")
+    @Operation(summary = "토큰 재발급", description = "유효기간 만료로 인한 JWT 토큰 재발급")
+    public ResponseEntity<?> updateToken(@RequestParam String userRefreshToken) {
+        try {
+            JwtToken tokens = userService.updateToken(userRefreshToken);
+
+            return ResponseEntity.ok(tokens);
+        } catch (InvalidTokenException e) {
+            // 리프레시 토큰이 만료된 경우
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("리프레시 토큰이 만료되었습니다. 다시 로그인해주세요.");
+        } catch (UsernameNotFoundException e) {
+            // 사용자 없음
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            // 기타 예외
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     @GetMapping("/info")
     @Operation(summary = "회원 정보 조회", description = "액세스 토큰을 사용해 회원 정보 조회")
     public ResponseEntity info(Authentication authentication) {
@@ -111,18 +134,21 @@ public class UserController {
             // 200, 클라이언트 요청 성공
             return ResponseEntity.ok(response);
         } catch (UsernameNotFoundException e) {
-            // 401, 클라이언트 인증 실패
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+            // 404, 사용자 정보가 없음
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (ExpiredJwtException e) {
+            // 400, 잘못된 요청
+            return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
             // 400, 잘못된 요청
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
-    @PostMapping("/img")
+    @PatchMapping("/img")
     @Operation(summary = "회원 이미지 수정", description = "마이 페이지에서 회원 이미지 수정")
     public ResponseEntity updateImg
-            (Authentication authentication, @RequestPart(value = "image") MultipartFile image) {
+            (Authentication authentication, @RequestPart(value = "image", required = false) MultipartFile image) {
         try {
             userService.updateImg(authentication.getName(), image);
 
@@ -134,8 +160,8 @@ public class UserController {
             // 409, 리소스 간의 충돌이 발생했을 때
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         } catch (Exception e) {
-            // 500, 서버 오류가 발생했을 때
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+            // 400, 잘못된 요청
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
@@ -154,15 +180,15 @@ public class UserController {
             // 409, 리소스 간의 충돌이 발생했을 때
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         } catch (Exception e) {
-            // 500, 서버 오류가 발생했을 때
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+            // 400, 잘못된 요청
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
-    @PostMapping("/nickname")
+    @PatchMapping("/nickname")
     @Operation(summary = "회원 닉네임 수정", description = "마이 페이지에서 회원 닉네임 수정")
     public ResponseEntity updateNickname
-            (Authentication authentication, @RequestBody String nickname) {
+            (Authentication authentication, @RequestParam String nickname) {
         try {
             userService.updateNickname(authentication.getName(), nickname);
 
@@ -174,9 +200,40 @@ public class UserController {
             // 409, 리소스 간의 충돌이 발생했을 때
             return ResponseEntity.status(HttpStatus.CONFLICT).body(false);
         } catch (Exception e) {
-            // 500, 서버 오류가 발생했을 때
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+            // 400, 잘못된 요청
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
+    @PatchMapping("/password")
+    @Operation(summary = "회원 비밀번호 수정", description = "마이 페이지에서 회원 비밀번호 수정")
+    public ResponseEntity updatePassword
+            (Authentication authentication, @RequestBody PasswordChangeRequestDTO passwordChangeRequestDTO) {
+        try {
+            userDetailsService.changePassword(passwordChangeRequestDTO.getOldPassword(), passwordChangeRequestDTO.getNewPassword());
+            
+            return ResponseEntity.ok("비밀번호 수정 성공");
+        } catch (AccessDeniedException e) {
+            // 401, 클라이언트 인증 실패
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        } catch (BadCredentialsException e) {
+            // 409, 리소스 간의 충돌이 발생했을 때
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        } catch (Exception e) {
+            // 400, 잘못된 요청
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping
+    @Operation(summary = "회원 탈퇴", description = "회월 탈퇴 시행")
+    public ResponseEntity deleteUser(Authentication authentication) {
+        try {
+            userService.delete(authentication.getName());
+
+            return ResponseEntity.ok("회원 탈퇴 성공");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
 }

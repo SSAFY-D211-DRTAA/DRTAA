@@ -1,11 +1,13 @@
 package com.d211.drtaa.global.config.jwt;
 
+import com.d211.drtaa.global.exception.auth.InvalidTokenException;
 import com.d211.drtaa.global.util.jwt.JwtTokenProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,11 +29,21 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
         // 1. Request Header에서 JWT 토큰 추출
         String token = resolveToken((HttpServletRequest) request);
 
-        // 2. validateToken으로 토큰 유효성 검사
-        if (token != null && jwtTokenProvider.validateToken(token)) {
-            // 토큰이 유효할 경우 토큰에서 Authentication 객체를 가지고 와서 SecurityContext에 저장
-            Authentication authentication = jwtTokenProvider.getAuthentication(token);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+        try {
+            // 2. validateToken으로 토큰 유효성 검사
+            if (token != null) {
+                jwtTokenProvider.validateToken(token);
+                // 토큰이 유효할 경우 토큰에서 Authentication 객체를 가지고 와서 SecurityContext에 저장
+                Authentication authentication = jwtTokenProvider.getAuthentication(token);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+        } catch (InvalidTokenException e) {
+            SecurityContextHolder.clearContext();
+            HttpServletResponse httpResponse = (HttpServletResponse) response;
+            httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json;charset=UTF-8");
+            response.getWriter().write("{\"error\":\"" + e.getMessage() + "\"}");
+            throw new InvalidTokenException(e.getMessage());
         }
 
         chain.doFilter(request, response);

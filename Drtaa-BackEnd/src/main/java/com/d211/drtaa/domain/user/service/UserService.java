@@ -13,11 +13,14 @@ public interface UserService {
     // LoginRequestDTO를 사용해 소셜 로그인 실행
     JwtToken SocialLogin(SocialLoginRequestDTO request);
 
-    // userEmail을 사용해 회원 정보 조회
-    UserInfoResponseDTO info(String user);
+    // JwtToken 재발행
+    JwtToken updateToken(String userRefreshToken);
 
-    // userEmail을 사용해 회원 삭제
-    void delete(String userEmail);
+    // userProviderId을 사용해 회원 정보 조회
+    UserInfoResponseDTO info(String userProviderId);
+
+    // userProviderId을 사용해 회원 삭제
+    void delete(String userProviderId);
 
     // 회원 기존 프로필 이미지(userProfileImg)를 image로 변경
     void updateImg(String userName, MultipartFile image) throws Exception;

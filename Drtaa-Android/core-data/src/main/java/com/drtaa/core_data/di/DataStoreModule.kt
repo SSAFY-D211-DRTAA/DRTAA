@@ -18,11 +18,20 @@ import javax.inject.Singleton
 object DataStoreModule {
 
     @Singleton
-    @Named("USER_DATASTORE")
+    @Named("TOKEN_DATASTORE")
     @Provides
-    fun provideDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
+    fun provideTokenDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
         return PreferenceDataStoreFactory.create {
             context.preferencesDataStoreFile("token")
+        }
+    }
+
+    @Singleton
+    @Named("USER_DATASTORE")
+    @Provides
+    fun provideUserDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
+        return PreferenceDataStoreFactory.create {
+            context.preferencesDataStoreFile("user")
         }
     }
 

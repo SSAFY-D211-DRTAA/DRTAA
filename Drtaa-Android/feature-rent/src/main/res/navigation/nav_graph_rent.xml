@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph_rent"
+    app:startDestination="@id/rentFragment">
+
+    <fragment
+        android:id="@+id/rentFragment"
+        android:name="com.drtaa.feature_rent.RentFragment"
+        android:label="RentFragment"
+        tools:layout="@layout/fragment_rent">
+        <action
+            android:id="@+id/action_rentFragment_to_rentLocationFragment"
+            app:destination="@id/rentSearchFragment" />
+        <action
+            android:id="@+id/action_rentFragment_to_rentPlanFragment"
+            app:destination="@id/rentPlanFragment" />
+        <action
+            android:id="@+id/action_rentFragment_to_rentPriceFragment"
+            app:destination="@id/rentPriceFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/rentSearchFragment"
+        android:name="com.drtaa.feature_rent.RentSearchFragment"
+        android:label="RentSearchFragment"
+        tools:layout="@layout/fragment_rent_search" />
+    <dialog
+        android:id="@+id/calendarBottomSheetDialogFragment"
+        android:name="com.drtaa.feature_rent.CalendarBottomSheetDialogFragment"
+        android:label="CalendarBottomSheetDialogFragment"
+        tools:layout="@layout/fragment_calendar_bottom_sheet" />
+    <fragment
+        android:id="@+id/rentPlanFragment"
+        android:name="com.drtaa.feature_rent.RentPlanFragment"
+        android:label="RentPlanFragment"
+        tools:layout="@layout/fragment_rent_plan" />
+    <fragment
+        android:id="@+id/rentPriceFragment"
+        android:name="com.drtaa.feature_rent.RentPriceFragment"
+        android:label="RentPriceFragment"
+        tools:layout="@layout/fragment_rent_price" >
+        <action
+            android:id="@+id/action_rentPriceFragment_to_rentSummaryFragment"
+            app:destination="@id/rentSummaryFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/rentSummaryFragment"
+        android:name="com.drtaa.feature_rent.RentSummaryFragment"
+        android:label="RentSummaryFragment"
+        tools:layout="@layout/fragment_rent_summary" />
+
+</navigation>

@@ -18,6 +18,8 @@ internal class AndroidCommonConventionPlugin : Plugin<Project> {
                 add("androidTestImplementation", libs.findLibrary("androidx.junit").get())
                 add("androidTestImplementation", libs.findLibrary("androidx.espresso.core").get())
                 add("implementation", libs.findLibrary("timber").get())
+                add("implementation",libs.findLibrary("ted.permission.normal").get())
+                add("implementation",libs.findLibrary("ted.permission.coroutine").get())
             }
         }
     }

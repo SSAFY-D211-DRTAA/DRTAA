@@ -4,8 +4,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.bitmap.CenterCrop
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import java.util.Locale
 
 const val RADIUS = 10
@@ -16,11 +14,13 @@ fun TextView.setTextUppercase(text: String?) {
 }
 
 @BindingAdapter("app:setImgUrl")
-fun ImageView.loadImageUrl(imgUrl: String) {
+fun ImageView.loadImageUrl(imgUrl: String?) {
+    if (imgUrl == null) {
+        return
+    }
+
     Glide.with(context)
         .load(imgUrl)
-        .fitCenter()
-        .transform(CenterCrop(), RoundedCorners(RADIUS))
 //        .placeholder()
 //        .error()
 //        .fallback()

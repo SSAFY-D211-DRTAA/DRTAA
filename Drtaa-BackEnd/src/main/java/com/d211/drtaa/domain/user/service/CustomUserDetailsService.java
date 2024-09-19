@@ -1,8 +1,10 @@
 package com.d211.drtaa.domain.user.service;
 
 import com.d211.drtaa.domain.user.dto.request.FormSignUpRequestDTO;
+import com.d211.drtaa.domain.user.dto.request.PasswordChangeRequestDTO;
 import com.d211.drtaa.domain.user.dto.request.SocialSignUpRequestDTO;
 import com.d211.drtaa.domain.user.entity.User;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.provisioning.UserDetailsManager;

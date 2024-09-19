@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.kotlinx.serialization)
     id("drtaa.plugin.common")
 }
 
@@ -34,5 +35,6 @@ android {
 }
 
 dependencies {
-
+    implementation(libs.kotlinx.serialization.core)
+    implementation(libs.kotlinx.serialization.json)
 }
