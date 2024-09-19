@@ -44,22 +44,25 @@ class CalendarBottomSheetDialogFragment :
     }
 
     private fun initData() {
-        if (rentViewModel.rentStartSchedule.value != null && rentViewModel.rentEndSchedule.value != null) {
+        val rentStartSchedule = rentViewModel.rentStartSchedule.value
+        val rentEndSchedule = rentViewModel.rentEndSchedule.value
+
+        if (rentStartSchedule != null && rentEndSchedule != null) {
             val startDate = CalendarDay.from(
-                rentViewModel.rentStartSchedule.value!!.year,
-                rentViewModel.rentStartSchedule.value!!.month,
-                rentViewModel.rentStartSchedule.value!!.date
+                rentStartSchedule.year,
+                rentStartSchedule.month,
+                rentStartSchedule.date
             )
             val endDate = CalendarDay.from(
-                rentViewModel.rentEndSchedule.value!!.year,
-                rentViewModel.rentEndSchedule.value!!.month,
-                rentViewModel.rentEndSchedule.value!!.date
+                rentEndSchedule.year,
+                rentEndSchedule.month,
+                rentEndSchedule.date
             )
 
-            val startHour = rentViewModel.rentStartSchedule.value!!.hour
-            val startMinute = rentViewModel.rentStartSchedule.value!!.minute
-            val endHour = rentViewModel.rentEndSchedule.value!!.hour
-            val endMinute = rentViewModel.rentEndSchedule.value!!.minute
+            val startHour = rentStartSchedule.hour
+            val startMinute = rentStartSchedule.minute
+            val endHour = rentEndSchedule.hour
+            val endMinute = rentEndSchedule.minute
 
             binding.cvRentCalendar.selectRange(startDate, endDate)
 
@@ -135,32 +138,38 @@ class CalendarBottomSheetDialogFragment :
 
     private fun initEvent() {
         binding.btnCalendarSelect.setOnClickListener {
-            rentViewModel.setRentStartSchedule(
-                RentSchedule(
-                    year = calendarBottomSheetViewModel.rentStartDate.value!!.year,
-                    month = calendarBottomSheetViewModel.rentStartDate.value!!.month,
-                    date = calendarBottomSheetViewModel.rentStartDate.value!!.day,
-                    day = calendarBottomSheetViewModel.rentStartDate.value!!.date.format(
-                        DateTimeFormatter.ofPattern("E")
-                    ),
-                    hour = calendarBottomSheetViewModel.rentStartTime.value!!.hour,
-                    minute = calendarBottomSheetViewModel.rentStartTime.value!!.minute
-                )
-            )
-            rentViewModel.setRentEndSchedule(
-                RentSchedule(
-                    year = calendarBottomSheetViewModel.rentEndDate.value!!.year,
-                    month = calendarBottomSheetViewModel.rentEndDate.value!!.month,
-                    date = calendarBottomSheetViewModel.rentEndDate.value!!.day,
-                    day = calendarBottomSheetViewModel.rentEndDate.value!!.date.format(
-                        DateTimeFormatter.ofPattern("E")
-                    ),
-                    hour = calendarBottomSheetViewModel.rentEndTime.value!!.hour,
-                    minute = calendarBottomSheetViewModel.rentEndTime.value!!.minute
-                )
-            )
+            val rentStartDate = calendarBottomSheetViewModel.rentStartDate.value
+            val rentStartTime = calendarBottomSheetViewModel.rentStartTime.value
+            val rentEndDate = calendarBottomSheetViewModel.rentEndDate.value
+            val rentEndTime = calendarBottomSheetViewModel.rentEndTime.value
 
-            dismiss()
+            if (rentStartDate != null && rentEndDate != null && rentStartTime != null && rentEndTime != null) {
+                rentViewModel.setRentStartSchedule(
+                    RentSchedule(
+                        year = rentStartDate.year,
+                        month = rentStartDate.month,
+                        date = rentStartDate.day,
+                        day = rentStartDate.date.format(
+                            DateTimeFormatter.ofPattern("E")
+                        ),
+                        hour = rentStartTime.hour,
+                        minute = rentStartTime.minute
+                    )
+                )
+                rentViewModel.setRentEndSchedule(
+                    RentSchedule(
+                        year = rentEndDate.year,
+                        month = rentEndDate.month,
+                        date = rentEndDate.day,
+                        day = rentEndDate.date.format(
+                            DateTimeFormatter.ofPattern("E")
+                        ),
+                        hour = rentEndTime.hour,
+                        minute = rentEndTime.minute
+                    )
+                )
+                dismiss()
+            }
         }
 
         binding.tvRentSummaryStartTime.setOnClickListener {
