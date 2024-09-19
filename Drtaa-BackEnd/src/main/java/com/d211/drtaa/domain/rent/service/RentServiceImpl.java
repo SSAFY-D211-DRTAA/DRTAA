@@ -47,6 +47,7 @@ public class RentServiceImpl implements RentService{
         List<RentResponseDTO> response = new ArrayList<>();
         for(Rent rent: rents) {
             RentResponseDTO dto = RentResponseDTO.builder()
+                    .rentId(rent.getRentId())
                     .rentStatus(rent.getRentStatus())
                     .rentHeadCount(rent.getRentHeadCount())
                     .rentTime(rent.getRentTime())
@@ -104,7 +105,7 @@ public class RentServiceImpl implements RentService{
         Rent rent = Rent.builder()
                 .user(user)
                 .rentCar(availableCar)
-                .rentStatus(RentStatus.RESERVED)
+                .rentStatus(RentStatus.reserved)
                 .rentHeadCount(rentCreateRequestDTO.getRentHeadCount())
                 .rentPrice(rentCreateRequestDTO.getRentPrice())
                 .rentTime(rentCreateRequestDTO.getRentTime())
@@ -119,7 +120,7 @@ public class RentServiceImpl implements RentService{
 
         // 렌트 차량 상태 변경
         availableCar.setRentCarIsDispatch(true); // 배차 상태
-        availableCar.setRentCarDrivingStatus(RentDrivingStatus.PARKED);// 주행 상태
+        availableCar.setRentCarDrivingStatus(RentDrivingStatus.parked);// 주행 상태
 
         // 변경된 렌트 차량 상태 저장
         rentCarRepository.save(availableCar);
@@ -202,7 +203,7 @@ public class RentServiceImpl implements RentService{
 
         // 2. 상태만 변경하기
         // 2-1. 상태 변경
-        rent.setRentStatus(RentStatus.CANCELLED);
+        rent.setRentStatus(RentStatus.canceled);
 
         // 2-2. 변경 상태 저장
         rentRepository.save(rent);
