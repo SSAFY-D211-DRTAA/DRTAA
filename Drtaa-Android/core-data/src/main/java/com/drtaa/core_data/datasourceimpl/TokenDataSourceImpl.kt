@@ -11,7 +11,7 @@ import javax.inject.Inject
 import javax.inject.Named
 
 class TokenDataSourceImpl @Inject constructor(
-    @Named("USER_DATASTORE")
+    @Named("TOKEN_DATASTORE")
     private val dataStore: DataStore<Preferences>
 ) : TokenDataSource {
     override suspend fun getAccessToken(): String {

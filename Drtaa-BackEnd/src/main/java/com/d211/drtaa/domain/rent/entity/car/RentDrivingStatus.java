@@ -1,8 +1,8 @@
 package com.d211.drtaa.domain.rent.entity.car;
 
 public enum RentDrivingStatus {
-    DRIVING,    // 주행
-    PARKED,     // 주차
-    IDLING,     // 배회
-    CHARGING    // 충전
+    driving,    // 주행
+    parked,     // 주차
+    idling,     // 배회
+    charging    // 충전
 }

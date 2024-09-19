@@ -12,7 +12,7 @@
         android:id="@+id/cl_root_bottom_sheet"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/rec_white_top_rad30"
+        android:background="@drawable/rect_white_top_rad30"
         android:paddingHorizontal="20dp"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
         app:layout_constraintBottom_toBottomOf="parent"

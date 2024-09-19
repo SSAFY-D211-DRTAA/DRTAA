@@ -19,7 +19,7 @@ public class RentHistory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "rent_history_id", nullable = false)
     @Schema(description = "렌트 기록 고유 번호", example = "1")
-    private long renHistoryId;
+    private long rentHistoryId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)

@@ -32,10 +32,6 @@ public class SecurityConfig {
                         .requestMatchers("/test", "/", "/index.html").permitAll() // 테스트 접근 허용
                         .anyRequest().authenticated() // 나머지 요청은 인증 필요
                 )
-                .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint((request, response, authException) ->
-                                response.sendRedirect("/index.html")) // 인증되지 않은 접근 시 리다이렉트할 페이지 설정
-                )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class); // JWT 필터를 UsernamePasswordAuthenticationFilter 앞에 추가
 
         return http.build(); // 설정된 HttpSecurity 객체를 빌드하여 반환
