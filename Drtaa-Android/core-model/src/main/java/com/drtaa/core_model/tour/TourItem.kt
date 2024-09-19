@@ -1,4 +1,4 @@
-package com.drtaa.core_model.data
+package com.drtaa.core_model.tour
 
 import kotlinx.serialization.SerialName
 

@@ -5,7 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.drtaa.core_model.data.Search
+import com.drtaa.core_model.map.Search
 import com.drtaa.core_ui.base.BaseDiffUtil
 import com.drtaa.feature_rent.databinding.ItemSearchBinding
 

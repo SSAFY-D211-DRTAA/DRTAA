@@ -6,7 +6,7 @@ import androidx.paging.PagingData
 import com.drtaa.core_data.datasource.TourDataSource
 import com.drtaa.core_data.paging.TourPagingSource
 import com.drtaa.core_data.repository.TourRepository
-import com.drtaa.core_model.data.TourItem
+import com.drtaa.core_model.tour.TourItem
 import kotlinx.coroutines.flow.Flow
 import timber.log.Timber
 import javax.inject.Inject

@@ -1,4 +1,4 @@
-package com.drtaa.core_model.data
+package com.drtaa.core_model.sign
 
 data class SocialUser(
     val userLogin: String,

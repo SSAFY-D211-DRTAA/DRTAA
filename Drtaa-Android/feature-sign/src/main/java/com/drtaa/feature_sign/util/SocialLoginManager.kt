@@ -9,8 +9,8 @@ import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.GetCredentialResponse
 import androidx.credentials.exceptions.GetCredentialException
+import com.drtaa.core_model.sign.SocialUser
 import com.drtaa.core_data.repository.SignRepository
-import com.drtaa.core_model.data.SocialUser
 import com.drtaa.core_model.util.Social
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential

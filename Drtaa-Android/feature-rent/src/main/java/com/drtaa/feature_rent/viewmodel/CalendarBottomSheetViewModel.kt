@@ -2,7 +2,7 @@ package com.drtaa.feature_rent.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.drtaa.core_model.data.Time
+import com.drtaa.core_model.rent.Time
 import com.prolificinteractive.materialcalendarview.CalendarDay
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

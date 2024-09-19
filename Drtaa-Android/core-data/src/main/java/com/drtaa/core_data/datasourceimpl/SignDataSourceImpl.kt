@@ -5,11 +5,11 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.drtaa.core_data.datasource.SignDataSource
-import com.drtaa.core_model.data.SocialUser
-import com.drtaa.core_model.data.UserLoginInfo
+import com.drtaa.core_model.sign.SocialUser
+import com.drtaa.core_model.sign.UserLoginInfo
+import com.drtaa.core_model.util.toRequestLogin
 import com.drtaa.core_model.network.RequestFormLogin
 import com.drtaa.core_model.network.ResponseLogin
-import com.drtaa.core_model.util.toRequestLogin
 import com.drtaa.core_network.api.SignAPI
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map

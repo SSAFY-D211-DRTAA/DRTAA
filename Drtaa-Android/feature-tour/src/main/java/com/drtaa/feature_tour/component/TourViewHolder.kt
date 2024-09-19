@@ -2,7 +2,7 @@ package com.drtaa.feature_tour.component
 
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import com.drtaa.core_model.data.TourItem
+import com.drtaa.core_model.tour.TourItem
 import com.drtaa.core_ui.centerCrop
 import com.drtaa.feature_tour.databinding.ItemTourBinding
 
