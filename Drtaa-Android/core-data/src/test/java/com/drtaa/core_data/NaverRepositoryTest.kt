@@ -23,7 +23,7 @@ import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltAndroidTest
-@Config(application = HiltTestApplication::class, manifest=Config.NONE)
+@Config(application = HiltTestApplication::class, manifest = Config.NONE)
 @RunWith(RobolectricTestRunner::class)
 class NaverRepositoryTest {
 
@@ -32,6 +32,7 @@ class NaverRepositoryTest {
 
     @Inject
     lateinit var naverRepository: NaverRepository
+
     @Inject
     lateinit var naverDataSource: NaverDataSource
 
