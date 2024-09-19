@@ -13,7 +13,7 @@ data class PaymentCompletionInfo(
     val userId: String,
     val paymentMethod: String,
     val purchasedAt: Date,
-    val carId: Long = 1,
+    val carId: Int = 1,
     val headCount: Int = 1,
     val rentStartTime: Date = Date(),
     val rentEndTime: Date = Date(System.currentTimeMillis() + HOUR_TO_MILLIS.value) // 1시간 후
