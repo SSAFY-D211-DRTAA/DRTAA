@@ -96,15 +96,9 @@ class RentViewModel @Inject constructor() : ViewModel() {
 
     fun getRentInfo() {
         viewModelScope.launch {
-            // 총 시간 (분단위 포함)
             val hours = calculateHours()
-            // 할인전 금액 :
             val price = (hours * PRICE_PER_HOUR).toInt()
-
-            // 24시간 단위 할인 금액
-            val discount = ((hours / 24) * DISCOUNT_PER_DAY).toInt()
-
-            // 할인된 금액
+            val discount = -1 * ((hours / 24) * DISCOUNT_PER_DAY).toInt()
             val finalPrice = price - discount
 
             _rentInfo.emit(
@@ -140,6 +134,6 @@ class RentViewModel @Inject constructor() : ViewModel() {
 
         private const val PRICE_PER_HOUR = 20000
         private const val PRICE_PER_DAY = 200000
-        private const val DISCOUNT_PER_DAY = 40000
+        private const val DISCOUNT_PER_DAY = 240000
     }
 }

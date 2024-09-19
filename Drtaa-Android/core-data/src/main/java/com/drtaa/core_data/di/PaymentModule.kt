@@ -21,5 +21,4 @@ abstract class PaymentModule {
     abstract fun bindPaymentDataSource(
         paymentDataSourceImpl: PaymentDataSourceImpl
     ): PaymentDataSource
-
 }

@@ -135,7 +135,7 @@
                         style="@style/ptd_regular"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text='@{rentInfo.price + "원"}'
+                        app:setTextPrice="@{rentInfo.price}"
                         app:layout_constraintBottom_toBottomOf="@+id/tv_summary_fare_total"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="@+id/tv_summary_fare_total"
@@ -156,7 +156,7 @@
                         style="@style/ptd_regular"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text='@{"-" + rentInfo.discount + "원"}'
+                        app:setTextPrice="@{rentInfo.discount}"
                         app:layout_constraintBottom_toBottomOf="@+id/tv_summary_discount"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="@+id/tv_summary_discount"
@@ -181,11 +181,11 @@
                         app:layout_constraintTop_toBottomOf="@+id/view_summary_price" />
 
                     <TextView
-                        android:id="@+id/tv_summary_total_price"
+                        android:id="@+id/tv_summary_final_price"
                         style="@style/ptd_regular"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text='@{rentInfo.finalPrice + "원"}'
+                        app:setTextPrice="@{rentInfo.finalPrice}"
                         app:layout_constraintBottom_toBottomOf="@+id/tv_summary_total"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="@+id/tv_summary_total"
