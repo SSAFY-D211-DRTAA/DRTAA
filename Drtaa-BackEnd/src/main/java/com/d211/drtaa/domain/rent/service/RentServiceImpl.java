@@ -1,8 +1,8 @@
 package com.d211.drtaa.domain.rent.service;
 
-import com.d211.drtaa.domain.rent.dto.request.RentStatusRequestDTO;
 import com.d211.drtaa.domain.rent.dto.request.RentCreateRequestDTO;
 import com.d211.drtaa.domain.rent.dto.request.RentEditRequestDTO;
+import com.d211.drtaa.domain.rent.dto.request.RentStatusRequestDTO;
 import com.d211.drtaa.domain.rent.dto.request.RentTimeRequestDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentDetailResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentResponseDTO;
@@ -11,9 +11,11 @@ import com.d211.drtaa.domain.rent.entity.RentStatus;
 import com.d211.drtaa.domain.rent.entity.car.RentCar;
 import com.d211.drtaa.domain.rent.entity.car.RentCarSchedule;
 import com.d211.drtaa.domain.rent.entity.car.RentDrivingStatus;
+import com.d211.drtaa.domain.rent.entity.history.RentHistory;
 import com.d211.drtaa.domain.rent.repository.RentRepository;
 import com.d211.drtaa.domain.rent.repository.car.RentCarRepository;
 import com.d211.drtaa.domain.rent.repository.car.RentCarScheduleRepository;
+import com.d211.drtaa.domain.rent.repository.history.RentHistoryRepository;
 import com.d211.drtaa.domain.rent.service.history.RentHistoryService;
 import com.d211.drtaa.domain.travel.entity.Travel;
 import com.d211.drtaa.domain.travel.entity.TravelDates;
@@ -47,6 +49,7 @@ public class RentServiceImpl implements RentService{
     private final RentRepository rentRepository;
     private final RentCarRepository rentCarRepository;
     private final RentCarScheduleRepository rentCarScheduleRepository;
+    private final RentHistoryRepository rentHistoryRepository;
     private final TravelRepository travelRepository;
     private final TravelDatesRepository travelDatesRepository;
 
@@ -135,30 +138,38 @@ public class RentServiceImpl implements RentService{
                 })
                 .collect(Collectors.toList());
 
+        // 배차 가능한 차량이 없는 경우
         if (availableCars.isEmpty())
             throw new RuntimeException("해당 기간에 사용 가능한 차량이 없습니다.");
 
-        RentCar availableCar = availableCars.get(0);
+        // 배차 가능한 차량이 있는 경우
+        RentCar availableCar = availableCars.get(0); // 가장 첫번째 차량 선택
 
+        // 여행 생성
         Travel travel = Travel.builder()
                 .travelName(startDate + " 여행")
                 .travelStartDate(startDate)
                 .travelEndDate(endDate)
                 .build();
 
+        // 여행 저장
         travelRepository.save(travel);
 
+        // 여행별 일정 생성
         while (!startDate.isAfter(endDate)) {
             TravelDates travelDates = TravelDates.builder()
                     .travel(travel)
                     .travelDatesDate(startDate)
                     .build();
 
+            // 여행별 일정 저장
             travelDatesRepository.save(travelDates);
 
+            // 다음날로 이동
             startDate = startDate.plusDays(1);
         }
 
+        // 렌트 생성
         Rent rent = Rent.builder()
                 .user(user)
                 .rentCar(availableCar)
@@ -173,19 +184,27 @@ public class RentServiceImpl implements RentService{
                 .rentDptLon(rentCreateRequestDTO.getRentDptLon())
                 .build();
 
+        // 렌트 저장
         rentRepository.save(rent);
 
-        availableCar.setRentCarDrivingStatus(RentDrivingStatus.parked);
+        // 렌트 차량 상태 변경
+        availableCar.setRentCarDrivingStatus(RentDrivingStatus.parked); // 주차(기본값)
+
+        // 렌트 차량 변경 상태 저장
         rentCarRepository.save(availableCar);
 
+        // 렌트 차량 일정 생성
         RentCarSchedule rentCarSchedule = RentCarSchedule.builder()
                 .rentCar(availableCar)
                 .rentCarScheduleStartDate(startDateTime.toLocalDate())
                 .rentCarScheduleEndDate(endDateTime.toLocalDate())
+                .rentCarScheduleIsDone(false)
                 .build();
 
+        // 렌트 차량 일정 저장
         rentCarScheduleRepository.save(rentCarSchedule);
 
+        // 반환값 빌더
         RentDetailResponseDTO response = RentDetailResponseDTO.builder()
                 .rentStatus(rent.getRentStatus())
                 .rentHeadCount(rent.getRentHeadCount())
@@ -255,7 +274,13 @@ public class RentServiceImpl implements RentService{
         carSchedule.setRentCarScheduleIsDone(true); // 완료
         
         // 렌트 기록 생성
-        rentHistoryService.createHistory(rent.getUser().getUserProviderId(), rent.getRentId());
+        RentHistory history = RentHistory.builder()
+                .user(rent.getUser())
+                .rent(rent)
+                .build();
+
+        // 생성된 기록 저장
+        rentHistoryRepository.save(history);
 
         // 변경 상태 저장
         rentRepository.save(rent);
