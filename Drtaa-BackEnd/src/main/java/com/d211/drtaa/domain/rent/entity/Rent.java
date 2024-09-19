@@ -1,6 +1,7 @@
 package com.d211.drtaa.domain.rent.entity;
 
 import com.d211.drtaa.domain.rent.entity.car.RentCar;
+import com.d211.drtaa.domain.travel.entity.Travel;
 import com.d211.drtaa.domain.user.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
@@ -34,15 +35,15 @@ public class Rent {
     @Schema(description = "렌트한 차량 고유번호", example = "1")
     private RentCar rentCar;
 
-//    @OneToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "travel_id", nullable = false)
-//    @Schema(description = "렌트한 여행 고유번호", example = "1")
-//    private Travel travel;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "travel_id", nullable = false)
+    @Schema(description = "렌트한 여행 고유번호", example = "1")
+    private Travel travel;
 
     @Column(name = "rent_status", nullable = false)
-    @ColumnDefault("RESERVED")
+    @ColumnDefault("reserved")
     @Enumerated(EnumType.STRING)
-    @Schema(description = "렌트 상태", example = "RESERVED")
+    @Schema(description = "렌트 상태", example = "reserved")
     private RentStatus rentStatus;
 
     @Column(name = "rent_head_count", nullable = false)

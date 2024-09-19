@@ -2,6 +2,7 @@ package com.drtaa.core_network.di
 
 import com.drtaa.core_network.api.MapAPI
 import com.drtaa.core_network.api.PaymentAPI
+import com.drtaa.core_network.api.RentAPI
 import com.drtaa.core_network.api.SignAPI
 import com.drtaa.core_network.api.TestAPI
 import com.drtaa.core_network.api.TourAPI
@@ -56,4 +57,13 @@ object APIModule {
         @AuthRetrofit
         retrofit: Retrofit
     ): PaymentAPI = retrofit.create(PaymentAPI::class.java)
+
+    @Singleton
+    @Provides
+    fun provideRentAPI(
+        @AuthRetrofit
+        retrofit: Retrofit
+    ): RentAPI {
+        return retrofit.create(RentAPI::class.java)
+    }
 }

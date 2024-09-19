@@ -4,9 +4,9 @@ import com.d211.drtaa.domain.rent.dto.request.RentCarDispatchStatusRequestDTO;
 import com.d211.drtaa.domain.rent.dto.request.RentCarDriveStatusRequestDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentCarDispatchStatusResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentCarDriveStatusResponseDTO;
-import com.d211.drtaa.domain.rent.dto.response.RentCarResponseDTO;
 import com.d211.drtaa.domain.rent.entity.car.RentCar;
 import com.d211.drtaa.domain.rent.repository.car.RentCarRepository;
+import com.d211.drtaa.global.exception.rent.NoAvailableRentCarException;
 import com.d211.drtaa.global.exception.rent.RentCarNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -23,21 +23,11 @@ public class RentCarServiceImpl implements RentCarService {
     private final RentCarRepository rentCarRepository;
 
     @Override
-    public List<RentCarDispatchStatusResponseDTO> getAllDispatchStatus() {
+    public List<RentCar> getAllDispatchStatus() {
         // 모든 렌트 차량 검색
         List<RentCar> rentCarsList = rentCarRepository.findAll();
 
-        List<RentCarDispatchStatusResponseDTO> response = new ArrayList<>();
-        for(RentCar rentCar : rentCarsList) {
-            RentCarDispatchStatusResponseDTO dto = RentCarDispatchStatusResponseDTO.builder()
-                    .rentCarId(rentCar.getRentCarId())
-                    .rentCarIsDispatch(rentCar.isRentCarIsDispatch())
-                    .build();
-
-            response.add(dto);
-        }
-
-        return response;
+        return rentCarsList;
     }
 
     @Override
@@ -56,43 +46,20 @@ public class RentCarServiceImpl implements RentCarService {
     }
 
     @Override
-    public List<RentCarResponseDTO> getUnassignedDispatchStatus() {
+    public RentCar getUnassignedDispatchStatus() {
         // 미배차 상태 렌트 차량 검색
-        List<RentCar> rentCarsList = rentCarRepository.findByRentCarIsDispatchFalse();
+        RentCar rentCar = rentCarRepository.findFirstByRentCarIsDispatchFalse()
+                .orElseThrow(() -> new NoAvailableRentCarException("현재 배차 가능한 차량이 없습니다."));
 
-        List<RentCarResponseDTO> response = new ArrayList<>();
-        for(RentCar rentCar : rentCarsList) {
-            RentCarResponseDTO dto = RentCarResponseDTO.builder()
-                    .rentCarId(rentCar.getRentCarId())
-                    .rentCarNumber(rentCar.getRentCarNumber())
-                    .rentCarManufacturer(rentCar.getRentCarManufacturer())
-                    .rentCarModel(rentCar.getRentCarModel())
-                    .build();
-
-            response.add(dto);
-        }
-
-        return response;
+        return rentCar;
     }
 
     @Override
-    public List<RentCarResponseDTO> getAssignedDispatchStatus() {
+    public List<RentCar> getAssignedDispatchStatus() {
         // 배차 상태 렌트 차량 검색
-        List<RentCar> rentCarsList = rentCarRepository.findByRentCarIsDispatchTrue();
+        List<RentCar> rentCar = rentCarRepository.findByRentCarIsDispatchTrue();
 
-        List<RentCarResponseDTO> response = new ArrayList<>();
-        for(RentCar rentCar : rentCarsList) {
-            RentCarResponseDTO dto = RentCarResponseDTO.builder()
-                    .rentCarId(rentCar.getRentCarId())
-                    .rentCarNumber(rentCar.getRentCarNumber())
-                    .rentCarManufacturer(rentCar.getRentCarManufacturer())
-                    .rentCarModel(rentCar.getRentCarModel())
-                    .build();
-
-            response.add(dto);
-        }
-
-        return response;
+        return rentCar;
     }
 
     @Override

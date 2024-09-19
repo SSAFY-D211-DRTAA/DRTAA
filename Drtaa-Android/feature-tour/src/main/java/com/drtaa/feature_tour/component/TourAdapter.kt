@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import com.drtaa.core_model.data.TourItem
+import com.drtaa.core_model.tour.TourItem
 import com.drtaa.core_ui.base.BaseDiffUtil
 import com.drtaa.feature_tour.databinding.ItemTourBinding
 

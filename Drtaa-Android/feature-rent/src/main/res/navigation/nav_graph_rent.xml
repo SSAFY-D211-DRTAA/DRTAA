@@ -17,8 +17,8 @@
             android:id="@+id/action_rentFragment_to_rentPlanFragment"
             app:destination="@id/rentPlanFragment" />
         <action
-            android:id="@+id/action_rentFragment_to_rentSummaryFragment"
-            app:destination="@id/rentSummaryFragment" />
+            android:id="@+id/action_rentFragment_to_rentPriceFragment"
+            app:destination="@id/rentPriceFragment" />
     </fragment>
     <fragment
         android:id="@+id/rentSearchFragment"
@@ -39,7 +39,11 @@
         android:id="@+id/rentPriceFragment"
         android:name="com.drtaa.feature_rent.RentPriceFragment"
         android:label="RentPriceFragment"
-        tools:layout="@layout/fragment_rent_price" />
+        tools:layout="@layout/fragment_rent_price" >
+        <action
+            android:id="@+id/action_rentPriceFragment_to_rentSummaryFragment"
+            app:destination="@id/rentSummaryFragment" />
+    </fragment>
     <fragment
         android:id="@+id/rentSummaryFragment"
         android:name="com.drtaa.feature_rent.RentSummaryFragment"

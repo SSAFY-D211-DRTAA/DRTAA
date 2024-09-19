@@ -1,4 +1,4 @@
-package com.drtaa.core_model.data
+package com.drtaa.core_model.rent
 
 import java.lang.String.format
 import java.util.Locale

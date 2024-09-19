@@ -1,10 +1,12 @@
 package com.drtaa.core_data.di
 
 import com.drtaa.core_data.datasource.NaverDataSource
+import com.drtaa.core_data.datasource.RentDataSource
 import com.drtaa.core_data.datasource.SignDataSource
 import com.drtaa.core_data.datasource.TokenDataSource
 import com.drtaa.core_data.datasource.TourDataSource
 import com.drtaa.core_data.datasourceimpl.NaverDataSourceImpl
+import com.drtaa.core_data.datasourceimpl.RentDataSourceImpl
 import com.drtaa.core_data.datasourceimpl.SignDataSourceImpl
 import com.drtaa.core_data.datasourceimpl.TokenDataSourceImpl
 import com.drtaa.core_data.datasourceimpl.TourDataSourceImpl
@@ -32,4 +34,8 @@ interface DataSourceModule {
     @Singleton
     @Binds
     fun bindTourDataSource(tourDataSourceImpl: TourDataSourceImpl): TourDataSource
+
+    @Singleton
+    @Binds
+    fun bindRentDataSource(rentDataSourceImpl: RentDataSourceImpl): RentDataSource
 }

@@ -4,7 +4,7 @@ import com.drtaa.core_data.datasource.NaverDataSource
 import com.drtaa.core_data.repository.NaverRepository
 import com.drtaa.core_data.util.ResultWrapper
 import com.drtaa.core_data.util.safeApiCall
-import com.drtaa.core_model.data.Search
+import com.drtaa.core_model.map.Search
 import com.drtaa.core_model.util.toSearch
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
