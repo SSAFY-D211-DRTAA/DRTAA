@@ -2,26 +2,23 @@ package com.drtaa.feature_payment.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.drtaa.core_data.auth.UserManager
+import com.drtaa.core_data.datasourceimpl.SignDataSourceImpl
 import com.drtaa.core_data.repository.PaymentRepository
 import com.drtaa.core_model.data.PaymentCompletionInfo
 import com.drtaa.core_model.data.SocialUser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import timber.log.Timber
-import java.text.SimpleDateFormat
 import java.util.Date
-import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
 class PaymentViewModel @Inject constructor(
     private val paymentRepository: PaymentRepository,
-    private val userManager: UserManager
+    private val signDataSourceImpl: SignDataSourceImpl
 ) : ViewModel() {
 
     private val _paymentStatus = MutableSharedFlow<PaymentStatus>()
@@ -30,7 +27,7 @@ class PaymentViewModel @Inject constructor(
     fun processBootpayPayment(data: String) {
         viewModelScope.launch {
             try {
-                val currentUser = userManager.currentUser.firstOrNull()
+                val currentUser = signDataSourceImpl.getUserData()
                 if (currentUser == null) {
                     _paymentStatus.emit(PaymentStatus.Error("사용자 정보를 찾을 수 없습니다. 다시 로그인해 주세요."))
                     return@launch

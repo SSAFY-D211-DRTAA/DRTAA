@@ -13,7 +13,7 @@ import kr.co.bootpay.android.models.BootItem
 import kr.co.bootpay.android.models.BootUser
 import kr.co.bootpay.android.models.Payload
 import androidx.lifecycle.lifecycleScope
-import com.drtaa.core_data.auth.UserManager
+import com.drtaa.core_data.datasourceimpl.SignDataSourceImpl
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -25,7 +25,7 @@ import javax.inject.Inject
 class PaymentFragment : BaseFragment<FragmentPaymentBinding>(R.layout.fragment_payment) {
 
     @Inject
-    lateinit var userManager: UserManager
+    lateinit var signDataSourceImpl: SignDataSourceImpl
 
     private val viewModel: PaymentViewModel by viewModels()
 
@@ -55,10 +55,9 @@ class PaymentFragment : BaseFragment<FragmentPaymentBinding>(R.layout.fragment_p
         updateCountAndPrice()
 
         lifecycleScope.launch {
-            userManager.printCurrentUserData()
-            userManager.currentUser.collect { user ->
-                Timber.d("최근 유저 확인: $user")
-            }
+           val currentUser = signDataSourceImpl.getUserData()
+            Timber.d("최근 유저 확인: $currentUser")
+
         }
 
         observeViewModel()
@@ -147,7 +146,7 @@ class PaymentFragment : BaseFragment<FragmentPaymentBinding>(R.layout.fragment_p
     }
 
     private suspend fun getBootUser(): BootUser? {
-        val currentUser = userManager.currentUser.firstOrNull() ?: return null
+        val currentUser = signDataSourceImpl.getUserData()
         return BootUser().apply {
             id = currentUser.id
             username = currentUser.nickname
