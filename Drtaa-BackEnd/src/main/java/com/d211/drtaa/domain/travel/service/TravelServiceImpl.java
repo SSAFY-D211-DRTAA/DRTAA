@@ -11,6 +11,7 @@ import com.d211.drtaa.domain.travel.repository.DatePlacesRepository;
 import com.d211.drtaa.domain.travel.repository.TravelDatesRepository;
 import com.d211.drtaa.domain.travel.repository.TravelRepository;
 import com.d211.drtaa.global.exception.travel.TravelNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -72,6 +73,7 @@ public class TravelServiceImpl implements TravelService {
 
 
     @Override
+    @Transactional
     public void createTravelDatesPlaces(PlacesRequestDTO placesRequestDTO) {
         // 여행 찾기
         Travel travel = travelRepository.findByTravelId(placesRequestDTO.getTravelId())
