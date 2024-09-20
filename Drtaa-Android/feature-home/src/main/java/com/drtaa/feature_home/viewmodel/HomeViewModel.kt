@@ -23,12 +23,12 @@ class HomeViewModel @Inject constructor(
         getUserData()
     }
 
-    fun getUserData() {
+    private fun getUserData() {
         viewModelScope.launch {
-            signRepository.getUserData().collect() { result ->
+            signRepository.getUserData().collect { result ->
                 result.onSuccess { user ->
                     _currentUser.value = user
-                }.onFailure { error ->
+                }.onFailure { _ ->
                     Timber.e("유저 정보 조회 오류")
                 }
             }

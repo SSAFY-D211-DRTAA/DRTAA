@@ -68,6 +68,6 @@ fun NaverMap.setCustomLocationButton(view: View) {
  *  @param longitude
  */
 fun NaverMap.moveCameraTo(latitude: Double, longitude: Double) {
-    val cameraUpdate = CameraUpdate.scrollTo(LatLng(latitude, longitude))
+    val cameraUpdate = CameraUpdate.scrollTo(LatLng(latitude, longitude)).animate(CameraAnimation.Easing)
     this.moveCamera(cameraUpdate)
 }
