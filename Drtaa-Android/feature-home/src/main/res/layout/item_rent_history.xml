@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="rent"
+            type="com.drtaa.core_model.rent.RentSimple" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/rect_white_rad30"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="30dp">
+
+        <TextView
+            android:id="@+id/tv_rent_id_title"
+            style="@style/ptd_regular"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="렌트 id: "
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_rent_id"
+            style="@style/ptd_regular"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/tv_rent_id_title"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="10000"
+            android:text="@{rent.rentId}"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
