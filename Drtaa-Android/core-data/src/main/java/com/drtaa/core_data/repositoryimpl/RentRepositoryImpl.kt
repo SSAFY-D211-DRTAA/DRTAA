@@ -7,7 +7,6 @@ import com.drtaa.core_data.util.safeApiCall
 import com.drtaa.core_model.network.RequestCallRent
 import com.drtaa.core_model.network.RequestCompleteRent
 import com.drtaa.core_model.network.RequestUnassignedCar
-import com.drtaa.core_model.network.ResponseCallRent
 import com.drtaa.core_model.rent.RentCar
 import com.drtaa.core_model.rent.RentDetail
 import com.drtaa.core_model.rent.RentSimple
@@ -63,7 +62,7 @@ class RentRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun callRent(requestCallRent: RequestCallRent): Flow<Result<ResponseCallRent>> =
+    override suspend fun callRent(requestCallRent: RequestCallRent): Flow<Result<RentDetail>> =
         flow {
             when (
                 val response = safeApiCall { rentDataSource.callRent(requestCallRent) }
