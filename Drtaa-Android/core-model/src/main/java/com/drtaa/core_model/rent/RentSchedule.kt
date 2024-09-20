@@ -1,6 +1,8 @@
 package com.drtaa.core_model.rent
 
 import java.lang.String.format
+import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 
 data class RentSchedule(
@@ -21,6 +23,16 @@ data class RentSchedule(
 
     fun toStringDate(): String {
         return format(Locale.ROOT, "%04d.%02d.%02d(%s)", year, month, date, day)
+    }
+
+    fun toRequestUnassignedCar(): String {
+        return format(Locale.ROOT, "%04d-%02d-%02d", year, month, date)
+    }
+
+    fun toDate(): Date {
+        val calendar = Calendar.getInstance()
+        calendar.set(year, month, date, hour, minute)
+        return calendar.time
     }
 
     override fun toString(): String {

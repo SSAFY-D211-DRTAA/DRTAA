@@ -24,29 +24,35 @@ repositories {
 }
 
 dependencies {
-    // spring
+    // Spring
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.6.0'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.17.2'
 
-
-    // jpa
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-
-    // security
+    // Security
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation 'org.springframework.boot:spring-boot-starter-security'
 
-    // jwt
+    // JWT
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
     implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
     implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+    // JPA
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
     // S3
     implementation group: 'io.awspring.cloud', name: 'spring-cloud-starter-aws', version: '2.4.4'
 
     // Redis
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-redis', version: '3.3.3'
+
+    // WebSocket
+    implementation group: 'org.springframework', name: 'spring-websocket', version: '6.1.13'
+
+    // mqtt
+    implementation 'org.springframework.boot:spring-boot-starter-integration'
+    implementation 'org.springframework.integration:spring-integration-mqtt:5.5.0'
 
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
@@ -57,10 +63,6 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
-    // mqtt
-    implementation 'org.springframework.boot:spring-boot-starter-integration'
-    implementation 'org.springframework.integration:spring-integration-mqtt:5.5.0'
 }
 
 tasks.named('test') {

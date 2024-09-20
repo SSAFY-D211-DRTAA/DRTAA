@@ -5,12 +5,10 @@ import com.d211.drtaa.domain.rent.dto.response.UserHistoryResponseDTO;
 import com.d211.drtaa.domain.rent.entity.Rent;
 import com.d211.drtaa.domain.rent.entity.car.RentCar;
 import com.d211.drtaa.domain.rent.entity.history.RentHistory;
-import com.d211.drtaa.domain.rent.repository.RentRepository;
 import com.d211.drtaa.domain.rent.repository.history.RentHistoryRepository;
 import com.d211.drtaa.domain.user.entity.User;
 import com.d211.drtaa.domain.user.repository.UserRepository;
 import com.d211.drtaa.global.exception.rent.RentHistoryNotFoundException;
-import com.d211.drtaa.global.exception.rent.RentNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -26,7 +24,6 @@ public class RentHistoryServiceImpl implements RentHistoryService{
 
     private final UserRepository userRepository;
     private final RentHistoryRepository rentHistoryRepository;
-    private final RentRepository rentRepository;
 
     @Override
     public List<UserHistoryResponseDTO> getHistory(String userProviderId) {
@@ -78,46 +75,9 @@ public class RentHistoryServiceImpl implements RentHistoryService{
                 .rentCarModel(rentCar.getRentCarModel())
 
                 // travel
-                .build();
-
-        return response;
-    }
-
-    @Override
-    public UserDetailHistoryResponseDTO createHistory(String userProviderId, Long rentId) {
-        // 사용자 찾기
-        User user = userRepository.findByUserProviderId(userProviderId)
-                .orElseThrow(() -> new UsernameNotFoundException("해당 userProviderId의 맞는 회원을 찾을 수 없습니다."));
-
-        // 렌트 찾기
-        Rent rent = rentRepository.findByRentId(rentId)
-                .orElseThrow(() -> new RentNotFoundException("해당 rentId의 맞는 렌트를 찾을 수 없습니다."));
-
-        // 기록 생성
-        RentHistory history = RentHistory.builder()
-                .user(user)
-                .rent(rent)
-                .build();
-
-        // 생성된 기록 저장
-        rentHistoryRepository.save(history);
-
-        UserDetailHistoryResponseDTO response = UserDetailHistoryResponseDTO.builder()
-                // rent
-                .rentHeadCount(history.getRent().getRentHeadCount())
-                .rentPrice(history.getRent().getRentPrice())
-                .rentTime(history.getRent().getRentTime())
-                .rentStartTime(history.getRent().getRentStartTime())
-                .rentEndTime(history.getRent().getRentEndTime())
-                .rentCreatedAt(history.getRent().getRentCreatedAt())
-                // rent-car
-                .rentCarNumber(history.getRent().getRentCar().getRentCarNumber())
-                .rentCarManufacturer(history.getRent().getRentCar().getRentCarManufacturer())
-                .rentCarModel(history.getRent().getRentCar().getRentCarModel())
-                //travel
-                .travelName(history.getRent().getTravel().getTravelName())
-                .travelStartDate(history.getRent().getTravel().getTravelStartDate())
-                .travelEndDate(history.getRent().getTravel().getTravelEndDate())
+                .travelName(rent.getTravel().getTravelName())
+                .travelStartDate(rent.getTravel().getTravelStartDate())
+                .travelEndDate(rent.getTravel().getTravelEndDate())
                 .build();
 
         return response;

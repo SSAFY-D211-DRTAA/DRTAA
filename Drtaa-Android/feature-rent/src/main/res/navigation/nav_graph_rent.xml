@@ -17,8 +17,8 @@
             android:id="@+id/action_rentFragment_to_rentPlanFragment"
             app:destination="@id/rentPlanFragment" />
         <action
-            android:id="@+id/action_rentFragment_to_rentPriceFragment"
-            app:destination="@id/rentPriceFragment" />
+            android:id="@+id/action_rentFragment_to_rentSummaryFragment"
+            app:destination="@id/rentSummaryFragment" />
     </fragment>
     <fragment
         android:id="@+id/rentSearchFragment"
@@ -36,18 +36,19 @@
         android:label="RentPlanFragment"
         tools:layout="@layout/fragment_rent_plan" />
     <fragment
-        android:id="@+id/rentPriceFragment"
-        android:name="com.drtaa.feature_rent.RentPriceFragment"
-        android:label="RentPriceFragment"
-        tools:layout="@layout/fragment_rent_price" >
-        <action
-            android:id="@+id/action_rentPriceFragment_to_rentSummaryFragment"
-            app:destination="@id/rentSummaryFragment" />
-    </fragment>
-    <fragment
         android:id="@+id/rentSummaryFragment"
         android:name="com.drtaa.feature_rent.RentSummaryFragment"
         android:label="RentSummaryFragment"
         tools:layout="@layout/fragment_rent_summary" />
+
+    <action
+        android:id="@+id/action_fragment_rent_to_nav_graph_payment"
+        app:destination="@id/nav_graph_payment">
+        <argument
+            android:name="payment"
+            app:argType="com.drtaa.core_model.rent.RentPayment" />
+    </action>
+
+    <include app:graph="@navigation/nav_graph_payment"/>
 
 </navigation>

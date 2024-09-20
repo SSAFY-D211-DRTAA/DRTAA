@@ -8,6 +8,7 @@ import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.drtaa.core_map.base.BaseMapFragment
+import com.drtaa.core_map.moveCameraTo
 import com.drtaa.core_map.setCustomLocationButton
 import com.drtaa.core_model.map.Search
 import com.drtaa.core_ui.hideKeyboard
@@ -72,6 +73,8 @@ class RentSearchFragment :
                 Timber.d("selectedSearchItem $selectedSearchItem")
                 selectedSearchItem?.let {
                     naverMap.setMarker(selectedSearchItem.lat, selectedSearchItem.lng)
+                    naverMap.moveCameraTo(selectedSearchItem.lat, selectedSearchItem.lng)
+                    naverMap.setContentPadding(0, 0, 0, MAP_BOTTOM_CONTENT_PADDING)
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
@@ -174,5 +177,6 @@ class RentSearchFragment :
 
     companion object {
         const val BOTTOM_SHEET_PEEK_HEIGHT = 500
+        const val MAP_BOTTOM_CONTENT_PADDING = 100
     }
 }

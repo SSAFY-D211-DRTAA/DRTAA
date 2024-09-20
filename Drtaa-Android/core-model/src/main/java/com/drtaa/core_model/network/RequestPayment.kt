@@ -6,7 +6,7 @@ data class RequestPayment(
     val price: Int,
     val paymentMethod: String,
     val purchasedAt: String,
-    val carId: Long,
+    val carId: Int,
     val headCount: Int,
     val rentStartTime: String,
     val rentEndTime: String

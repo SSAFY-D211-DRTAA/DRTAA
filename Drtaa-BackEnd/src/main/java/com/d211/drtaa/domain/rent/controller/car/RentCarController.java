@@ -1,21 +1,25 @@
 package com.d211.drtaa.domain.rent.controller.car;
 
-import com.d211.drtaa.domain.rent.dto.request.RentCarDispatchStatusRequestDTO;
 import com.d211.drtaa.domain.rent.dto.request.RentCarDriveStatusRequestDTO;
-import com.d211.drtaa.domain.rent.dto.response.RentCarDispatchStatusResponseDTO;
+import com.d211.drtaa.domain.rent.dto.request.RentCarUnassignedDispatchStatusRequestDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentCarDriveStatusResponseDTO;
+import com.d211.drtaa.domain.rent.dto.response.RentCarLocationResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentCarResponseDTO;
-import com.d211.drtaa.domain.rent.entity.car.RentCar;
 import com.d211.drtaa.domain.rent.entity.car.RentDrivingStatus;
 import com.d211.drtaa.domain.rent.service.car.RentCarService;
 import com.d211.drtaa.global.exception.rent.NoAvailableRentCarException;
 import com.d211.drtaa.global.exception.rent.RentCarNotFoundException;
+import com.d211.drtaa.global.exception.rent.RentNotFoundException;
+import com.d211.drtaa.global.exception.websocket.WebSocketDisConnectedException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,7 +37,7 @@ public class RentCarController {
     @Operation(summary = "전체 배차 상태 조회", description = "전체 렌트 차량의 배차 상태 조회")
     public ResponseEntity getAllDispatchStatus() {
         try {
-            List<RentCar> response = rentCarService.getAllDispatchStatus();
+            List<RentCarResponseDTO> response = rentCarService.getAllDispatchStatus();
 
             return ResponseEntity.ok(response); // 200
         } catch (Exception e) {
@@ -41,79 +45,26 @@ public class RentCarController {
         }
     }
 
-    @PatchMapping("/dispatch")
-    @Operation(summary = "배차 상태 수정", description = "rentCarId의 맞는 렌트 차량의 배차 상태 수정")
-    public ResponseEntity updateDispatchStatus(@RequestBody RentCarDispatchStatusRequestDTO rentCarDispatchStatusRequestDTO) {
-        try {
-            rentCarService.updateDispatchStatus(rentCarDispatchStatusRequestDTO);
-
-            String dispatchStatus = rentCarDispatchStatusRequestDTO.isRentCarIsDispatch() ? "배차" : "미배차";
-            String response = "차 (rentCarId: " + rentCarDispatchStatusRequestDTO.getRentCarId() + ")의 배차 상태가 " + dispatchStatus + "로 변경되었습니다.";
-
-            return ResponseEntity.ok(response); // 200
-        } catch (RentCarNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage()); // 400
-        }
-    }
-
-    @GetMapping("/dispatch/{rentCarId}")
-    @Operation(summary = "특정 차량 배차 상태 조회", description = "rentCarId의 맞는 렌트 차량의 배차 상태 조회")
-    public ResponseEntity getDispatchStatus(@PathVariable("rentCarId") Long rentCarId) {
-        try {
-            RentCarDispatchStatusResponseDTO response = rentCarService.getDispatchStatus(rentCarId);
-
-            return ResponseEntity.ok(response); // 200
-        } catch (RentCarNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage()); // 400
-        }
-    }
-
-    @GetMapping("/dispatch/unassigned")
+    @PostMapping("/dispatch")
     @Operation(summary = "미배차 차량 조회", description = "미배차 상태인 렌트 차량 조회")
-    public ResponseEntity getUnassignedDispatchStatus() {
+    public ResponseEntity getUnassignedDispatchStatus(@RequestBody RentCarUnassignedDispatchStatusRequestDTO rentCarUnassignedDispatchStatusRequestDTO) {
         try {
-            RentCar car = rentCarService.getUnassignedDispatchStatus();
-
-            RentCarResponseDTO response =  RentCarResponseDTO.builder()
-                    .isAvailable(true)
-                    .rentCar(car)
-                    .build();
+            RentCarResponseDTO response = rentCarService.getUnassignedDispatchStatus(rentCarUnassignedDispatchStatusRequestDTO);
 
             return ResponseEntity.ok(response); // 200
         } catch (NoAvailableRentCarException e) {
             RentCarResponseDTO response =  RentCarResponseDTO.builder()
                     .isAvailable(false)
                     // 빈 객체로 응답
-                    .rentCar(RentCar.builder()
-                            .rentCarId(0)
-                            .rentCarNumber("")
-                            .rentCarManufacturer("")
-                            .rentCarModel("")
-                            .rentCarImg("")
-                            .rentCarIsDispatch(true)
-                            .rentCarDrivingStatus(RentDrivingStatus.parked)
-                            .build())
+                    .rentCarId(0)
+                    .rentCarNumber("")
+                    .rentCarManufacturer("")
+                    .rentCarModel("")
+                    .rentCarImg("")
+                    .rentCarDrivingStatus(RentDrivingStatus.parked)
                     .build();
 
             return ResponseEntity.ok(response); // 200
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage()); // 400
-        }
-    }
-
-    @GetMapping("/dispatch/assigned")
-    @Operation(summary = "배차 차량 조회", description = "배차 상태인 렌트 차량 조회")
-    public ResponseEntity getAssignedDispatchStatus() {
-        try {
-            List<RentCar> response = rentCarService.getAssignedDispatchStatus();
-
-            return ResponseEntity.ok(response); // 200
-        } catch (NoAvailableRentCarException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage()); // 400
         }
@@ -125,8 +76,7 @@ public class RentCarController {
         try {
             rentCarService.updateDriveStatus(rentCarDriveStatusRequestDTO);
 
-            String response = "차 (rentCarId: " + rentCarDriveStatusRequestDTO.getRentCarId() + ")의 배차 상태가 " + rentCarDriveStatusRequestDTO.getRentCarDrivingStatus() + "로 변경되었습니다.";
-            return ResponseEntity.ok(response); // 200
+            return ResponseEntity.ok(rentCarDriveStatusRequestDTO); // 200
         } catch (RentCarNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
         } catch (Exception e) {
@@ -145,6 +95,24 @@ public class RentCarController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage()); // 400
+        }
+    }
+
+    @PostMapping("/call/{rentId}")
+    @Operation(summary = "렌트 차량 호출", description = "회원의 현재 진행중인 렌트의 렌트 차량 호출")
+    public ResponseEntity callRentCar(Authentication authentication, @PathVariable("rentId") long rentId) {
+        try{
+            RentCarLocationResponseDTO response = rentCarService.callRentCar(authentication.getName(), rentId);
+
+            return ResponseEntity.ok(response); //200
+        } catch (RentNotFoundException | RentCarNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
+        } catch (AuthenticationException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("권한 인증에 실패하였습니다."); // 401
+        } catch (WebSocketDisConnectedException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage()); // 500
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
         }
     }
 }
