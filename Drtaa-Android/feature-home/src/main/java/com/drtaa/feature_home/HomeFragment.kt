@@ -3,7 +3,6 @@ package com.drtaa.feature_home
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import com.drtaa.core_ui.base.BaseFragment
 import com.drtaa.feature_home.databinding.FragmentHomeBinding
 import com.drtaa.feature_home.viewmodel.HomeViewModel
