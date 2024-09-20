@@ -41,9 +41,8 @@ android {
 dependencies {
     implementation(libs.map.sdk)
     implementation(project(":core-map"))
+    implementation(project(":feature-payment"))
     //Calendar
     implementation(libs.material.calendarview)
     implementation(libs.threetenabp)
-
-    implementation (libs.android)
 }
