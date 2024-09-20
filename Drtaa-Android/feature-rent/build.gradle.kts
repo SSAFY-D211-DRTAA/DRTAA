@@ -45,6 +45,4 @@ dependencies {
     //Calendar
     implementation(libs.material.calendarview)
     implementation(libs.threetenabp)
-
-    implementation (libs.bootpay)
 }

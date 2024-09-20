@@ -86,7 +86,13 @@ class PaymentFragment : BaseDialogFragment<FragmentPaymentBinding>(R.layout.frag
                 }
 
                 override fun onClose() {
+                    Timber.tag("bootpay").d("onClose")
+                    findNavController().previousBackStackEntry?.savedStateHandle?.set(
+                        Pay.CANCELED.type,
+                        true
+                    )
                     Bootpay.removePaymentWindow()
+                    dismiss()
                 }
 
                 override fun onIssued(data: String) {
@@ -104,7 +110,6 @@ class PaymentFragment : BaseDialogFragment<FragmentPaymentBinding>(R.layout.frag
                         Pay.SUCCESS.type,
                         Pair(true, data)
                     )
-                    showSnackBar("결제에 성공했습니다")
                     dismiss()
                 }
             }).requestPayment()
