@@ -10,7 +10,6 @@ import com.drtaa.core_model.rent.RentPayment
 import com.drtaa.core_model.sign.SocialUser
 import com.drtaa.core_model.util.Pay
 import com.drtaa.core_ui.base.BaseDialogFragment
-import com.drtaa.core_ui.showSnackBar
 import com.drtaa.feature_payment.databinding.FragmentPaymentBinding
 import com.drtaa.feature_payment.viewmodel.PaymentViewModel
 import dagger.hilt.android.AndroidEntryPoint

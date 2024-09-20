@@ -2,7 +2,6 @@ package com.drtaa.feature_payment.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.drtaa.core_data.repository.PaymentRepository
 import com.drtaa.core_data.repository.SignRepository
 import com.drtaa.core_model.sign.SocialUser
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,7 +13,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PaymentViewModel @Inject constructor(
-    private val paymentRepository: PaymentRepository,
     private val signRepository: SignRepository
 ) : ViewModel() {
 
