@@ -4,7 +4,7 @@ variables:
   ANDROID_COMPILE_SDK: "34"
   ANDROID_BUILD_TOOLS: "34.0.0"
   ANDROID_SDK_TOOLS: "8512546"
-  ANDROID_HOME: "C:\android-sdk"
+  ANDROID_HOME: "C:\\android-sdk"
   ANDROID_PROJECT_DIR: "Drtaa-Android"
 
 before_script:
