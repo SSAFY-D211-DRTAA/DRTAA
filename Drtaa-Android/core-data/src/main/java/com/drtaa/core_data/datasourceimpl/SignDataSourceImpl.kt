@@ -41,22 +41,22 @@ class SignDataSourceImpl @Inject constructor(
     override suspend fun getUserData(): SocialUser {
         return dataStore.data.map { prefs ->
             SocialUser(
+                prefs[USER_LOGIN_TYPE] ?: "",
                 prefs[USER_ID] ?: "",
                 prefs[USER_NAME] ?: "",
                 prefs[USER_NICKNAME] ?: "",
                 prefs[USER_PROFILE_IMAGE] ?: "",
-                prefs[USER_LOGIN_TYPE] ?: ""
             )
         }.first()
     }
 
     override suspend fun setUserData(user: SocialUser) {
         dataStore.edit { preferences ->
+            preferences[USER_LOGIN_TYPE] = user.userLogin
             preferences[USER_ID] = user.id
             preferences[USER_NAME] = user.name ?: ""
             preferences[USER_NICKNAME] = user.nickname
             preferences[USER_PROFILE_IMAGE] = user.profileImageUrl ?: ""
-            preferences[USER_LOGIN_TYPE] = user.userLogin
         }
     }
 
