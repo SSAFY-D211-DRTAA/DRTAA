@@ -1,49 +1,34 @@
-image: mcr.microsoft.com/windows/servercore:ltsc2019
+image: openjdk:17-jdk
 
 variables:
   ANDROID_COMPILE_SDK: "34"
   ANDROID_BUILD_TOOLS: "34.0.0"
-  ANDROID_SDK_TOOLS: "8512546"
-  ANDROID_HOME: "C:\android-sdk"
-  JAVA_HOME: "C:\Program Files\Java\jdk-17"
-  ANDROID_PROJECT_DIR: "Drtaa-Android"
+  ANDROID_SDK_TOOLS:   "9477386"
+  ANDROID_PROJECT_DIR: "Drtaa-Android"  # 안드로이드 프로젝트 폴더 경로
 
 before_script:
-  - $ErrorActionPreference = "Stop"
-  - $ProgressPreference = "SilentlyContinue"
-  
-  # Java 설치
-  - Invoke-WebRequest -Uri "https://download.java.net/java/GA/jdk17/0d483333a00540d886896bac774ff48b/35/GPL/openjdk-17_windows-x64_bin.zip" -OutFile "openjdk.zip"
-  - Expand-Archive -Path "openjdk.zip" -DestinationPath "C:\Program Files\Java\" -Force
-  - Rename-Item -Path "C:\Program Files\Java\jdk-17" -NewName "C:\Program Files\Java\jdk-17"
-  - $env:PATH += ";$env:JAVA_HOME\bin"
-  
-  # Android SDK 다운로드 및 설치
-  - New-Item -ItemType Directory -Force -Path $env:ANDROID_HOME | Out-Null
-  - Invoke-WebRequest -Uri "https://dl.google.com/android/repository/commandlinetools-win-${env:ANDROID_SDK_TOOLS}_latest.zip" -OutFile "commandlinetools.zip"
-  - Expand-Archive -Path "commandlinetools.zip" -DestinationPath "$env:ANDROID_HOME" -Force
-  - New-Item -ItemType Directory -Force -Path "$env:ANDROID_HOME\cmdline-tools" | Out-Null
-  - Move-Item "$env:ANDROID_HOME\cmdline-tools" "$env:ANDROID_HOME\cmdline-tools\latest" -Force
-  - $env:PATH += ";$env:ANDROID_HOME\cmdline-tools\latest\bin;$env:ANDROID_HOME\platform-tools"
-
-  # SDK 컴포넌트 설치
-  - Write-Host "y" | sdkmanager.bat --sdk_root=$env:ANDROID_HOME "platforms;android-$env:ANDROID_COMPILE_SDK" "build-tools;$env:ANDROID_BUILD_TOOLS" "platform-tools"
-  
-  # 프로젝트 디렉토리로 이동
-  - cd $env:ANDROID_PROJECT_DIR
-  
-  # local.properties 파일 생성
-  - Set-Content -Path "local.properties" -Value "sdk.dir=$env:ANDROID_HOME"
-  - Add-Content -Path "local.properties" -Value "NAVER_MAP_CLIENT_ID=$env:NAVER_MAP_CLIENT_ID"
-  - Add-Content -Path "local.properties" -Value "NAVER_MAP_CLIENT_ID_MANIFEST=$env:NAVER_MAP_CLIENT_ID_MANIFEST"
-  - Add-Content -Path "local.properties" -Value "NAVER_MAP_CLIENT_SECRET=$env:NAVER_MAP_CLIENT_SECRET"
-  - Add-Content -Path "local.properties" -Value "NAVER_CLIENT_ID=$env:NAVER_CLIENT_ID"
-  - Add-Content -Path "local.properties" -Value "NAVER_CLIENT_SECRET=$env:NAVER_CLIENT_SECRET"
-  - Add-Content -Path "local.properties" -Value "GOOGLE_LOGIN_CLIENT_ID=$env:GOOGLE_LOGIN_CLIENT_ID"
-  - Add-Content -Path "local.properties" -Value "TOUR_API_KEY=$env:TOUR_API_KEY"
-  - Add-Content -Path "local.properties" -Value "BASE_URL=$env:BASE_URL"
-  - Add-Content -Path "local.properties" -Value "MQTT_URL=$env:MQTT_URL"
-  - Add-Content -Path "local.properties" -Value "BOOTPAY_APP_ID=$env:BOOTPAY_APP_ID"
+  - apt-get --quiet update --yes
+  - apt-get --quiet install --yes wget tar unzip lib32stdc++6 lib32z1
+  - wget --quiet --output-document=android-sdk.zip https://dl.google.com/android/repository/commandlinetools-linux-${ANDROID_SDK_TOOLS}_latest.zip
+  - unzip -d android-sdk-linux android-sdk.zip
+  - echo y | android-sdk-linux/cmdline-tools/bin/sdkmanager --sdk_root=. "platforms;android-${ANDROID_COMPILE_SDK}" >/dev/null
+  - echo y | android-sdk-linux/cmdline-tools/bin/sdkmanager --sdk_root=. "platform-tools" >/dev/null
+  - echo y | android-sdk-linux/cmdline-tools/bin/sdkmanager --sdk_root=. "build-tools;${ANDROID_BUILD_TOOLS}" >/dev/null
+  - export ANDROID_HOME=$PWD
+  - export PATH=$PATH:$PWD/platform-tools/
+  - cd $ANDROID_PROJECT_DIR
+  - chmod +x ./gradlew
+  - echo "sdk.dir=$ANDROID_HOME" > local.properties
+  - echo "NAVER_MAP_CLIENT_ID=$NAVER_MAP_CLIENT_ID" >> local.properties
+  - echo "NAVER_MAP_CLIENT_ID_MANIFEST=$NAVER_MAP_CLIENT_ID_MANIFEST" >> local.properties
+  - echo "NAVER_MAP_CLIENT_SECRET=$NAVER_MAP_CLIENT_SECRET" >> local.properties
+  - echo "NAVER_CLIENT_ID=$NAVER_CLIENT_ID" >> local.properties
+  - echo "NAVER_CLIENT_SECRET=$NAVER_CLIENT_SECRET" >> local.properties
+  - echo "GOOGLE_LOGIN_CLIENT_ID=$GOOGLE_LOGIN_CLIENT_ID" >> local.properties
+  - echo "TOUR_API_KEY=$TOUR_API_KEY" >> local.properties
+  - echo "BASE_URL=$BASE_URL" >> local.properties
+  - echo "MQTT_URL=$MQTT_URL" >> local.properties
+  - echo "BOOTPAY_APP_ID=$BOOTPAY_APP_ID" >> local.properties
 
 stages:
   - build
@@ -51,9 +36,9 @@ stages:
 debug:
   stage: build
   script:
-    - .\gradlew.bat assembleDebug
+    - ./gradlew assembleDebug
   artifacts:
     paths:
-      - $env:ANDROID_PROJECT_DIR\app\build\outputs\apk\debug\app-debug.apk
+      - $ANDROID_PROJECT_DIR/app/build/outputs/apk/debug/app-debug.apk
   only:
     - develop
