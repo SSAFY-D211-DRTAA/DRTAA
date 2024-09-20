@@ -4,7 +4,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.bumptech.glide.Glide.init
 import com.drtaa.core_ui.base.BaseFragment
 import com.drtaa.feature_home.databinding.FragmentHomeBinding
 import com.drtaa.feature_home.viewmodel.HomeViewModel
@@ -22,14 +21,13 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
             binding.homeviewModel = this@HomeFragment.homeviewModel
         }
         initObserve()
-
         initEvent()
     }
 
-    private fun initObserve(){
+    private fun initObserve() {
         homeviewModel.currentUser.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { result ->
-                if(result == null) return@onEach
+                if (result == null) return@onEach
                 binding.socialUser = result
                 Timber.d("$result")
             }.launchIn(viewLifecycleOwner.lifecycleScope)
@@ -37,11 +35,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
 
     private fun initEvent() {
         binding.btnHomeCarRent.setOnClickListener {
-            findNavController().navigate(R.id.action_home_to_rent)
-        }
-
-        binding.btnHomePayment.setOnClickListener {
-            findNavController().navigate(R.id.action_home_to_payment)
+            navigateDestination(R.id.action_home_to_rent)
         }
 
         binding.btnHomeRentHistory.setOnClickListener {
