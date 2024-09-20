@@ -1,7 +1,13 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
     id("drtaa.plugin.core")
+}
+
+fun getApiKey(propertyKey: String): String {
+    return gradleLocalProperties(rootDir, providers).getProperty(propertyKey)
 }
 
 android {
@@ -10,7 +16,7 @@ android {
 
     defaultConfig {
         minSdk = 28
-
+        buildConfigField("String", "MQTT_URL", getApiKey("MQTT_URL"))
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
@@ -35,6 +41,9 @@ android {
         resources {
             excludes += setOf("META-INF/INDEX.LIST", "META-INF/io.netty.versions.properties")
         }
+    }
+    buildFeatures{
+        buildConfig = true
     }
 }
 
