@@ -34,11 +34,12 @@ class PaymentViewModel @Inject constructor(
         currentUser()
     }
 
+    // datastore에서 저장된 user 가져오기
     private fun currentUser() {
         viewModelScope.launch {
             signRepository.getUserData().collect { result ->
-                result.onSuccess { currentUser ->
-                    _currentUser.emit(currentUser)
+                result.onSuccess { user ->
+                    _currentUser.value = user
                 }.onFailure { error ->
                     Timber.e("사용자 정보를 가져오는데 실패했습니다...")
                     _paymentStatus.emit(PaymentStatus.Error("사용자 정보를 가져오는데 실패했습니다: ${error.message}"))

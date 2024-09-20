@@ -1,95 +1,64 @@
 package com.drtaa.feature_payment
 
-import android.util.Log
+import android.os.Bundle
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.drtaa.core_ui.base.BaseFragment
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
+import com.drtaa.core_model.rent.RentPayment
+import com.drtaa.core_model.sign.SocialUser
+import com.drtaa.core_model.util.Pay
+import com.drtaa.core_ui.base.BaseDialogFragment
+import com.drtaa.core_ui.showSnackBar
 import com.drtaa.feature_payment.databinding.FragmentPaymentBinding
 import com.drtaa.feature_payment.viewmodel.PaymentViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 import kr.co.bootpay.android.Bootpay
 import kr.co.bootpay.android.events.BootpayEventListener
 import kr.co.bootpay.android.models.BootExtra
 import kr.co.bootpay.android.models.BootItem
 import kr.co.bootpay.android.models.BootUser
 import kr.co.bootpay.android.models.Payload
+import timber.log.Timber
 
 @AndroidEntryPoint
-class PaymentFragment : BaseFragment<FragmentPaymentBinding>(R.layout.fragment_payment) {
+class PaymentFragment : BaseDialogFragment<FragmentPaymentBinding>(R.layout.fragment_payment) {
 
     private val viewModel: PaymentViewModel by viewModels()
+    private val args: PaymentFragmentArgs by navArgs()
 
-    private var count = 1
-    private val pricePerItem = 50
-
-    override fun initView() {
-        binding.btnPaymentBootpay.setOnClickListener {
-            lifecycleScope.launch {
-                requestbootPayment()
-            }
-        }
-
-        binding.btnPaymentCntDec.setOnClickListener {
-            if (count > 1) {
-                count--
-                updateCountAndPrice()
-            }
-        }
-        binding.btnPaymentCntInc.setOnClickListener {
-            count++
-            updateCountAndPrice()
-        }
-
-        updateCountAndPrice()
+    override fun initView(savedInstanceState: Bundle?) {
         observeViewModel()
     }
 
-    private fun updateCountAndPrice() {
-        binding.tvPaymentCount.text = count.toString()
-        binding.tvPaymentTotalprice.text = "총 금액: ${count * pricePerItem}원"
-    }
-
     private fun observeViewModel() {
-        viewModel.paymentStatus
-            .onEach { status ->
-                binding.tvPaymentStatus.text = when (status) {
-                    is PaymentViewModel.PaymentStatus.Success -> {
-                        "성공: ${status.message}"
-                    }
-
-                    is PaymentViewModel.PaymentStatus.Error -> {
-                        "오류: ${status.message}"
-                    }
-
-                    is PaymentViewModel.PaymentStatus.PaymentInfoRetrieved -> {
-                        "ㅇㅇㅇ"
-                    }
-                }
+        viewModel.currentUser.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach { user ->
+            user?.let {
+                requestPayment(user, args.payment)
             }
-            .launchIn(viewLifecycleOwner.lifecycleScope)
+        }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
-    private fun requestbootPayment() {
-        val bootUser = getBootUser()
-
+    private fun requestPayment(user: SocialUser, payment: RentPayment) {
+        val bootUser = getBootUser(user)
         val extra = BootExtra()
             .setCardQuota("0,2,3")
-
+        val product = payment.items.first()
         val items = ArrayList<BootItem>().apply {
             add(
-                BootItem().setName("아이템").setId("ITEM_CODE").setQty(count)
-                    .setPrice(pricePerItem.toDouble())
+                BootItem().setName(product.name).setId(product.id).setQty(product.quantity)
+                    .setPrice(product.price.toDouble() - SALE)
             )
         }
 
         val payload = Payload().apply {
-            setApplicationId("66e2dabea3175898bd6e4b23")
-            setOrderName("부트페이 결제테스트")
-            setOrderId("1234")
-            setPrice((count * pricePerItem).toDouble())
+            setApplicationId(BuildConfig.BOOTPAY_APP_ID)
+            setOrderName(payment.orderName)
+            setOrderId(payment.orderId)
+            setPrice(product.price.toDouble() - SALE)
             setUser(bootUser)
             setExtra(extra)
             this.items = items
@@ -99,11 +68,21 @@ class PaymentFragment : BaseFragment<FragmentPaymentBinding>(R.layout.fragment_p
             .setPayload(payload)
             .setEventListener(object : BootpayEventListener {
                 override fun onCancel(data: String) {
-                    Log.d("bootpay", "cancel: $data")
+                    Timber.tag("bootpay").d("cancel: %s", data)
+                    findNavController().previousBackStackEntry?.savedStateHandle?.set(
+                        Pay.CANCELED.type,
+                        true
+                    )
+                    dismiss()
                 }
 
                 override fun onError(data: String) {
-                    Log.d("bootpay", "error: $data")
+                    Timber.tag("bootpay").d("error: %s", data)
+                    findNavController().previousBackStackEntry?.savedStateHandle?.set(
+                        Pay.CLOSED.type,
+                        true
+                    )
+                    dismiss()
                 }
 
                 override fun onClose() {
@@ -111,31 +90,33 @@ class PaymentFragment : BaseFragment<FragmentPaymentBinding>(R.layout.fragment_p
                 }
 
                 override fun onIssued(data: String) {
-                    Log.d("bootpay", "issued: $data")
+                    Timber.tag("bootpay").d("issued: %s", data)
                 }
 
                 override fun onConfirm(data: String): Boolean {
-                    Log.d("bootpay", "confirm: $data")
+                    Timber.tag("bootpay").d("confirm: %s", data)
                     return true
                 }
 
                 override fun onDone(data: String) {
-                    Log.d("bootpay", "done: $data")
-                    viewModel.processBootpayPayment(data)
+                    Timber.tag("bootpay").d("done: %s", data)
+                    findNavController().previousBackStackEntry?.savedStateHandle?.set(
+                        Pay.SUCCESS.type,
+                        Pair(true, data)
+                    )
+                    showSnackBar("결제에 성공했습니다")
+                    dismiss()
                 }
             }).requestPayment()
     }
 
-    private fun getBootUser(): BootUser? {
-        return viewModel.currentUser.value?.let { currentUser ->
-            BootUser().apply {
-                id = currentUser.id
-                username = currentUser.nickname
-                email = "abc@naver.com"
-                phone = ""
-                area = ""
-                gender = 0
-            }
+    private fun getBootUser(user: SocialUser): BootUser {
+        return BootUser().apply {
+            username = user.nickname // naver 로그인 시 nickname이 유효
         }
+    }
+
+    companion object {
+        const val SALE = 239900.0
     }
 }

@@ -43,5 +43,4 @@ dependencies {
     implementation(libs.map.sdk)
     implementation(project(":core-map"))
     implementation(project(":feature-rent"))
-    implementation(project(":feature-payment"))
 }

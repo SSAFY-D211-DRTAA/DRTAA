@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
+
         <variable
             name="viewModel"
             type="com.drtaa.feature_payment.viewmodel.PaymentViewModel" />
@@ -12,96 +11,17 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/white"
         android:padding="16dp">
 
         <TextView
-            android:id="@+id/tv_payment_countinfo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="수량:"
-            android:textSize="18sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <Button
-            android:id="@+id/btn_payment_cnt_dec"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:text="-"
-            android:textSize="18sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_payment_countinfo"
-            android:layout_marginTop="8dp" />
-
-        <TextView
-            android:id="@+id/tv_payment_count"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:text="1"
-            android:textSize="18sp"
+            style="@style/jua"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:gravity="center"
-            app:layout_constraintStart_toEndOf="@id/btn_payment_cnt_dec"
-            app:layout_constraintTop_toTopOf="@id/btn_payment_cnt_dec"
-            app:layout_constraintBottom_toBottomOf="@id/btn_payment_cnt_dec" />
+            android:text="결제 창으로 이동중입니다"
+            android:textSize="32sp" />
 
-        <Button
-            android:id="@+id/btn_payment_cnt_inc"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:text="+"
-            android:textSize="18sp"
-            app:layout_constraintStart_toEndOf="@id/tv_payment_count"
-            app:layout_constraintTop_toTopOf="@id/btn_payment_cnt_dec"
-            app:layout_constraintBottom_toBottomOf="@id/btn_payment_cnt_dec" />
-
-        <TextView
-            android:id="@+id/tv_payment_totalprice"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="총 금액: 50원"
-            android:textSize="18sp"
-            android:layout_marginTop="16dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/btn_payment_cnt_dec" />
-
-        <Button
-            android:id="@+id/btn_payment_bootpay"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="결제하기"
-            android:layout_marginTop="16dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_payment_totalprice" />
-
-        <TextView
-            android:id="@+id/tv_payment_status"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/btn_payment_bootpay"
-            tools:text="결제 상태" />
-
-        <ScrollView
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginTop="16dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_payment_status">
-
-            <TextView
-                android:id="@+id/tv_payment_paymentInfo"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="14sp"
-                tools:text="결제 정보" />
-
-        </ScrollView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

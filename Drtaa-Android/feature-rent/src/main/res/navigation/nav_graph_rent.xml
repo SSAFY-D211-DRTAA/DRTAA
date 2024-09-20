@@ -41,4 +41,14 @@
         android:label="RentSummaryFragment"
         tools:layout="@layout/fragment_rent_summary" />
 
+    <action
+        android:id="@+id/action_fragment_rent_to_nav_graph_payment"
+        app:destination="@id/nav_graph_payment">
+        <argument
+            android:name="payment"
+            app:argType="com.drtaa.core_model.rent.RentPayment" />
+    </action>
+
+    <include app:graph="@navigation/nav_graph_payment"/>
+
 </navigation>

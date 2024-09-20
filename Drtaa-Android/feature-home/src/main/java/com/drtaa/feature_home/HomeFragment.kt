@@ -15,16 +15,12 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         binding.apply {
             binding.viewModel = this@HomeFragment.viewModel
         }
-
         initEvent()
     }
 
     private fun initEvent() {
         binding.btnHomeCarRent.setOnClickListener {
             findNavController().navigate(R.id.action_home_to_rent)
-        }
-        binding.btnHomePayment.setOnClickListener {
-            findNavController().navigate(R.id.action_home_to_payment)
         }
     }
 }
