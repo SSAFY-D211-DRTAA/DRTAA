@@ -23,8 +23,13 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         binding.btnHomeCarRent.setOnClickListener {
             findNavController().navigate(R.id.action_home_to_rent)
         }
+
         binding.btnHomePayment.setOnClickListener {
             findNavController().navigate(R.id.action_home_to_payment)
+        }
+
+        binding.btnHomeRentHistory.setOnClickListener {
+            navigateDestination(R.id.action_homeFragment_to_rentHistoryFragment)
         }
     }
 }

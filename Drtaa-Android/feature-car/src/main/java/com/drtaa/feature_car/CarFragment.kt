@@ -22,6 +22,7 @@ import timber.log.Timber
 class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
 
     private val viewModel: CarViewModel by hiltNavGraphViewModels<CarViewModel>(R.id.nav_graph_car)
+
     private lateinit var cardView: View
     private lateinit var overlayView: View
     private lateinit var reflectionView: View
@@ -46,7 +47,7 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
             }
 
             btnReturn.setOnClickListener {
-                viewModel.completeRent(1, 1)
+                viewModel.completeRent()
             }
         }
         setupCardTouchListener()
@@ -54,6 +55,15 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
     }
 
     private fun initObserve() {
+        viewModel.currentRentDetail.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach { currentRentDetail ->
+                if (currentRentDetail != null) {
+                    binding.clCurrentRent.visibility = View.VISIBLE
+                } else {
+                    binding.tvNoCurrentRent.visibility = View.VISIBLE
+                }
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
+
         viewModel.isSuccessComplete.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { isSuccess ->
                 if (isSuccess) {

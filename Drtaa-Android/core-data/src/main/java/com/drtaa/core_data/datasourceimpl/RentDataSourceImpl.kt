@@ -1,11 +1,13 @@
 package com.drtaa.core_data.datasourceimpl
 
 import com.drtaa.core_data.datasource.RentDataSource
-import com.drtaa.core_model.network.RequestCompleteRent
 import com.drtaa.core_model.network.RequestCallRent
+import com.drtaa.core_model.network.RequestCompleteRent
 import com.drtaa.core_model.network.RequestUnassignedCar
 import com.drtaa.core_model.network.ResponseCallRent
 import com.drtaa.core_model.rent.RentCar
+import com.drtaa.core_model.rent.RentDetail
+import com.drtaa.core_model.rent.RentSimple
 import com.drtaa.core_network.api.RentAPI
 import javax.inject.Inject
 
@@ -22,5 +24,13 @@ class RentDataSourceImpl @Inject constructor(
 
     override suspend fun completeRent(requestCompleteRent: RequestCompleteRent) {
         rentAPI.completeRent(requestCompleteRent)
+    }
+
+    override suspend fun getRentHistory(): List<RentSimple> {
+        return rentAPI.getRentHistory()
+    }
+
+    override suspend fun getCurrentRent(): RentDetail {
+        return rentAPI.getCurrentRent()
     }
 }

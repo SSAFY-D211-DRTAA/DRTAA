@@ -9,6 +9,8 @@ import com.drtaa.core_model.network.RequestCompleteRent
 import com.drtaa.core_model.network.RequestUnassignedCar
 import com.drtaa.core_model.network.ResponseCallRent
 import com.drtaa.core_model.rent.RentCar
+import com.drtaa.core_model.rent.RentDetail
+import com.drtaa.core_model.rent.RentSimple
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import timber.log.Timber
@@ -54,28 +56,73 @@ class RentRepositoryImpl @Inject constructor(
                     Timber.d("실패")
                 }
 
-            is ResultWrapper.NetworkError -> {
-                emit(Result.failure(Exception("네트워크 에러")))
-                Timber.d("네트워크 에러")
+                is ResultWrapper.NetworkError -> {
+                    emit(Result.failure(Exception("네트워크 에러")))
+                    Timber.d("네트워크 에러")
+                }
             }
         }
-    }
 
-    override suspend fun callRent(requestCallRent: RequestCallRent): Flow<Result<ResponseCallRent>> = flow {
-        when (val response = safeApiCall { rentDataSource.callRent(requestCallRent) }) {
+    override suspend fun callRent(requestCallRent: RequestCallRent): Flow<Result<ResponseCallRent>> =
+        flow {
+            when (
+                val response = safeApiCall { rentDataSource.callRent(requestCallRent) }
+            ) {
+                is ResultWrapper.Success -> {
+                    emit(Result.success(response.data))
+                    Timber.d("렌트 호출 성공")
+                }
+
+                is ResultWrapper.GenericError -> {
+                    emit(Result.failure(Exception(response.message)))
+                    Timber.d("렌트 호출 실패: ${response.message}")
+                }
+
+                is ResultWrapper.NetworkError -> {
+                    emit(Result.failure(Exception("네트워크 에러")))
+                    Timber.d("렌트 호출 네트워크 에러")
+                }
+            }
+        }
+
+    override suspend fun getRentHistory(): Flow<Result<List<RentSimple>>> = flow {
+        when (
+            val response = safeApiCall { rentDataSource.getRentHistory() }
+        ) {
             is ResultWrapper.Success -> {
                 emit(Result.success(response.data))
-                Timber.d("렌트 호출 성공")
+                Timber.d("렌트 이용 기록 조회 성공")
             }
 
             is ResultWrapper.GenericError -> {
                 emit(Result.failure(Exception(response.message)))
-                Timber.d("렌트 호출 실패: ${response.message}")
+                Timber.d("렌트 이용 기록 조회 실패: ${response.message}")
             }
 
             is ResultWrapper.NetworkError -> {
                 emit(Result.failure(Exception("네트워크 에러")))
-                Timber.d("렌트 호출 네트워크 에러")
+                Timber.d("렌트 이용 기록 조회 네트워크 에러")
+            }
+        }
+    }
+
+    override suspend fun getCurrentRent(): Flow<Result<RentDetail>> = flow {
+        when (
+            val response = safeApiCall { rentDataSource.getCurrentRent() }
+        ) {
+            is ResultWrapper.Success -> {
+                emit(Result.success(response.data))
+                Timber.d("현재 렌트 조회 성공")
+            }
+
+            is ResultWrapper.GenericError -> {
+                emit(Result.failure(Exception(response.message)))
+                Timber.d("현재 렌트 조회 실패: ${response.message}")
+            }
+
+            is ResultWrapper.NetworkError -> {
+                emit(Result.failure(Exception("네트워크 에러")))
+                Timber.d("현재 렌트 조회 네트워크 에러")
             }
         }
     }

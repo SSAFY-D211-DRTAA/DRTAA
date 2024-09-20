@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.drtaa.core_data.repository.GPSRepository
 import com.drtaa.core_data.repository.RentRepository
 import com.drtaa.core_model.network.RequestCompleteRent
+import com.drtaa.core_model.rent.RentDetail
 import com.naver.maps.geometry.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -17,6 +18,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -29,17 +31,37 @@ class CarViewModel @Inject constructor(
 ) : ViewModel() {
     private var publishJob: Job? = null
     private val mqttScope = CoroutineScope(Dispatchers.IO)
+
     private val _gpsData = MutableSharedFlow<LatLng>()
     val gpsData = _gpsData.asSharedFlow()
+
     private val _trackingState = MutableStateFlow<Boolean>(false)
     val trackingState: StateFlow<Boolean> get() = _trackingState
+
+    private val _currentRentDetail = MutableSharedFlow<RentDetail?>()
+    val currentRentDetail: SharedFlow<RentDetail?> = _currentRentDetail
 
     private val _isSuccessComplete = MutableSharedFlow<Boolean>()
     val isSuccessComplete: SharedFlow<Boolean> = _isSuccessComplete
 
     init {
+        getCurrentRent()
         initMQTT()
         observeMqttMessages()
+    }
+
+    private fun getCurrentRent() {
+        viewModelScope.launch {
+            rentRepository.getCurrentRent().collect { result ->
+                result.onSuccess { data ->
+                    Timber.d("성공")
+                    _currentRentDetail.emit(data)
+                }.onFailure {
+                    Timber.d("현재 진행 중인 렌트가 없습니다.")
+                    _currentRentDetail.emit(null)
+                }
+            }
+        }
     }
 
     private fun initMQTT() {
@@ -76,11 +98,13 @@ class CarViewModel @Inject constructor(
         }
     }
 
-    fun completeRent(rentId: Int, rentCarScheduleId: Int) {
+    fun completeRent() {
         viewModelScope.launch {
+            val rentDetail = currentRentDetail.first() ?: return@launch
+
             val requestCompleteRent = RequestCompleteRent(
-                rentId = rentId,
-                rentCarScheduleId = rentCarScheduleId
+                rentId = rentDetail.rentId,
+                rentCarScheduleId = rentDetail.rentCarScheduleId
             )
 
             rentRepository.completeRent(requestCompleteRent).collect { result ->

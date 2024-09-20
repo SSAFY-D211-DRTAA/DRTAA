@@ -1,5 +1,6 @@
 package com.drtaa.feature_home
 
+import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -28,6 +29,11 @@ class RentHistoryFragment :
         rentHistoryViewModel.rentHistory.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { rentHistory ->
                 rentHistoryAdapter.submitList(rentHistory)
+                if (rentHistory.isEmpty()) {
+                    binding.tvNoRentHistory.visibility = View.VISIBLE
+                } else {
+                    binding.rvRentHistory.visibility = View.VISIBLE
+                }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
