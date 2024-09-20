@@ -1,7 +1,13 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
     id("drtaa.plugin.feature")
+}
+
+fun getApiKey(propertyKey: String): String {
+    return gradleLocalProperties(rootDir, providers).getProperty(propertyKey)
 }
 
 android {
@@ -10,6 +16,8 @@ android {
 
     defaultConfig {
         minSdk = 28
+
+        buildConfigField("String", "BOOTPAY_APP_ID", getApiKey("BOOTPAY_APP_ID"))
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
@@ -38,6 +46,6 @@ android {
 }
 
 dependencies {
-    implementation (libs.android)
+    implementation (libs.bootpay)
     implementation (libs.gson)
 }

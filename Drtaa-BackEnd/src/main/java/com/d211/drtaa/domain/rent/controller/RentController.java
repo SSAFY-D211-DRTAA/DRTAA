@@ -1,8 +1,10 @@
 package com.d211.drtaa.domain.rent.controller;
 
+import com.d211.drtaa.domain.rent.dto.request.RentStatusRequestDTO;
 import com.d211.drtaa.domain.rent.dto.request.RentCreateRequestDTO;
 import com.d211.drtaa.domain.rent.dto.request.RentEditRequestDTO;
 import com.d211.drtaa.domain.rent.dto.request.RentTimeRequestDTO;
+import com.d211.drtaa.domain.rent.dto.response.RentCarLocationResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentDetailResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentResponseDTO;
 import com.d211.drtaa.domain.rent.service.RentService;
@@ -49,9 +51,23 @@ public class RentController {
 
     @GetMapping("/{rentId}")
     @Operation(summary = "렌트 상세 조회", description = "회원의 렌트 상세 조회")
-    public ResponseEntity getAllRent(@PathVariable("rentId") Long rentId) {
+    public ResponseEntity getAllRent(@PathVariable("rentId") long rentId) {
         try {
             RentDetailResponseDTO response = rentService.getDetailRent(rentId);
+
+            return ResponseEntity.ok(response); //200
+        } catch(RentNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
+        }
+    }
+
+    @GetMapping("/current")
+    @Operation(summary = "진행중인 렌트 상세 조회", description = "회원의 현재 진행중인 렌트 상세 조회")
+    public ResponseEntity getCurrentRent(Authentication authentication) {
+        try {
+            RentDetailResponseDTO response = rentService.getCurrentRent(authentication.getName());
 
             return ResponseEntity.ok(response); //200
         } catch(RentNotFoundException e) {
@@ -110,11 +126,11 @@ public class RentController {
         }
     }
 
-    @PatchMapping("/status/{rentId}/completed")
+    @PatchMapping("/status/completed")
     @Operation(summary = "렌트 상태 변경(반납)", description = "렌트 취소")
-    public ResponseEntity rentStatusCompleted(@PathVariable("rentId") Long rentId) {
+    public ResponseEntity rentStatusCompleted(@RequestBody RentStatusRequestDTO requestDTO) {
         try {
-            rentService.rentStatusCompleted(rentId);
+            rentService.rentStatusCompleted(requestDTO);
 
             return ResponseEntity.ok("Success");
         } catch(RentNotFoundException | RentCarNotFoundException e) {
@@ -126,11 +142,11 @@ public class RentController {
         }
     }
 
-    @PatchMapping("/status/{rentId}/canceled")
+    @PatchMapping("/status/canceled")
     @Operation(summary = "렌트 상태 변경(취소)", description = "렌트 취소")
-    public ResponseEntity rentStatusCanceld(@PathVariable("rentId") Long rentId) {
+    public ResponseEntity rentStatusCanceld(@RequestBody RentStatusRequestDTO requestDTO) {
         try {
-            rentService.rentStatusCanceld(rentId);
+            rentService.rentStatusCanceld(requestDTO);
 
             return ResponseEntity.ok("Success");
         } catch(RentNotFoundException | RentCarNotFoundException e) {

@@ -6,16 +6,23 @@ import android.graphics.drawable.GradientDrawable
 import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
-import androidx.fragment.app.viewModels
+import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.drtaa.core_ui.base.BaseFragment
+import com.drtaa.core_ui.showSnackBar
 import com.drtaa.feature_car.databinding.FragmentCarBinding
 import com.drtaa.feature_car.viewmodel.CarViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import timber.log.Timber
 
 @AndroidEntryPoint
 class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
 
-    private val viewModel: CarViewModel by viewModels()
+    private val viewModel: CarViewModel by hiltNavGraphViewModels<CarViewModel>(R.id.nav_graph_car)
+
     private lateinit var cardView: View
     private lateinit var overlayView: View
     private lateinit var reflectionView: View
@@ -32,10 +39,41 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
             cardImage = ivTourCard
 
             btnMqtt.setOnClickListener {
-                viewModel.publish()
+                viewModel.startPublish()
+            }
+
+            btnTrackingCar.setOnClickListener {
+                navigateDestination(R.id.action_carFragment_to_carTrackingFragment)
+            }
+
+            btnReturn.setOnClickListener {
+                viewModel.completeRent()
             }
         }
         setupCardTouchListener()
+        initObserve()
+    }
+
+    private fun initObserve() {
+        viewModel.currentRentDetail.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach { currentRentDetail ->
+                if (currentRentDetail != null) {
+                    binding.clCurrentRent.visibility = View.VISIBLE
+                } else {
+                    binding.tvNoCurrentRent.visibility = View.VISIBLE
+                }
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+        viewModel.isSuccessComplete.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach { isSuccess ->
+                if (isSuccess) {
+                    Timber.d("반납 성공")
+                    showSnackBar("반납 성공")
+                } else {
+                    Timber.d("반납 실패")
+                    showSnackBar("반납 실패")
+                }
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
     @SuppressLint("ClickableViewAccessibility")

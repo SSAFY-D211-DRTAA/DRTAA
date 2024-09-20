@@ -86,12 +86,8 @@ class RentFragment : BaseFragment<FragmentRentBinding>(R.layout.fragment_rent) {
             }
         }
 
-        binding.btnRentPlan.setOnClickListener {
-            navigateDestination(R.id.action_rentFragment_to_rentPlanFragment)
-        }
-
         binding.btnRentNext.setOnClickListener {
-            navigateDestination(R.id.action_rentFragment_to_rentPriceFragment)
+            navigateDestination(R.id.action_rentFragment_to_rentSummaryFragment)
         }
     }
 }

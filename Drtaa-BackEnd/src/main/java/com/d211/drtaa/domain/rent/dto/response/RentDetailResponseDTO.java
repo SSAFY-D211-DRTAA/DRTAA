@@ -13,6 +13,8 @@ import java.time.LocalDateTime;
 @Builder
 public class RentDetailResponseDTO {
     // rent
+    @Schema(description = "렌트 고유 번호", example = "1")
+    private long rentId;
     @Schema(description = "렌트 상태", example = "RESERVED")
     private RentStatus rentStatus;
     @Schema(description = "렌트 이용 인원 수", example = "1(단위: 명)")
@@ -41,4 +43,6 @@ public class RentDetailResponseDTO {
     private String rentCarManufacturer;
     @Schema(description = "렌트 차량 모델 이름", example = "K5")
     private String rentCarModel;
+    @Schema(description = "렌트 차량 일정 고유 번호", example = "1")
+    private long rentCarScheduleId;
 }

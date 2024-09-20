@@ -28,8 +28,8 @@ public class SecurityConfig {
                         .requestMatchers("/swagger-ui/**").permitAll() // Swagger UI 접근 허용
                         .requestMatchers("/v3/api-docs/**").permitAll() // API 문서 접근 허용
                         .requestMatchers("/payment/**").permitAll()
-                        .requestMatchers("/user/signup/**", "/user/login/**", "/user/token").permitAll() // 회원가입, 로그인, 토큰 재발급 접근 허용
-                        .requestMatchers("/test", "/", "/index.html").permitAll() // 테스트 접근 허용
+                        .requestMatchers("/user/signup/**", "/user/login/**", "/user/token/**").permitAll() // 회원가입, 로그인, 토큰 재발급 접근 허용
+                        .requestMatchers("/test/**", "/", "/index.html").permitAll() // 테스트 접근 허용
                         .anyRequest().authenticated() // 나머지 요청은 인증 필요
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class); // JWT 필터를 UsernamePasswordAuthenticationFilter 앞에 추가

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
@@ -11,53 +12,92 @@
         android:layout_height="match_parent"
         android:background="#1A1A1A">
 
-        <Button
-            android:id="@+id/btn_mqtt"
+        <TextView
+            android:id="@+id/tv_no_current_rent"
+            style="@style/ptd_regular"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="MQTT"
+            android:text="현재 진행 중인 렌트가 없습니다."
+            android:textColor="@color/gray_a3a3"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cv_tour_card"
-            android:layout_width="220dp"
-            android:layout_height="310dp"
-            app:cardCornerRadius="15dp"
-            app:cardElevation="10dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_current_rent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible"
+            tools:visibility="visible">
 
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+            <Button
+                android:id="@+id/btn_mqtt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="MQTT"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-                <View
-                    android:id="@+id/view_tour_overlay"
+            <Button
+                android:id="@+id/btn_tracking_car"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tracking Car"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btn_mqtt" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_return"
+                style="@style/btn_long_blue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="반납"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/btn_tracking_car" />
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cv_tour_card"
+                android:layout_width="220dp"
+                android:layout_height="310dp"
+                app:cardCornerRadius="15dp"
+                app:cardElevation="10dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/card_overlay" />
+                    android:layout_height="match_parent">
 
-                <ImageView
-                    android:id="@+id/iv_tour_card"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/kanna" />
+                    <View
+                        android:id="@+id/view_tour_overlay"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/card_overlay" />
 
+                    <ImageView
+                        android:id="@+id/iv_tour_card"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/kanna" />
 
-                <View
-                    android:id="@+id/view_tour_reflection"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/card_reflection" />
+                    <View
+                        android:id="@+id/view_tour_reflection"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/card_reflection" />
 
-            </FrameLayout>
+                </FrameLayout>
 
-        </androidx.cardview.widget.CardView>
+            </androidx.cardview.widget.CardView>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

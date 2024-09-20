@@ -173,8 +173,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="10dp"
-                    android:text="2"
                     android:padding="3dp"
+                    android:text="2"
                     android:textSize="16sp" />
 
                 <ImageView
@@ -185,24 +185,6 @@
                     android:src="@drawable/ic_circle_plus" />
 
             </LinearLayout>
-
-            <TextView
-                style="@style/ptd_medium"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="20dp"
-                android:text="일정"
-                android:textSize="16sp" />
-
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/btn_rent_plan"
-                style="@style/btn_long_blue"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:text="일정 추가하기"
-                android:textSize="14sp" />
 
             <View
                 android:layout_width="wrap_content"

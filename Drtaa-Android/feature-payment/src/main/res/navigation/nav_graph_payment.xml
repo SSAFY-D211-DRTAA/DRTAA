@@ -5,10 +5,18 @@
     android:id="@+id/nav_graph_payment"
     app:startDestination="@id/paymentFragment">
 
-    <fragment
+    <argument
+        android:name="payment"
+        app:argType="com.drtaa.core_model.rent.RentPayment" />
+
+    <dialog
         android:id="@+id/paymentFragment"
         android:name="com.drtaa.feature_payment.PaymentFragment"
         android:label="PaymentFragment"
-        tools:layout="@layout/fragment_payment" />
+        tools:layout="@layout/fragment_payment">
+        <argument
+            android:name="payment"
+            app:argType="com.drtaa.core_model.rent.RentPayment" />
+    </dialog>
 
 </navigation>
