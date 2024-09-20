@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -16,5 +18,5 @@ public class DatesDetailResponseDTO {
     @Schema(name = "여행 일정 날짜", example = "2024/01/01")
     private LocalDate travelDatesDate;
 
-    private PlacesDetailResponseDTO placesDetail;
+    private List<PlacesDetailResponseDTO> placesDetail = new ArrayList<>();
 }
