@@ -86,6 +86,7 @@ public class RentServiceImpl implements RentService{
         RentCar rentCar = rent.getRentCar();
 
         RentDetailResponseDTO response = RentDetailResponseDTO.builder()
+                .rentId(rent.getRentId())
                 .rentStatus(rent.getRentStatus())
                 .rentHeadCount(rent.getRentHeadCount())
                 .rentPrice(rent.getRentPrice())
@@ -114,6 +115,7 @@ public class RentServiceImpl implements RentService{
         RentCar rentCar = rent.getRentCar();
 
         RentDetailResponseDTO response = RentDetailResponseDTO.builder()
+                .rentId(rent.getRentId())
                 .rentStatus(rent.getRentStatus())
                 .rentHeadCount(rent.getRentHeadCount())
                 .rentPrice(rent.getRentPrice())
@@ -234,6 +236,7 @@ public class RentServiceImpl implements RentService{
 
         // 반환값 빌더
         RentDetailResponseDTO response = RentDetailResponseDTO.builder()
+                .rentId(rent.getRentId())
                 .rentStatus(rent.getRentStatus())
                 .rentHeadCount(rent.getRentHeadCount())
                 .rentPrice(rent.getRentPrice())

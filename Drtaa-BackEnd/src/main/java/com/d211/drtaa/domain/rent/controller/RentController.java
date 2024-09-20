@@ -4,6 +4,7 @@ import com.d211.drtaa.domain.rent.dto.request.RentStatusRequestDTO;
 import com.d211.drtaa.domain.rent.dto.request.RentCreateRequestDTO;
 import com.d211.drtaa.domain.rent.dto.request.RentEditRequestDTO;
 import com.d211.drtaa.domain.rent.dto.request.RentTimeRequestDTO;
+import com.d211.drtaa.domain.rent.dto.response.RentCarLocationResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentDetailResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentResponseDTO;
 import com.d211.drtaa.domain.rent.service.RentService;
@@ -50,7 +51,7 @@ public class RentController {
 
     @GetMapping("/{rentId}")
     @Operation(summary = "렌트 상세 조회", description = "회원의 렌트 상세 조회")
-    public ResponseEntity getAllRent(@PathVariable("rentId") Long rentId) {
+    public ResponseEntity getAllRent(@PathVariable("rentId") long rentId) {
         try {
             RentDetailResponseDTO response = rentService.getDetailRent(rentId);
 
