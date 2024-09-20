@@ -10,6 +10,22 @@ import com.prolificinteractive.materialcalendarview.DayViewFacade
 import org.threeten.bp.DayOfWeek
 
 /* 선택된 날짜의 background를 설정하는 클래스 */
+class BlockDecorator(context: Context) : DayViewDecorator {
+    private val color = ContextCompat.getColor(context, com.drtaa.core_ui.R.color.gray_d9d9)
+    private var today = CalendarDay.today()
+
+    override fun shouldDecorate(day: CalendarDay?): Boolean {
+        return day?.isBefore(today)!!
+    }
+
+    // 일자 선택 시 내가 정의한 드로어블이 적용되도록 한다
+    override fun decorate(view: DayViewFacade) {
+        view.setDaysDisabled(true)
+        view.addSpan(object : ForegroundColorSpan(color) {})
+    }
+}
+
+/* 선택된 날짜의 background를 설정하는 클래스 */
 class SingleDayDecorator(context: Context, private var date: CalendarDay? = null) :
     DayViewDecorator {
     private val drawableSingle =
@@ -27,7 +43,7 @@ class SingleDayDecorator(context: Context, private var date: CalendarDay? = null
         view.addSpan(object : ForegroundColorSpan(color) {})
     }
 
-    fun setDate(date: CalendarDay) {
+    fun setDate(date: CalendarDay?) {
         this.date = date
     }
 }
@@ -50,7 +66,7 @@ class StartDayDecorator(context: Context, private var date: CalendarDay? = null)
         view.addSpan(object : ForegroundColorSpan(color) {})
     }
 
-    fun setDate(date: CalendarDay) {
+    fun setDate(date: CalendarDay?) {
         this.date = date
     }
 }
@@ -73,7 +89,7 @@ class EndDayDecorator(context: Context, private var date: CalendarDay? = null) :
         view.addSpan(object : ForegroundColorSpan(color) {})
     }
 
-    fun setDate(date: CalendarDay) {
+    fun setDate(date: CalendarDay?) {
         this.date = date
     }
 }
@@ -126,7 +142,7 @@ class SelectedMonthDecorator(private val selectedMonth: Int, val context: Contex
     override fun decorate(view: DayViewFacade) {
         view.addSpan(
             ForegroundColorSpan(
-                ContextCompat.getColor(context, com.drtaa.core_ui.R.color.gray_d9d9)
+                ContextCompat.getColor(context, com.drtaa.core_ui.R.color.gray_a3a3)
             )
         )
     }
@@ -134,21 +150,26 @@ class SelectedMonthDecorator(private val selectedMonth: Int, val context: Contex
 
 /* 일요일 날짜의 색상을 설정하는 클래스 */
 class SundayDecorator : DayViewDecorator {
+    private val today = CalendarDay.today()
+
     override fun shouldDecorate(day: CalendarDay): Boolean {
         val sunday = day.date.with(DayOfWeek.SUNDAY).dayOfMonth
-        return sunday == day.day
+        return sunday == day.day && !day.isBefore(today)
     }
 
     override fun decorate(view: DayViewFacade) {
+
         view.addSpan(object : ForegroundColorSpan(Color.RED) {})
     }
 }
 
 /* 토요일 날짜의 색상을 설정하는 클래스 */
 class SaturdayDecorator : DayViewDecorator {
+    private val today = CalendarDay.today()
+
     override fun shouldDecorate(day: CalendarDay): Boolean {
         val saturday = day.date.with(DayOfWeek.SATURDAY).dayOfMonth
-        return saturday == day.day
+        return saturday == day.day && !day.isBefore(today)
     }
 
     override fun decorate(view: DayViewFacade) {
