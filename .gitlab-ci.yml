@@ -37,6 +37,8 @@ debug:
   stage: build
   script:
     - ./gradlew assembleDebug
+  tags:
+    - mingyu
   artifacts:
     paths:
       - $ANDROID_PROJECT_DIR/app/build/outputs/apk/debug/app-debug.apk
