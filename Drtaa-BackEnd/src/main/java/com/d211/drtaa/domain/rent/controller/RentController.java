@@ -62,6 +62,20 @@ public class RentController {
         }
     }
 
+    @GetMapping("/current")
+    @Operation(summary = "진행중인 렌트 상세 조회", description = "회원의 현재 진행중인 렌트 상세 조회")
+    public ResponseEntity getCurrentRent(Authentication authentication) {
+        try {
+            RentDetailResponseDTO response = rentService.getCurrentRent(authentication.getName());
+
+            return ResponseEntity.ok(response); //200
+        } catch(RentNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
+        }
+    }
+
     @PostMapping
     @Operation(summary = "렌트 요청", description = "렌트 요청")
     public ResponseEntity createRent

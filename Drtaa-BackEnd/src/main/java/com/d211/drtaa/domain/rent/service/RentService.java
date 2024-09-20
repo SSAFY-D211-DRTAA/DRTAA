@@ -16,6 +16,9 @@ public interface RentService {
     // rentId의 렌트 상세 조회
     RentDetailResponseDTO getDetailRent(long rentId);
 
+    // 현재 진행중인 렌트 조회
+    RentDetailResponseDTO getCurrentRent(String userProviderId);
+
     // 렌트 요청
     RentDetailResponseDTO createRent(String userProviderId, RentCreateRequestDTO rentCreateRequestDTO);
 
