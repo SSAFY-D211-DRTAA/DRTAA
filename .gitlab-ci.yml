@@ -1,26 +1,31 @@
-image: mcr.microsoft.com/dotnet/sdk:5.0 # Windows 기반 이미지 사용
+image: mcr.microsoft.com/windows/servercore:ltsc2019
 
 variables:
   ANDROID_COMPILE_SDK: "34"
   ANDROID_BUILD_TOOLS: "34.0.0"
+  ANDROID_SDK_TOOLS: "8512546"
+  ANDROID_HOME: "C:\android-sdk"
   ANDROID_PROJECT_DIR: "Drtaa-Android"
 
 before_script:
-  - $env:ANDROID_HOME = "C:\android-sdk"
-  - $env:PATH += ";$env:ANDROID_HOME\tools;$env:ANDROID_HOME\platform-tools"
+  - $ErrorActionPreference = "Stop"
+  - $ProgressPreference = "SilentlyContinue"
   
-  # Android SDK 다운로드 및 설치 (이미 설치되어 있다면 이 부분은 생략 가능)
-  - Invoke-WebRequest -Uri "https://dl.google.com/android/repository/commandlinetools-win-8512546_latest.zip" -OutFile "commandlinetools.zip"
-  - Expand-Archive -Path "commandlinetools.zip" -DestinationPath "$env:ANDROID_HOME"
-  - Move-Item "$env:ANDROID_HOME\cmdline-tools" "$env:ANDROID_HOME\latest"
-  - $env:PATH += ";$env:ANDROID_HOME\latest\bin"
-  
-  - sdkmanager.bat "platforms;android-$env:ANDROID_COMPILE_SDK" "build-tools;$env:ANDROID_BUILD_TOOLS" "platform-tools"
-  - cd $env:ANDROID_PROJECT_DIR
-  - ./gradlew.bat --version # Gradle 버전 확인
+  # Android SDK 다운로드 및 설치
+  - New-Item -ItemType Directory -Force -Path $env:ANDROID_HOME | Out-Null
+  - Invoke-WebRequest -Uri "https://dl.google.com/android/repository/commandlinetools-win-${env:ANDROID_SDK_TOOLS}_latest.zip" -OutFile "commandlinetools.zip"
+  - Expand-Archive -Path "commandlinetools.zip" -DestinationPath "$env:ANDROID_HOME" -Force
+  - Move-Item "$env:ANDROID_HOME\cmdline-tools" "$env:ANDROID_HOME\latest" -Force
+  - $env:PATH += ";$env:ANDROID_HOME\latest\bin;$env:ANDROID_HOME\tools;$env:ANDROID_HOME\tools\bin;$env:ANDROID_HOME\platform-tools"
 
+  # SDK 컴포넌트 설치
+  - Write-Host "y" | sdkmanager.bat --sdk_root=$env:ANDROID_HOME "platforms;android-$env:ANDROID_COMPILE_SDK" "build-tools;$env:ANDROID_BUILD_TOOLS" "platform-tools"
+  
+  # 프로젝트 디렉토리로 이동
+  - cd $env:ANDROID_PROJECT_DIR
+  
   # local.properties 파일 생성
-  - Add-Content -Path "local.properties" -Value "sdk.dir=$env:ANDROID_HOME"
+  - Set-Content -Path "local.properties" -Value "sdk.dir=$env:ANDROID_HOME"
   - Add-Content -Path "local.properties" -Value "NAVER_MAP_CLIENT_ID=$env:NAVER_MAP_CLIENT_ID"
   - Add-Content -Path "local.properties" -Value "NAVER_MAP_CLIENT_ID_MANIFEST=$env:NAVER_MAP_CLIENT_ID_MANIFEST"
   - Add-Content -Path "local.properties" -Value "NAVER_MAP_CLIENT_SECRET=$env:NAVER_MAP_CLIENT_SECRET"
@@ -38,9 +43,9 @@ stages:
 debug:
   stage: build
   script:
-    - ./gradlew.bat assembleDebug
+    - .\gradlew.bat assembleDebug
   artifacts:
     paths:
-      - $env:ANDROID_PROJECT_DIR/app/build/outputs/apk/debug/app-debug.apk
+      - $env:ANDROID_PROJECT_DIR\app\build\outputs\apk\debug\app-debug.apk
   only:
     - develop
