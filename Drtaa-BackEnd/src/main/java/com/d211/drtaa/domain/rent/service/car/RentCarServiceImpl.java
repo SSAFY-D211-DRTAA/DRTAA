@@ -3,16 +3,31 @@ package com.d211.drtaa.domain.rent.service.car;
 import com.d211.drtaa.domain.rent.dto.request.RentCarDriveStatusRequestDTO;
 import com.d211.drtaa.domain.rent.dto.request.RentCarUnassignedDispatchStatusRequestDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentCarDriveStatusResponseDTO;
+import com.d211.drtaa.domain.rent.dto.response.RentCarLocationResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentCarResponseDTO;
+import com.d211.drtaa.domain.rent.entity.Rent;
 import com.d211.drtaa.domain.rent.entity.car.RentCar;
 import com.d211.drtaa.domain.rent.entity.car.RentCarSchedule;
+import com.d211.drtaa.domain.rent.entity.car.RentDrivingStatus;
+import com.d211.drtaa.domain.rent.repository.RentRepository;
 import com.d211.drtaa.domain.rent.repository.car.RentCarRepository;
 import com.d211.drtaa.domain.rent.repository.car.RentCarScheduleRepository;
+import com.d211.drtaa.global.config.websocket.MyMessage;
+import com.d211.drtaa.global.config.websocket.WebSocketConfig;
 import com.d211.drtaa.global.exception.rent.NoAvailableRentCarException;
 import com.d211.drtaa.global.exception.rent.RentCarNotFoundException;
+import com.d211.drtaa.global.exception.rent.RentNotFoundException;
+import com.d211.drtaa.global.exception.websocket.WebSocketDisConnectedException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketSession;
+import org.springframework.web.socket.client.standard.StandardWebSocketClient;
+import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -24,8 +39,11 @@ import java.util.stream.Collectors;
 @Log4j2
 public class RentCarServiceImpl implements RentCarService {
 
+    private final RentRepository rentRepository;
     private final RentCarRepository rentCarRepository;
     private final RentCarScheduleRepository rentCarScheduleRepository;
+    private final WebSocketConfig webSocketConfig;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public List<RentCarResponseDTO> getAllDispatchStatus() {
@@ -112,4 +130,61 @@ public class RentCarServiceImpl implements RentCarService {
         // 저장
         rentCarRepository.save(car);
     }
+
+    @Override
+    @Transactional
+    public RentCarLocationResponseDTO callRentCar(String name, long rentId) {
+        // rentId에 해당하는 렌트 찾기
+        Rent rent = rentRepository.findByRentId(rentId)
+                .orElseThrow(() -> new RentNotFoundException("해당 rentId의 맞는 렌트를 찾을 수 없습니다."));
+
+        // rentCarId에 해당하는 렌트 차량 찾기
+        RentCar car = rentCarRepository.findByRentCarId(rent.getRentCar().getRentCarId())
+                .orElseThrow(() -> new RentCarNotFoundException("해당 rentCarId의 맞는 차량을 찾을 수 없습니다."));
+
+        final RentCarLocationResponseDTO[] response = {null}; // 응답 DTO 초기화
+        try {
+            StandardWebSocketClient client = new StandardWebSocketClient();
+            WebSocketSession session = client.execute(new TextWebSocketHandler() {
+                @Override
+                protected void handleTextMessage(WebSocketSession session, TextMessage message) {
+                    // 서버로부터 받은 메시지를 처리하는 로직
+                    try {
+                        // JSON 메시지를 JsonNode로 파싱
+                        JsonNode jsonNode = objectMapper.readTree(message.getPayload());
+                        log.info("Received message: {}", jsonNode);
+
+                        // DTO 생성
+                        response[0] = RentCarLocationResponseDTO.builder()
+                                .rentCarId(car.getRentCarId())
+                                .rentCarLat(jsonNode.get("rentCarLat").asDouble()) // rentCarLat을 double로 변환
+                                .rentCarLon(jsonNode.get("rentCarLon").asDouble()) // rentCarLon을 double로 변환
+                                .build();
+
+                    } catch (Exception e) {
+                        log.error("Error processing received message: ", e);
+                    }
+                }
+            }, webSocketConfig.getUrl()).get();
+
+            MyMessage message = new MyMessage("vehicle_dispatch");
+            String jsonMessage = objectMapper.writeValueAsString(message);
+            session.sendMessage(new TextMessage(jsonMessage));
+            log.info("Sent message: {}", jsonMessage);
+            Thread.sleep(1000); // 필요에 따라 대기 시간 조절
+
+        } catch (Exception e) {
+            log.error("Error during WebSocket communication: ", e);
+            throw new WebSocketDisConnectedException("WebSocket이 네트워크 연결을 거부했습니다.");
+        }
+
+        // 렌트 차량 상태 변경
+        car.setRentCarDrivingStatus(RentDrivingStatus.call);
+
+        // 렌트 차량 변경 상태 저장
+        rentCarRepository.save(car);
+
+        return response[0] != null ? response[0] : RentCarLocationResponseDTO.builder().build(); // 응답이 없으면 빈 DTO 반환
+    }
+
 }

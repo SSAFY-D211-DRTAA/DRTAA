@@ -73,9 +73,9 @@ class pure_pursuit:
         self.min_lfd = 5
         self.max_lfd = 15
         self.lfd_gain = 0.78
-        self.target_velocity = 35
+        self.target_velocity = 40 # km/h (목표 속도)
 
-        self.stop_line_threshold = 8 
+        self.stop_line_threshold = 15 # 정지선을 인식하는 거리 
         self.previous_global_path = None  # 이전 경로 저장 변수 추가
         self.velocity_list = [] 
 
@@ -87,7 +87,7 @@ class pure_pursuit:
 
         self.traffic_light_manager = TrafficLightManager()
 
-        rate = rospy.Rate(30)  # 30hz
+        rate = rospy.Rate(50)  # 30hz
 
         while not rospy.is_shutdown():
             if self.is_path and self.is_odom and self.is_status and len(self.velocity_list) > 0: 
@@ -179,7 +179,7 @@ class pure_pursuit:
         # rospy.loginfo(f"Object info updated: {len(self.object_data.npc_list)} NPCs, {len(self.object_data.pedestrian_list)} pedestrians, {len(self.object_data.obstacle_list)} obstacles")
 
     def turning_left_callback(self, msg):
-        self.is_turning_left = msg
+        self.is_turning_left = msg.data # Bool은 data로 값을 가져옴!!
         # rospy.loginfo(f"Left turn signal: {self.is_turning_left}")
     
     def load_nodes(self): # 노드 정보 로드
@@ -228,23 +228,27 @@ class pure_pursuit:
             is_near_stop_line, distance_to_stop_line = self.detect_stop_line()
             
             if is_near_stop_line: # 정지선 근처인 경우
+                # rospy.loginfo(f"Near stop line, distance: {distance_to_stop_line:.2f}")
                 
-                if self.is_turning_left and self.traffic_light_manager.can_turn_left():
-                    rospy.loginfo("Left turn signal on, proceeding with left turn")
-                    return
-                    
-                elif self.traffic_light_manager.traffic_light_status & 1:  # Red light
-                    rospy.loginfo("Red light detected, stopping")
-                    self.target_velocity = self.calculate_approach_velocity(distance_to_stop_line)
-                    
-                elif self.traffic_light_manager.traffic_light_status & 4:  # Yellow light
-                    rospy.loginfo("Yellow light detected, slowing down")
-                    approach_velocity = self.calculate_approach_velocity(distance_to_stop_line)
-                    self.target_velocity = min(approach_velocity, self.target_velocity)
-                    
-                elif self.traffic_light_manager.can_go_straight():  # Green light
-                    rospy.loginfo("Green light detected, proceeding")
-                    return
+                if self.is_turning_left: # 좌회전을 해야할 경우
+                    if self.traffic_light_manager.can_turn_left(): # 좌회전 가능
+                        rospy.loginfo("Left turn signal on, proceeding with left turn")
+                    else: # 좌회전 금지
+                        rospy.loginfo("Left turn signal on, but left turn not allowed")
+                        self.target_velocity = self.calculate_approach_velocity(distance_to_stop_line)
+                    #self.target_velocity = self.normal_speed  # Set speed for left turn
+                else: # 직진
+                    if self.traffic_light_manager.traffic_light_status & 1:  # Red light
+                        rospy.loginfo("Red light detected, stopping")
+                        self.target_velocity = self.calculate_approach_velocity(distance_to_stop_line)
+                        
+                    elif self.traffic_light_manager.traffic_light_status & 4:  # Yellow light
+                        rospy.loginfo("Yellow light detected, slowing down")
+                        approach_velocity = self.calculate_approach_velocity(distance_to_stop_line)
+                        self.target_velocity = min(approach_velocity, self.target_velocity)
+                        
+                    elif self.traffic_light_manager.can_go_straight():  # Green light
+                        rospy.loginfo("Green light detected, proceeding")
         except Exception as e:
             rospy.logerr(f"Error in trafficlight_logic: {e}")
             self.target_velocity = 0
@@ -252,14 +256,13 @@ class pure_pursuit:
     def calculate_approach_velocity(self, distance):
         max_approach_speed = 15  # km/h
         min_approach_speed = 0   # km/h
-        deceleration_distance = 15  # meters
         
-        if distance > deceleration_distance:
+        if distance > self.stop_line_threshold:
             return max_approach_speed
         elif distance < 5:
             return min_approach_speed
         else:
-            return max(min_approach_speed, (distance / deceleration_distance) * max_approach_speed)
+            return max(min_approach_speed, (distance / self.stop_line_threshold) * max_approach_speed)
         
     def calc_vaild_obj(self, status_msg, object_data):
 
@@ -461,7 +464,7 @@ class AdaptiveCruiseControl:
                 for path in ref_path.poses :      
                     if global_obs_info[i][0] == 2 : # type=1 [obstacle] 
                         dis = sqrt(pow(path.pose.position.x - global_obs_info[i][1], 2) + pow(path.pose.position.y - global_obs_info[i][2], 2))
-                        if dis<2.35:
+                        if dis < 2.35:
                             rel_distance = sqrt(pow(global_obs_info[i][1], 2) + pow(global_obs_info[i][2], 2))
                             if rel_distance < min_rel_distance:
                                 min_rel_distance = rel_distance

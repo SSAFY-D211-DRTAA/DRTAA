@@ -4,6 +4,7 @@ import com.d211.drtaa.domain.rent.dto.request.RentStatusRequestDTO;
 import com.d211.drtaa.domain.rent.dto.request.RentCreateRequestDTO;
 import com.d211.drtaa.domain.rent.dto.request.RentEditRequestDTO;
 import com.d211.drtaa.domain.rent.dto.request.RentTimeRequestDTO;
+import com.d211.drtaa.domain.rent.dto.response.RentCarLocationResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentDetailResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentResponseDTO;
 
@@ -15,6 +16,9 @@ public interface RentService {
 
     // rentId의 렌트 상세 조회
     RentDetailResponseDTO getDetailRent(long rentId);
+
+    // 현재 진행중인 렌트 조회
+    RentDetailResponseDTO getCurrentRent(String userProviderId);
 
     // 렌트 요청
     RentDetailResponseDTO createRent(String userProviderId, RentCreateRequestDTO rentCreateRequestDTO);

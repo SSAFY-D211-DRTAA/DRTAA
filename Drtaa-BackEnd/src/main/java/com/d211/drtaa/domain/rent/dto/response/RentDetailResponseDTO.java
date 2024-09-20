@@ -13,6 +13,8 @@ import java.time.LocalDateTime;
 @Builder
 public class RentDetailResponseDTO {
     // rent
+    @Schema(description = "렌트 고유 번호", example = "1")
+    private long rentId;
     @Schema(description = "렌트 상태", example = "RESERVED")
     private RentStatus rentStatus;
     @Schema(description = "렌트 이용 인원 수", example = "1(단위: 명)")

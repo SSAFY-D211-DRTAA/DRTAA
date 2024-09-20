@@ -3,11 +3,11 @@
 
 import rospy
 import rospkg
-from math import sqrt
+from math import sqrt, atan2
 from geometry_msgs.msg import PoseStamped
 from nav_msgs.msg import Odometry, Path
 from std_msgs.msg import Bool
-
+from tf.transformations import euler_from_quaternion
 import numpy as np
 from scipy.interpolate import interp1d
 
@@ -41,6 +41,13 @@ class local_path_pub:
         self.is_odom = True
         self.x = msg.pose.pose.position.x
         self.y = msg.pose.pose.position.y
+        # Extract orientation as quaternion and convert to Euler angles
+        orientation_q = msg.pose.pose.orientation
+        orientation_list = [orientation_q.x, orientation_q.y, orientation_q.z, orientation_q.w]
+        _, _, yaw = euler_from_quaternion(orientation_list)
+        
+        # Update heading (yaw)
+        self.heading = yaw
 
     def global_path_callback(self, msg):
         self.is_path = True
@@ -82,6 +89,19 @@ class local_path_pub:
                 current_waypoint = i
             elif dis > min_dis + 1.0:  # 거리가 다시 증가하기 시작하면 검색 중단
                 break
+        
+        # 지난 경로 무시: 이전에 방문한 경로점보다 작은 인덱스는 무시
+        if current_waypoint <= self.prev_current_waypoint:
+            return self.prev_current_waypoint
+
+        # 방향 기준 추가: 차량의 진행 방향과 경로점의 방향 비교
+        angle_to_waypoint = atan2(pose.pose.position.y - y, pose.pose.position.x - x)
+        angle_difference = (angle_to_waypoint - self.heading + np.pi) % (2 * np.pi) - np.pi
+        
+        # 특정 임계값을 기준으로 진행 방향과 맞지 않는 경우 무시
+        if angle_difference < -0.1 or angle_difference > 0.1:
+            return self.prev_current_waypoint
+
         return current_waypoint
 
     def predict_left_turn(self, local_path, look_ahead_distance=40):

@@ -1,5 +1,9 @@
 package com.drtaa.feature_rent
 
+import android.app.Dialog
+import android.os.Bundle
+import android.view.View
+import android.widget.FrameLayout
 import androidx.fragment.app.viewModels
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.flowWithLifecycle
@@ -10,6 +14,8 @@ import com.drtaa.feature_rent.databinding.FragmentCalendarBottomSheetBinding
 import com.drtaa.feature_rent.util.formatToYearMonthDay
 import com.drtaa.feature_rent.viewmodel.CalendarBottomSheetViewModel
 import com.drtaa.feature_rent.viewmodel.RentViewModel
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.prolificinteractive.materialcalendarview.CalendarDay
 import com.prolificinteractive.materialcalendarview.format.ArrayWeekDayFormatter
 import kotlinx.coroutines.flow.launchIn
@@ -34,6 +40,15 @@ class CalendarBottomSheetDialogFragment :
     private lateinit var startTimePickerDialog: TimePickerDialog
     private lateinit var endTimePickerDialog: TimePickerDialog
 
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val dialog = super.onCreateDialog(savedInstanceState) as BottomSheetDialog
+        dialog.setOnShowListener { dialogInterface ->
+            val bottomSheetDialog = dialogInterface as BottomSheetDialog
+            setupFullHeight(bottomSheetDialog)
+        }
+        return dialog
+    }
+
     override fun initView() {
         initCalendar()
         initCalendarEvent()
@@ -41,6 +56,15 @@ class CalendarBottomSheetDialogFragment :
         initEvent()
         initObserve()
         initData()
+    }
+
+    private fun setupFullHeight(bottomSheetDialog: BottomSheetDialog) {
+        val bottomSheet = bottomSheetDialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet) as FrameLayout?
+        val behavior = BottomSheetBehavior.from(bottomSheet!!)
+        val layoutParams = bottomSheet.layoutParams
+        bottomSheet.layoutParams = layoutParams
+        behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        behavior.skipCollapsed = true
     }
 
     private fun initData() {
@@ -172,11 +196,11 @@ class CalendarBottomSheetDialogFragment :
             }
         }
 
-        binding.tvRentSummaryStartTime.setOnClickListener {
+        binding.llRentSummaryStart.setOnClickListener {
             startTimePickerDialog.show()
         }
 
-        binding.tvRentSummaryEndTime.setOnClickListener {
+        binding.llRentSummaryEnd.setOnClickListener {
             endTimePickerDialog.show()
         }
     }

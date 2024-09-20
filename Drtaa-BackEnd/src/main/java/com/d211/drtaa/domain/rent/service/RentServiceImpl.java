@@ -86,6 +86,36 @@ public class RentServiceImpl implements RentService{
         RentCar rentCar = rent.getRentCar();
 
         RentDetailResponseDTO response = RentDetailResponseDTO.builder()
+                .rentId(rent.getRentId())
+                .rentStatus(rent.getRentStatus())
+                .rentHeadCount(rent.getRentHeadCount())
+                .rentPrice(rent.getRentPrice())
+                .rentTime(rent.getRentTime())
+                .rentStartTime(rent.getRentStartTime())
+                .rentEndTime(rent.getRentEndTime())
+                .rentDptLat(rent.getRentDptLat())
+                .rentDptLon(rent.getRentDptLon())
+                .rentCreatedAt(rent.getRentCreatedAt())
+                // rent-car
+                .rentCarId(rentCar.getRentCarId())
+                .rentCarNumber(rentCar.getRentCarNumber())
+                .rentCarManufacturer(rentCar.getRentCarManufacturer())
+                .rentCarModel(rentCar.getRentCarModel())
+                .build();
+
+        return response;
+    }
+
+    @Override
+    public RentDetailResponseDTO getCurrentRent(String userProviderId) {
+        // 현재 날짜에 진행중인 렌트 기록 찾기
+        Rent rent = rentRepository.findCurrentRentByUserProviderId(userProviderId)
+                .orElseThrow(() -> new RentNotFoundException("현재 진행 중인 렌트가 없습니다."));
+
+        RentCar rentCar = rent.getRentCar();
+
+        RentDetailResponseDTO response = RentDetailResponseDTO.builder()
+                .rentId(rent.getRentId())
                 .rentStatus(rent.getRentStatus())
                 .rentHeadCount(rent.getRentHeadCount())
                 .rentPrice(rent.getRentPrice())
@@ -206,6 +236,7 @@ public class RentServiceImpl implements RentService{
 
         // 반환값 빌더
         RentDetailResponseDTO response = RentDetailResponseDTO.builder()
+                .rentId(rent.getRentId())
                 .rentStatus(rent.getRentStatus())
                 .rentHeadCount(rent.getRentHeadCount())
                 .rentPrice(rent.getRentPrice())
