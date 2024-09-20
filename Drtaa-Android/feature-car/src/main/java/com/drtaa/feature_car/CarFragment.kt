@@ -36,7 +36,6 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
             cardView = cvTourCard
             overlayView = viewTourOverlay
             reflectionView = viewTourReflection
-            cardImage = ivTourCard
 
             btnMqtt.setOnClickListener {
                 viewModel.startPublish()
@@ -58,9 +57,9 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
         viewModel.currentRentDetail.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { currentRentDetail ->
                 if (currentRentDetail != null) {
-                    binding.clCurrentRent.visibility = View.VISIBLE
+                    binding.tvTourRentstart.setText("이용중인 차량이 없습니다..")
                 } else {
-                    binding.tvNoCurrentRent.visibility = View.VISIBLE
+                    binding.tvTourRentstart.visibility = View.VISIBLE
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
 
