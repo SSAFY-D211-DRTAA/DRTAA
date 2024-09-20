@@ -73,9 +73,9 @@ class pure_pursuit:
         self.min_lfd = 5
         self.max_lfd = 15
         self.lfd_gain = 0.78
-        self.target_velocity = 35
+        self.target_velocity = 40 # km/h (목표 속도)
 
-        self.stop_line_threshold = 8 
+        self.stop_line_threshold = 15 # 정지선을 인식하는 거리 
         self.previous_global_path = None  # 이전 경로 저장 변수 추가
         self.velocity_list = [] 
 
@@ -87,7 +87,7 @@ class pure_pursuit:
 
         self.traffic_light_manager = TrafficLightManager()
 
-        rate = rospy.Rate(30)  # 30hz
+        rate = rospy.Rate(50)  # 30hz
 
         while not rospy.is_shutdown():
             if self.is_path and self.is_odom and self.is_status and len(self.velocity_list) > 0: 
@@ -256,14 +256,13 @@ class pure_pursuit:
     def calculate_approach_velocity(self, distance):
         max_approach_speed = 15  # km/h
         min_approach_speed = 0   # km/h
-        deceleration_distance = 15  # meters
         
-        if distance > deceleration_distance:
+        if distance > self.stop_line_threshold:
             return max_approach_speed
         elif distance < 5:
             return min_approach_speed
         else:
-            return max(min_approach_speed, (distance / deceleration_distance) * max_approach_speed)
+            return max(min_approach_speed, (distance / self.stop_line_threshold) * max_approach_speed)
         
     def calc_vaild_obj(self, status_msg, object_data):
 
