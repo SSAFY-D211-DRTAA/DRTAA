@@ -4,7 +4,6 @@ import com.drtaa.core_data.datasource.RentDataSource
 import com.drtaa.core_model.network.RequestCallRent
 import com.drtaa.core_model.network.RequestCompleteRent
 import com.drtaa.core_model.network.RequestUnassignedCar
-import com.drtaa.core_model.network.ResponseCallRent
 import com.drtaa.core_model.rent.RentCar
 import com.drtaa.core_model.rent.RentDetail
 import com.drtaa.core_model.rent.RentSimple
@@ -18,7 +17,7 @@ class RentDataSourceImpl @Inject constructor(
         return rentAPI.getUnassignedCar(rentSchedule)
     }
 
-    override suspend fun callRent(requestCallRent: RequestCallRent): ResponseCallRent {
+    override suspend fun callRent(requestCallRent: RequestCallRent): RentDetail {
         return rentAPI.callRent(requestCallRent)
     }
 
