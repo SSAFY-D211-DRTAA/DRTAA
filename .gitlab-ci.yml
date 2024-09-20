@@ -1,34 +1,36 @@
-image: openjdk:17-jdk
+image: mcr.microsoft.com/dotnet/sdk:5.0 # Windows 기반 이미지 사용
 
 variables:
   ANDROID_COMPILE_SDK: "34"
   ANDROID_BUILD_TOOLS: "34.0.0"
-  ANDROID_SDK_TOOLS:   "9477386"
-  ANDROID_PROJECT_DIR: "Drtaa-Android"  # 안드로이드 프로젝트 폴더 경로
+  ANDROID_PROJECT_DIR: "Drtaa-Android"
 
 before_script:
-  - apt-get --quiet update --yes
-  - apt-get --quiet install --yes wget tar unzip lib32stdc++6 lib32z1
-  - wget --quiet --output-document=android-sdk.zip https://dl.google.com/android/repository/commandlinetools-linux-${ANDROID_SDK_TOOLS}_latest.zip
-  - unzip -d android-sdk-linux android-sdk.zip
-  - echo y | android-sdk-linux/cmdline-tools/bin/sdkmanager --sdk_root=. "platforms;android-${ANDROID_COMPILE_SDK}" >/dev/null
-  - echo y | android-sdk-linux/cmdline-tools/bin/sdkmanager --sdk_root=. "platform-tools" >/dev/null
-  - echo y | android-sdk-linux/cmdline-tools/bin/sdkmanager --sdk_root=. "build-tools;${ANDROID_BUILD_TOOLS}" >/dev/null
-  - export ANDROID_HOME=$PWD
-  - export PATH=${PATH}:$PWD/platform-tools/
-  - cd $ANDROID_PROJECT_DIR
-  - chmod +x ./gradlew
-  - echo "sdk.dir=$ANDROID_HOME" > local.properties
-  - echo "NAVER_MAP_CLIENT_ID=$NAVER_MAP_CLIENT_ID" >> local.properties
-  - echo "NAVER_MAP_CLIENT_ID_MANIFEST=$NAVER_MAP_CLIENT_ID_MANIFEST" >> local.properties
-  - echo "NAVER_MAP_CLIENT_SECRET=$NAVER_MAP_CLIENT_SECRET" >> local.properties
-  - echo "NAVER_CLIENT_ID=$NAVER_CLIENT_ID" >> local.properties
-  - echo "NAVER_CLIENT_SECRET=$NAVER_CLIENT_SECRET" >> local.properties
-  - echo "GOOGLE_LOGIN_CLIENT_ID=$GOOGLE_LOGIN_CLIENT_ID" >> local.properties
-  - echo "TOUR_API_KEY=$TOUR_API_KEY" >> local.properties
-  - echo "BASE_URL=$BASE_URL" >> local.properties
-  - echo "MQTT_URL=$MQTT_URL" >> local.properties
-  - echo "BOOTPAY_APP_ID=$BOOTPAY_APP_ID" >> local.properties
+  - $env:ANDROID_HOME = "C:\android-sdk"
+  - $env:PATH += ";$env:ANDROID_HOME\tools;$env:ANDROID_HOME\platform-tools"
+  
+  # Android SDK 다운로드 및 설치 (이미 설치되어 있다면 이 부분은 생략 가능)
+  - Invoke-WebRequest -Uri "https://dl.google.com/android/repository/commandlinetools-win-8512546_latest.zip" -OutFile "commandlinetools.zip"
+  - Expand-Archive -Path "commandlinetools.zip" -DestinationPath "$env:ANDROID_HOME"
+  - Move-Item "$env:ANDROID_HOME\cmdline-tools" "$env:ANDROID_HOME\latest"
+  - $env:PATH += ";$env:ANDROID_HOME\latest\bin"
+  
+  - sdkmanager.bat "platforms;android-$env:ANDROID_COMPILE_SDK" "build-tools;$env:ANDROID_BUILD_TOOLS" "platform-tools"
+  - cd $env:ANDROID_PROJECT_DIR
+  - ./gradlew.bat --version # Gradle 버전 확인
+
+  # local.properties 파일 생성
+  - Add-Content -Path "local.properties" -Value "sdk.dir=$env:ANDROID_HOME"
+  - Add-Content -Path "local.properties" -Value "NAVER_MAP_CLIENT_ID=$env:NAVER_MAP_CLIENT_ID"
+  - Add-Content -Path "local.properties" -Value "NAVER_MAP_CLIENT_ID_MANIFEST=$env:NAVER_MAP_CLIENT_ID_MANIFEST"
+  - Add-Content -Path "local.properties" -Value "NAVER_MAP_CLIENT_SECRET=$env:NAVER_MAP_CLIENT_SECRET"
+  - Add-Content -Path "local.properties" -Value "NAVER_CLIENT_ID=$env:NAVER_CLIENT_ID"
+  - Add-Content -Path "local.properties" -Value "NAVER_CLIENT_SECRET=$env:NAVER_CLIENT_SECRET"
+  - Add-Content -Path "local.properties" -Value "GOOGLE_LOGIN_CLIENT_ID=$env:GOOGLE_LOGIN_CLIENT_ID"
+  - Add-Content -Path "local.properties" -Value "TOUR_API_KEY=$env:TOUR_API_KEY"
+  - Add-Content -Path "local.properties" -Value "BASE_URL=$env:BASE_URL"
+  - Add-Content -Path "local.properties" -Value "MQTT_URL=$env:MQTT_URL"
+  - Add-Content -Path "local.properties" -Value "BOOTPAY_APP_ID=$env:BOOTPAY_APP_ID"
 
 stages:
   - build
@@ -36,11 +38,9 @@ stages:
 debug:
   stage: build
   script:
-    - ./gradlew assembleDebug
-  tags:
-    - mingyu
+    - ./gradlew.bat assembleDebug
   artifacts:
     paths:
-      - $ANDROID_PROJECT_DIR/app/build/outputs/apk/debug/app-debug.apk
+      - $env:ANDROID_PROJECT_DIR/app/build/outputs/apk/debug/app-debug.apk
   only:
     - develop
