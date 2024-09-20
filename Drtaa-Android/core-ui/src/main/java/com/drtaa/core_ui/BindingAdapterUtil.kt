@@ -27,7 +27,9 @@ fun ImageView.loadImageUrl(imgUrl: String?) {
 //        .fallback()
         .into(this)
 
-    this.adjustViewBounds = true
+    if (this !is de.hdodenhof.circleimageview.CircleImageView) {
+        this.adjustViewBounds = true
+    }
 }
 
 @BindingAdapter("app:setTextPrice")
