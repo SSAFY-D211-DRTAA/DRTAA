@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.time.Duration
 import javax.inject.Inject
 
@@ -99,7 +98,7 @@ class RentViewModel @Inject constructor() : ViewModel() {
         viewModelScope.launch {
             val hours = calculateHours()
             val price = (hours * PRICE_PER_HOUR).toInt()
-            val discount = -1 * ((hours.toInt() / 24) * DISCOUNT_PER_DAY)
+            val discount = -1 * ((hours.toInt() / ONE_DAY) * DISCOUNT_PER_DAY)
             val finalPrice = price + discount
 
             _rentInfo.emit(
@@ -124,7 +123,7 @@ class RentViewModel @Inject constructor() : ViewModel() {
 
         val duration = Duration.between(startDateTime, endDateTime)
         val hours = duration.toHours()
-        val minutes = duration.toMinutes() % 60 / 60.0
+        val minutes = duration.toMinutes() % ONE_HOUR_TO_MINUTE / ONE_HOUR_TO_MINUTE.toDouble()
 
         return hours.toInt() + minutes
     }
@@ -134,7 +133,9 @@ class RentViewModel @Inject constructor() : ViewModel() {
         private const val MAX_PEOPLE = 8
 
         private const val PRICE_PER_HOUR = 20000
-        private const val PRICE_PER_DAY = 200000
         private const val DISCOUNT_PER_DAY = 240000
+
+        private const val ONE_DAY = 24
+        private const val ONE_HOUR_TO_MINUTE = 60
     }
 }

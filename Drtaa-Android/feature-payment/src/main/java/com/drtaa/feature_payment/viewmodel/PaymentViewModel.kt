@@ -76,7 +76,7 @@ class PaymentViewModel @Inject constructor(
         val dataObject = jsonObject.getJSONObject("data")
 
         val price = dataObject.getInt("price")
-        val count = price / 50
+        val count = price
         Timber.d("결제 금액: $price, 수량: $count")
 
         return PaymentCompletionInfo(

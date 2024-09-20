@@ -37,5 +37,5 @@ fun TextView.setTextPrice(price: Int) {
 
 @BindingAdapter("app:setTextTime")
 fun TextView.setTextTime(time: Double) {
-    this.text = if(time - time.toInt() > 0) time.toString() else time.toInt().toString()
+    this.text = if (time - time.toInt() > 0) time.toString() else time.toInt().toString()
 }
