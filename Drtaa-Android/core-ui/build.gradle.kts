@@ -55,4 +55,6 @@ dependencies {
     // DI
     implementation(libs.androidx.hilt.navigation.fragment)
     implementation(libs.play.services.location)
+    // CircleImageView
+    implementation (libs.circleimageview)
 }
