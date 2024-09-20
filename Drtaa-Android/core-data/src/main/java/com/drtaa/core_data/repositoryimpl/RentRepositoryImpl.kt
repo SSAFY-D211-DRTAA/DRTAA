@@ -4,8 +4,10 @@ import com.drtaa.core_data.datasource.RentDataSource
 import com.drtaa.core_data.repository.RentRepository
 import com.drtaa.core_data.util.ResultWrapper
 import com.drtaa.core_data.util.safeApiCall
+import com.drtaa.core_model.network.RequestCallRent
 import com.drtaa.core_model.network.RequestCompleteRent
 import com.drtaa.core_model.network.RequestUnassignedCar
+import com.drtaa.core_model.network.ResponseCallRent
 import com.drtaa.core_model.rent.RentCar
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -52,10 +54,29 @@ class RentRepositoryImpl @Inject constructor(
                     Timber.d("실패")
                 }
 
-                is ResultWrapper.NetworkError -> {
-                    emit(Result.failure(Exception("네트워크 에러")))
-                    Timber.d("네트워크 에러")
-                }
+            is ResultWrapper.NetworkError -> {
+                emit(Result.failure(Exception("네트워크 에러")))
+                Timber.d("네트워크 에러")
             }
         }
+    }
+
+    override suspend fun callRent(requestCallRent: RequestCallRent): Flow<Result<ResponseCallRent>> = flow {
+        when (val response = safeApiCall { rentDataSource.callRent(requestCallRent) }) {
+            is ResultWrapper.Success -> {
+                emit(Result.success(response.data))
+                Timber.d("렌트 호출 성공")
+            }
+
+            is ResultWrapper.GenericError -> {
+                emit(Result.failure(Exception(response.message)))
+                Timber.d("렌트 호출 실패: ${response.message}")
+            }
+
+            is ResultWrapper.NetworkError -> {
+                emit(Result.failure(Exception("네트워크 에러")))
+                Timber.d("렌트 호출 네트워크 에러")
+            }
+        }
+    }
 }

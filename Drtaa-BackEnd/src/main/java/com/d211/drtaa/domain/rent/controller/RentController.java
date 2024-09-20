@@ -1,6 +1,6 @@
 package com.d211.drtaa.domain.rent.controller;
 
-import com.d211.drtaa.domain.rent.dto.request.RentCompletedRequestDTO;
+import com.d211.drtaa.domain.rent.dto.request.RentStatusRequestDTO;
 import com.d211.drtaa.domain.rent.dto.request.RentCreateRequestDTO;
 import com.d211.drtaa.domain.rent.dto.request.RentEditRequestDTO;
 import com.d211.drtaa.domain.rent.dto.request.RentTimeRequestDTO;
@@ -62,6 +62,20 @@ public class RentController {
         }
     }
 
+    @GetMapping("/current")
+    @Operation(summary = "진행중인 렌트 상세 조회", description = "회원의 현재 진행중인 렌트 상세 조회")
+    public ResponseEntity getCurrentRent(Authentication authentication) {
+        try {
+            RentDetailResponseDTO response = rentService.getCurrentRent(authentication.getName());
+
+            return ResponseEntity.ok(response); //200
+        } catch(RentNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
+        }
+    }
+
     @PostMapping
     @Operation(summary = "렌트 요청", description = "렌트 요청")
     public ResponseEntity createRent
@@ -113,7 +127,7 @@ public class RentController {
 
     @PatchMapping("/status/completed")
     @Operation(summary = "렌트 상태 변경(반납)", description = "렌트 취소")
-    public ResponseEntity rentStatusCompleted(@RequestBody RentCompletedRequestDTO requestDTO) {
+    public ResponseEntity rentStatusCompleted(@RequestBody RentStatusRequestDTO requestDTO) {
         try {
             rentService.rentStatusCompleted(requestDTO);
 
@@ -127,11 +141,11 @@ public class RentController {
         }
     }
 
-    @PatchMapping("/status/{rentId}/canceled")
+    @PatchMapping("/status/canceled")
     @Operation(summary = "렌트 상태 변경(취소)", description = "렌트 취소")
-    public ResponseEntity rentStatusCanceld(@PathVariable("rentId") Long rentId) {
+    public ResponseEntity rentStatusCanceld(@RequestBody RentStatusRequestDTO requestDTO) {
         try {
-            rentService.rentStatusCanceld(rentId);
+            rentService.rentStatusCanceld(requestDTO);
 
             return ResponseEntity.ok("Success");
         } catch(RentNotFoundException | RentCarNotFoundException e) {

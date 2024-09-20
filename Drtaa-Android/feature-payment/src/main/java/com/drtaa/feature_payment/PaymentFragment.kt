@@ -25,8 +25,6 @@ class PaymentFragment : BaseFragment<FragmentPaymentBinding>(R.layout.fragment_p
     private var count = 1
     private val pricePerItem = 50
 
-    private var applicationId = "66e2dabea3175898bd6e4b23" // 이건 왜 대체 적용 안됨? ;;; 어2가 아리마셍요 ㅋㅋ
-
     override fun initView() {
         binding.btnPaymentBootpay.setOnClickListener {
             lifecycleScope.launch {
@@ -96,12 +94,6 @@ class PaymentFragment : BaseFragment<FragmentPaymentBinding>(R.layout.fragment_p
             setExtra(extra)
             this.items = items
         }
-
-        val map: MutableMap<String, Any> = HashMap()
-        map["1"] = "abcdef"
-        map["2"] = "abcdef55"
-        map["3"] = 1234
-        payload.metadata = map
 
         Bootpay.init(childFragmentManager, requireContext())
             .setPayload(payload)

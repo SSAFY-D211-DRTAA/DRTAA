@@ -4,7 +4,6 @@ import com.d211.drtaa.domain.rent.dto.request.RentCarDriveStatusRequestDTO;
 import com.d211.drtaa.domain.rent.dto.request.RentCarUnassignedDispatchStatusRequestDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentCarDriveStatusResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentCarResponseDTO;
-import com.d211.drtaa.domain.rent.entity.car.RentCar;
 import com.d211.drtaa.domain.rent.entity.car.RentDrivingStatus;
 import com.d211.drtaa.domain.rent.service.car.RentCarService;
 import com.d211.drtaa.global.exception.rent.NoAvailableRentCarException;
@@ -71,8 +70,7 @@ public class RentCarController {
         try {
             rentCarService.updateDriveStatus(rentCarDriveStatusRequestDTO);
 
-            String response = "차 (rentCarId: " + rentCarDriveStatusRequestDTO.getRentCarId() + ")의 배차 상태가 " + rentCarDriveStatusRequestDTO.getRentCarDrivingStatus() + "로 변경되었습니다.";
-            return ResponseEntity.ok(response); // 200
+            return ResponseEntity.ok(rentCarDriveStatusRequestDTO); // 200
         } catch (RentCarNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
         } catch (Exception e) {
