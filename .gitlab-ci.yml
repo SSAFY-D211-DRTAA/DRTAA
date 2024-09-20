@@ -15,7 +15,7 @@ before_script:
   - echo y | android-sdk-linux/cmdline-tools/bin/sdkmanager --sdk_root=. "platform-tools" >/dev/null
   - echo y | android-sdk-linux/cmdline-tools/bin/sdkmanager --sdk_root=. "build-tools;${ANDROID_BUILD_TOOLS}" >/dev/null
   - export ANDROID_HOME=$PWD
-  - export PATH=$PATH:$PWD/platform-tools/
+  - export PATH=${PATH}:$PWD/platform-tools/
   - cd $ANDROID_PROJECT_DIR
   - chmod +x ./gradlew
   - echo "sdk.dir=$ANDROID_HOME" > local.properties
