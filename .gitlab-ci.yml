@@ -3,22 +3,21 @@ image: ubuntu:20.04
 variables:
   ANDROID_COMPILE_SDK: "34"
   ANDROID_BUILD_TOOLS: "34.0.0"
-  ANDROID_SDK_TOOLS:   "9477386"
-  ANDROID_PROJECT_DIR: "/Drtaa-Android"  # 안드로이드 프로젝트 폴더 경로
+  ANDROID_SDK_TOOLS: "9477386"
+  ANDROID_PROJECT_DIR: "Drtaa-Android"
+  DEBIAN_FRONTEND: "noninteractive"
 
 before_script:
-  - apt update || (apt-get update && apt-get install -y apt)
-  - apt-get install -y wget tar unzip lib32stdc++6 lib32z1 openjdk-17-jdk
-  - wget --quiet --output-document=android-sdk.zip https://dl.google.com/android/repository/commandlinetools-linux-${ANDROID_SDK_TOOLS}_latest.zip
-  - apt-get --quiet update --yes
-  - apt-get --quiet install --yes wget tar unzip lib32stdc++6 lib32z1
+  - apt-get update && apt-get install -y wget unzip openjdk-17-jdk
+  - mkdir -p android-sdk-linux
   - wget --quiet --output-document=android-sdk.zip https://dl.google.com/android/repository/commandlinetools-linux-${ANDROID_SDK_TOOLS}_latest.zip
   - unzip -d android-sdk-linux android-sdk.zip
-  - echo y | android-sdk-linux/cmdline-tools/bin/sdkmanager --sdk_root=. "platforms;android-${ANDROID_COMPILE_SDK}" >/dev/null
-  - echo y | android-sdk-linux/cmdline-tools/bin/sdkmanager --sdk_root=. "platform-tools" >/dev/null
-  - echo y | android-sdk-linux/cmdline-tools/bin/sdkmanager --sdk_root=. "build-tools;${ANDROID_BUILD_TOOLS}" >/dev/null
-  - export ANDROID_HOME=$PWD
-  - export PATH=$PATH:$PWD/platform-tools/
+  - mv android-sdk-linux/cmdline-tools android-sdk-linux/latest
+  - mkdir -p android-sdk-linux/cmdline-tools
+  - mv android-sdk-linux/latest android-sdk-linux/cmdline-tools/
+  - export ANDROID_HOME=$PWD/android-sdk-linux
+  - export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools
+  - yes | sdkmanager --sdk_root=$ANDROID_HOME "platforms;android-${ANDROID_COMPILE_SDK}" "platform-tools" "build-tools;${ANDROID_BUILD_TOOLS}"
   - cd $ANDROID_PROJECT_DIR
   - chmod +x ./gradlew
   - echo "sdk.dir=$ANDROID_HOME" > local.properties
