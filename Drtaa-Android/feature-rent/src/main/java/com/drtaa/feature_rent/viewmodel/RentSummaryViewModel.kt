@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -91,19 +92,19 @@ class RentSummaryViewModel @Inject constructor(
 
     fun processBootpayPayment(paymentData: String, rentInfo: RentInfo) {
         viewModelScope.launch {
-            try {
+            runCatching {
                 val currentUser = signRepository.getUserData().first().getOrThrow()
                 val paymentInfo = parseBootpayData(paymentData, currentUser, rentInfo)
                 val paymentRequest = paymentInfo.toPaymentRequest()
                 paymentRepository.savePaymentInfo(paymentRequest).collect { result ->
                     result.onSuccess {
-                        _paymentStatus.emit(PaymentStatus.Success("결제가 성공적으로 처리되었습니다."))
+                        _paymentStatus.emit(PaymentStatus.Success("결제가 성공적으로 처리 되었습니다."))
                         callRent(rentInfo)
                     }.onFailure { error ->
                         _paymentStatus.emit(PaymentStatus.Error("결제 저장 중 오류가 발생했습니다: ${error.message}"))
                     }
                 }
-            } catch (e: Exception) {
+            }.onFailure { e ->
                 _paymentStatus.emit(PaymentStatus.Error("결제 데이터 처리 중 오류가 발생했습니다: ${e.message}"))
             }
         }
