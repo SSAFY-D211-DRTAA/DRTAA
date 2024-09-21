@@ -6,6 +6,9 @@ variables:
   ANDROID_SDK_ROOT: "/sdk"
 
 before_script:
+  # wget 설치
+  - apt-get update && apt-get install -y wget unzip
+
   # Android SDK 설치
   - mkdir -p $ANDROID_SDK_ROOT
   - wget -q "https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip" -O cmdline-tools.zip
