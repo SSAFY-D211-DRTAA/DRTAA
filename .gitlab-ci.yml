@@ -40,6 +40,6 @@ assembleDebug:
     - ./gradlew assembleDebug
   artifacts:
     paths:
-      - app/build/outputs/apk/debug/app-debug.apk
-      - app/build/outputs/logs/
+      - Drtaa-Android/app/build/outputs/apk/debug/app-debug.apk
+      - Drtaa-Android/app/build/outputs/logs/
     expire_in: 1 week
