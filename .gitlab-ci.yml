@@ -46,6 +46,10 @@ assembleDebug:
     - export JAVA_HOME="/opt/java/openjdk"
     - export PATH="$JAVA_HOME/bin:$PATH"
     - ./gradlew assembleDebug --no-daemon --parallel --max-workers=4 --stacktrace --info
+    - echo "Debug APK generated at:"
+    - find app/build/outputs/apk/debug -name "*.apk"
   artifacts:
     paths:
-      - app/build/outputs/
+      - app/build/outputs/apk/debug/*.apk
+      - app/build/outputs/logs/
+    expire_in: 1 week
