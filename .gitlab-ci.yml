@@ -3,17 +3,24 @@ image: cimg/android:2023.08
 variables:
   ANDROID_COMPILE_SDK: "34"
   ANDROID_BUILD_TOOLS: "34.0.0"
-  ANDROID_SDK_ROOT: "/home/circleci/android-sdk"
+  ANDROID_SDK_ROOT: "/sdk"
   GRADLE_USER_HOME: "$CI_PROJECT_DIR/Drtaa-Android/.gradle"
 
-cache:
-  key: ${CI_PROJECT_ID}
-  paths:
-    - Drtaa-Android/.gradle/
+# cache:
+#   key: ${CI_PROJECT_ID}
+#   paths:
+#     - Drtaa-Android/.gradle/
 
 default:
   before_script:
     - cd Drtaa-Android
+
+stages:
+  - build
+
+build_debug_apk:
+  stage: build
+  script:
     - echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
     - echo "NAVER_MAP_CLIENT_ID=\"$NAVER_MAP_CLIENT_ID\"" >> local.properties
     - echo "NAVER_MAP_CLIENT_ID_MANIFEST=$NAVER_MAP_CLIENT_ID_MANIFEST" >> local.properties
@@ -25,14 +32,7 @@ default:
     - echo "BASE_URL=\"$BASE_URL\"" >> local.properties
     - echo "MQTT_URL=\"$MQTT_URL\"" >> local.properties
     - echo "BOOTPAY_APP_ID=\"$BOOTPAY_APP_ID\"" >> local.properties
-
-stages:
-  - build
-
-build_debug_apk:
-  stage: build
-  script:
-    - ./gradlew assembleDebug --stacktrace --info
+    - ./gradlew assembleDebug
   artifacts:
     paths:
       - Drtaa-Android/app/build/outputs/apk/debug/app-debug.apk
