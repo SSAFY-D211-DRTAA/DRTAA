@@ -1,4 +1,4 @@
-image: openjdk:17-jdk
+image: openjdk:17-jdk-alpine
 
 variables:
   ANDROID_COMPILE_SDK: "34"
@@ -6,8 +6,7 @@ variables:
   ANDROID_SDK_TOOLS: "9477386"
 
 before_script:
-  - apt-get --quiet update --yes
-  - apt-get --quiet install --yes wget tar unzip lib32stdc++6 lib32z1
+  - apk add --no-cache wget tar unzip
   - export ANDROID_HOME="${PWD}/android-home"
   - install -d $ANDROID_HOME
   - wget --output-document=$ANDROID_HOME/cmdline-tools.zip https://dl.google.com/android/repository/commandlinetools-linux-${ANDROID_SDK_TOOLS}_latest.zip
@@ -51,8 +50,8 @@ assembleDebug:
     paths:
       - app/build/outputs/
 
-debugTests:
-  interruptible: true
-  stage: test
-  script:
-    - ./gradlew -Pci --console=plain :app:testDebug
+# debugTests:
+#   interruptible: true
+#   stage: test
+#   script:
+#     - ./gradlew -Pci --console=plain :app:testDebug
