@@ -5,7 +5,9 @@ variables:
   ANDROID_BUILD_TOOLS: "34.0.0"
   ANDROID_SDK_TOOLS: "9477386"
 
+
 before_script:
+  - cd Drtaa-Android
   - apt-get --quiet update --yes
   - apt-get --quiet install --yes wget tar unzip
   - export ANDROID_HOME="${PWD}/android-home"
