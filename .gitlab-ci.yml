@@ -1,4 +1,4 @@
-image: eclipse-temurin:17-jdk-focal
+image: eclipse-temurin:17-jdk-jammy
 
 variables:
   ANDROID_COMPILE_SDK: "34"
@@ -8,24 +8,18 @@ variables:
 before_script:
   - cd Drtaa-Android
   - apt-get --quiet update --yes
-  - apt-get --quiet install --yes wget tar unzip lib32z1 lib32stdc++6
-  - export ANDROID_HOME="${PWD}/android-home"
-  - export ANDROID_SDK_ROOT=$ANDROID_HOME
+  - apt-get --quiet install --yes wget unzip
+  - export ANDROID_HOME="${PWD}/android-sdk-root"
   - install -d $ANDROID_HOME
-  - wget --output-document=$ANDROID_HOME/cmdline-tools.zip https://dl.google.com/android/repository/commandlinetools-linux-${ANDROID_SDK_TOOLS}_latest.zip
-  - pushd $ANDROID_HOME
-  - unzip -d cmdline-tools cmdline-tools.zip
-  - pushd cmdline-tools
-  - mv cmdline-tools tools || true
-  - popd
-  - popd
-  - export PATH=$PATH:${ANDROID_HOME}/cmdline-tools/tools/bin/:${ANDROID_HOME}/platform-tools/
+  - wget --no-verbose --output-document=$ANDROID_HOME/cmdline-tools.zip https://dl.google.com/android/repository/commandlinetools-linux-${ANDROID_SDK_TOOLS}_latest.zip
+  - unzip -q -d "$ANDROID_HOME/cmdline-tools" "$ANDROID_HOME/cmdline-tools.zip"
+  - mv -T "$ANDROID_HOME/cmdline-tools/cmdline-tools" "$ANDROID_HOME/cmdline-tools/tools"
+  - export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/cmdline-tools/tools/bin
   - sdkmanager --version
-  - yes | sdkmanager --licenses || true
+  - yes | sdkmanager --licenses > /dev/null || true
   - sdkmanager "platforms;android-${ANDROID_COMPILE_SDK}"
   - sdkmanager "platform-tools"
   - sdkmanager "build-tools;${ANDROID_BUILD_TOOLS}"
-  - sdkmanager "cmdline-tools;latest"
   - chmod +x ./gradlew
   - echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
   - echo "NAVER_MAP_CLIENT_ID=\"$NAVER_MAP_CLIENT_ID\"" >> local.properties
@@ -43,17 +37,9 @@ assembleDebug:
   interruptible: true
   stage: build
   script:
-    - export JAVA_HOME="/opt/java/openjdk"
-    - export PATH="$JAVA_HOME/bin:$PATH"
-    - ./gradlew assembleDebug --no-daemon --parallel --max-workers=4 --stacktrace --info
-    - if [ -f Drtaa-Android/app/build/outputs/apk/debug/app-debug.apk ]; then
-        echo "Debug APK generated at app/build/outputs/apk/debug/";
-      else
-        echo "APK not found!";
-        exit 1;
-      fi
+    - ./gradlew assembleDebug
   artifacts:
     paths:
-      - Drtaa-Android/app/build/outputs/apk/debug/app-debug.apk
-      - Drtaa-Android/app/build/outputs/logs/
+      - app/build/outputs/apk/debug/app-debug.apk
+      - app/build/outputs/logs/
     expire_in: 1 week
