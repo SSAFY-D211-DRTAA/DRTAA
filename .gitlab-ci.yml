@@ -1,11 +1,12 @@
 image: cimg/android:2023.08  # Android SDK 34 포함 이미지
 
 variables:
-  ANDROID_COMPILE_SDK: "34"   # Android SDK 34로 설정
-  ANDROID_BUILD_TOOLS: "34.0.0"  # 빌드 도구 34.0.0
+  ANDROID_COMPILE_SDK: "34"
+  ANDROID_BUILD_TOOLS: "34.0.0"
   ANDROID_SDK_ROOT: "/sdk"
 
 before_script:
+  - cd Drtaa-Android  # Drtaa-Android 폴더로 이동
   # local.properties 파일 생성 및 환경 변수 설정
   - echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
   - echo "NAVER_MAP_CLIENT_ID=$NAVER_MAP_CLIENT_ID" >> local.properties
@@ -31,10 +32,9 @@ build_debug_apk:
     # APK 빌드
     - ./gradlew assembleDebug
   artifacts:
-    # 빌드 결과물 저장
     paths:
-      - app/build/outputs/apk/debug/app-debug.apk
+      - Drtaa-Android/app/build/outputs/apk/debug/app-debug.apk  # 경로 수정
   only:
-    - pushes  # push 발생 시에만 빌드
+    - pushes
   tags:
     - android
