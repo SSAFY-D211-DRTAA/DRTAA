@@ -3,7 +3,7 @@ image: cimg/android:2023.08
 variables:
   ANDROID_COMPILE_SDK: "34"
   ANDROID_BUILD_TOOLS: "34.0.0"
-  ANDROID_SDK_ROOT: "/sdk"
+  ANDROID_SDK_ROOT: "/home/circleci/android-sdk"
   GRADLE_USER_HOME: "$CI_PROJECT_DIR/Drtaa-Android/.gradle"
 
 cache:
@@ -14,6 +14,17 @@ cache:
 default:
   before_script:
     - cd Drtaa-Android
+    - echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
+    - echo "NAVER_MAP_CLIENT_ID=\"$NAVER_MAP_CLIENT_ID\"" >> local.properties
+    - echo "NAVER_MAP_CLIENT_ID_MANIFEST=$NAVER_MAP_CLIENT_ID_MANIFEST" >> local.properties
+    - echo "NAVER_MAP_CLIENT_SECRET=\"$NAVER_MAP_CLIENT_SECRET\"" >> local.properties
+    - echo "NAVER_CLIENT_ID=\"$NAVER_CLIENT_ID\"" >> local.properties
+    - echo "NAVER_CLIENT_SECRET=\"$NAVER_CLIENT_SECRET\"" >> local.properties
+    - echo "GOOGLE_LOGIN_CLIENT_ID=\"$GOOGLE_LOGIN_CLIENT_ID\"" >> local.properties
+    - echo "TOUR_API_KEY=\"$TOUR_API_KEY\"" >> local.properties
+    - echo "BASE_URL=\"$BASE_URL\"" >> local.properties
+    - echo "MQTT_URL=\"$MQTT_URL\"" >> local.properties
+    - echo "BOOTPAY_APP_ID=\"$BOOTPAY_APP_ID\"" >> local.properties
 
 stages:
   - build
@@ -21,18 +32,7 @@ stages:
 build_debug_apk:
   stage: build
   script:
-    - echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
-    - echo "NAVER_MAP_CLIENT_ID=$NAVER_MAP_CLIENT_ID" >> local.properties
-    - echo "NAVER_MAP_CLIENT_ID_MANIFEST=$NAVER_MAP_CLIENT_ID_MANIFEST" >> local.properties
-    - echo "NAVER_MAP_CLIENT_SECRET=$NAVER_MAP_CLIENT_SECRET" >> local.properties
-    - echo "NAVER_CLIENT_ID=$NAVER_CLIENT_ID" >> local.properties
-    - echo "NAVER_CLIENT_SECRET=$NAVER_CLIENT_SECRET" >> local.properties
-    - echo "GOOGLE_LOGIN_CLIENT_ID=$GOOGLE_LOGIN_CLIENT_ID" >> local.properties
-    - echo "TOUR_API_KEY=$TOUR_API_KEY" >> local.properties
-    - echo "BASE_URL=$BASE_URL" >> local.properties
-    - echo "MQTT_URL=$MQTT_URL" >> local.properties
-    - echo "BOOTPAY_APP_ID=$BOOTPAY_APP_ID" >> local.properties
-    - ./gradlew assembleDebug
+    - ./gradlew assembleDebug --stacktrace --info
   artifacts:
     paths:
       - Drtaa-Android/app/build/outputs/apk/debug/app-debug.apk
