@@ -1,4 +1,4 @@
-image: circleci/android:api-34  # Android SDK 34 포함 이미지
+image: cimg/android:2023.08  # Android SDK 34 포함 이미지
 
 variables:
   ANDROID_COMPILE_SDK: "34"   # Android SDK 34로 설정
