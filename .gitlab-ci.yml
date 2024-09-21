@@ -1,13 +1,49 @@
+image: openjdk:17-jdk  # JDK 17로 설정
+
+variables:
+  ANDROID_COMPILE_SDK: "34"   # Android SDK 34로 설정
+  ANDROID_BUILD_TOOLS: "34.0.0"  # 빌드 도구 34.0.0
+  ANDROID_SDK_ROOT: "/sdk"
+
+before_script:
+  # Android SDK 설치
+  - mkdir -p $ANDROID_SDK_ROOT
+  - wget -q "https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip" -O cmdline-tools.zip
+  - unzip -q cmdline-tools.zip -d $ANDROID_SDK_ROOT
+  - mkdir -p $ANDROID_SDK_ROOT/cmdline-tools/latest
+  - mv $ANDROID_SDK_ROOT/cmdline-tools/* $ANDROID_SDK_ROOT/cmdline-tools/latest
+  - yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT "platforms;android-$ANDROID_COMPILE_SDK" "build-tools;$ANDROID_BUILD_TOOLS"
+  - yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT "platform-tools"
+  
+  # local.properties 파일 생성 및 환경 변수 설정
+  - echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
+  - echo "NAVER_MAP_CLIENT_ID=$NAVER_MAP_CLIENT_ID" >> local.properties
+  - echo "NAVER_MAP_CLIENT_ID_MANIFEST=$NAVER_MAP_CLIENT_ID_MANIFEST" >> local.properties
+  - echo "NAVER_MAP_CLIENT_SECRET=$NAVER_MAP_CLIENT_SECRET" >> local.properties
+  - echo "NAVER_CLIENT_ID=$NAVER_CLIENT_ID" >> local.properties
+  - echo "NAVER_CLIENT_SECRET=$NAVER_CLIENT_SECRET" >> local.properties
+  - echo "GOOGLE_LOGIN_CLIENT_ID=$GOOGLE_LOGIN_CLIENT_ID" >> local.properties
+  - echo "TOUR_API_KEY=$TOUR_API_KEY" >> local.properties
+  - echo "BASE_URL=$BASE_URL" >> local.properties
+  - echo "MQTT_URL=$MQTT_URL" >> local.properties
+  - echo "BOOTPAY_APP_ID=$BOOTPAY_APP_ID" >> local.properties
+  
+  # Gradle 실행 권한 부여
+  - chmod +x ./gradlew
+
 stages:
   - build
-  - test
 
-build_job:
+build_debug_apk:
   stage: build
   script:
-    - echo "Building the application..."
-
-test_job:
-  stage: test
-  script:
-    - echo "Running tests..."
+    # APK 빌드
+    - ./gradlew assembleDebug
+  artifacts:
+    # 빌드 결과물 저장
+    paths:
+      - app/build/outputs/apk/debug/app-debug.apk
+  only:
+    - pushes  # push 발생 시에만 빌드
+  tags:
+    - android
