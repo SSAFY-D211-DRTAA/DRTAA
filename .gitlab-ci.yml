@@ -5,23 +5,10 @@ variables:
   ANDROID_BUILD_TOOLS: "34.0.0"
   ANDROID_SDK_ROOT: "/home/circleci/android-sdk"
   GRADLE_USER_HOME: "$CI_PROJECT_DIR/Drtaa-Android/.gradle"
-
-cache:
-  key: ${CI_PROJECT_ID}-${CI_COMMIT_REF_SLUG}
-  paths:
-    - Drtaa-Android/.gradle/
-    - Drtaa-Android/build/
-    - Drtaa-Android/app/build/
-    - ${ANDROID_SDK_ROOT}
-
+  
 default:
   before_script:
-    - mkdir -p ${ANDROID_SDK_ROOT}
-    - echo y | sdkmanager --sdk_root=${ANDROID_SDK_ROOT} "platforms;android-${ANDROID_COMPILE_SDK}" "build-tools;${ANDROID_BUILD_TOOLS}"
     - cd Drtaa-Android
-    - echo "org.gradle.jvmargs=-Xmx2048m -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8" >> gradle.properties
-    - echo "org.gradle.daemon=false" >> gradle.properties
-    - export JAVA_TOOL_OPTIONS="-Dhttps.protocols=TLSv1.2,TLSv1.3"
 
 stages:
   - build
@@ -29,7 +16,7 @@ stages:
 build_debug_apk:
   stage: build
   script:
-    - echo "sdk.dir=${ANDROID_SDK_ROOT}" > local.properties
+    - echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
     - echo "NAVER_MAP_CLIENT_ID=\"$NAVER_MAP_CLIENT_ID\"" >> local.properties
     - echo "NAVER_MAP_CLIENT_ID_MANIFEST=$NAVER_MAP_CLIENT_ID_MANIFEST" >> local.properties
     - echo "NAVER_MAP_CLIENT_SECRET=\"$NAVER_MAP_CLIENT_SECRET\"" >> local.properties
@@ -40,7 +27,7 @@ build_debug_apk:
     - echo "BASE_URL=\"$BASE_URL\"" >> local.properties
     - echo "MQTT_URL=\"$MQTT_URL\"" >> local.properties
     - echo "BOOTPAY_APP_ID=\"$BOOTPAY_APP_ID\"" >> local.properties
-    - ./gradlew assembleDebug --stacktrace --info
+    - ./gradlew assembleDebug
   artifacts:
     paths:
       - Drtaa-Android/app/build/outputs/apk/debug/app-debug.apk
