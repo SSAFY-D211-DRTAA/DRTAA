@@ -5,13 +5,13 @@ variables:
   ANDROID_BUILD_TOOLS: "34.0.0"
   ANDROID_SDK_ROOT: "/sdk"
   GRADLE_USER_HOME: "$CI_PROJECT_DIR/Drtaa-Android/.gradle"
-  GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4g -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
 
-# cache는 일시적으로 주석 처리된 상태를 유지합니다.
-# cache:
-#   key: ${CI_PROJECT_ID}
-#   paths:
-#     - Drtaa-Android/.gradle/
+cache:
+  key: ${CI_PROJECT_ID}-${CI_COMMIT_REF_SLUG}
+  paths:
+    - Drtaa-Android/.gradle/
+    - Drtaa-Android/build/
+    - Drtaa-Android/app/build/
 
 default:
   before_script:
@@ -34,7 +34,7 @@ build_debug_apk:
     - echo "BASE_URL=\"$BASE_URL\"" >> local.properties
     - echo "MQTT_URL=\"$MQTT_URL\"" >> local.properties
     - echo "BOOTPAY_APP_ID=\"$BOOTPAY_APP_ID\"" >> local.properties
-    - ./gradlew assembleDebug --stacktrace --info --scan
+    - ./gradlew assembleDebug
   artifacts:
     paths:
       - Drtaa-Android/app/build/outputs/apk/debug/app-debug.apk
