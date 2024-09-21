@@ -8,7 +8,7 @@ variables:
 before_script:
   - cd Drtaa-Android
   - apt-get --quiet update --yes
-  - apt-get --quiet install --yes wget tar unzip lib32z1 lib32stdc++6 
+  - apt-get --quiet install --yes wget tar unzip lib32z1 lib32stdc++6
   - export ANDROID_HOME="${PWD}/android-home"
   - export ANDROID_SDK_ROOT=$ANDROID_HOME
   - install -d $ANDROID_HOME
@@ -46,10 +46,14 @@ assembleDebug:
     - export JAVA_HOME="/opt/java/openjdk"
     - export PATH="$JAVA_HOME/bin:$PATH"
     - ./gradlew assembleDebug --no-daemon --parallel --max-workers=4 --stacktrace --info
-    - echo "Debug APK generated at:"
-    - find Drtaa-Android/app/build/outputs/apk/debug -name "*.apk"
+    - if [ -f app/build/outputs/apk/debug/app-debug.apk ]; then
+        echo "Debug APK generated at app/build/outputs/apk/debug/";
+      else
+        echo "APK not found!";
+        exit 1;
+      fi
   artifacts:
     paths:
-      - Drtaa-Android/app/build/outputs/apk/debug/*.apk
-      - Drtaa-Android/app/build/outputs/logs/
+      - app/build/outputs/apk/debug/app-debug.apk
+      - app/build/outputs/logs/
     expire_in: 1 week
