@@ -1,4 +1,4 @@
-image: openjdk:17-jdk-alpine
+image: eclipse-temurin:17-jdk-focal
 
 variables:
   ANDROID_COMPILE_SDK: "34"
@@ -6,7 +6,8 @@ variables:
   ANDROID_SDK_TOOLS: "9477386"
 
 before_script:
-  - apk add --no-cache wget tar unzip
+  - apt-get --quiet update --yes
+  - apt-get --quiet install --yes wget tar unzip lib32stdc++6 lib32z1
   - export ANDROID_HOME="${PWD}/android-home"
   - install -d $ANDROID_HOME
   - wget --output-document=$ANDROID_HOME/cmdline-tools.zip https://dl.google.com/android/repository/commandlinetools-linux-${ANDROID_SDK_TOOLS}_latest.zip
