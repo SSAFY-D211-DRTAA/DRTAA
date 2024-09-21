@@ -1,4 +1,4 @@
-image: cimg/android:2023.08
+image: cimg/android:2024.09
 
 variables:
   ANDROID_COMPILE_SDK: "34"
