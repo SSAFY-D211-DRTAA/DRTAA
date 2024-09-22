@@ -1,0 +1,12 @@
+{
+    "log_level": "DEBUG",
+    "websocket_url": "ws://rosbridge:9090",
+    "east_offset": 313008.55819800857,
+    "north_offset": 4161698.628368007,
+    "utm_zone": 52,
+
+    "test_lat":  37.57569116736151,
+    "test_lon":  126.90039723462993,
+    "next_goal_lat":  37.57569116736151,
+    "next_goal_lon":  126.90039723462993
+}
