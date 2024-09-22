@@ -1,7 +1,7 @@
 <launch>
     <node pkg="drtaa" type="mgeo_pub.py" name="mgeo_pub"  />
     <node pkg="drtaa" type="gpsimu_parser.py" name="gpsimu_parser" />
-    <node pkg="drtaa" type="mgeo_astar_path.py" name="astar_path_pub"/>
+    <node pkg="drtaa" type="mgeo_astar_path.py" name="astar_path_pub" output='screen'/>
     <node pkg="drtaa" type="local_path_pub.py" name="local_path_pub" />    
     <node pkg="tf2_ros" type="static_transform_publisher" name="tf_lidar" args="2 0 1.25 0 0 0 1 base_link velodyne" />
     <node pkg="drtaa" type="lidar_velodyne_cluster.py" name="lidar_velodyne_cluster"  />

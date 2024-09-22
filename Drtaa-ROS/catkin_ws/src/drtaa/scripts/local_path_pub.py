@@ -10,6 +10,7 @@ from std_msgs.msg import Bool
 from tf.transformations import euler_from_quaternion
 import numpy as np
 from scipy.interpolate import interp1d
+from scipy.spatial import KDTree
 
 class local_path_pub:
     def __init__(self):
@@ -30,7 +31,7 @@ class local_path_pub:
         self.y = 0
         self.local_path_size = 70
         self.prev_current_waypoint = 0
-        self.smoothing_factor = 0.8  # 경로 평활화 계수
+        self.smoothing_factor = 0.95  # 경로 평활화 계수
 
         rate = rospy.Rate(50)  # 20hz
         while not rospy.is_shutdown():
@@ -95,14 +96,27 @@ class local_path_pub:
             return self.prev_current_waypoint
 
         # 방향 기준 추가: 차량의 진행 방향과 경로점의 방향 비교
-        angle_to_waypoint = atan2(pose.pose.position.y - y, pose.pose.position.x - x)
-        angle_difference = (angle_to_waypoint - self.heading + np.pi) % (2 * np.pi) - np.pi
+        # angle_to_waypoint = atan2(pose.pose.position.y - y, pose.pose.position.x - x)
+        # angle_difference = (angle_to_waypoint - self.heading + np.pi) % (2 * np.pi) - np.pi
         
         # 특정 임계값을 기준으로 진행 방향과 맞지 않는 경우 무시
-        if angle_difference < -0.1 or angle_difference > 0.1:
-            return self.prev_current_waypoint
+        # if angle_difference < -0.1 or angle_difference > 0.1:
+        #     return self.prev_current_waypoint
 
         return current_waypoint
+        
+    # def find_closest_waypoint(self, x, y, start_index=0):
+    #     # 글로벌 경로에서 웨이포인트 좌표 추출
+    #     waypoints = np.array([[pose.pose.position.x, pose.pose.position.y] for pose in self.global_path_msg.poses])
+        
+    #     # KD-트리 생성 및 가장 가까운 웨이포인트 찾기
+    #     tree = KDTree(waypoints[start_index:])
+        
+    #     _, idx = tree.query([x, y], k=1)
+        
+    #     # 인덱스 조정 및 반환
+    #     return start_index + idx
+
 
     def predict_left_turn(self, local_path, look_ahead_distance=40):
         if len(local_path.poses) < 10:
