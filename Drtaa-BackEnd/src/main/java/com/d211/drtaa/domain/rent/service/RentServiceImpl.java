@@ -33,6 +33,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,7 +42,6 @@ import java.util.stream.Collectors;
 @Log4j2
 public class RentServiceImpl implements RentService{
 
-    private final RentHistoryService rentHistoryService;
     private final UserRepository userRepository;
     private final RentRepository rentRepository;
     private final RentCarRepository rentCarRepository;
@@ -58,6 +58,57 @@ public class RentServiceImpl implements RentService{
 
         // 사용자의 렌트 찾기
         List<Rent> rents = rentRepository.findByUser(user);
+
+        List<RentResponseDTO> response = new ArrayList<>();
+        for(Rent rent: rents) {
+            RentResponseDTO dto = RentResponseDTO.builder()
+                    .rentId(rent.getRentId())
+                    .rentStatus(rent.getRentStatus())
+                    .rentHeadCount(rent.getRentHeadCount())
+                    .rentTime(rent.getRentTime())
+                    .rentStartTime(rent.getRentStartTime())
+                    .build();
+
+            response.add(dto);
+        }
+
+        return response;
+    }
+
+    @Override
+    public List<RentResponseDTO> getCompletedRent(String userProviderId) {
+        // 사용자 찾기
+        User user = userRepository.findByUserProviderId(userProviderId)
+                .orElseThrow(() -> new UsernameNotFoundException("해당 userProviderId의 맞는 회원을 찾을 수 없습니다."));
+
+        // 사용자의 완료된 렌트 찾기
+        List<Rent> rents = rentRepository.findByUserAndRentStatusCompleted(user);
+
+        List<RentResponseDTO> response = new ArrayList<>();
+        for(Rent rent: rents) {
+            RentResponseDTO dto = RentResponseDTO.builder()
+                    .rentId(rent.getRentId())
+                    .rentStatus(rent.getRentStatus())
+                    .rentHeadCount(rent.getRentHeadCount())
+                    .rentTime(rent.getRentTime())
+                    .rentStartTime(rent.getRentStartTime())
+                    .build();
+
+            response.add(dto);
+        }
+
+        return response;
+    }
+
+    @Override
+    public List<RentResponseDTO> getActiveRent(String userProviderId) {
+        // 사용자 찾기
+        User user = userRepository.findByUserProviderId(userProviderId)
+                .orElseThrow(() -> new UsernameNotFoundException("해당 userProviderId의 맞는 회원을 찾을 수 없습니다."));
+
+        // 사용자의 진행중 & 예약중인 렌트 찾기
+        List<Rent> rents = rentRepository.findByUserAndRentStatusInOrderByRentStatusDesc(
+                user, Arrays.asList(RentStatus.in_progress, RentStatus.reserved));
 
         List<RentResponseDTO> response = new ArrayList<>();
         for(Rent rent: rents) {
@@ -142,9 +193,10 @@ public class RentServiceImpl implements RentService{
         LocalDate startDate = rentCheckRequestDTO.getRentStartTime();
         LocalDate endDate = rentCheckRequestDTO.getRentEndTime();
 
-        // 해당 날짜의 렌트가 존재하는지 확인하기
-        boolean isRentExist = rentRepository.existsByUserAndRentStartTimeBetweenOrRentEndTimeBetween(
+        // 해당 날짜의 rentStatus가 reserved인 렌트가 존재하는지 확인하기
+        boolean isRentExist = rentRepository.existsByUserAndRentStatusAndRentStartTimeBetweenOrRentEndTimeBetween(
                 user,                           // 조회하려는 대상 사용자
+                RentStatus.reserved,            // 렌트 상태가 reserved인지 확인
                 startDate.atStartOfDay(),       // 렌트 시작 시간을 해당 시작일의 00:00:00로 설정
                 endDate.atTime(LocalTime.MAX),  // 렌트 종료 시간을 해당 종료일의 23:59:59로 설정
                 startDate.atStartOfDay(),       // 렌트 종료 시간이 해당 시작일의 00:00:00과 비교
@@ -171,17 +223,18 @@ public class RentServiceImpl implements RentService{
         // ** 결제 **
         List<RentCar> availableCars = rentCarRepository.findAll().stream()
                 .filter(car -> {
-                    List<RentCarSchedule> schedules = rentCarScheduleRepository.findByRentCar(car);
+                    // 해당 차량의 일정 가져오기 (완료되지 않은 일정만 가져오기)
+                    List<RentCarSchedule> schedules = rentCarScheduleRepository.findByRentCarAndRentCarScheduleIsDoneFalse(car);
 
+                    // 일정이 없으면 바로 사용 가능하다고 판단
                     if (schedules.isEmpty()) {
                         return true;
                     }
 
+                    // 일정이 있는 경우, 해당 기간에 겹치는 일정이 있는지 확인
                     boolean isAvailable = schedules.stream().allMatch(schedule -> {
-                        if (!schedule.isRentCarScheduleIsDone()) {
-                            return !(startDateTime.toLocalDate().isBefore(schedule.getRentCarScheduleEndDate()) && endDateTime.toLocalDate().isAfter(schedule.getRentCarScheduleStartDate()));
-                        }
-                        return true;
+                        return !(startDateTime.toLocalDate().isBefore(schedule.getRentCarScheduleEndDate()) &&
+                                endDateTime.toLocalDate().isAfter(schedule.getRentCarScheduleStartDate()));
                     });
 
                     return isAvailable;
@@ -245,6 +298,7 @@ public class RentServiceImpl implements RentService{
 
         // 렌트 차량 일정 생성
         RentCarSchedule rentCarSchedule = RentCarSchedule.builder()
+                .rent(rent)
                 .rentCar(availableCar)
                 .rentCarScheduleStartDate(startDateTime.toLocalDate())
                 .rentCarScheduleEndDate(endDateTime.toLocalDate())

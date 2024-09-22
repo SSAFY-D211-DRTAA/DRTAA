@@ -31,10 +31,42 @@ public class RentController {
     private final RentService rentService;
 
     @GetMapping
-    @Operation(summary = "렌트 조회", description = "회원의 전체 렌트 조회")
+    @Operation(summary = "렌트 전체 조회", description = "회원의 렌트 전체 조회")
     public ResponseEntity getAllRent(Authentication authentication) {
         try {
             List<RentResponseDTO> response = rentService.getAllRent(authentication.getName());
+
+            return ResponseEntity.ok(response); // 200
+        } catch (UsernameNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
+        } catch (AuthenticationException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("권한 인증에 실패하였습니다."); // 401
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
+        }
+    }
+
+    @GetMapping("/status/completed")
+    @Operation(summary = "완료된 렌트 조회", description = "해당 회원의 완료된 렌트 전체 조회")
+    public ResponseEntity getCompletedRent(Authentication authentication) {
+        try {
+            List<RentResponseDTO> response = rentService.getCompletedRent(authentication.getName());
+
+            return ResponseEntity.ok(response); // 200
+        } catch (UsernameNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
+        } catch (AuthenticationException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("권한 인증에 실패하였습니다."); // 401
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
+        }
+    }
+
+    @GetMapping("/status/active")
+    @Operation(summary = "진행중 & 예약된 렌트 조회", description = "해당 회원의 진행중인 렌트 한개와 예약된 렌트 전체 조회")
+    public ResponseEntity getActiveRent(Authentication authentication) {
+        try {
+            List<RentResponseDTO> response = rentService.getActiveRent(authentication.getName());
 
             return ResponseEntity.ok(response); // 200
         } catch (UsernameNotFoundException e) {

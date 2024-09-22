@@ -11,4 +11,5 @@ import java.util.Optional;
 public interface RentCarScheduleRepository extends JpaRepository<RentCarSchedule, Long> {
     List<RentCarSchedule> findByRentCar(RentCar car);
     Optional<RentCarSchedule> findByRentCarScheduleId(long rentCarScheduleId);
+    List<RentCarSchedule> findByRentCarAndRentCarScheduleIsDoneFalse(RentCar car);
 }
