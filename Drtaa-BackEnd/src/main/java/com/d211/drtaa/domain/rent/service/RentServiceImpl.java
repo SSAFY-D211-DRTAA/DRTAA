@@ -197,17 +197,18 @@ public class RentServiceImpl implements RentService{
         // ** 결제 **
         List<RentCar> availableCars = rentCarRepository.findAll().stream()
                 .filter(car -> {
-                    List<RentCarSchedule> schedules = rentCarScheduleRepository.findByRentCar(car);
+                    // 해당 차량의 일정 가져오기 (완료되지 않은 일정만 가져오기)
+                    List<RentCarSchedule> schedules = rentCarScheduleRepository.findByRentCarAndRentCarScheduleIsDoneFalse(car);
 
+                    // 일정이 없으면 바로 사용 가능하다고 판단
                     if (schedules.isEmpty()) {
                         return true;
                     }
 
+                    // 일정이 있는 경우, 해당 기간에 겹치는 일정이 있는지 확인
                     boolean isAvailable = schedules.stream().allMatch(schedule -> {
-                        if (!schedule.isRentCarScheduleIsDone()) {
-                            return !(startDateTime.toLocalDate().isBefore(schedule.getRentCarScheduleEndDate()) && endDateTime.toLocalDate().isAfter(schedule.getRentCarScheduleStartDate()));
-                        }
-                        return true;
+                        return !(startDateTime.toLocalDate().isBefore(schedule.getRentCarScheduleEndDate()) &&
+                                endDateTime.toLocalDate().isAfter(schedule.getRentCarScheduleStartDate()));
                     });
 
                     return isAvailable;
