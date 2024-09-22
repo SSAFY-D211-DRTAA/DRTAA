@@ -128,8 +128,11 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
 
     private fun rotateCard(v: View, x: Float, y: Float) {
         val (centerX, centerY) = v.width / HALF to v.height / HALF
-        val rotateX = (centerY - y) / centerY * PER
-        val rotateY = (x - centerX) / centerX * PER
+        var rotateX = (centerY - y) / centerY * MAX_ROTATION
+        var rotateY = (x - centerX) / centerX * MAX_ROTATION
+
+        rotateX = rotateX.coerceIn(-MAX_ROTATION, MAX_ROTATION)
+        rotateY = rotateY.coerceIn(-MAX_ROTATION, MAX_ROTATION)
 
         cardView.animate()
             .rotationX(rotateX)
@@ -179,5 +182,6 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
         const val PER = 10
         const val DURATION = 300L
         const val TOUCH_PRESS_TIME = 100
+        const val MAX_ROTATION = 15f
     }
 }

@@ -14,12 +14,12 @@
         <TextView
             android:id="@+id/tv_tour_title"
             style="@style/ptd_extra_bold"
-            android:textSize="26sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="25dp"
             android:layout_marginTop="30dp"
             android:text="대여 현황"
+            android:textSize="26sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -51,12 +51,12 @@
                     android:background="@drawable/card_reflection" />
 
 
-
             </FrameLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
+
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/constraintLayout2"
                     android:layout_width="match_parent"
@@ -74,6 +74,16 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         app:srcCompat="@drawable/kanna" />
+
+                    <ImageView
+                        android:id="@+id/btn_tracking_car"
+                        android:layout_width="35dp"
+                        android:layout_height="35dp"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginBottom="15dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:srcCompat="@drawable/ic_car_tracking" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -101,11 +111,11 @@
                     <TextView
                         android:id="@+id/tv_tour_carname"
                         style="@style/ptd_semi_bold"
-                        android:textSize="17sp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
                         android:text="기아 k99"
+                        android:textSize="17sp"
                         app:layout_constraintStart_toStartOf="@+id/tv_tour_title_cartype"
                         app:layout_constraintTop_toBottomOf="@+id/tv_tour_title_cartype" />
 
@@ -135,22 +145,22 @@
                     <TextView
                         android:id="@+id/tv_tour_title_rentstart"
                         style="@style/ptd_light"
-                        android:textColor="@color/gray_5858"
-                        android:textSize="14sp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="15dp"
                         android:text="이용시작"
+                        android:textColor="@color/gray_5858"
+                        android:textSize="14sp"
                         app:layout_constraintStart_toStartOf="@+id/tv_tour_carname"
                         app:layout_constraintTop_toBottomOf="@+id/tv_tour_carname" />
 
                     <TextView
                         android:id="@+id/tv_tour_rentstart"
                         style="@style/ptd_semi_bold"
-                        android:textSize="17sp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="2020.20.20\n20:20"
+                        android:textSize="17sp"
                         app:layout_constraintStart_toStartOf="@+id/tv_tour_title_rentstart"
                         app:layout_constraintTop_toBottomOf="@+id/tv_tour_title_rentstart" />
 
@@ -188,18 +198,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="MQTT"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/cv_tour_card" />
-
-        <Button
-            android:id="@+id/btn_tracking_car"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Tracking Car"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btn_mqtt" />
+            app:layout_constraintStart_toEndOf="@+id/tv_tour_title"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_return"
@@ -207,10 +207,45 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="반납"
+            app:layout_constraintStart_toEndOf="@+id/btn_mqtt"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <TextView
+            android:id="@+id/tv_tour_remain_time"
+            style="@style/ptd_extra_bold"
+            android:textSize="18sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="남은시간 : ㅇㅇ분"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/btn_tracking_car" />
+            app:layout_constraintTop_toBottomOf="@+id/cv_tour_card" />
 
+
+        <Button
+            android:id="@+id/btn_tour_extend"
+            style="@style/btn_short_black"
+            android:layout_width="150dp"
+            android:layout_height="45dp"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="30dp"
+            android:text="연장하기"
+            app:layout_constraintEnd_toStartOf="@+id/btn_tour_qrcode"
+            app:layout_constraintHorizontal_bias="0.4"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_tour_remain_time" />
+
+        <ImageView
+            android:id="@+id/btn_tour_qrcode"
+            android:layout_width="150dp"
+            android:layout_height="45dp"
+            android:layout_marginEnd="30dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/btn_tour_extend"
+            app:srcCompat="@drawable/ic_qr_btn" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>
