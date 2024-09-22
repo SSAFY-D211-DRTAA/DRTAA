@@ -33,13 +33,8 @@ before_script:
   - echo "MQTT_URL=\"$MQTT_URL\"" >> local.properties
   - echo "BOOTPAY_APP_ID=\"$BOOTPAY_APP_ID\"" >> local.properties
 
-.android_changes: &android_changes
-  only:
-    changes:
-      - Drtaa-Android/**/*
 
 assembleDebug:
-  <<: *android_changes
   interruptible: true
   stage: build
   script:
@@ -48,4 +43,8 @@ assembleDebug:
     paths:
       - Drtaa-Android/app/build/outputs/apk/debug/app-debug.apk
       - Drtaa-Android/app/build/outputs/logs/
-    expire_in: 1 week
+    expire_in: 8h
+  rules:
+    - if: $CI_COMMIT_BRANCH == "develop"
+      changes:
+        - Drtaa-Android/**/*
