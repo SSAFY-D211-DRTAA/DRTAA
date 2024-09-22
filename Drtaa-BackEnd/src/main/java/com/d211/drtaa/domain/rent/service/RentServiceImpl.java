@@ -1,9 +1,6 @@
 package com.d211.drtaa.domain.rent.service;
 
-import com.d211.drtaa.domain.rent.dto.request.RentCreateRequestDTO;
-import com.d211.drtaa.domain.rent.dto.request.RentEditRequestDTO;
-import com.d211.drtaa.domain.rent.dto.request.RentStatusRequestDTO;
-import com.d211.drtaa.domain.rent.dto.request.RentTimeRequestDTO;
+import com.d211.drtaa.domain.rent.dto.request.*;
 import com.d211.drtaa.domain.rent.dto.response.RentDetailResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentResponseDTO;
 import com.d211.drtaa.domain.rent.entity.Rent;
@@ -34,6 +31,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -44,7 +42,6 @@ import java.util.stream.Collectors;
 public class RentServiceImpl implements RentService{
 
     private final RentHistoryService rentHistoryService;
-
     private final UserRepository userRepository;
     private final RentRepository rentRepository;
     private final RentCarRepository rentCarRepository;
@@ -133,6 +130,29 @@ public class RentServiceImpl implements RentService{
                 .build();
 
         return response;
+    }
+
+    @Override
+    public boolean chkRent(String userProviderId, RentCheckRequestDTO rentCheckRequestDTO) {
+        // 사용자 찾기
+        User user = userRepository.findByUserProviderId(userProviderId)
+                .orElseThrow(() -> new UsernameNotFoundException("해당 userProviderId의 맞는 회원을 찾을 수 없습니다."));
+
+        // 시작 날짜, 종료 날짜
+        LocalDate startDate = rentCheckRequestDTO.getRentStartTime();
+        LocalDate endDate = rentCheckRequestDTO.getRentEndTime();
+
+        // 해당 날짜의 렌트가 존재하는지 확인하기
+        boolean isRentExist = rentRepository.existsByUserAndRentStartTimeBetweenOrRentEndTimeBetween(
+                user,                           // 조회하려는 대상 사용자
+                startDate.atStartOfDay(),       // 렌트 시작 시간을 해당 시작일의 00:00:00로 설정
+                endDate.atTime(LocalTime.MAX),  // 렌트 종료 시간을 해당 종료일의 23:59:59로 설정
+                startDate.atStartOfDay(),       // 렌트 종료 시간이 해당 시작일의 00:00:00과 비교
+                endDate.atTime(LocalTime.MAX)   // 렌트 종료 시간이 해당 종료일의 23:59:59와 비교
+        );
+
+        // 이미 렌트가 존재하면 true, 없으면 false 반환
+        return isRentExist;
     }
 
     @Override
