@@ -6,11 +6,14 @@ services:
     volumes:
       - ./auto_control_client:/app
     command: python3 main.py
+    env_file:
+      - ./auto_control_client/.env
     depends_on:
       rosbridge:
         condition: service_healthy
     networks:
       - ros_network
+      - external_network
 
   rosbridge:
     build:
@@ -34,3 +37,5 @@ services:
 networks:
   ros_network:
     driver: bridge
+  external_network:
+    external: true

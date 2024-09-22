@@ -1,6 +1,7 @@
 {
     "log_level": "DEBUG",
-    "websocket_url": "ws://rosbridge:9090",
+    "ros_bridge_websocket_url": "ws://rosbridge:9090",
+    "ec2_websocket_url": "ws://WS_SERVER_URL",
     "east_offset": 313008.55819800857,
     "north_offset": 4161698.628368007,
     "utm_zone": 52,
