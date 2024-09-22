@@ -33,7 +33,13 @@ before_script:
   - echo "MQTT_URL=\"$MQTT_URL\"" >> local.properties
   - echo "BOOTPAY_APP_ID=\"$BOOTPAY_APP_ID\"" >> local.properties
 
+.android_changes: &android_changes
+  only:
+    changes:
+      - Drtaa-Android/**/*
+
 assembleDebug:
+  <<: *android_changes
   interruptible: true
   stage: build
   script:
