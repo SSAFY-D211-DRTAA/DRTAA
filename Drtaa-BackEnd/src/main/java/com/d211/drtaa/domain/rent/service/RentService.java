@@ -1,7 +1,6 @@
 package com.d211.drtaa.domain.rent.service;
 
 import com.d211.drtaa.domain.rent.dto.request.*;
-import com.d211.drtaa.domain.rent.dto.response.RentCarLocationResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentDetailResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentResponseDTO;
 
@@ -10,6 +9,9 @@ import java.util.List;
 public interface RentService {
     // 전체 렌트 조회
     List<RentResponseDTO> getAllRent(String userProviderId);
+
+    // 완료된 전체 렌트 조회
+    List<RentResponseDTO> getCompletedRent(String userProviderId);
 
     // rentId의 렌트 상세 조회
     RentDetailResponseDTO getDetailRent(long rentId);

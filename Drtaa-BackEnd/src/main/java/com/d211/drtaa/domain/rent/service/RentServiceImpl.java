@@ -76,6 +76,31 @@ public class RentServiceImpl implements RentService{
     }
 
     @Override
+    public List<RentResponseDTO> getCompletedRent(String userProviderId) {
+        // 사용자 찾기
+        User user = userRepository.findByUserProviderId(userProviderId)
+                .orElseThrow(() -> new UsernameNotFoundException("해당 userProviderId의 맞는 회원을 찾을 수 없습니다."));
+
+        // 사용자의 완료된 렌트 찾기
+        List<Rent> rents = rentRepository.findByUserAndRentStatusCompleted(user);
+
+        List<RentResponseDTO> response = new ArrayList<>();
+        for(Rent rent: rents) {
+            RentResponseDTO dto = RentResponseDTO.builder()
+                    .rentId(rent.getRentId())
+                    .rentStatus(rent.getRentStatus())
+                    .rentHeadCount(rent.getRentHeadCount())
+                    .rentTime(rent.getRentTime())
+                    .rentStartTime(rent.getRentStartTime())
+                    .build();
+
+            response.add(dto);
+        }
+
+        return response;
+    }
+
+    @Override
     public RentDetailResponseDTO getDetailRent(long rentId) {
         Rent rent = rentRepository.findByRentId(rentId)
                 .orElseThrow(() -> new RentNotFoundException("해당 rentId의 맞는 렌트를 찾을 수 없습니다."));
@@ -245,6 +270,7 @@ public class RentServiceImpl implements RentService{
 
         // 렌트 차량 일정 생성
         RentCarSchedule rentCarSchedule = RentCarSchedule.builder()
+                .rent(rent)
                 .rentCar(availableCar)
                 .rentCarScheduleStartDate(startDateTime.toLocalDate())
                 .rentCarScheduleEndDate(endDateTime.toLocalDate())

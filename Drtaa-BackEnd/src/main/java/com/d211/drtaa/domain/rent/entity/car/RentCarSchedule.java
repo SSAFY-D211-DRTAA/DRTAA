@@ -1,5 +1,6 @@
 package com.d211.drtaa.domain.rent.entity.car;
 
+import com.d211.drtaa.domain.rent.entity.Rent;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
@@ -20,6 +21,11 @@ public class RentCarSchedule {
     @Column(name = "rent_car_schedule_id", nullable = false)
     @Schema(description = "렌트 차량 일정 고유 번호", example = "1")
     private long rentCarScheduleId;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "rent_id", nullable = false)
+    @Schema(description = "렌트 고유 번호", example = "1")
+    private Rent rent;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rent_car_id", nullable = false)
