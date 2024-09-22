@@ -53,7 +53,7 @@ class pure_pursuit:
         rospy.Subscriber("/is_left_turn", Bool, self.turning_left_callback)
 
         self.ctrl_cmd_pub = rospy.Publisher('/ctrl_cmd', CtrlCmd, queue_size=1)
-        self.complete_drive_pub = rospy.Publisher('/complete_drive', Bool, queue_size=1)
+        # self.complete_drive_pub = rospy.Publisher('/complete_drive', Bool, queue_size=1)
 
         self.ctrl_cmd_msg = CtrlCmd()
         self.ctrl_cmd_msg.longlCmdType = 1
@@ -63,7 +63,7 @@ class pure_pursuit:
         self.is_status = False
         self.is_global_path = False
         self.is_look_forward_point = False
-        self.has_published_complete = False  # 주행 완료 메시지 발행 여부
+        # self.has_published_complete = False  # 주행 완료 메시지 발행 여부
 
         self.forward_point = Point()
         self.current_postion = Point()
@@ -116,10 +116,11 @@ class pure_pursuit:
                     self.ctrl_cmd_msg.brake = 1.0  # 브레이크를 최대로 설정하여 차량 정지
                     self.ctrl_cmd_pub.publish(self.ctrl_cmd_msg)
 
-                    if not self.has_published_complete:
-                        rospy.loginfo("목적지 도착!!")
-                        self.complete_drive_pub.publish(True)  # 주행 완료 메시지 발행
-                        self.has_published_complete = True  # 플래그 업데이트
+                    #if not self.has_published_complete:
+                        #rospy.loginfo("목적지 도착!!")
+                        # self.has_published_complete = True  # 플래그 업데이트
+                        # self.complete_drive_pub.publish(self.has_published_complete)  # 주행 완료 메시지 발행
+                    
                     continue
 
                 self.adaptive_cruise_control.check_object(self.path ,global_npc_info, local_npc_info
@@ -164,7 +165,7 @@ class pure_pursuit:
         if self.previous_global_path is None or not self.is_same_path(self.previous_global_path, msg):
             self.global_path = msg
             self.is_global_path = True
-            self.has_published_complete = False # 경로가 업데이트되면 주행 완료 메시지 발행 플래그 초기화
+            # self.has_published_complete = False # 경로가 업데이트되면 주행 완료 메시지 발행 플래그 초기화
             self.velocity_list = self.vel_planning.curvedBaseVelocity(self.global_path, 50)
             rospy.loginfo("Global path updated and velocity list recalculated")
             self.previous_global_path = msg  # 이전 경로 업데이트
@@ -227,7 +228,7 @@ class pure_pursuit:
 
         try:
             if not self.traffic_light_manager.is_data_available():
-                rospy.loginfo("No traffic light data available, proceeding with caution")
+                #rospy.loginfo("No traffic light data available, proceeding with caution")
                 return  # 신호등 정보가 없으면 함수를 종료하고 기본 주행 로직을 따름
             
             is_near_stop_line, distance_to_stop_line = self.detect_stop_line()
@@ -237,23 +238,25 @@ class pure_pursuit:
                 
                 if self.is_turning_left: # 좌회전을 해야할 경우
                     if self.traffic_light_manager.can_turn_left(): # 좌회전 가능
-                        rospy.loginfo("Left turn signal on, proceeding with left turn")
+                        #rospy.loginfo("Left turn signal on, proceeding with left turn")
+                        return
                     else: # 좌회전 금지
-                        rospy.loginfo("Left turn signal on, but left turn not allowed")
+                        #rospy.loginfo("Left turn signal on, but left turn not allowed")
                         self.target_velocity = self.calculate_approach_velocity(distance_to_stop_line)
                     #self.target_velocity = self.normal_speed  # Set speed for left turn
                 else: # 직진
                     if self.traffic_light_manager.traffic_light_status & 1:  # Red light
-                        rospy.loginfo("Red light detected, stopping")
+                        #rospy.loginfo("Red light detected, stopping")
                         self.target_velocity = self.calculate_approach_velocity(distance_to_stop_line)
                         
                     elif self.traffic_light_manager.traffic_light_status & 4:  # Yellow light
-                        rospy.loginfo("Yellow light detected, slowing down")
+                        r#ospy.loginfo("Yellow light detected, slowing down")
                         approach_velocity = self.calculate_approach_velocity(distance_to_stop_line)
                         self.target_velocity = min(approach_velocity, self.target_velocity)
                         
                     elif self.traffic_light_manager.can_go_straight():  # Green light
-                        rospy.loginfo("Green light detected, proceeding")
+                        #rospy.loginfo("Green light detected, proceeding")
+                        return
         except Exception as e:
             rospy.logerr(f"Error in trafficlight_logic: {e}")
             self.target_velocity = 0
