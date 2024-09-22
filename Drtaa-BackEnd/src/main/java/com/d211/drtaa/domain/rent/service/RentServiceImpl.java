@@ -33,6 +33,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,7 +42,6 @@ import java.util.stream.Collectors;
 @Log4j2
 public class RentServiceImpl implements RentService{
 
-    private final RentHistoryService rentHistoryService;
     private final UserRepository userRepository;
     private final RentRepository rentRepository;
     private final RentCarRepository rentCarRepository;
@@ -83,6 +83,32 @@ public class RentServiceImpl implements RentService{
 
         // 사용자의 완료된 렌트 찾기
         List<Rent> rents = rentRepository.findByUserAndRentStatusCompleted(user);
+
+        List<RentResponseDTO> response = new ArrayList<>();
+        for(Rent rent: rents) {
+            RentResponseDTO dto = RentResponseDTO.builder()
+                    .rentId(rent.getRentId())
+                    .rentStatus(rent.getRentStatus())
+                    .rentHeadCount(rent.getRentHeadCount())
+                    .rentTime(rent.getRentTime())
+                    .rentStartTime(rent.getRentStartTime())
+                    .build();
+
+            response.add(dto);
+        }
+
+        return response;
+    }
+
+    @Override
+    public List<RentResponseDTO> getActiveRent(String userProviderId) {
+        // 사용자 찾기
+        User user = userRepository.findByUserProviderId(userProviderId)
+                .orElseThrow(() -> new UsernameNotFoundException("해당 userProviderId의 맞는 회원을 찾을 수 없습니다."));
+
+        // 사용자의 진행중 & 예약중인 렌트 찾기
+        List<Rent> rents = rentRepository.findByUserAndRentStatusInOrderByRentStatusDesc(
+                user, Arrays.asList(RentStatus.in_progress, RentStatus.reserved));
 
         List<RentResponseDTO> response = new ArrayList<>();
         for(Rent rent: rents) {
