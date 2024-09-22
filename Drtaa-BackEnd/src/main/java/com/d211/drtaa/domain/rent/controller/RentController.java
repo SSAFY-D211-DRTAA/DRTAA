@@ -1,9 +1,6 @@
 package com.d211.drtaa.domain.rent.controller;
 
-import com.d211.drtaa.domain.rent.dto.request.RentStatusRequestDTO;
-import com.d211.drtaa.domain.rent.dto.request.RentCreateRequestDTO;
-import com.d211.drtaa.domain.rent.dto.request.RentEditRequestDTO;
-import com.d211.drtaa.domain.rent.dto.request.RentTimeRequestDTO;
+import com.d211.drtaa.domain.rent.dto.request.*;
 import com.d211.drtaa.domain.rent.dto.response.RentCarLocationResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentDetailResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentResponseDTO;
@@ -72,6 +69,22 @@ public class RentController {
             return ResponseEntity.ok(response); //200
         } catch(RentNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
+        }
+    }
+
+    @PostMapping("/chk")
+    @Operation(summary = "렌트 중복 확인", description = "요청 날짜에 렌트 요청 내역이 존재하는지 확인")
+    public ResponseEntity chkRent(Authentication authentication, @RequestBody RentCheckRequestDTO rentCheckRequestDTO) {
+        try{
+            boolean response = rentService.chkRent(authentication.getName(), rentCheckRequestDTO);
+
+            return ResponseEntity.ok(response);
+        } catch (UsernameNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
+        } catch (AuthenticationException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("권한 인증에 실패하였습니다."); // 401
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
         }

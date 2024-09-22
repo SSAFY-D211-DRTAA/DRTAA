@@ -5,6 +5,7 @@ import com.d211.drtaa.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,4 +21,7 @@ public interface RentRepository extends JpaRepository<Rent, Long> {
             "AND r.rentStartTime <= CURRENT_TIMESTAMP " +
             "AND r.rentEndTime > CURRENT_TIMESTAMP")
     Optional<Rent> findCurrentRentByUserProviderId(String userProviderId);
+
+    // exists
+    boolean existsByUserAndRentStartTimeBetweenOrRentEndTimeBetween(User user, LocalDateTime localDateTime, LocalDateTime localDateTime1, LocalDateTime localDateTime2, LocalDateTime localDateTime3);
 }
