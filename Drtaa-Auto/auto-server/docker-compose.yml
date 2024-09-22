@@ -1,0 +1,21 @@
+services:
+  mqtt-broker:
+    build:
+      context: .
+      dockerfile: Dockerfile.mqtt
+    ports:
+      - "1883:1883"
+      - "8883:8883"
+    volumes:
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf
+    restart: unless-stopped
+
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    volumes:
+      - ./auto_control_server:/app
+    ports:
+      - "8765:8765"
+    command: python3 main.py
