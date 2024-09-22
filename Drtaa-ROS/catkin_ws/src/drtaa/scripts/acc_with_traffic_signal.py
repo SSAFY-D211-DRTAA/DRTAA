@@ -32,11 +32,11 @@ class TrafficLightManager:
 
     def can_turn_left(self):
         # Check if a left turn is allowed
-        return (self.traffic_light_status & 32) != 0 and (self.traffic_light_type in [1, 2])
+        return (((self.traffic_light_status & 32) != 0 and (self.traffic_light_type in [1, 2])) or ((self.traffic_light_status & 16) !=0 and (self.traffic_light_type == 0)))
 
     def can_go_straight(self):
         # Check if going straight is allowed
-        return (self.traffic_light_status & 16) != 0
+        return (((self.traffic_light_status & 16) != 0 and (self.traffic_light_type in [0, 2])) or ((self.traffic_light_status & 32) != 0 and (self.traffic_light_type == 1)))
 
 class pure_pursuit:
     def __init__(self):
@@ -46,8 +46,6 @@ class pure_pursuit:
         rospy.Subscriber("/local_path", Path, self.path_callback)
         rospy.Subscriber("/odom", Odometry, self.odom_callback)
         rospy.Subscriber("/Ego_topic", EgoVehicleStatus, self.status_callback)
-
-
         rospy.Subscriber("/Object_topic", ObjectStatusList, self.object_info_callback)
         # rospy.Subscriber("/Object_topic_to_lidar", ObjectStatusList, self.object_info_callback) => 추후에 npc, ped, obs 구별하는 로직 및 기둥, 중앙분리대 같은 것은 해당 리스트에 포함 안되도록 해야함!!!
 
@@ -55,6 +53,7 @@ class pure_pursuit:
         rospy.Subscriber("/is_left_turn", Bool, self.turning_left_callback)
 
         self.ctrl_cmd_pub = rospy.Publisher('/ctrl_cmd', CtrlCmd, queue_size=1)
+        self.complete_drive_pub = rospy.Publisher('/complete_drive', Bool, queue_size=1)
 
         self.ctrl_cmd_msg = CtrlCmd()
         self.ctrl_cmd_msg.longlCmdType = 1
@@ -64,6 +63,7 @@ class pure_pursuit:
         self.is_status = False
         self.is_global_path = False
         self.is_look_forward_point = False
+        self.has_published_complete = False  # 주행 완료 메시지 발행 여부
 
         self.forward_point = Point()
         self.current_postion = Point()
@@ -73,9 +73,9 @@ class pure_pursuit:
         self.min_lfd = 5
         self.max_lfd = 15
         self.lfd_gain = 0.78
-        self.target_velocity = 40 # km/h (목표 속도)
+        self.target_velocity = 40 
 
-        self.stop_line_threshold = 15 # 정지선을 인식하는 거리 
+        self.stop_line_threshold = 15  ## 정지선 감지 거리 
         self.previous_global_path = None  # 이전 경로 저장 변수 추가
         self.velocity_list = [] 
 
@@ -87,7 +87,7 @@ class pure_pursuit:
 
         self.traffic_light_manager = TrafficLightManager()
 
-        rate = rospy.Rate(50)  # 30hz
+        rate = rospy.Rate(50)  ## 30hz
 
         while not rospy.is_shutdown():
             if self.is_path and self.is_odom and self.is_status and len(self.velocity_list) > 0: 
@@ -112,10 +112,14 @@ class pure_pursuit:
                 if self.is_look_forward_point: # 전방 경로 상에 waypoint가 존재하는 경우
                     self.ctrl_cmd_msg.steering = steering
                 else: # 전방에 waypoint가 없는 경우 (경로 끝에 도달한 경우)
-                    rospy.loginfo("No forward point found")
                     self.ctrl_cmd_msg.accel = 0.0
                     self.ctrl_cmd_msg.brake = 1.0  # 브레이크를 최대로 설정하여 차량 정지
                     self.ctrl_cmd_pub.publish(self.ctrl_cmd_msg)
+
+                    if not self.has_published_complete:
+                        rospy.loginfo("목적지 도착!!")
+                        self.complete_drive_pub.publish(True)  # 주행 완료 메시지 발행
+                        self.has_published_complete = True  # 플래그 업데이트
                     continue
 
                 self.adaptive_cruise_control.check_object(self.path ,global_npc_info, local_npc_info
@@ -160,6 +164,7 @@ class pure_pursuit:
         if self.previous_global_path is None or not self.is_same_path(self.previous_global_path, msg):
             self.global_path = msg
             self.is_global_path = True
+            self.has_published_complete = False # 경로가 업데이트되면 주행 완료 메시지 발행 플래그 초기화
             self.velocity_list = self.vel_planning.curvedBaseVelocity(self.global_path, 50)
             rospy.loginfo("Global path updated and velocity list recalculated")
             self.previous_global_path = msg  # 이전 경로 업데이트
@@ -254,7 +259,7 @@ class pure_pursuit:
             self.target_velocity = 0
 
     def calculate_approach_velocity(self, distance):
-        max_approach_speed = 15  # km/h
+        max_approach_speed = 20  ## km/h
         min_approach_speed = 0   # km/h
         
         if distance > self.stop_line_threshold:
