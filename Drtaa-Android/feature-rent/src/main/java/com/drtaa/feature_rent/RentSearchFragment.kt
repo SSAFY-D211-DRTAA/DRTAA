@@ -48,7 +48,7 @@ class RentSearchFragment :
 
     override fun initOnMapReady(naverMap: NaverMap) {
         naverMap.uiSettings.isLocationButtonEnabled = false
-        naverMap.setCustomLocationButton(binding.ivRentSearchCurrentLocation)
+        naverMap.setCustomLocationButton(binding.layoutRentSearchBottomSheet.ivRentSearchCurrentLocation)
         locationSource = FusedLocationSource(this, LOCATION_PERMISSION_REQUEST_CODE)
         naverMap.locationTrackingMode = LocationTrackingMode.Follow
         initObserve(naverMap)
