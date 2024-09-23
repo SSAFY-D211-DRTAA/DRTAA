@@ -18,12 +18,12 @@ interface RentCarAPI {
         @Body rentSchedule: RequestUnassignedCar,
     ): RentCar
 
-    @POST("rent-car/call")
+    @PATCH("rent-car/call")
     suspend fun callAssignedCar(
         @Body requestCallCar: RequestRentCarCall,
     ): ResponseRentCarCall
 
-    @GET("rent-car/call/{rentId}")
+    @PATCH("rent-car/call/{rentId}")
     suspend fun callFirstAssignedCar(
         @Path("rentId") rentId: Long,
     ): ResponseRentCarCall
