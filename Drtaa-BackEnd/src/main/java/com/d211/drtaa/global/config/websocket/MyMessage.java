@@ -13,7 +13,7 @@ import lombok.Setter;
 @Setter
 public class MyMessage {
     private String action;
-    private double lattitude;
+    private double latitude;
     private double longitude;
 
     public MyMessage(String action) {

@@ -157,9 +157,9 @@ public class RentCarServiceImpl implements RentCarService {
                         log.info("Received message: {}", jsonNode);
 
                         // null 체크 추가
-                        JsonNode latNode = jsonNode.get("lattitude");
+                        JsonNode latNode = jsonNode.get("latitude");
                         JsonNode lonNode = jsonNode.get("longitude");
-                        log.info("lattitude: {}", latNode);
+                        log.info("latitude: {}", latNode);
                         log.info("longitude: {}", lonNode);
 
                         if (latNode != null && lonNode != null && !latNode.isNull() && !lonNode.isNull()) {
@@ -227,9 +227,9 @@ public class RentCarServiceImpl implements RentCarService {
                         log.info("Received message: {}", jsonNode);
 
                         // null 체크 추가
-                        JsonNode latNode = jsonNode.get("lattitude");
+                        JsonNode latNode = jsonNode.get("latitude");
                         JsonNode lonNode = jsonNode.get("longitude");
-                        log.info("lattitude: {}", latNode);
+                        log.info("latitude: {}", latNode);
                         log.info("longitude: {}", lonNode);
 
                         if (latNode != null && lonNode != null && !latNode.isNull() && !lonNode.isNull()) {
