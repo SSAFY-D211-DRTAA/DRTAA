@@ -23,13 +23,12 @@ class CommandDistributorWebSocketServer:
                 try:
                     data = json.loads(message)
                     logger.info(f"Received message on additional server: {data}")
-                    if data['type'] == 'gps':
-                        try:
-                            with open('gps_data.json', 'w') as f:
-                                json.dump(data, f)
-                        except IOError as e:
-                            logger.error(f"GPS file save error: {e}")
-                        await websocket.send(json.dumps(data))
+                    try:
+                        with open('gps_data.json', 'w') as f:
+                            json.dump(data, f)
+                    except IOError as e:
+                        logger.error(f"GPS file save error: {e}")
+                    await websocket.send(json.dumps(data))
                 except json.JSONDecodeError:
                     await websocket.send(json.dumps({"error": "Invalid JSON"}))
         except websockets.exceptions.ConnectionClosed:
