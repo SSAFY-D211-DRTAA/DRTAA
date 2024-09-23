@@ -15,4 +15,8 @@ public class MyMessage {
     private String action;
     private double rentDptLat;
     private double rentDptLon;
+
+    public MyMessage(String action) {
+        this.action = action;
+    }
 }
