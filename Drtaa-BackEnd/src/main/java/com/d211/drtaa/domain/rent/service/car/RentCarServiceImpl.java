@@ -156,12 +156,22 @@ public class RentCarServiceImpl implements RentCarService {
                         JsonNode jsonNode = objectMapper.readTree(message.getPayload());
                         log.info("Received message: {}", jsonNode);
 
-                        // DTO 생성
-                        response[0] = RentCarLocationResponseDTO.builder()
-                                .rentCarId(car.getRentCarId())
-                                .rentCarLat(jsonNode.get("rentCarLat").asDouble()) // rentCarLat을 double로 변환
-                                .rentCarLon(jsonNode.get("rentCarLon").asDouble()) // rentCarLon을 double로 변환
-                                .build();
+                        // null 체크 추가
+                        JsonNode latNode = jsonNode.get("latitude");
+                        JsonNode lonNode = jsonNode.get("longitude");
+                        log.info("latitude: {}", latNode);
+                        log.info("longitude: {}", lonNode);
+
+                        if (latNode != null && lonNode != null && !latNode.isNull() && !lonNode.isNull()) {
+                            // DTO 생성
+                            response[0] = RentCarLocationResponseDTO.builder()
+                                    .rentCarId(car.getRentCarId())
+                                    .rentCarLat(latNode.asDouble()) // rentCarLat을 double로 변환
+                                    .rentCarLon(lonNode.asDouble()) // rentCarLon을 double로 변환
+                                    .build();
+                        } else {
+                            log.warn("Received null for rentCarLat or rentCarLon");
+                        }
 
                     } catch (Exception e) {
                         log.error("Error processing received message: ", e);
@@ -169,7 +179,7 @@ public class RentCarServiceImpl implements RentCarService {
                 }
             }, webSocketConfig.getUrl()).get();
 
-            // 상태와 렌트 차량 탑승 호출 위치 전달
+            // 상태와 렌트 탑승 위치 전송
             MyMessage message = new MyMessage("vehicle_dispatch", rent.getRentDptLat(), rent.getRentDptLon());
             String jsonMessage = objectMapper.writeValueAsString(message);
             session.sendMessage(new TextMessage(jsonMessage));
@@ -217,10 +227,10 @@ public class RentCarServiceImpl implements RentCarService {
                         log.info("Received message: {}", jsonNode);
 
                         // null 체크 추가
-                        JsonNode latNode = jsonNode.get("rentCarLat");
-                        JsonNode lonNode = jsonNode.get("rentCarLon");
-                        log.info("lat: {}", latNode);
-                        log.info("lon: {}", lonNode);
+                        JsonNode latNode = jsonNode.get("latitude");
+                        JsonNode lonNode = jsonNode.get("longitude");
+                        log.info("latitude: {}", latNode);
+                        log.info("longitude: {}", lonNode);
 
                         if (latNode != null && lonNode != null && !latNode.isNull() && !lonNode.isNull()) {
                             // DTO 생성
