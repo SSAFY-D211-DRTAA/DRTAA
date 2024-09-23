@@ -1,6 +1,7 @@
 package com.d211.drtaa.domain.travel.service;
 
 import com.d211.drtaa.domain.travel.dto.request.PlacesRequestDTO;
+import com.d211.drtaa.domain.travel.dto.request.TravelNameRequestDTO;
 import com.d211.drtaa.domain.travel.dto.response.DatesDetailResponseDTO;
 import com.d211.drtaa.domain.travel.dto.response.PlacesDetailResponseDTO;
 import com.d211.drtaa.domain.travel.dto.response.TravelDetailResponseDTO;
@@ -36,7 +37,7 @@ public class TravelServiceImpl implements TravelService {
                 .orElseThrow(() -> new TravelNotFoundException("해당 travelId에 맞는 여행을 찾을 수 없습니다."));
 
         // 여행 일정 리스트 찾기
-        List<TravelDates> datesList = travelDatesRepository.findByTravelId(travelId);
+        List<TravelDates> datesList = travelDatesRepository.findByTravel(travel);
 
         // 각 일정에 대해 일정 장소 리스트를 찾고, DTO로 변환
         List<DatesDetailResponseDTO> datesDtoList = datesList.stream().map(dates -> {
@@ -47,6 +48,8 @@ public class TravelServiceImpl implements TravelService {
                     PlacesDetailResponseDTO.builder()
                             .travelDatesId(places.getTravelDatesId())
                             .datePlacesName(places.getDatePlacesName())
+                            .datePlacesCategory(places.getDatePlacesCategory())
+                            .datePlacesAddress(places.getDatePlacesAddress())
                             .datePlacesLat(places.getDatePlacesLat())
                             .datePlacesLon(places.getDatePlacesLon())
                             .build()
@@ -71,14 +74,9 @@ public class TravelServiceImpl implements TravelService {
         return dto;
     }
 
-
     @Override
     @Transactional
     public void createTravelDatesPlaces(PlacesRequestDTO placesRequestDTO) {
-        // 여행 찾기
-        Travel travel = travelRepository.findByTravelId(placesRequestDTO.getTravelId())
-                .orElseThrow(() -> new TravelNotFoundException("해당 travelId의 맞는 여행을 찾을 수 없습니다."));
-
         // 여행 일정 찾기
         TravelDates dates = travelDatesRepository.findByTravelDatesId(placesRequestDTO.getTravelDatesId())
                 .orElseThrow(() -> new TravelNotFoundException("해당 travelId의 맞는 여행을 찾을 수 없습니다."));
@@ -93,5 +91,19 @@ public class TravelServiceImpl implements TravelService {
 
         // 생성한 일정 장소 저장
         datePlacesRepository.save(places);
+    }
+
+    @Override
+    @Transactional
+    public void updateTravelName(TravelNameRequestDTO travelNameRequestDTO) {
+        // 여행 찾기
+        Travel travel = travelRepository.findByTravelId(travelNameRequestDTO.getTravelId())
+                .orElseThrow(() -> new TravelNotFoundException("해당 travelId의 맞는 여행을 찾을 수 없습니다."));
+
+        // 여행 이름 변경
+        travel.setTravelName(travelNameRequestDTO.getTravelName());
+
+        // 변경 상태 저장
+        travelRepository.save(travel);
     }
 }

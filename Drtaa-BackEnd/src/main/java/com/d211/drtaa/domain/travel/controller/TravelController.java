@@ -1,6 +1,7 @@
 package com.d211.drtaa.domain.travel.controller;
 
 import com.d211.drtaa.domain.travel.dto.request.PlacesRequestDTO;
+import com.d211.drtaa.domain.travel.dto.request.TravelNameRequestDTO;
 import com.d211.drtaa.domain.travel.dto.response.TravelDetailResponseDTO;
 import com.d211.drtaa.domain.travel.service.TravelService;
 import com.d211.drtaa.global.exception.travel.TravelNotFoundException;
@@ -45,6 +46,20 @@ public class TravelController {
 
             return ResponseEntity.ok("Success");
         } catch (TravelNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage()); // 400
+        }
+    }
+
+    @PatchMapping("/name")
+    @Operation(summary = "여행 이름 변경", description = "travelId의 해당하는 여행 이름 변경")
+    public ResponseEntity updateTravelName(@RequestBody TravelNameRequestDTO travelNameRequestDTO) {
+        try {
+            travelService.updateTravelName(travelNameRequestDTO);
+
+            return ResponseEntity.ok("Success"); // 200
+        } catch(TravelNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage()); // 400
