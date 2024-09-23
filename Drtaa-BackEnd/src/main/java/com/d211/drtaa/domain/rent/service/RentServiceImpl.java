@@ -139,12 +139,14 @@ public class RentServiceImpl implements RentService{
 
     @Override
     public RentDetailResponseDTO getDetailRent(long rentId) {
+        // 렌트 찾기
         Rent rent = rentRepository.findByRentId(rentId)
                 .orElseThrow(() -> new RentNotFoundException("해당 rentId의 맞는 렌트를 찾을 수 없습니다."));
-
         RentCar rentCar = rent.getRentCar();
+        Travel travel = rent.getTravel();
 
         RentDetailResponseDTO response = RentDetailResponseDTO.builder()
+                // rent
                 .rentId(rent.getRentId())
                 .rentStatus(rent.getRentStatus())
                 .rentHeadCount(rent.getRentHeadCount())
@@ -161,6 +163,8 @@ public class RentServiceImpl implements RentService{
                 .rentCarManufacturer(rentCar.getRentCarManufacturer())
                 .rentCarModel(rentCar.getRentCarModel())
                 .rentCarImg(rentCar.getRentCarImg())
+                // travel
+                .travelId(travel.getTravelId())
                 .build();
 
         return response;
@@ -171,10 +175,11 @@ public class RentServiceImpl implements RentService{
         // 현재 날짜에 진행중인 렌트 기록 찾기
         Rent rent = rentRepository.findCurrentRentByUserProviderId(userProviderId)
                 .orElseThrow(() -> new RentNotFoundException("현재 진행 중인 렌트가 없습니다."));
-
         RentCar rentCar = rent.getRentCar();
+        Travel travel = rent.getTravel();
 
         RentDetailResponseDTO response = RentDetailResponseDTO.builder()
+                // rent
                 .rentId(rent.getRentId())
                 .rentStatus(rent.getRentStatus())
                 .rentHeadCount(rent.getRentHeadCount())
@@ -191,6 +196,8 @@ public class RentServiceImpl implements RentService{
                 .rentCarManufacturer(rentCar.getRentCarManufacturer())
                 .rentCarModel(rentCar.getRentCarModel())
                 .rentCarImg(rentCar.getRentCarImg())
+                // travel
+                .travelId(travel.getTravelId())
                 .build();
 
         return response;
@@ -321,8 +328,10 @@ public class RentServiceImpl implements RentService{
         // 렌트 차량 일정 저장
         rentCarScheduleRepository.save(rentCarSchedule);
 
+        RentCar rentCar = rent.getRentCar();
         // 반환값 빌더
         RentDetailResponseDTO response = RentDetailResponseDTO.builder()
+                // rent
                 .rentId(rent.getRentId())
                 .rentStatus(rent.getRentStatus())
                 .rentHeadCount(rent.getRentHeadCount())
@@ -333,11 +342,14 @@ public class RentServiceImpl implements RentService{
                 .rentDptLat(rent.getRentDptLat())
                 .rentDptLon(rent.getRentDptLon())
                 .rentCreatedAt(rent.getRentCreatedAt())
-                .rentCarId(rent.getRentCar().getRentCarId())
-                .rentCarNumber(rent.getRentCar().getRentCarNumber())
-                .rentCarManufacturer(rent.getRentCar().getRentCarManufacturer())
-                .rentCarModel(rent.getRentCar().getRentCarModel())
-                .rentCarImg(rent.getRentCar().getRentCarImg())
+                // rent-car
+                .rentCarId(rentCar.getRentCarId())
+                .rentCarNumber(rentCar.getRentCarNumber())
+                .rentCarManufacturer(rentCar.getRentCarManufacturer())
+                .rentCarModel(rentCar.getRentCarModel())
+                .rentCarImg(rentCar.getRentCarImg())
+                // travel
+                .travelId(travel.getTravelId())
                 .build();
 
         return response;
