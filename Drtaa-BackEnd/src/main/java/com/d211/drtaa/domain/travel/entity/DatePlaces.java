@@ -3,6 +3,8 @@ package com.d211.drtaa.domain.travel.entity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
+import org.checkerframework.checker.units.qual.N;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDate;
 
@@ -45,4 +47,13 @@ public class DatePlaces {
     @Column(name = "date_places_lon", nullable = false)
     @Schema(description = "일정 장소 경도", example = "0.0")
     private double datePlacesLon;
+
+    @Column(name = "date_places_is_visited", nullable = false)
+    @ColumnDefault("0")
+    @Schema(description = "일정 장소 방문 여부", example = "false")
+    private boolean datePlacesIsVisited;
+
+    public boolean getDatePlacesIsVisited() {
+        return this.datePlacesIsVisited;
+    }
 }

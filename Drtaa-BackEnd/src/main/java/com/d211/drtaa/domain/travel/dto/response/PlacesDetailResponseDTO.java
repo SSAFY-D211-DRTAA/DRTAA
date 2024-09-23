@@ -21,4 +21,6 @@ public class PlacesDetailResponseDTO {
     private double datePlacesLat;
     @Schema(description = "일정 장소 경도", example = "0.0")
     private double datePlacesLon;
+    @Schema(description = "일정 장소 방문 여부", example = "false")
+    private boolean datePlacesIsVisited;
 }

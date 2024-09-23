@@ -52,6 +52,7 @@ public class TravelServiceImpl implements TravelService {
                             .datePlacesAddress(places.getDatePlacesAddress())
                             .datePlacesLat(places.getDatePlacesLat())
                             .datePlacesLon(places.getDatePlacesLon())
+                            .datePlacesIsVisited(places.getDatePlacesIsVisited())
                             .build()
             ).collect(Collectors.toList());
 
@@ -85,8 +86,11 @@ public class TravelServiceImpl implements TravelService {
         DatePlaces places = DatePlaces.builder()
                 .travelDates(dates)
                 .datePlacesName(placesRequestDTO.getDatePlacesName())
+                .datePlacesCategory(placesRequestDTO.getDatePlacesCategory())
+                .datePlacesAddress(placesRequestDTO.getDatePlacesAddress())
                 .datePlacesLat(placesRequestDTO.getDatePlacesLat())
                 .datePlacesLon(placesRequestDTO.getDatePlacesLon())
+                .datePlacesIsVisited(false)
                 .build();
 
         // 생성한 일정 장소 저장
