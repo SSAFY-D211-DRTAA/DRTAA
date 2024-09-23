@@ -22,9 +22,6 @@ fun ImageView.loadImageUrl(imgUrl: String?) {
 
     Glide.with(context)
         .load(imgUrl)
-//        .placeholder()
-//        .error()
-//        .fallback()
         .into(this)
 
     if (this !is de.hdodenhof.circleimageview.CircleImageView) {

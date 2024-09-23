@@ -29,8 +29,8 @@
                 <ImageView
                     android:id="@+id/iv_tour_empty"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/bg_tour_empty"
+                    android:layout_height="230dp"
+                    android:src="@drawable/ic_tour_basic_image"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
