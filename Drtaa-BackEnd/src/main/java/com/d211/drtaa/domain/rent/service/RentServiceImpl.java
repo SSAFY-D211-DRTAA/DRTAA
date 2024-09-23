@@ -1,7 +1,6 @@
 package com.d211.drtaa.domain.rent.service;
 
 import com.d211.drtaa.domain.rent.dto.request.*;
-import com.d211.drtaa.domain.rent.dto.response.RentCarLocationResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentDetailResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentResponseDTO;
 import com.d211.drtaa.domain.rent.entity.Rent;
@@ -161,6 +160,7 @@ public class RentServiceImpl implements RentService{
                 .rentCarNumber(rentCar.getRentCarNumber())
                 .rentCarManufacturer(rentCar.getRentCarManufacturer())
                 .rentCarModel(rentCar.getRentCarModel())
+                .rentCarImg(rentCar.getRentCarImg())
                 .build();
 
         return response;
@@ -190,6 +190,7 @@ public class RentServiceImpl implements RentService{
                 .rentCarNumber(rentCar.getRentCarNumber())
                 .rentCarManufacturer(rentCar.getRentCarManufacturer())
                 .rentCarModel(rentCar.getRentCarModel())
+                .rentCarImg(rentCar.getRentCarImg())
                 .build();
 
         return response;
@@ -336,6 +337,7 @@ public class RentServiceImpl implements RentService{
                 .rentCarNumber(rent.getRentCar().getRentCarNumber())
                 .rentCarManufacturer(rent.getRentCar().getRentCarManufacturer())
                 .rentCarModel(rent.getRentCar().getRentCarModel())
+                .rentCarImg(rent.getRentCar().getRentCarImg())
                 .build();
 
         return response;
