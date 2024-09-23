@@ -51,8 +51,8 @@ class MessageHandler:
 
     def handle_vehicle_dispatch(self, data):
         # 차량 호출 로직
-        return {"status": "success", "message": "Vehicle dispatched", "rentCarLat": data['rentCarLat'], "rentCarLon": data['rentCarLon']}
-
+        return {"status": "success", "message": "Vehicle dispatched", "latitude": data['latitude'], "longitude": data['longitude']}
+    
     def handle_vehicle_return(self, data):
         # 차량 반납 로직
         return {"status": "success", "message": "Vehicle returned"}
@@ -65,11 +65,7 @@ class MessageHandler:
         # 차량 GPS
         try:
             with open('gps_data.json') as f:
-                gps_data = json.load(f)
-                return {"status": "success",
-                        "action": gps_data['type'],
-                        "latitude": gps_data['latitude'],
-                        "longitude": gps_data['longitude']}
+                return json.load(f)
 
         except FileNotFoundError:
             return {"status": "fail", "message": "설정 파일을 찾을 수 없습니다."}
