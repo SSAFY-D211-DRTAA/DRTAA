@@ -18,4 +18,5 @@ services:
       - ./auto_control_server:/app
     ports:
       - "8765:8765"
+      - "8766:8766"
     command: python3 main.py
