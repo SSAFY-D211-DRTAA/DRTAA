@@ -101,7 +101,6 @@ class CarTrackingFragment :
 
     companion object {
         private const val ICON_SIZE = 100
-//        private const val DEFAULT_ZOOM_LEVEL = 16.0
         private val DEFAULT_LATLNG = LatLng(37.576760, 126.898863)
 //        private val SANGAM_LATLNG = LatLng(37.57569116736151, 126.90039723462993)
     }

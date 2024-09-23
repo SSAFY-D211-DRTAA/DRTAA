@@ -1,5 +1,6 @@
 package com.drtaa.core_data.datasourceimpl
 
+import com.drtaa.core_data.datasource.RentCarDataSource
 import com.drtaa.core_data.datasource.RentDataSource
 import com.drtaa.core_model.network.RequestCallRent
 import com.drtaa.core_model.network.RequestCompleteRent
@@ -16,10 +17,9 @@ import com.drtaa.core_network.api.RentAPI
 import com.drtaa.core_network.api.RentCarAPI
 import javax.inject.Inject
 
-class RentDataSourceImpl @Inject constructor(
-    private val rentAPI: RentAPI,
+class RentCarDataSourceImpl @Inject constructor(
     private val rentCarAPI: RentCarAPI,
-) : RentDataSource {
+) : RentCarDataSource {
     override suspend fun getUnassignedCar(rentSchedule: RequestUnassignedCar): RentCar {
         return rentCarAPI.getUnassignedCar(rentSchedule)
     }
@@ -38,25 +38,5 @@ class RentDataSourceImpl @Inject constructor(
 
     override suspend fun getDriveStatus(rentCarId: Long): ResponseDrivingCar {
         return rentCarAPI.getDriveStatus(rentCarId)
-    }
-
-    override suspend fun callRent(requestCallRent: RequestCallRent): RentDetail {
-        return rentAPI.callAllRent(requestCallRent)
-    }
-
-    override suspend fun completeRent(requestCompleteRent: RequestCompleteRent) {
-        rentAPI.completeRent(requestCompleteRent)
-    }
-
-    override suspend fun getRentHistory(): List<RentSimple> {
-        return rentAPI.getRentHistory()
-    }
-
-    override suspend fun getCurrentRent(): RentDetail {
-        return rentAPI.getCurrentRent()
-    }
-
-    override suspend fun getAllRentState(): List<ResponseRentStateAll> {
-        return rentAPI.getAllRentState()
     }
 }

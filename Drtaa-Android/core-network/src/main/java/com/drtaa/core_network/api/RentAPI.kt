@@ -15,15 +15,8 @@ import retrofit2.http.PATCH
 import retrofit2.http.POST
 
 interface RentAPI {
-    @POST("rent-car/dispatch")
-    suspend fun getUnassignedCar(
-        @Body rentSchedule: RequestUnassignedCar
-    ): RentCar
-
-    @POST("rent-car/call")
-    suspend fun callAssignedCar(
-        @Body requestCallCar: RequestRentCarCall
-    ): ResponseRentCarCall
+    @GET("rent")
+    suspend fun getRentHistory(): List<RentSimple>
 
     @POST("rent")
     suspend fun callAllRent(
@@ -37,10 +30,7 @@ interface RentAPI {
 
     @GET("rent/status/active")
     suspend fun getAllRentState(): List<ResponseRentStateAll>
-
-    @GET("rent")
-    suspend fun getRentHistory(): List<RentSimple>
-
+    
     @GET("rent/current")
     suspend fun getCurrentRent(): RentDetail
 }

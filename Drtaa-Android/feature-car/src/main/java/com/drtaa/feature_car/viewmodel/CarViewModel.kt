@@ -3,6 +3,7 @@ package com.drtaa.feature_car.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.drtaa.core_data.repository.GPSRepository
+import com.drtaa.core_data.repository.RentCarRepository
 import com.drtaa.core_data.repository.RentRepository
 import com.drtaa.core_model.network.RequestCompleteRent
 import com.drtaa.core_model.rent.CarPosition
@@ -29,6 +30,7 @@ import javax.inject.Inject
 class CarViewModel @Inject constructor(
     private val gpsRepository: GPSRepository,
     private val rentRepository: RentRepository,
+    private val rentCarRepository: RentCarRepository,
 ) : ViewModel() {
     private var publishJob: Job? = null
     private val mqttScope = CoroutineScope(Dispatchers.IO)
@@ -155,7 +157,7 @@ class CarViewModel @Inject constructor(
     fun callAssignedCar(userPosition: LatLng) {
         viewModelScope.launch {
             val rentId = _latestReservedId.value
-            rentRepository.callAssignedCar(
+            rentCarRepository.callAssignedCar(
                 rentId,
                 userPosition.latitude,
                 userPosition.longitude
