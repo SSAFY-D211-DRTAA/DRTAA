@@ -12,5 +12,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class MyMessage {
-    private String action;
+    private String status;
+    private double rentDptLat;
+    private double rentDptLon;
 }

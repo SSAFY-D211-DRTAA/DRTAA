@@ -74,7 +74,13 @@ class CarViewModel @Inject constructor(
         _trackingState.value = !_trackingState.value
     }
 
-    fun startPublish(data: String = "GPS", intervalMillis: Long = DEFAULT_INTERVAL) {
+    fun startPublish(
+        data: String =
+            """
+         {"action":"vehicle_gps"}
+            """.trimIndent(),
+        intervalMillis: Long = DEFAULT_INTERVAL
+    ) {
         publishJob = mqttScope.launch {
             while (isActive) {
                 gpsRepository.publishGpsData(data)
