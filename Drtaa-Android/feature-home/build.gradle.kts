@@ -45,5 +45,4 @@ dependencies {
 
     implementation(project(":core-map"))
     implementation(project(":feature-rent"))
-    implementation(project(":feature-payment"))
 }

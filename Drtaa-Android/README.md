@@ -5,12 +5,14 @@
 - Coroutine, Flow
 - Hilt(apply MultiModule), build-logic
 - Android Jetpack - Navigation, Paging, ViewModel, DataBinding, DataStore, Safe Args
-- OkHttp3, Retrofit2
-- NaverMap API, Naver Geocoding API, Tmap API
+- OkHttp3, Retrofit2, HiveMQ, 
+- NaverMap API, Naver Geocoding API, Tmap API, 한국관광공사 TourAPI,
 - GoogleSignIn, NaverIdLogin
+- BootPay
 - Glide
 - Timber
 - Detekt
+- Gitlab Pipeline Android CI
 
 ### 모듈 구조
 

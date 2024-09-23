@@ -10,3 +10,9 @@ enum class Social(val type: String) {
 enum class Time(val value: Int) {
     HOUR_TO_MILLIS(ONE_HOUR_IN_MILLIS),
 }
+
+enum class Pay(val type: String) {
+    SUCCESS("success"),
+    CLOSED("closed"),
+    CANCELED("canceled")
+}

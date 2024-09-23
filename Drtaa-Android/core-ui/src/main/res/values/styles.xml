@@ -35,4 +35,10 @@
         <item name="android:background">@drawable/selector_btn_blue</item>
     </style>
 
+    <style name="CustomNumberPickerTheme" parent="Theme.AppCompat.Light">
+        <item name="android:fontFamily">@font/jua</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+
 </resources>

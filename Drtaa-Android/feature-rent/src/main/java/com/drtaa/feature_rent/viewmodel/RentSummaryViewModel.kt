@@ -99,7 +99,11 @@ class RentSummaryViewModel @Inject constructor(
         }
     }
 
-    private fun parseBootpayData(data: String, currentUser: SocialUser, rentInfo: RentInfo): PaymentCompletionInfo {
+    private fun parseBootpayData(
+        data: String,
+        currentUser: SocialUser,
+        rentInfo: RentInfo
+    ): PaymentCompletionInfo {
         val jsonObject = JSONObject(data)
         val dataObject = jsonObject.getJSONObject("data")
         val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())

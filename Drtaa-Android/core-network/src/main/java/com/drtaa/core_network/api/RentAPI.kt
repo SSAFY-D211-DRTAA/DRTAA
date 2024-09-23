@@ -1,9 +1,8 @@
 package com.drtaa.core_network.api
 
-import com.drtaa.core_model.network.RequestCompleteRent
 import com.drtaa.core_model.network.RequestCallRent
+import com.drtaa.core_model.network.RequestCompleteRent
 import com.drtaa.core_model.network.RequestUnassignedCar
-import com.drtaa.core_model.network.ResponseCallRent
 import com.drtaa.core_model.rent.RentCar
 import com.drtaa.core_model.rent.RentDetail
 import com.drtaa.core_model.rent.RentSimple
@@ -21,7 +20,7 @@ interface RentAPI {
     @POST("rent")
     suspend fun callRent(
         @Body requestCallRent: RequestCallRent
-    ): ResponseCallRent
+    ): RentDetail
 
     @PATCH("rent/status/completed")
     suspend fun completeRent(
