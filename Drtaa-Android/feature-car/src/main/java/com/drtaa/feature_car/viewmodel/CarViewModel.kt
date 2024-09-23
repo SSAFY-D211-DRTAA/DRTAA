@@ -53,6 +53,7 @@ class CarViewModel @Inject constructor(
     private fun getCurrentRent() {
         viewModelScope.launch {
             rentRepository.getCurrentRent().collect { result ->
+                Timber.d("진행 중 렌트 가져오기 데이터 $result")
                 result.onSuccess { data ->
                     Timber.d("성공")
                     _currentRentDetail.emit(data)

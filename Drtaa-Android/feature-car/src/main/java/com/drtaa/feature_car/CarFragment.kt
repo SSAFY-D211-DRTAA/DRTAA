@@ -20,7 +20,7 @@ import timber.log.Timber
 @AndroidEntryPoint
 class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
 
-    private val viewModel: CarViewModel by hiltNavGraphViewModels<CarViewModel>(R.id.nav_graph_car)
+    private val carViewModel: CarViewModel by hiltNavGraphViewModels<CarViewModel>(R.id.nav_graph_car)
 
     private lateinit var cardView: View
     private lateinit var overlayView: View
@@ -34,16 +34,8 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
             overlayView = viewTourOverlay
             reflectionView = viewTourReflection
 
-            btnMqtt.setOnClickListener {
-                viewModel.startPublish()
-            }
-
             btnTrackingCar.setOnClickListener {
                 navigateDestination(R.id.action_carFragment_to_carTrackingFragment)
-            }
-
-            btnReturn.setOnClickListener {
-                viewModel.completeRent()
             }
         }
         setupCardTouchListener()
@@ -51,12 +43,13 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
     }
 
     private fun initObserve() {
-        viewModel.currentRentDetail.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+        carViewModel.currentRentDetail.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { currentRentDetail ->
                 binding.apply {
                     if (currentRentDetail != null) {
+                        binding.rentDetail = currentRentDetail
                         imgCarCarimage.visibility = View.VISIBLE
-                    }else{
+                    } else {
                         btnTrackingCar.isClickable = false
                         clCarBottomText.visibility = View.GONE
                         animeCarNorent.visibility = View.VISIBLE
@@ -65,7 +58,7 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
 
-        viewModel.isSuccessComplete.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+        carViewModel.isSuccessComplete.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { isSuccess ->
                 if (isSuccess) {
                     Timber.d("반납 성공")

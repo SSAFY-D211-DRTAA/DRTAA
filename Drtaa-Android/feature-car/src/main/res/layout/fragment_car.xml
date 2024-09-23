@@ -4,7 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
+        <variable
+            name="rentDetail"
+            type="com.drtaa.core_model.rent.RentDetail" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -57,10 +59,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-
-
-
-
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/constraintLayout2"
                     android:layout_width="match_parent"
@@ -87,7 +85,7 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
-                        app:srcCompat="@drawable/kanna" />
+                        app:setImgUrl="@{rentDetail.rentCarImg}" />
 
                     <ImageView
                         android:id="@+id/btn_tracking_car"
@@ -128,7 +126,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="기아 k99"
+                        android:text="@{rentDetail.rentCarModel}"
                         android:textSize="17sp"
                         app:layout_constraintStart_toStartOf="@+id/tv_tour_title_cartype"
                         app:layout_constraintTop_toBottomOf="@+id/tv_tour_title_cartype" />
@@ -151,7 +149,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="99파 9999"
+                        android:text="@{rentDetail.rentCarNumber}"
                         android:textSize="17sp"
                         app:layout_constraintStart_toStartOf="@+id/tv_tour_title_carnumber"
                         app:layout_constraintTop_toBottomOf="@+id/tv_tour_title_carnumber" />
@@ -173,7 +171,7 @@
                         style="@style/ptd_semi_bold"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="2020.20.20\n20:20"
+                        android:text="@{rentDetail.rentStartTime}"
                         android:textSize="17sp"
                         app:layout_constraintStart_toStartOf="@+id/tv_tour_title_rentstart"
                         app:layout_constraintTop_toBottomOf="@+id/tv_tour_title_rentstart" />
@@ -196,7 +194,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="2020.20.20\n20:20"
+                        android:text="@{rentDetail.rentEndTime}"
                         android:textSize="17sp"
                         app:layout_constraintStart_toStartOf="@+id/tv_tour_title_rentend"
                         app:layout_constraintTop_toBottomOf="@+id/tv_tour_title_rentend" />
@@ -206,24 +204,6 @@
 
         </androidx.cardview.widget.CardView>
 
-        <Button
-            android:id="@+id/btn_mqtt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="MQTT"
-            app:layout_constraintStart_toEndOf="@+id/tv_tour_title"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_return"
-            style="@style/btn_long_blue"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="반납"
-            app:layout_constraintStart_toEndOf="@+id/btn_mqtt"
-            app:layout_constraintTop_toTopOf="parent" />
-
-
         <TextView
             android:id="@+id/tv_tour_remain_time"
             style="@style/ptd_extra_bold"
@@ -231,7 +211,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:text="남은시간 : ㅇㅇ분"
+            android:text='@{"남은시간 : "+rentDetail.rentTime}'
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/cv_tour_card" />
