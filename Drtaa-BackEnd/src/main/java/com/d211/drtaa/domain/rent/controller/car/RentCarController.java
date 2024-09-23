@@ -99,7 +99,7 @@ public class RentCarController {
         }
     }
 
-    @GetMapping("/call/{rentId}")
+    @PatchMapping("/call/{rentId}")
     @Operation(summary = "렌트 차량 첫호출", description = "회원의 진행할 렌트 차량 첫호출(렌트 요청 시 입력했던 탑승 위치 전송)")
     public ResponseEntity callRentCar(@PathVariable("rentId") long rentId) {
         try{
@@ -117,7 +117,7 @@ public class RentCarController {
         }
     }
 
-    @PostMapping("/call")
+    @PatchMapping("/call")
     @Operation(summary = "렌트 차량 재호출", description = "회원의 진행중인 렌트 차량 재호출(회원 위치 전송)")
     public ResponseEntity reCallRentCar(@RequestBody RentCarCallRequestDTO rentCarCallRequestDTO) {
         try{
