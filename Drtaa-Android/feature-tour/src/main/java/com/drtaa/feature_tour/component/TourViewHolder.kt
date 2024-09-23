@@ -14,7 +14,14 @@ class TourViewHolder(
     fun bind(data: TourItem) {
         binding.apply {
             tvTourTitle.text = data.title
-            tvTourTel.text = data.tel
+            if (data.tel.isEmpty() || data.tel.length == 0) {
+                imgTourTel.visibility = View.GONE
+                tvTourTel.visibility = View.GONE
+            } else {
+                imgTourTel.visibility = View.VISIBLE
+                tvTourTel.text = data.tel
+            }
+
             tvTourAddr.text = data.addr1
             if (data.firstimage.isNotEmpty()) {
                 ivTour.visibility = View.VISIBLE

@@ -5,7 +5,6 @@ import android.annotation.SuppressLint
 import android.graphics.drawable.GradientDrawable
 import android.view.MotionEvent
 import android.view.View
-import android.widget.ImageView
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -26,9 +25,7 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
     private lateinit var cardView: View
     private lateinit var overlayView: View
     private lateinit var reflectionView: View
-    private lateinit var cardImage: ImageView
     private var isTouching: Boolean = false
-    private var isNeko: Boolean = true
     private var touchStartTime: Long = 0
 
     override fun initView() {
@@ -36,7 +33,6 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
             cardView = cvTourCard
             overlayView = viewTourOverlay
             reflectionView = viewTourReflection
-            cardImage = ivTourCard
 
             btnMqtt.setOnClickListener {
                 viewModel.startPublish()
@@ -57,10 +53,15 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
     private fun initObserve() {
         viewModel.currentRentDetail.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { currentRentDetail ->
-                if (currentRentDetail != null) {
-                    binding.clCurrentRent.visibility = View.VISIBLE
-                } else {
-                    binding.tvNoCurrentRent.visibility = View.VISIBLE
+                binding.apply {
+                    if (currentRentDetail != null) {
+                        imgCarCarimage.visibility = View.VISIBLE
+                    }else{
+                        btnTrackingCar.isClickable = false
+                        clCarBottomText.visibility = View.GONE
+                        animeCarNorent.visibility = View.VISIBLE
+                        tvTourRemainTime.setText("현재 이용중인 차량이 없습니다..")
+                    }
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
 
@@ -89,13 +90,6 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
                 MotionEvent.ACTION_MOVE -> handleActionMove(v, event) // 이동했을 때
 
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                    if (isTouching && isShortTouch()) {
-                        isNeko = !isNeko // true false 전환
-                        val newImageResource =
-                            if (isNeko) R.drawable.kanna else R.drawable.kanna // 이미지 전환, 나중에는 view 전환으로 하면 될 듯?
-                        cardImage.setImageResource(newImageResource) // 칸나칸나 이미지 적용
-                    }
-
                     isTouching = false
                     cardView.animate()
                         .rotationX(0f)
@@ -116,7 +110,6 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
     }
 
     private fun isLongTouch() = System.currentTimeMillis() - touchStartTime > TOUCH_PRESS_TIME
-    private fun isShortTouch() = System.currentTimeMillis() - touchStartTime <= TOUCH_PRESS_TIME
 
     private fun handleActionMove(v: View, event: MotionEvent): Boolean {
         if (isTouching && isLongTouch()) {
@@ -129,8 +122,11 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
 
     private fun rotateCard(v: View, x: Float, y: Float) {
         val (centerX, centerY) = v.width / HALF to v.height / HALF
-        val rotateX = (centerY - y) / centerY * PER
-        val rotateY = (x - centerX) / centerX * PER
+        var rotateX = (centerY - y) / centerY * MAX_ROTATION
+        var rotateY = (x - centerX) / centerX * MAX_ROTATION
+
+        rotateX = rotateX.coerceIn(-MAX_ROTATION, MAX_ROTATION)
+        rotateY = rotateY.coerceIn(-MAX_ROTATION, MAX_ROTATION)
 
         cardView.animate()
             .rotationX(rotateX)
@@ -177,8 +173,8 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
         const val OVERLAY_VIEW = 0.6f
         const val POINT_XY = 0.5f
         const val HALF = 2f
-        const val PER = 10
         const val DURATION = 300L
         const val TOUCH_PRESS_TIME = 100
+        const val MAX_ROTATION = 15f
     }
 }

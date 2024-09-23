@@ -19,8 +19,10 @@ import com.drtaa.feature_rent.viewmodel.RentSearchViewModel
 import com.drtaa.feature_rent.viewmodel.RentViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
+import com.naver.maps.map.LocationTrackingMode
 import com.naver.maps.map.MapView
 import com.naver.maps.map.NaverMap
+import com.naver.maps.map.util.FusedLocationSource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -35,6 +37,7 @@ class RentSearchFragment :
     override var mapView: MapView? = null
 
     private lateinit var behavior: BottomSheetBehavior<ConstraintLayout>
+    private lateinit var locationSource: FusedLocationSource
 
     private val searchListAdapter = SearchListAdapter()
 
@@ -45,8 +48,9 @@ class RentSearchFragment :
 
     override fun initOnMapReady(naverMap: NaverMap) {
         naverMap.uiSettings.isLocationButtonEnabled = false
-        naverMap.setCustomLocationButton(binding.ivRentSearchCurrentLocation)
-
+        naverMap.setCustomLocationButton(binding.layoutRentSearchBottomSheet.ivRentSearchCurrentLocation)
+        locationSource = FusedLocationSource(this, LOCATION_PERMISSION_REQUEST_CODE)
+        naverMap.locationTrackingMode = LocationTrackingMode.Follow
         initObserve(naverMap)
     }
 
@@ -178,5 +182,6 @@ class RentSearchFragment :
     companion object {
         const val BOTTOM_SHEET_PEEK_HEIGHT = 500
         const val MAP_BOTTOM_CONTENT_PADDING = 100
+        const val LOCATION_PERMISSION_REQUEST_CODE = 1000
     }
 }

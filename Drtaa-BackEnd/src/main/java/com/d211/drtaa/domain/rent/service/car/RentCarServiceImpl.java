@@ -1,5 +1,6 @@
 package com.d211.drtaa.domain.rent.service.car;
 
+import com.d211.drtaa.domain.rent.dto.request.RentCarCallRequestDTO;
 import com.d211.drtaa.domain.rent.dto.request.RentCarDriveStatusRequestDTO;
 import com.d211.drtaa.domain.rent.dto.request.RentCarUnassignedDispatchStatusRequestDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentCarDriveStatusResponseDTO;
@@ -133,7 +134,7 @@ public class RentCarServiceImpl implements RentCarService {
 
     @Override
     @Transactional
-    public RentCarLocationResponseDTO callRentCar(String name, long rentId) {
+    public RentCarLocationResponseDTO callRentCar(long rentId) {
         // rentId에 해당하는 렌트 찾기
         Rent rent = rentRepository.findByRentId(rentId)
                 .orElseThrow(() -> new RentNotFoundException("해당 rentId의 맞는 렌트를 찾을 수 없습니다."));
@@ -142,7 +143,8 @@ public class RentCarServiceImpl implements RentCarService {
         RentCar car = rentCarRepository.findByRentCarId(rent.getRentCar().getRentCarId())
                 .orElseThrow(() -> new RentCarNotFoundException("해당 rentCarId의 맞는 차량을 찾을 수 없습니다."));
 
-        final RentCarLocationResponseDTO[] response = {null}; // 응답 DTO 초기화
+        // 응답 DTO 초기화
+        final RentCarLocationResponseDTO[] response = {null};
         try {
             StandardWebSocketClient client = new StandardWebSocketClient();
             WebSocketSession session = client.execute(new TextWebSocketHandler() {
@@ -154,12 +156,22 @@ public class RentCarServiceImpl implements RentCarService {
                         JsonNode jsonNode = objectMapper.readTree(message.getPayload());
                         log.info("Received message: {}", jsonNode);
 
-                        // DTO 생성
-                        response[0] = RentCarLocationResponseDTO.builder()
-                                .rentCarId(car.getRentCarId())
-                                .rentCarLat(jsonNode.get("rentCarLat").asDouble()) // rentCarLat을 double로 변환
-                                .rentCarLon(jsonNode.get("rentCarLon").asDouble()) // rentCarLon을 double로 변환
-                                .build();
+                        // null 체크 추가
+                        JsonNode latNode = jsonNode.get("latitude");
+                        JsonNode lonNode = jsonNode.get("longitude");
+                        log.info("latitude: {}", latNode);
+                        log.info("longitude: {}", lonNode);
+
+                        if (latNode != null && lonNode != null && !latNode.isNull() && !lonNode.isNull()) {
+                            // DTO 생성
+                            response[0] = RentCarLocationResponseDTO.builder()
+                                    .rentCarId(car.getRentCarId())
+                                    .rentCarLat(latNode.asDouble()) // rentCarLat을 double로 변환
+                                    .rentCarLon(lonNode.asDouble()) // rentCarLon을 double로 변환
+                                    .build();
+                        } else {
+                            log.warn("Received null for rentCarLat or rentCarLon");
+                        }
 
                     } catch (Exception e) {
                         log.error("Error processing received message: ", e);
@@ -167,7 +179,8 @@ public class RentCarServiceImpl implements RentCarService {
                 }
             }, webSocketConfig.getUrl()).get();
 
-            MyMessage message = new MyMessage("vehicle_dispatch");
+            // 상태와 렌트 탑승 위치 전송
+            MyMessage message = new MyMessage("vehicle_dispatch", rent.getRentDptLat(), rent.getRentDptLon());
             String jsonMessage = objectMapper.writeValueAsString(message);
             session.sendMessage(new TextMessage(jsonMessage));
             log.info("Sent message: {}", jsonMessage);
@@ -184,7 +197,79 @@ public class RentCarServiceImpl implements RentCarService {
         // 렌트 차량 변경 상태 저장
         rentCarRepository.save(car);
 
-        return response[0] != null ? response[0] : RentCarLocationResponseDTO.builder().build(); // 응답이 없으면 빈 DTO 반환
+        // 응답이 없으면 빈 DTO 반환
+        return response[0] != null ? response[0] : RentCarLocationResponseDTO.builder().build();
     }
+
+    @Override
+    @Transactional
+    public RentCarLocationResponseDTO reCallRentCar(RentCarCallRequestDTO rentCarCallRequestDTO) {
+        // rentId에 해당하는 렌트 찾기
+        Rent rent = rentRepository.findByRentId(rentCarCallRequestDTO.getRentId())
+                .orElseThrow(() -> new RentNotFoundException("해당 rentId의 맞는 렌트를 찾을 수 없습니다."));
+
+        // rentCarId에 해당하는 렌트 차량 찾기
+        RentCar car = rentCarRepository.findByRentCarId(rent.getRentCar().getRentCarId())
+                .orElseThrow(() -> new RentCarNotFoundException("해당 rentCarId의 맞는 차량을 찾을 수 없습니다."));
+
+        // 응답 DTO 초기화
+        final RentCarLocationResponseDTO[] response = {null};
+
+        try {
+            StandardWebSocketClient client = new StandardWebSocketClient();
+            WebSocketSession session = client.execute(new TextWebSocketHandler() {
+                @Override
+                protected void handleTextMessage(WebSocketSession session, TextMessage message) {
+                    // 서버로부터 받은 메시지를 처리하는 로직
+                    try {
+                        // JSON 메시지를 JsonNode로 파싱
+                        JsonNode jsonNode = objectMapper.readTree(message.getPayload());
+                        log.info("Received message: {}", jsonNode);
+
+                        // null 체크 추가
+                        JsonNode latNode = jsonNode.get("latitude");
+                        JsonNode lonNode = jsonNode.get("longitude");
+                        log.info("latitude: {}", latNode);
+                        log.info("longitude: {}", lonNode);
+
+                        if (latNode != null && lonNode != null && !latNode.isNull() && !lonNode.isNull()) {
+                            // DTO 생성
+                            response[0] = RentCarLocationResponseDTO.builder()
+                                    .rentCarId(car.getRentCarId())
+                                    .rentCarLat(latNode.asDouble()) // rentCarLat을 double로 변환
+                                    .rentCarLon(lonNode.asDouble()) // rentCarLon을 double로 변환
+                                    .build();
+                        } else {
+                            log.warn("Received null for rentCarLat or rentCarLon");
+                        }
+
+                    } catch (Exception e) {
+                        log.error("Error processing received message: ", e);
+                    }
+                }
+            }, webSocketConfig.getUrl()).get();
+
+            // 상태와 사용자 탑승 호출 위치 전송
+            MyMessage message = new MyMessage("vehicle_dispatch", rentCarCallRequestDTO.getUserLat(), rentCarCallRequestDTO.getUserLon());
+            String jsonMessage = objectMapper.writeValueAsString(message);
+            session.sendMessage(new TextMessage(jsonMessage));
+            log.info("Sent message: {}", jsonMessage);
+            Thread.sleep(1000); // 필요에 따라 대기 시간 조절
+
+        } catch (Exception e) {
+            log.error("Error during WebSocket communication: ", e);
+            throw new WebSocketDisConnectedException("WebSocket이 네트워크 연결을 거부했습니다.");
+        }
+
+        // 렌트 차량 상태 변경
+        car.setRentCarDrivingStatus(RentDrivingStatus.call);
+
+        // 렌트 차량 변경 상태 저장
+        rentCarRepository.save(car);
+
+        // 응답이 없으면 빈 DTO 반환
+        return response[0] != null ? response[0] : RentCarLocationResponseDTO.builder().build();
+    }
+
 
 }

@@ -31,7 +31,7 @@ data class RentSchedule(
 
     fun toDate(): Date {
         val calendar = Calendar.getInstance()
-        calendar.set(year, month, date, hour, minute)
+        calendar.set(year, month - DIFF_MONTH, date, hour, minute)
         return calendar.time
     }
 
@@ -45,5 +45,9 @@ data class RentSchedule(
             hour,
             minute
         )
+    }
+
+    companion object{
+        const val DIFF_MONTH = 1
     }
 }

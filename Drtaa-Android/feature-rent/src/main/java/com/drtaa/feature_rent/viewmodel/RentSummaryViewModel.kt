@@ -1,19 +1,17 @@
 package com.drtaa.feature_rent.viewmodel
 
-import android.location.Location
-import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.drtaa.core_data.repository.PaymentRepository
 import com.drtaa.core_data.repository.RentRepository
 import com.drtaa.core_data.repository.SignRepository
 import com.drtaa.core_model.data.PaymentCompletionInfo
+import com.drtaa.core_model.map.Search
 import com.drtaa.core_model.network.RequestCallRent
 import com.drtaa.core_model.network.RequestUnassignedCar
 import com.drtaa.core_model.rent.RentCar
 import com.drtaa.core_model.rent.RentInfo
 import com.drtaa.core_model.sign.SocialUser
-import com.drtaa.core_ui.component.LocationHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,7 +31,6 @@ class RentSummaryViewModel @Inject constructor(
     private val rentRepository: RentRepository,
     private val paymentRepository: PaymentRepository,
     private val signRepository: SignRepository,
-    private val locationHelper: LocationHelper
 ) : ViewModel() {
 
     private val _assignedCar = MutableSharedFlow<RentCar?>()
@@ -45,11 +42,15 @@ class RentSummaryViewModel @Inject constructor(
     private val _currentUser = MutableStateFlow<SocialUser?>(null)
     val currentUser: StateFlow<SocialUser?> = _currentUser
 
-    private val _currentLocation = MutableStateFlow<Location?>(null)
-    val currentLocation: StateFlow<Location?> = _currentLocation
+    private val _rentStartLocation = MutableStateFlow<Search?>(null)
+    val rentStartLocation: StateFlow<Search?> = _rentStartLocation
 
     init {
         getCurrentUser()
+    }
+
+    fun setRentStartLocation(search: Search) {
+        _rentStartLocation.value = search
     }
 
     private fun getCurrentUser() {
@@ -60,17 +61,6 @@ class RentSummaryViewModel @Inject constructor(
                 }.onFailure { error ->
                     Timber.e("유저 정보 조회 오류")
                 }
-            }
-        }
-    }
-
-    fun getCurrentLocation(activity: FragmentActivity) {
-        viewModelScope.launch {
-            try {
-                val location = locationHelper.getCurrentLocation(activity)
-                _currentLocation.value = location
-            } catch (e: Exception) {
-                Timber.e("위치 가져오기 실패: ${e.message}")
             }
         }
     }
@@ -134,12 +124,7 @@ class RentSummaryViewModel @Inject constructor(
 
     private fun callRent(rentInfo: RentInfo) {
         viewModelScope.launch {
-            val currentLocation = _currentLocation.value
-
-            if (currentLocation == null) {
-                Timber.e("현재 위치를 가져올 수 없습니다..")
-                return@launch
-            }
+            val rentStartLocation = _rentStartLocation.value
 
             val dateFormatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
 
@@ -149,8 +134,8 @@ class RentSummaryViewModel @Inject constructor(
                 rentPrice = rentInfo.finalPrice.toLong(),
                 rentStartTime = dateFormatter.format(rentInfo.startSchedule.toDate()),
                 rentEndTime = dateFormatter.format(rentInfo.endSchedule.toDate()),
-                rentDptLat = currentLocation.latitude,
-                rentDptLon = currentLocation.longitude
+                rentDptLat = rentStartLocation!!.lat,
+                rentDptLon = rentStartLocation.lng
             )
 
             rentRepository.callRent(requestCallRent).collect { result ->

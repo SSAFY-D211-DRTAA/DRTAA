@@ -10,6 +10,7 @@ from std_msgs.msg import Bool
 from tf.transformations import euler_from_quaternion
 import numpy as np
 from scipy.interpolate import interp1d
+from scipy.spatial import KDTree
 
 class local_path_pub:
     def __init__(self):
@@ -30,9 +31,9 @@ class local_path_pub:
         self.y = 0
         self.local_path_size = 70
         self.prev_current_waypoint = 0
-        self.smoothing_factor = 0.8  # 경로 평활화 계수
+        self.smoothing_factor = 0.5  # 경로 평활화 계수
 
-        rate = rospy.Rate(50)  # 20hz
+        rate = rospy.Rate(20)  # 20hz
         while not rospy.is_shutdown():
             self.update_local_path()
             rate.sleep()
@@ -72,6 +73,7 @@ class local_path_pub:
             else:
                 local_path_msg.poses = self.global_path_msg.poses[smoothed_waypoint:]
 
+            rospy.loginfo("Local path generated with {} poses".format(len(local_path_msg.poses)))
             self.prev_current_waypoint = smoothed_waypoint
 
             is_turning_left = self.predict_left_turn(local_path_msg)
@@ -87,12 +89,8 @@ class local_path_pub:
             if dis < min_dis:
                 min_dis = dis
                 current_waypoint = i
-            elif dis > min_dis + 1.0:  # 거리가 다시 증가하기 시작하면 검색 중단
+            elif dis > min_dis + 5.0:  # 거리가 다시 증가하기 시작하면 검색 중단
                 break
-        
-        # 지난 경로 무시: 이전에 방문한 경로점보다 작은 인덱스는 무시
-        if current_waypoint <= self.prev_current_waypoint:
-            return self.prev_current_waypoint
 
         # 방향 기준 추가: 차량의 진행 방향과 경로점의 방향 비교
         angle_to_waypoint = atan2(pose.pose.position.y - y, pose.pose.position.x - x)

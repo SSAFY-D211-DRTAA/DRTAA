@@ -28,6 +28,7 @@ class CalendarBottomSheetDialogFragment :
     private val rentViewModel: RentViewModel by hiltNavGraphViewModels(R.id.nav_graph_rent)
     private val calendarBottomSheetViewModel: CalendarBottomSheetViewModel by viewModels()
 
+    private lateinit var blockDecorator: BlockDecorator
     private lateinit var singleDayDecorator: SingleDayDecorator
     private lateinit var startDayDecorator: StartDayDecorator
     private lateinit var endDayDecorator: EndDayDecorator
@@ -59,7 +60,8 @@ class CalendarBottomSheetDialogFragment :
     }
 
     private fun setupFullHeight(bottomSheetDialog: BottomSheetDialog) {
-        val bottomSheet = bottomSheetDialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet) as FrameLayout?
+        val bottomSheet =
+            bottomSheetDialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet) as FrameLayout?
         val behavior = BottomSheetBehavior.from(bottomSheet!!)
         val layoutParams = bottomSheet.layoutParams
         bottomSheet.layoutParams = layoutParams
@@ -211,6 +213,7 @@ class CalendarBottomSheetDialogFragment :
             ArrayWeekDayFormatter(resources.getTextArray(R.array.custom_weekdays))
         )
 
+        blockDecorator = BlockDecorator(requireActivity())
         singleDayDecorator = SingleDayDecorator(requireActivity())
         startDayDecorator = StartDayDecorator(requireActivity())
         endDayDecorator = EndDayDecorator(requireActivity())
@@ -223,6 +226,7 @@ class CalendarBottomSheetDialogFragment :
 
         // 캘린더에 Decorator 추가
         binding.cvRentCalendar.addDecorators(
+            blockDecorator,
             sundayDecorator,
             saturdayDecorator,
             selectedMonthDecorator,
@@ -256,14 +260,15 @@ class CalendarBottomSheetDialogFragment :
             // Decorators 추가
             selectedMonthDecorator = SelectedMonthDecorator(date.month, requireActivity())
             binding.cvRentCalendar.addDecorators(
+                blockDecorator,
                 sundayDecorator,
                 saturdayDecorator,
                 selectedMonthDecorator,
                 todayDecorator,
+                singleDayDecorator,
                 middleDayDecorator,
                 startDayDecorator,
-                endDayDecorator,
-                singleDayDecorator
+                endDayDecorator
             )
         }
 
@@ -273,6 +278,7 @@ class CalendarBottomSheetDialogFragment :
             binding.cvRentCalendar.removeDecorator(middleDayDecorator)
             binding.cvRentCalendar.removeDecorator(startDayDecorator)
             binding.cvRentCalendar.removeDecorator(endDayDecorator)
+            binding.cvRentCalendar.invalidateDecorators()
 
             val middleRange = dates.subList(1, dates.size - 1).map { CalendarDay.from(it.date) }
 
@@ -291,22 +297,27 @@ class CalendarBottomSheetDialogFragment :
 
         // 날짜가 단일 선택되었을 때 리스너
         binding.cvRentCalendar.setOnDateChangedListener { widget, date, selected ->
+            calendarBottomSheetViewModel.setRentEndDate(null)
+            if (selected) {
+                singleDayDecorator.setDate(date)
+                calendarBottomSheetViewModel.setRentStartDate(date)
+            } else {
+                singleDayDecorator.setDate(null)
+                calendarBottomSheetViewModel.setRentStartDate(null)
+            }
+
+            startDayDecorator.setDate(null)
+            middleDayDecorator.setDateRange(listOf())
+            endDayDecorator.setDate(null)
+
             binding.cvRentCalendar.removeDecorator(singleDayDecorator)
             binding.cvRentCalendar.removeDecorator(middleDayDecorator)
             binding.cvRentCalendar.removeDecorator(startDayDecorator)
             binding.cvRentCalendar.removeDecorator(endDayDecorator)
+            binding.cvRentCalendar.invalidateDecorators()
 
-            singleDayDecorator.setDate(date)
-            binding.cvRentCalendar.addDecorators(
-                singleDayDecorator
-            )
-
-            calendarBottomSheetViewModel.setRentStartDate(date)
-            calendarBottomSheetViewModel.setRentEndDate(null)
-
-            if (!selected) {
-                calendarBottomSheetViewModel.setRentStartDate(null)
-                binding.cvRentCalendar.removeDecorator(singleDayDecorator)
+            if (selected) {
+                binding.cvRentCalendar.addDecorators(singleDayDecorator)
             }
         }
     }

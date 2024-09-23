@@ -1,5 +1,6 @@
 package com.d211.drtaa.domain.rent.controller.car;
 
+import com.d211.drtaa.domain.rent.dto.request.RentCarCallRequestDTO;
 import com.d211.drtaa.domain.rent.dto.request.RentCarDriveStatusRequestDTO;
 import com.d211.drtaa.domain.rent.dto.request.RentCarUnassignedDispatchStatusRequestDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentCarDriveStatusResponseDTO;
@@ -98,11 +99,29 @@ public class RentCarController {
         }
     }
 
-    @PostMapping("/call/{rentId}")
-    @Operation(summary = "렌트 차량 호출", description = "회원의 현재 진행중인 렌트의 렌트 차량 호출")
-    public ResponseEntity callRentCar(Authentication authentication, @PathVariable("rentId") long rentId) {
+    @GetMapping("/call/{rentId}")
+    @Operation(summary = "렌트 차량 첫호출", description = "회원의 진행할 렌트 차량 첫호출(렌트 요청 시 입력했던 탑승 위치 전송)")
+    public ResponseEntity callRentCar(@PathVariable("rentId") long rentId) {
         try{
-            RentCarLocationResponseDTO response = rentCarService.callRentCar(authentication.getName(), rentId);
+            RentCarLocationResponseDTO response = rentCarService.callRentCar(rentId);
+
+            return ResponseEntity.ok(response); //200
+        } catch (RentNotFoundException | RentCarNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
+        } catch (AuthenticationException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("권한 인증에 실패하였습니다."); // 401
+        } catch (WebSocketDisConnectedException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage()); // 500
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
+        }
+    }
+
+    @PostMapping("/call")
+    @Operation(summary = "렌트 차량 재호출", description = "회원의 진행중인 렌트 차량 재호출(회원 위치 전송)")
+    public ResponseEntity reCallRentCar(@RequestBody RentCarCallRequestDTO rentCarCallRequestDTO) {
+        try{
+            RentCarLocationResponseDTO response = rentCarService.reCallRentCar(rentCarCallRequestDTO);
 
             return ResponseEntity.ok(response); //200
         } catch (RentNotFoundException | RentCarNotFoundException e) {

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import heapq
 import rospy
 import os
 import sys
@@ -9,7 +10,8 @@ import numpy as np
 from math import sqrt, pow, atan2
 from geometry_msgs.msg import PoseStamped, PoseWithCovarianceStamped
 from nav_msgs.msg import Path, Odometry
-from queue import PriorityQueue
+from scipy.spatial import KDTree
+from std_msgs.msg import Bool
 
 current_path = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(current_path)
@@ -23,6 +25,7 @@ class AStarPathPublisher:
         # rospy.Subscriber('/initialpose', PoseWithCovarianceStamped, self.init_callback) 
         rospy.Subscriber('/odom', Odometry, self.odom_callback)
         self.global_path_pub = rospy.Publisher('/global_path', Path, queue_size=1)
+        self.destination_reached_pub = rospy.Publisher('/complete_drive', Bool, queue_size=1)
 
         # 초기 상태 변수 설정
         self.is_goal_pose = False
@@ -30,6 +33,11 @@ class AStarPathPublisher:
         self.start_node = None
         self.end_node = None
         self.global_path_msg = None
+        self.kd_tree = None
+        
+        # Flag to check if destination reached message is published
+        self.destination_reached = False
+        self.goal_position = None
 
         try:
             # MGeo 데이터 로드
@@ -37,6 +45,7 @@ class AStarPathPublisher:
             mgeo_planner_map = MGeo.create_instance_from_json(load_path)
             self.nodes = mgeo_planner_map.node_set.nodes
             self.links = mgeo_planner_map.link_set.lines
+            self.build_kd_tree()
         except Exception as e:
             rospy.logerr(f"Failed to load Mgeo data: {e}")
 
@@ -44,7 +53,7 @@ class AStarPathPublisher:
         self.global_planner = AStar(self.nodes, self.links)
 
         # 메인 루프
-        rate = rospy.Rate(50) # 50Hz
+        rate = rospy.Rate(20) # 50Hz
         while not rospy.is_shutdown():
             if self.global_path_msg is not None:
                 self.global_path_pub.publish(self.global_path_msg)
@@ -56,36 +65,78 @@ class AStarPathPublisher:
    
         self.end_node = self.find_closest_node(msg.pose.position)
         self.is_goal_pose = True
-        rospy.logwarn(f"목표 위치 근접 노드: {self.end_node}")
-    
+        rospy.loginfo(f"목적지 노드: {self.end_node}")
+        # [INFO] [1727033826.562245]: 목적지 노드: A119AS319285
+
+        if self.end_node in self.nodes:
+            # 점 표기법을 사용하여 Node 객체의 point 속성에 접근
+            node_point = self.nodes[self.end_node].point
+            self.goal_position = [node_point[0], node_point[1]]
+            # rospy.loginfo(f"Goal position set to: {self.goal_position}")
+            # [INFO] [1727033826.564504]: Goal position set to: [1575.1212905439897, -891.3160112658516]
+        else:
+            rospy.logerr(f"End node {self.end_node} not found in nodes.")
+
     def odom_callback(self, msg):
-    
+        
+        self.current_position = msg.pose.pose.position
         if self.is_goal_pose: # 목표 위치가 설정되어 있을 때만 시작 위치 설정
-            self.current_position = msg.pose.pose.position
-            self.start_node = self.find_closest_node(self.current_position)
+            self.start_node = self.find_closest_node(msg.pose.pose.position)
             self.is_init_pose = True
             # rospy.loginfo(f"현재 위치 근접 노드: {self.start_node}")
             self.update_path()
-                
 
+        if self.goal_position is not None:
+            if not self.destination_reached and self.is_destination_reached(self.current_position):
+                    rospy.loginfo("Destination reached!")
+                    self.destination_reached = True
+                    self.destination_reached_pub.publish(self.destination_reached)
+                    # Reset state variables and global path
+                    self.reset_global_path()
+
+    def is_destination_reached(self, current_position):
+        if self.goal_position is None:
+            rospy.logwarn("Goal position is not set.")
+            return False
+        # Define a threshold distance to consider as "reached"
+        # rospy.loginfo(f"현재 위치: {current_position}")
+        threshold_distance = 1.0  # meters
+        current_pos_array = np.array([current_position.x, current_position.y])
+        distance_to_goal = np.linalg.norm(np.array(self.goal_position) - current_pos_array)
+        # rospy.loginfo(f"Distance to goal: {distance_to_goal}")
+        return distance_to_goal < threshold_distance
+        
+    def reset_global_path(self):
+        # Reset the global path and related state variables
+        self.global_path_msg = None
+        self.is_goal_pose = False
+        self.is_init_pose = False
+        self.goal_position = None # 추가: 목적지 위치 초기화
+        self.destination_reached = False  # 추가: 목적지 도달 상태 초기화
+
+    def build_kd_tree(self):
+
+        if not self.kd_tree: # KD-Tree가 아직 생성되지 않은 경우에만 생성
+            node_positions = np.array([[node.point[0], node.point[1]] for node in self.nodes.values()])
+        self.kd_tree = KDTree(node_positions)
+        
     def find_closest_node(self, position):
-        # 주어진 위치에서 가장 가까운 노드 찾기
-        closest_node = None
-        min_distance = float('inf')
-        for node_id, node in self.nodes.items():
-            distance = sqrt(pow(node.point[0] - position.x, 2) + pow(node.point[1] - position.y, 2))
-            if distance < min_distance:
-                min_distance = distance
-                closest_node = node_id
-        return closest_node
+        # KD-Tree를 사용하여 노드 검색 최적화
+        if not hasattr(self, 'kd_tree'):
+            node_positions = np.array([[node.point[0], node.point[1]] for node in self.nodes.values()])
+            self.kd_tree = KDTree(node_positions)
+
+        _, idx = self.kd_tree.query([position.x, position.y])
+        return list(self.nodes.keys())[idx]
     
     def update_path(self):
         # 시작점과 목표점이 설정되면 경로 계산
         if self.is_goal_pose and self.is_init_pose:
             self.global_path_msg = self.calc_astar_path_node(self.start_node, self.end_node)
-            self.is_goal_pose = False
+            
             if self.global_path_msg is not None:
                 rospy.loginfo("Global path calculated and fixed")
+                self.is_goal_pose = False
                 return
 
     def calc_astar_path_node(self, start_node, end_node):
@@ -117,17 +168,14 @@ class AStar:
     def __init__(self, nodes, links):
         self.nodes = nodes
         self.links = links
-        self.weight = self.get_weight_matrix()
-
-    def get_weight_matrix(self):
-        # 노드 간 가중치 행렬 생성
-        weight = {from_node_id: {to_node_id: float('inf') for to_node_id in self.nodes.keys()} for from_node_id in self.nodes.keys()}
-        for from_node_id, from_node in self.nodes.items():
-            weight[from_node_id][from_node_id] = 0
+        # 가중치 행렬 초기화 개선: 실제 연결된 노드만 초기화
+        self.weight = {from_node_id: {} for from_node_id in nodes.keys()}
+        
+        for from_node_id, from_node in nodes.items():
             for to_node in from_node.get_to_nodes():
                 shortest_link, min_cost = from_node.find_shortest_link_leading_to_node(to_node)
-                weight[from_node_id][to_node.idx] = min_cost
-        return weight
+                if shortest_link is not None:
+                    self.weight[from_node_id][to_node.idx] = min_cost
     
     def heuristic(self, a, b):
         # 휴리스틱 함수: 두 노드 간의 유클리드 거리
@@ -148,21 +196,22 @@ class AStar:
         return newpath
     
     def find_shortest_path(self, start_node_idx, end_node_idx):
-        # A* 알고리즘을 사용한 최단 경로 탐색
         start_node = self.nodes[start_node_idx]
         end_node = self.nodes[end_node_idx]
-
-        open_list = PriorityQueue()
-        open_list.put((0, start_node_idx))
-
+        
+        open_list = []
+        heapq.heappush(open_list, (0, start_node_idx))
+        
         came_from = {}
+        
         g_score = {node_id: float('inf') for node_id in self.nodes.keys()}
         g_score[start_node_idx] = 0
+        
         f_score = {node_id: float('inf') for node_id in self.nodes.keys()}
         f_score[start_node_idx] = self.heuristic(start_node, end_node)
 
-        while not open_list.empty():
-            current_node_idx = open_list.get()[1]
+        while open_list:
+            current_f_score, current_node_idx = heapq.heappop(open_list)
 
             if current_node_idx == end_node_idx:
                 return True, self.reconstruct_path(came_from, end_node_idx)
@@ -174,7 +223,7 @@ class AStar:
                     came_from[neighbor_idx] = current_node_idx
                     g_score[neighbor_idx] = tentative_g_score
                     f_score[neighbor_idx] = g_score[neighbor_idx] + self.heuristic(self.nodes[neighbor_idx], end_node)
-                    open_list.put((f_score[neighbor_idx], neighbor_idx))
+                    heapq.heappush(open_list, (f_score[neighbor_idx], neighbor_idx))
 
         return False, None
 
