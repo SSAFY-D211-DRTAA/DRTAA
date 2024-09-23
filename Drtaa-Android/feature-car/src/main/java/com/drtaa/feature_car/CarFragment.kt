@@ -29,6 +29,12 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
     private var touchStartTime: Long = 0
 
     override fun initView() {
+        initUI()
+        initObserve()
+        setupCardTouchListener()
+    }
+
+    private fun initUI() {
         binding.apply {
             cardView = cvTourCard
             overlayView = viewTourOverlay
@@ -42,13 +48,12 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
                 navigateDestination(R.id.action_carFragment_to_carTrackingFragment)
             }
         }
-        setupCardTouchListener()
-        initObserve()
     }
 
     private fun initObserve() {
         viewModel.currentRentDetail.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { currentRentDetail ->
+                Timber.tag("car").d("$currentRentDetail")
                 binding.apply {
                     if (currentRentDetail != null) {
                         imgCarCarimage.visibility = View.VISIBLE
@@ -57,7 +62,7 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
                         btnTrackingCar.isClickable = false
                         clCarBottomText.visibility = View.GONE
                         animeCarNorent.visibility = View.VISIBLE
-                        tvTourRemainTime.setText("현재 이용중인 차량이 없습니다..")
+                        tvTourRemainTime.text = "현재 이용중인 차량이 없습니다.."
                     }
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
@@ -65,10 +70,8 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
         viewModel.isSuccessComplete.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { isSuccess ->
                 if (isSuccess) {
-                    Timber.d("반납 성공")
                     showSnackBar("반납 성공")
                 } else {
-                    Timber.d("반납 실패")
                     showSnackBar("반납 실패")
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
