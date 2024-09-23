@@ -51,6 +51,13 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
     }
 
     private fun initObserve() {
+        viewModel.latestReservedId.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach {
+            binding.tvReservedState.text = if (it == 0L) {
+                "현재 예약된 차량이 없습니다"
+            } else {
+                "예약한 차량 호출하기"
+            }
+        }.launchIn(viewLifecycleOwner.lifecycleScope)
         viewModel.currentRentDetail.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { currentRentDetail ->
                 Timber.tag("car").d("$currentRentDetail")

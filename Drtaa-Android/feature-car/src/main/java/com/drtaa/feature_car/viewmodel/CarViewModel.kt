@@ -48,7 +48,8 @@ class CarViewModel @Inject constructor(
     private val _carPosition = MutableSharedFlow<CarPosition>()
     val carPosition: SharedFlow<CarPosition> = _carPosition.asSharedFlow()
 
-    private val _latestRentId = MutableStateFlow<Long>(0L)
+    private val _latestReservedId = MutableStateFlow<Long>(0L)
+    val latestReservedId: StateFlow<Long> = _latestReservedId
 
     init {
         getCurrentRent()
@@ -61,7 +62,7 @@ class CarViewModel @Inject constructor(
             rentRepository.getAllRentState().collect { result ->
                 result.onSuccess { data ->
                     Timber.tag("rent latest").d("성공 $data")
-                    _latestRentId.value = data
+                    _latestReservedId.value = data
                 }.onFailure {
                     Timber.tag("rent").d("현재 진행 중인 렌트가 없습니다.")
                 }
@@ -153,7 +154,7 @@ class CarViewModel @Inject constructor(
 
     fun callAssignedCar(userPosition: LatLng) {
         viewModelScope.launch {
-            val rentId = _latestRentId.value
+            val rentId = _latestReservedId.value
             rentRepository.callAssignedCar(
                 rentId,
                 userPosition.latitude,
