@@ -75,11 +75,11 @@ class RentSummaryFragment :
             .onEach { status ->
                 when (status) {
                     is RentSummaryViewModel.PaymentStatus.Success -> {
-                        Toast.makeText(requireContext(), status.message, Toast.LENGTH_SHORT).show()
+                        showSnackBar(status.message)
                     }
 
                     is RentSummaryViewModel.PaymentStatus.Error -> {
-                        Toast.makeText(requireContext(), status.message, Toast.LENGTH_SHORT).show()
+                        showSnackBar(status.message)
                     }
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
