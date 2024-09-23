@@ -2,11 +2,6 @@ package com.drtaa.core_data.repository
 
 import com.drtaa.core_model.network.RequestCallRent
 import com.drtaa.core_model.network.RequestCompleteRent
-import com.drtaa.core_model.network.RequestDrivingCar
-import com.drtaa.core_model.network.RequestUnassignedCar
-import com.drtaa.core_model.network.ResponseDrivingCar
-import com.drtaa.core_model.rent.CarPosition
-import com.drtaa.core_model.rent.RentCar
 import com.drtaa.core_model.rent.RentDetail
 import com.drtaa.core_model.rent.RentSimple
 import kotlinx.coroutines.flow.Flow
