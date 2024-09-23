@@ -31,7 +31,7 @@ public class WebSocketClientConfig {
                 }
             }, webSocketConfig.getUrl()).get();
 
-            MyMessage myMessage = new MyMessage("Spring Boot Connect", 0.0, 0.0);
+            MyMessage myMessage = new MyMessage("Spring Boot Connect");
             String jsonMessage = objectMapper.writeValueAsString(myMessage);
             session.sendMessage(new TextMessage(jsonMessage));
         };
