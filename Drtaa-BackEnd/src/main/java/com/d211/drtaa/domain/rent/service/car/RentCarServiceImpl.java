@@ -216,12 +216,22 @@ public class RentCarServiceImpl implements RentCarService {
                         JsonNode jsonNode = objectMapper.readTree(message.getPayload());
                         log.info("Received message: {}", jsonNode);
 
-                        // DTO 생성
-                        response[0] = RentCarLocationResponseDTO.builder()
-                                .rentCarId(car.getRentCarId())
-                                .rentCarLat(jsonNode.get("rentCarLat").asDouble()) // rentCarLat을 double로 변환
-                                .rentCarLon(jsonNode.get("rentCarLon").asDouble()) // rentCarLon을 double로 변환
-                                .build();
+                        // null 체크 추가
+                        JsonNode latNode = jsonNode.get("rentCarLat");
+                        JsonNode lonNode = jsonNode.get("rentCarLon");
+                        log.info("lat: {}", latNode);
+                        log.info("lon: {}", lonNode);
+
+                        if (latNode != null && lonNode != null && !latNode.isNull() && !lonNode.isNull()) {
+                            // DTO 생성
+                            response[0] = RentCarLocationResponseDTO.builder()
+                                    .rentCarId(car.getRentCarId())
+                                    .rentCarLat(latNode.asDouble()) // rentCarLat을 double로 변환
+                                    .rentCarLon(lonNode.asDouble()) // rentCarLon을 double로 변환
+                                    .build();
+                        } else {
+                            log.warn("Received null for rentCarLat or rentCarLon");
+                        }
 
                     } catch (Exception e) {
                         log.error("Error processing received message: ", e);
@@ -250,5 +260,6 @@ public class RentCarServiceImpl implements RentCarService {
         // 응답이 없으면 빈 DTO 반환
         return response[0] != null ? response[0] : RentCarLocationResponseDTO.builder().build();
     }
+
 
 }
