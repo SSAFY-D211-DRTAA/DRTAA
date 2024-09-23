@@ -13,6 +13,7 @@ import androidx.navigation.NavDirections
 import androidx.navigation.fragment.findNavController
 import com.drtaa.core_map.LOCATION_PERMISSION_REQUEST_CODE
 import com.drtaa.core_map.setup
+import com.drtaa.core_ui.component.LoadingDialog
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.MapView
 import com.naver.maps.map.NaverMap
