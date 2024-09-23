@@ -20,7 +20,11 @@ class MessageHandler:
             return {"error": "Invalid JSON"}
     
     def process_action(self, action, data):
-        if action == 'Spring Boot Connect':
+        if action == 'vehicle_gps':
+            return self.handle_vehicle_gps(data)
+        elif action == 'Auto Client Connect':
+            return self.handle_connect(data)
+        elif action == 'Spring Boot Connect':
             return self.handle_connect(data)
         elif action == 'vehicle_info':
             return self.handle_vehicle_info(data)
@@ -52,3 +56,14 @@ class MessageHandler:
     def handle_vehicle_drive(self, data):
         # 차량 주행 로직
         return {"status": "success", "message": "Vehicle driving"}
+    
+    def handle_vehicle_gps(self, data):
+        # 차량 GPS
+        try:
+            with open('gps_data.json') as f:
+                return {"status": "success", "message": json.load(f)}
+
+        except FileNotFoundError:
+            return {"status": "fail", "message": "설정 파일을 찾을 수 없습니다."}
+        except json.JSONDecodeError:
+            return {"status": "fail", "message": "설정 파일 형식이 잘못되었습니다."}
