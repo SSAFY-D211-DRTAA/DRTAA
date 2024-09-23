@@ -84,6 +84,8 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
                 MotionEvent.ACTION_DOWN -> { // 처음 눌렀을 때 시간을 재서 클릭과 드로잉을 구분해야지
                     isTouching = true
                     touchStartTime = System.currentTimeMillis()
+                    // 부모 ScrollView가 터치 이벤트를 가로채지 않도록 설정
+                    v.parent.requestDisallowInterceptTouchEvent(true)
                     true
                 }
 
@@ -99,6 +101,8 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
 
                     resetOverlay()
                     resetReflection()
+                    // 부모 ScrollView가 다시 터치 이벤트를 가로챌 수 있도록 원복
+                    v.parent.requestDisallowInterceptTouchEvent(false)
                     true
                 }
 

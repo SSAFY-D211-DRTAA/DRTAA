@@ -12,7 +12,7 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
 
             <TextView
                 android:id="@+id/tv_tour_title"
@@ -113,9 +113,9 @@
                             style="@style/jua"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:gravity="center"
                             android:text="예약한 차량 호출하기"
                             android:textSize="24sp"
-                            android:gravity="center"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 
@@ -247,8 +247,10 @@
                 android:layout_height="45dp"
                 android:layout_marginStart="30dp"
                 android:layout_marginTop="20dp"
+                android:layout_marginBottom="16dp"
                 android:layout_marginEnd="30dp"
                 android:text="연장하기"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/btn_tour_qrcode"
                 app:layout_constraintHorizontal_bias="0.4"
                 app:layout_constraintStart_toStartOf="parent"
@@ -266,7 +268,6 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </ScrollView>
-
 
 
 </layout>
