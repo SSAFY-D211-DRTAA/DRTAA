@@ -8,6 +8,7 @@ import com.hivemq.client.mqtt.mqtt5.Mqtt5AsyncClient
 import com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5Publish
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -16,6 +17,7 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.math.min
 
 private const val TAG = "MQTT"
 
@@ -25,6 +27,10 @@ class MqttManager @Inject constructor() {
     private val gson = Gson()
     private val _receivedMessages = MutableSharedFlow<ResponseGPS>()
     val receivedMessages: SharedFlow<ResponseGPS> = _receivedMessages.asSharedFlow()
+    private var reconnectAttempts = 0
+    private var isConnected = false
+    private val _connectionStatus = MutableSharedFlow<Boolean>()
+    val connectionStatus: SharedFlow<Boolean> = _connectionStatus.asSharedFlow()
 
     suspend fun setupMqttClient() {
         client = MqttClient.builder()
@@ -33,20 +39,49 @@ class MqttManager @Inject constructor() {
             .serverPort(PORT)
             .buildAsync()
 
-        try {
-            withContext(Dispatchers.IO) {
-                client.connect().whenComplete { _, throwable ->
-                    if (throwable != null) {
-                        Timber.tag(TAG).e(throwable, "MQTT 연결실패")
-                    } else {
-                        Timber.tag(TAG).d("MQTT 연결성공")
-                        subscribeToTopic()
+        connectWithRetry()
+    }
+
+    private suspend fun connectWithRetry() {
+        while (!isConnected) {
+            try {
+                withContext(Dispatchers.IO) {
+                    client.connect().whenComplete { _, throwable ->
+                        if (throwable != null) {
+                            Timber.tag(TAG).e(throwable, "MQTT 연결실패")
+                            CoroutineScope(Dispatchers.Main).launch {
+                                _connectionStatus.emit(false)
+                            }
+                        } else {
+                            Timber.tag(TAG).d("MQTT 연결성공")
+                            isConnected = true
+                            reconnectAttempts = 0
+                            subscribeToTopic()
+                            CoroutineScope(Dispatchers.Main).launch {
+                                _connectionStatus.emit(true)
+                            }
+                        }
                     }
                 }
+            } catch (e: Exception) {
+                Timber.tag(TAG).e(e, "MQTT 연결실패")
+                CoroutineScope(Dispatchers.Main).launch {
+                    _connectionStatus.emit(false)
+                }
             }
-        } catch (e: Exception) {
-            Timber.tag(TAG).e(e, "MQTT 연결실패")
+
+            if (!isConnected) {
+                val delay = calculateReconnectDelay()
+                Timber.tag(TAG).d("재연결 시도 중... ${delay}ms 후 다시 시도합니다.")
+                delay(delay)
+            }
         }
+    }
+
+    private fun calculateReconnectDelay(): Long {
+        val delay = INITIAL_RECONNECT_DELAY * (1 shl min(reconnectAttempts, DELAY))
+        reconnectAttempts++
+        return min(delay, MAX_RECONNECT_DELAY)
     }
 
     private fun subscribeToTopic() {
@@ -71,6 +106,10 @@ class MqttManager @Inject constructor() {
     }
 
     fun publishMessage(message: String) {
+        if (!isConnected) {
+            Timber.tag(TAG).w("MQTT가 연결되어 있지 않습니다. 메시지를 보낼 수 없습니다.")
+            return
+        }
         client.publishWith()
             .topic(GPS_SUB)
             .qos(MqttQos.EXACTLY_ONCE)
@@ -86,12 +125,18 @@ class MqttManager @Inject constructor() {
     }
 
     fun disconnect() {
-        client.disconnect()
+        if (isConnected) {
+            client.disconnect()
+            isConnected = false
+        }
     }
 
     companion object {
         private const val MQTT_SERVER = BuildConfig.MQTT_URL
         private const val PORT = 1883
+        private const val DELAY = 5
+        private const val MAX_RECONNECT_DELAY = 20000L // 최대 30초
+        private const val INITIAL_RECONNECT_DELAY = 1000L // 초기 1초
         private const val GPS_SUB = "gps/data/v1/subscribe"
         private const val GPS_PUB = "gps/data/v1/publish"
     }

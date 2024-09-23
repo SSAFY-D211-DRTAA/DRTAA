@@ -27,6 +27,18 @@ abstract class BaseMapFragment<T : ViewDataBinding>(private val layoutResId: Int
     private var _binding: T? = null
     val binding get() = _binding!!
 
+    private val loading by lazy {
+        LoadingDialog(requireActivity())
+    }
+
+    fun dismissLoading() {
+        loading.dismiss()
+    }
+
+    fun showLoading() {
+        loading.show()
+    }
+
     abstract var mapView: MapView?
     private lateinit var locationSource: FusedLocationSource
 

@@ -3,7 +3,10 @@ package com.drtaa.core_data.datasourceimpl
 import com.drtaa.core_data.datasource.RentDataSource
 import com.drtaa.core_model.network.RequestCallRent
 import com.drtaa.core_model.network.RequestCompleteRent
+import com.drtaa.core_model.network.RequestRentCarCall
 import com.drtaa.core_model.network.RequestUnassignedCar
+import com.drtaa.core_model.network.ResponseRentCarCall
+import com.drtaa.core_model.network.ResponseRentStateAll
 import com.drtaa.core_model.rent.RentCar
 import com.drtaa.core_model.rent.RentDetail
 import com.drtaa.core_model.rent.RentSimple
@@ -18,7 +21,7 @@ class RentDataSourceImpl @Inject constructor(
     }
 
     override suspend fun callRent(requestCallRent: RequestCallRent): RentDetail {
-        return rentAPI.callRent(requestCallRent)
+        return rentAPI.callAllRent(requestCallRent)
     }
 
     override suspend fun completeRent(requestCompleteRent: RequestCompleteRent) {
@@ -31,5 +34,13 @@ class RentDataSourceImpl @Inject constructor(
 
     override suspend fun getCurrentRent(): RentDetail {
         return rentAPI.getCurrentRent()
+    }
+
+    override suspend fun callAssignedCar(requestCallCar: RequestRentCarCall): ResponseRentCarCall {
+        return rentAPI.callAssignedCar(requestCallCar)
+    }
+
+    override suspend fun getAllRentState(): List<ResponseRentStateAll> {
+        return rentAPI.getAllRentState()
     }
 }

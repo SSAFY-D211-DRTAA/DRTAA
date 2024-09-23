@@ -2,7 +2,10 @@ package com.drtaa.core_network.api
 
 import com.drtaa.core_model.network.RequestCallRent
 import com.drtaa.core_model.network.RequestCompleteRent
+import com.drtaa.core_model.network.RequestRentCarCall
 import com.drtaa.core_model.network.RequestUnassignedCar
+import com.drtaa.core_model.network.ResponseRentCarCall
+import com.drtaa.core_model.network.ResponseRentStateAll
 import com.drtaa.core_model.rent.RentCar
 import com.drtaa.core_model.rent.RentDetail
 import com.drtaa.core_model.rent.RentSimple
@@ -17,8 +20,13 @@ interface RentAPI {
         @Body rentSchedule: RequestUnassignedCar
     ): RentCar
 
+    @POST("rent-car/call")
+    suspend fun callAssignedCar(
+        @Body requestCallCar: RequestRentCarCall
+    ): ResponseRentCarCall
+
     @POST("rent")
-    suspend fun callRent(
+    suspend fun callAllRent(
         @Body requestCallRent: RequestCallRent
     ): RentDetail
 
@@ -26,6 +34,9 @@ interface RentAPI {
     suspend fun completeRent(
         @Body requestCompleteRent: RequestCompleteRent
     )
+
+    @GET("rent/status/active")
+    suspend fun getAllRentState(): List<ResponseRentStateAll>
 
     @GET("rent")
     suspend fun getRentHistory(): List<RentSimple>

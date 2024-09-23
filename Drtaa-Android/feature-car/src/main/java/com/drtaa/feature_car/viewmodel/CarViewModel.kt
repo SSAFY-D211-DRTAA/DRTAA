@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.drtaa.core_data.repository.GPSRepository
 import com.drtaa.core_data.repository.RentRepository
 import com.drtaa.core_model.network.RequestCompleteRent
+import com.drtaa.core_model.rent.CarPosition
 import com.drtaa.core_model.rent.RentDetail
 import com.naver.maps.geometry.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -44,10 +45,28 @@ class CarViewModel @Inject constructor(
     private val _isSuccessComplete = MutableSharedFlow<Boolean>()
     val isSuccessComplete: SharedFlow<Boolean> = _isSuccessComplete
 
+    private val _carPosition = MutableSharedFlow<CarPosition>()
+    val carPosition: SharedFlow<CarPosition> = _carPosition.asSharedFlow()
+
+    private val _latestRentId = MutableStateFlow<Long>(0L)
+
     init {
         getCurrentRent()
-        initMQTT()
+        getLatestRent()
         observeMqttMessages()
+    }
+
+    private fun getLatestRent() {
+        viewModelScope.launch {
+            rentRepository.getAllRentState().collect { result ->
+                result.onSuccess { data ->
+                    Timber.tag("rent latest").d("성공 $data")
+                    _latestRentId.value = data
+                }.onFailure {
+                    Timber.tag("rent").d("현재 진행 중인 렌트가 없습니다.")
+                }
+            }
+        }
     }
 
     private fun getCurrentRent() {
@@ -64,7 +83,7 @@ class CarViewModel @Inject constructor(
         }
     }
 
-    private fun initMQTT() {
+    fun initMQTT() {
         viewModelScope.launch {
             gpsRepository.setupMqttConnection()
         }
@@ -106,8 +125,8 @@ class CarViewModel @Inject constructor(
 
     fun completeRent() {
         viewModelScope.launch {
-            val rentDetail = currentRentDetail.first() ?: return@launch
-
+            val rentDetail = getRentDetail() ?: return@launch
+            Timber.tag("complete").d("$rentDetail")
             val requestCompleteRent = RequestCompleteRent(
                 rentId = rentDetail.rentId,
                 rentCarScheduleId = rentDetail.rentCarScheduleId
@@ -115,11 +134,34 @@ class CarViewModel @Inject constructor(
 
             rentRepository.completeRent(requestCompleteRent).collect { result ->
                 result.onSuccess {
-                    Timber.d("성공")
+                    Timber.tag("complete").d("성공")
                     _isSuccessComplete.emit(true)
                 }.onFailure {
-                    Timber.d("실패")
+                    Timber.tag("complete").d("실패")
                     _isSuccessComplete.emit(false)
+                }
+            }
+        }
+    }
+
+    private suspend fun getRentDetail(): RentDetail? {
+        return currentRentDetail.first()
+    }
+
+    fun callAssignedCar(userPosition: LatLng) {
+        viewModelScope.launch {
+            val rentId = _latestRentId.value
+            rentRepository.callAssignedCar(
+                rentId,
+                userPosition.latitude,
+                userPosition.longitude
+            ).collect { result ->
+                result.onSuccess {
+                    Timber.tag("call car").d("성공")
+                    _carPosition.emit(it)
+                }.onFailure {
+                    Timber.tag("call car").d("실패")
+                    _carPosition.emit(CarPosition(0.0, 0.0))
                 }
             }
         }

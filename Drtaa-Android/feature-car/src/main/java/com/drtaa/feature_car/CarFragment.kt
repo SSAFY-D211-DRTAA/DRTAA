@@ -34,16 +34,12 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
             overlayView = viewTourOverlay
             reflectionView = viewTourReflection
 
-            btnMqtt.setOnClickListener {
-                viewModel.startPublish()
-            }
-
             btnTrackingCar.setOnClickListener {
                 navigateDestination(R.id.action_carFragment_to_carTrackingFragment)
             }
 
-            btnReturn.setOnClickListener {
-                viewModel.completeRent()
+            clCarBottomTextGotoUse.setOnClickListener {
+                navigateDestination(R.id.action_carFragment_to_carTrackingFragment)
             }
         }
         setupCardTouchListener()
@@ -56,7 +52,8 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
                 binding.apply {
                     if (currentRentDetail != null) {
                         imgCarCarimage.visibility = View.VISIBLE
-                    }else{
+                    } else {
+                        clCarBottomTextGotoUse.visibility = View.VISIBLE
                         btnTrackingCar.isClickable = false
                         clCarBottomText.visibility = View.GONE
                         animeCarNorent.visibility = View.VISIBLE
