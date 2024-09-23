@@ -78,6 +78,7 @@ class pure_pursuit:
         self.stop_line_threshold = 15  ## 정지선 감지 거리 
         self.previous_global_path = None  # 이전 경로 저장 변수 추가
         self.velocity_list = [] 
+        self.local_path_point = None
 
         self.nodes = self.load_nodes()
 
@@ -87,7 +88,7 @@ class pure_pursuit:
 
         self.traffic_light_manager = TrafficLightManager()
 
-        rate = rospy.Rate(50)  ## 30hz
+        rate = rospy.Rate(20)  ## 30hz
 
         while not rospy.is_shutdown():
             if self.is_path and self.is_odom and self.is_status and len(self.velocity_list) > 0: 
@@ -350,16 +351,16 @@ class pure_pursuit:
 
             for num, i in enumerate(self.path.poses):
                 path_point = np.array([i.pose.position.x, i.pose.position.y, 1])
-                local_path_point = det_trans_matrix.dot(path_point)
+                self.local_path_point = det_trans_matrix.dot(path_point)
                 
-                if local_path_point[0] > 0:
-                    dis = sqrt(pow(local_path_point[0], 2) + pow(local_path_point[1], 2))
+                if self.local_path_point[0] > 0:
+                    dis = sqrt(pow(self.local_path_point[0], 2) + pow(self.local_path_point[1], 2))
                     if dis >= self.lfd:
                         self.forward_point = i.pose.position
                         self.is_look_forward_point = True
                         break
 
-            theta = atan2(local_path_point[1], local_path_point[0])
+            theta = atan2(self.local_path_point[1], self.local_path_point[0])
             steering = atan2(2 * self.vehicle_length * sin(theta), self.lfd)
 
             # 조향각에 따른 속도 제한
