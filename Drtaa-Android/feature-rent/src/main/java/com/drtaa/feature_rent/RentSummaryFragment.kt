@@ -40,7 +40,10 @@ class RentSummaryFragment :
     }
 
     private fun initData() {
-        rentSummaryViewModel.getCurrentLocation(requireActivity())
+        val rentStartLocation = rentViewModel.rentStartLocation.value
+        if (rentStartLocation != null) {
+            rentSummaryViewModel.setRentStartLocation(rentStartLocation)
+        }
 
         val rentSchedule = RequestUnassignedCar(
             rentCarScheduleStartDate = rentViewModel.rentStartSchedule.value!!.toRequestUnassignedCar(),

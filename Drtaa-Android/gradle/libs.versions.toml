@@ -28,6 +28,7 @@ lifecycle-extensions = "2.2.0"
 pagingRuntimeKtx = "3.3.2"
 
 # Logging
+playServicesLocationVersion = "21.0.1"
 threetenabp = "1.2.1"
 robolectric = "4.10.3"
 timber = "5.0.1"
@@ -100,6 +101,7 @@ androidx-credentials-play-services-auth = { module = "androidx.credentials:crede
 googleid = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleid" }
 
 # Logging
+play-services-location-v2101 = { module = "com.google.android.gms:play-services-location", version.ref = "playServicesLocationVersion" }
 robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
 threetenabp = { module = "com.jakewharton.threetenabp:threetenabp", version.ref = "threetenabp" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }

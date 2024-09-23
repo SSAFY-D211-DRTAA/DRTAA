@@ -46,4 +46,7 @@ dependencies {
     implementation(libs.threetenabp)
 
     implementation (libs.android)
+
+    //location
+    implementation (libs.play.services.location.v2101)
 }
