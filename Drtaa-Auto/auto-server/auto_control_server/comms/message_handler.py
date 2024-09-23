@@ -9,15 +9,19 @@ class MessageHandler:
         pass
 
     def handle_message(self, message, source):
-        try:
-            data = json.loads(message)
-            action = data.get('action')
-            response = self.process_action(action, data)
-            logger.info(f"Processed message from {source}: {action}")
-            return response
-        except json.JSONDecodeError:
-            logger.error(f"Invalid JSON received from {source}")
-            return {"error": "Invalid JSON"}
+        if isinstance(message, dict):
+            data = message
+        else:
+            try:
+                data = json.loads(message)
+            except json.JSONDecodeError:
+                logger.error(f"Invalid JSON received from {source}")
+                return {"error": "Invalid JSON"}
+        
+        action = data.get('action')
+        response = self.process_action(action, data)
+        logger.info(f"Processed message from {source}: {action}")
+        return response
     
     def process_action(self, action, data):
         if action == 'vehicle_gps':
