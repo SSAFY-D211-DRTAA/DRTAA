@@ -18,6 +18,9 @@ GPS_TOPIC = "/gps"
 COMPLETE_DRIVE_TOPIC = "/complete_drive"
 MOVE_BASE_GOAL_TOPIC = "/move_base_simple/goal"
 
+current_goal_index = 0
+gps_count_index = 0
+
 # .env 파일 로드
 load_dotenv()
 
@@ -39,7 +42,7 @@ def load_config() -> Dict[str, Union[str, float, int]]:
         sys.exit(1)
 
 def validate_config(config: Dict[str, Any]) -> None:
-    required_keys = ['ros_bridge_websocket_url', 'ec2_websocket_url', 'utm_zone', 'east_offset', 'north_offset', 'next_goal_lat', 'next_goal_lon']
+    required_keys = ['ros_bridge_websocket_url', 'ec2_websocket_url', 'utm_zone', 'east_offset', 'north_offset', 'test_lat', 'test_lon', 'goals',]
     for key in required_keys:
         if key not in config:
             raise ValueError(f"설정 파일에 '{key}' 값이 없습니다.")
@@ -115,6 +118,16 @@ def publish_pose_from_gps(ws: WebSocketApp, lat: float, lon: float) -> None:
     }
     ws.send(json.dumps(msg))
 
+def publish_next_goal(ws: websocket.WebSocketApp) -> None:
+    global current_goal_index
+    if current_goal_index < len(config['goals']):
+        goal = config['goals'][current_goal_index]
+        publish_pose_from_gps(ws, goal['lat'], goal['lon'])
+        logging.info(f"목표 위치 발행: {goal['lat']}, {goal['lon']}")
+        current_goal_index += 1
+    else:
+        logging.info("모든 목표 위치에 도달했습니다.")
+
 def subscribe(ws: WebSocketApp, topic: str, type: str) -> None:
     """
     지정된 토픽을 구독합니다.
@@ -151,6 +164,7 @@ ros_bridge_ws: WebSocketApp = None
 ec2_ws: WebSocketApp = None
 
 def on_ros_bridge_message(ws: WebSocketApp, message: str) -> None:
+    global gps_count_index
     try:
         data: Dict[str, Any] = json.loads(message)
         if data['op'] == 'publish':
@@ -180,12 +194,16 @@ def on_ros_bridge_message(ws: WebSocketApp, message: str) -> None:
 
                 gps_data = data['msg']
 
-                # GPS 데이터를 파일에 저장
                 try:
                     with open('gps_data.json', 'w') as f:
                         json.dump(gps_data, f)
                 except IOError as e:
                     logging.error(f"GPS 데이터를 파일에 저장하는 중 오류 발생: {e}")
+
+                gps_count_index += 1
+                if gps_count_index > 20:
+                    gps_count_index = 0
+                    send_to_ec2(gps_data)
 
             elif data['topic'] == COMPLETE_DRIVE_TOPIC:
                 logging.info("도착지에 도착했습니다.")
@@ -199,12 +217,13 @@ def on_ros_bridge_message(ws: WebSocketApp, message: str) -> None:
                 }
                 """
                 
-                # GPS 데이터를 파일에 저장
                 try:
                     with open('complete_drive_data.json', 'w') as f:
                         json.dump(data, f)
                 except IOError as e:
                     logging.error(f"완료 데이터를 파일에 저장하는 중 오류 발생: {e}")
+                
+                send_to_ec2(data)
 
                 publish_pose_from_gps(ws, config['next_goal_lat'], config['next_goal_lon'])
     except json.JSONDecodeError:
@@ -226,7 +245,7 @@ def on_ros_bridge_open(ws: WebSocketApp) -> None:
     subscribe(ws, "/gps", "morai_msgs/GPSMessage")
     subscribe(ws, "/complete_drive", "std_msgs/Bool")
 
-    # publish_pose_from_gps(ws, config['test_lat'], config['test_lon'])
+    publish_pose_from_gps(ws, config['test_lat'], config['test_lon'])
 
 def on_ec2_message(ws: WebSocketApp, message: str) -> None:
     logging.info(f"EC2로부터 메시지 수신: {message}")
@@ -289,12 +308,7 @@ def signal_handler(sig: int, frame: Any) -> None:
     sys.exit(0)
 
 
-if __name__ == "__main__":데이터를 파일에 저장
-        try:
-            with open('ec2_data.json', 'w') as f:
-                json.dump(data, f)
-        except IOError as e:
-            logging.erro
+if __name__ == "__main__":
     ros_bridge_ws: WebSocketApp = WebSocketApp(config['ros_bridge_websocket_url'],
                                                on_open=on_ros_bridge_open,
                                                on_message=on_ros_bridge_message,
