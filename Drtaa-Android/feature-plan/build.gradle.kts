@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.drtaa.feature_main"
+    namespace = "com.drtaa.feature_plan"
     compileSdk = 34
 
     defaultConfig {
@@ -31,27 +31,14 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
-    buildFeatures{
+    buildFeatures {
         dataBinding = true
         buildConfig = true
-    }
-    sourceSets {
-        getByName("main") {
-            res {
-                srcDirs("src\\main\\res", "src\\main\\res")
-            }
-        }
     }
 }
 
 dependencies {
-    // modules
-    implementation(project(":feature-mypage"))
-    implementation(project(":feature-home"))
-    implementation(project(":feature-tour"))
-    implementation(project(":feature-car"))
-    implementation(project(":feature-rent"))
-    implementation(project(":feature-payment"))
-    implementation(project(":feature-plan"))
     implementation(libs.map.sdk)
+    implementation(project(":core-map"))
+    implementation(libs.androidx.viewpager2)
 }
