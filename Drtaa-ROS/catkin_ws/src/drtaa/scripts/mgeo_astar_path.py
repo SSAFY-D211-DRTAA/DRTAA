@@ -53,7 +53,7 @@ class AStarPathPublisher:
         self.global_planner = AStar(self.nodes, self.links)
 
         # 메인 루프
-        rate = rospy.Rate(50) # 50Hz
+        rate = rospy.Rate(20) # 50Hz
         while not rospy.is_shutdown():
             if self.global_path_msg is not None:
                 self.global_path_pub.publish(self.global_path_msg)
@@ -85,6 +85,7 @@ class AStarPathPublisher:
             self.is_init_pose = True
             # rospy.loginfo(f"현재 위치 근접 노드: {self.start_node}")
             self.update_path()
+
         if self.goal_position is not None:
             if not self.destination_reached and self.is_destination_reached(self.current_position):
                     rospy.loginfo("Destination reached!")
@@ -99,7 +100,7 @@ class AStarPathPublisher:
             return False
         # Define a threshold distance to consider as "reached"
         # rospy.loginfo(f"현재 위치: {current_position}")
-        threshold_distance = 3.0  # meters
+        threshold_distance = 1.0  # meters
         current_pos_array = np.array([current_position.x, current_position.y])
         distance_to_goal = np.linalg.norm(np.array(self.goal_position) - current_pos_array)
         # rospy.loginfo(f"Distance to goal: {distance_to_goal}")
@@ -110,10 +111,13 @@ class AStarPathPublisher:
         self.global_path_msg = None
         self.is_goal_pose = False
         self.is_init_pose = False
+        self.goal_position = None # 추가: 목적지 위치 초기화
+        self.destination_reached = False  # 추가: 목적지 도달 상태 초기화
 
     def build_kd_tree(self):
-        # Extract node positions and build the KDTree
-        node_positions = np.array([[node.point[0], node.point[1]] for node in self.nodes.values()])
+
+        if not self.kd_tree: # KD-Tree가 아직 생성되지 않은 경우에만 생성
+            node_positions = np.array([[node.point[0], node.point[1]] for node in self.nodes.values()])
         self.kd_tree = KDTree(node_positions)
         
     def find_closest_node(self, position):
@@ -125,17 +129,6 @@ class AStarPathPublisher:
         _, idx = self.kd_tree.query([position.x, position.y])
         return list(self.nodes.keys())[idx]
     
-    # def find_closest_node(self, position):
-    #     # 주어진 위치에서 가장 가까운 노드 찾기
-    #     closest_node = None
-    #     min_distance = float('inf')
-    #     for node_id, node in self.nodes.items():
-    #         distance = sqrt(pow(node.point[0] - position.x, 2) + pow(node.point[1] - position.y, 2))
-    #         if distance < min_distance:
-    #             min_distance = distance
-    #             closest_node = node_id
-    #     return closest_node
-
     def update_path(self):
         # 시작점과 목표점이 설정되면 경로 계산
         if self.is_goal_pose and self.is_init_pose:
