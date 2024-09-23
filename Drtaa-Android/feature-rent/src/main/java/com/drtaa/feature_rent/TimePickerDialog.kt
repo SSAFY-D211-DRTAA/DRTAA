@@ -3,12 +3,12 @@ package com.drtaa.feature_rent
 import android.content.Context
 import android.widget.NumberPicker
 import com.drtaa.core_ui.base.BaseDialog
-import com.drtaa.feature_rent.databinding.DialogTimePickerBinding
+import com.drtaa.core_ui.databinding.DialogTimePickerBinding
 import okhttp3.internal.format
 
 class TimePickerDialog(
     val context: Context
-) : BaseDialog<DialogTimePickerBinding>(context, R.layout.dialog_time_picker) {
+) : BaseDialog<DialogTimePickerBinding>(context, com.drtaa.core_ui.R.layout.dialog_time_picker) {
 
     private var hour: Int = DEFAULT_HOUR
     private var minute: Int = DEFAULT_MINUTE

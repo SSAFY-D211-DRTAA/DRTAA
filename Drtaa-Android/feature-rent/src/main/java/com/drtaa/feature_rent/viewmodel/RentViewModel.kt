@@ -2,12 +2,16 @@ package com.drtaa.feature_rent.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.drtaa.core_data.repository.RentRepository
 import com.drtaa.core_model.rent.RentInfo
 import com.drtaa.core_model.rent.RentSchedule
 import com.drtaa.core_model.map.Search
+import com.drtaa.core_model.network.RequestDuplicatedSchedule
 import com.drtaa.core_model.util.toLocalDateTime
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
@@ -15,7 +19,9 @@ import java.time.Duration
 import javax.inject.Inject
 
 @HiltViewModel
-class RentViewModel @Inject constructor() : ViewModel() {
+class RentViewModel @Inject constructor(
+    private val rentRepository: RentRepository
+) : ViewModel() {
     private val _rentStartLocation = MutableStateFlow<Search?>(null)
     val rentStartLocation: StateFlow<Search?> = _rentStartLocation
 
@@ -33,6 +39,9 @@ class RentViewModel @Inject constructor() : ViewModel() {
 
     private val _rentInfo = MutableStateFlow<RentInfo?>(null)
     val rentInfo: StateFlow<RentInfo?> = _rentInfo
+
+    private val _isDuplicatedSchedule = MutableSharedFlow<Boolean?>()
+    val isDuplicatedSchedule: SharedFlow<Boolean?> = _isDuplicatedSchedule
 
     init {
         setRentValid()
@@ -77,6 +86,23 @@ class RentViewModel @Inject constructor() : ViewModel() {
             }
         }
         return result
+    }
+
+    fun checkDuplicatedSchedule() {
+        viewModelScope.launch {
+            rentRepository.checkDuplicatedRent(
+                RequestDuplicatedSchedule(
+                    rentStartTime = rentStartSchedule.value!!.toRequestUnassignedCar(),
+                    rentEndTime = rentEndSchedule.value!!.toRequestUnassignedCar()
+                )
+            ).collect { result ->
+                result.onSuccess { data ->
+                    _isDuplicatedSchedule.emit(data)
+                }.onFailure {
+                    _isDuplicatedSchedule.emit(null)
+                }
+            }
+        }
     }
 
     private fun setRentValid() {

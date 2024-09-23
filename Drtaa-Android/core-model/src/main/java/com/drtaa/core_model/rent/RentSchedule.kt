@@ -47,7 +47,7 @@ data class RentSchedule(
         )
     }
 
-    companion object{
+    companion object {
         const val DIFF_MONTH = 1
     }
 }

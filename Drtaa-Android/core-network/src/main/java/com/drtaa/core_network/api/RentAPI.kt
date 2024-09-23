@@ -2,6 +2,7 @@ package com.drtaa.core_network.api
 
 import com.drtaa.core_model.network.RequestCallRent
 import com.drtaa.core_model.network.RequestCompleteRent
+import com.drtaa.core_model.network.RequestDuplicatedSchedule
 import com.drtaa.core_model.network.RequestUnassignedCar
 import com.drtaa.core_model.rent.RentCar
 import com.drtaa.core_model.rent.RentDetail
@@ -32,4 +33,9 @@ interface RentAPI {
 
     @GET("rent/current")
     suspend fun getCurrentRent(): RentDetail
+
+    @POST("rent/chk")
+    suspend fun checkDuplicatedRent(
+        @Body rentSchedule: RequestDuplicatedSchedule
+    ): Boolean
 }
