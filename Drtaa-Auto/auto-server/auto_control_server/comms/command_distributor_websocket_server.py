@@ -14,7 +14,8 @@ class CommandDistributorWebSocketServer:
         self.port = port
         # self.clients = set()
         self.client = None
-        event_system.subscribe('new_command', self.distribute_command)
+
+        event_system.subscribe('recv_cmd', self.distribute_command)
 
     async def handle_client(self, websocket, path):
         self.client = websocket
@@ -42,13 +43,15 @@ class CommandDistributorWebSocketServer:
     #         self.clients.remove(websocket)
 
     async def distribute_command(self, command):
-        logger.info(f"Distributing command: {command}")
+        logger.debug(f"dst cmd: {command}")
         message = json.dumps(command)
+
         # for client in self.clients:
         #     try:
         #         await client.send(message)
         #     except websockets.exceptions.ConnectionClosed:
         #         logger.info("Failed to send command to a client")
+        
         if self.client:
             try:
                 await self.client.send(message)

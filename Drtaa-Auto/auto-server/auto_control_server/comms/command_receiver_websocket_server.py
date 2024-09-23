@@ -19,11 +19,9 @@ class CommandReceiverWebSocketServer:
             async for message in websocket:
                 try:
                     data = json.loads(message)
-                    logger.info(f"Received message: {data}")
+                    logger.debug(f"recv msg: {data}")
+                    await event_system.publish('recv_command', data)
                     response = self.message_handler.handle_message(data, "WebSocket")
-                    
-                    # await event_system.publish('new_command', 'test')
-                    logger.error(response)
                     await websocket.send(json.dumps(response))
                 except json.JSONDecodeError:
                     await websocket.send(json.dumps({"error": "Invalid JSON"}))

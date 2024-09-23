@@ -38,6 +38,8 @@ class MessageHandler:
             return self.handle_vehicle_return(data)
         elif action == 'vehicle_drive':
             return self.handle_vehicle_drive(data)
+        elif action == 'vehicle_wait':
+            return self.handle_vehicle_wait(data)
         else:
             logger.warning(f"Unknown action received: {action}")
             return {"error": "Unknown action"}
@@ -61,6 +63,10 @@ class MessageHandler:
         # 차량 주행 로직
         return {"status": "success", "message": "Vehicle driving"}
     
+    def handle_vehicle_wait(self, data):
+        # 차량 대기 로직
+        return {"status": "success", "message": "Vehicle waiting"}
+
     def handle_vehicle_gps(self, data):
         # 차량 GPS
         try:
