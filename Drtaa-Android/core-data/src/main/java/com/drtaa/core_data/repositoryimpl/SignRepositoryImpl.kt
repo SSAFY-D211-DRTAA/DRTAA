@@ -111,4 +111,26 @@ class SignRepositoryImpl @Inject constructor(
     override suspend fun clearUserData() {
         signDataSource.clearUserData()
     }
+
+    override suspend fun updateProfileImage(image: File?): Flow<Result<String>> = flow {
+        when (
+            val response = safeApiCall {
+                val filePart: MultipartBody.Part? =
+                    FormDataConverterUtil.getNullableMultiPartBody("image", image)
+                signDataSource.updateUserProfileImage(filePart)
+            }
+        ) {
+            is ResultWrapper.Success -> {
+                emit(Result.success(response.data))
+            }
+
+            is ResultWrapper.GenericError -> {
+                emit(Result.failure(Exception(response.message)))
+            }
+
+            is ResultWrapper.NetworkError -> {
+                emit(Result.failure(Exception("네트워크 에러")))
+            }
+        }
+    }
 }

@@ -66,6 +66,10 @@ class SignDataSourceImpl @Inject constructor(
         }
     }
 
+    override suspend fun updateUserProfileImage(image: MultipartBody.Part?): String {
+        return signAPI.updateUserProfileImage(image)
+    }
+
     companion object {
         private val USER_ID = stringPreferencesKey("user_id")
         private val USER_NAME = stringPreferencesKey("user_name")

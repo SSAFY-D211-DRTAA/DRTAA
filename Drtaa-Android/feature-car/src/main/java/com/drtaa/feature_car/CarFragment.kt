@@ -8,9 +8,7 @@ import android.content.pm.PackageManager
 import android.graphics.drawable.GradientDrawable
 import android.view.MotionEvent
 import android.view.View
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.constraintlayout.motion.utils.HyperSpline.Cubic.HALF
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
