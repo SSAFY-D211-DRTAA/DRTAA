@@ -29,11 +29,6 @@ interface RentAPI {
         @Body requestRentExtend: RequestRentExtend,
     ): String
 
-    @PATCH("rent/status/{rentId}/in-progress")
-    suspend fun getOnRentCar(
-        @Path("rentId") rentId: Long,
-    ): String
-
     @GET("rent/status/{rentId}/completed")
     suspend fun getAllCompletedRent(
         @Path("rentId") rentId: Long,
