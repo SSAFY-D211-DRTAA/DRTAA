@@ -51,8 +51,8 @@ dependencies {
     // Redis
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-redis', version: '3.3.3'
 
-    // Firebase
-    implementation group: 'com.google.firebase', name: 'firebase-admin', version: '9.2.0'
+    // FCM
+    implementation group: 'com.google.firebase', name: 'firebase-admin', version: '9.3.0'
 
     // WebSocket
     implementation group: 'org.springframework', name: 'spring-websocket', version: '6.1.13'

@@ -13,6 +13,8 @@ import com.naver.maps.map.NaverMap
 import com.naver.maps.map.util.FusedLocationSource
 
 const val LOCATION_PERMISSION_REQUEST_CODE = 1000
+const val MIN_ZOOM = 15.0
+const val MAX_ZOOM = 18.0
 
 /**
  * 지도 스크롤이 부모 뷰의 스크롤에 영향 주지 않게 하는 메서드
@@ -39,6 +41,8 @@ fun MapView.ignoreParentScroll() {
 fun NaverMap.setup(fusedLocationSource: FusedLocationSource) {
     locationSource = fusedLocationSource
     locationTrackingMode = LocationTrackingMode.Follow
+    minZoom = MIN_ZOOM // 최소 줌 레벨
+    maxZoom = MAX_ZOOM // 최대 줌 레벨
     uiSettings.isZoomControlEnabled = false // Zoom 컨트롤러 사용유무
     uiSettings.isLocationButtonEnabled = true // 현재위치 사용유무
 }

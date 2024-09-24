@@ -3,6 +3,7 @@ package com.drtaa.feature_rent.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.drtaa.core_data.repository.PaymentRepository
+import com.drtaa.core_data.repository.RentCarRepository
 import com.drtaa.core_data.repository.RentRepository
 import com.drtaa.core_data.repository.SignRepository
 import com.drtaa.core_model.data.PaymentCompletionInfo
@@ -29,6 +30,7 @@ import javax.inject.Inject
 @HiltViewModel
 class RentSummaryViewModel @Inject constructor(
     private val rentRepository: RentRepository,
+    private val rentCarRepository: RentCarRepository,
     private val paymentRepository: PaymentRepository,
     private val signRepository: SignRepository,
 ) : ViewModel() {
@@ -67,7 +69,7 @@ class RentSummaryViewModel @Inject constructor(
 
     fun getUnAssignedCar(rentSchedule: RequestUnassignedCar) {
         viewModelScope.launch {
-            rentRepository.getUnassignedCar(rentSchedule).collect { result ->
+            rentCarRepository.getUnassignedCar(rentSchedule).collect { result ->
                 result.onSuccess { data ->
                     Timber.d("성공")
                     _assignedCar.emit(data)
@@ -102,7 +104,7 @@ class RentSummaryViewModel @Inject constructor(
     private fun parseBootpayData(
         data: String,
         currentUser: SocialUser,
-        rentInfo: RentInfo
+        rentInfo: RentInfo,
     ): PaymentCompletionInfo {
         val jsonObject = JSONObject(data)
         val dataObject = jsonObject.getJSONObject("data")

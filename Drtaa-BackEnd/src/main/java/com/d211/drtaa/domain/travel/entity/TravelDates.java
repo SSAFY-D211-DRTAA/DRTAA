@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "travel_dates")
@@ -29,4 +30,7 @@ public class TravelDates {
     @Column(name = "travel_dates_date", nullable = false)
     @Schema(name = "여행 일정 날짜", example = "2024/01/01")
     private LocalDate travelDatesDate;
+
+    @OneToMany(mappedBy = "travelDates", cascade = CascadeType.ALL)
+    private List<DatePlaces> places;
 }
