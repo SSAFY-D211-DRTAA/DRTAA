@@ -3,6 +3,9 @@ package com.drtaa.core_network.api
 import com.drtaa.core_model.network.RequestCallRent
 import com.drtaa.core_model.network.RequestChangeRent
 import com.drtaa.core_model.network.RequestCompleteRent
+import com.drtaa.core_model.network.RequestDuplicatedSchedule
+import com.drtaa.core_model.network.RequestUnassignedCar
+import com.drtaa.core_model.rent.RentCar
 import com.drtaa.core_model.network.RequestRentExtend
 import com.drtaa.core_model.network.ResponseRentStateAll
 import com.drtaa.core_model.rent.RentDetail
@@ -57,10 +60,15 @@ interface RentAPI {
     @GET("rent/status/active")
     suspend fun getAllRentState(): List<ResponseRentStateAll>
 
-    @GET("rent/current")
-    suspend fun getCurrentRent(): RentDetail
-
     // history
     @GET("rent")
     suspend fun getRentHistory(): List<RentSimple>
+
+    @GET("rent/current")
+    suspend fun getCurrentRent(): RentDetail
+
+    @POST("rent/chk")
+    suspend fun checkDuplicatedRent(
+        @Body rentSchedule: RequestDuplicatedSchedule
+    ): Boolean
 }
