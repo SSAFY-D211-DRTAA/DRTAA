@@ -1,26 +1,19 @@
 package com.drtaa.feature_mypage
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Matrix
 import android.net.Uri
 import android.os.Environment
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.drtaa.core_model.sign.SocialUser
 import com.drtaa.core_ui.base.BaseFragment
 import com.drtaa.core_ui.showSnackBar
 import com.drtaa.feature_mypage.databinding.FragmentMyPageBinding
 import com.drtaa.feature_mypage.viewmodel.MyPageViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
@@ -82,6 +75,7 @@ class MyPageFragment : BaseFragment<FragmentMyPageBinding>(R.layout.fragment_my_
     private fun handleImage(imageUri: Uri) {
         val imageFile = uriToFile(requireActivity(), imageUri)
         myPageViewModel.setProfileImage(imageUri, imageFile)
+        Timber.d("이미지는 ${imageFile}")
     }
 
     private fun uriToFile(context: Context, uri: Uri): File {

@@ -11,6 +11,8 @@ import com.drtaa.core_model.util.toRequestLogin
 import com.drtaa.core_model.network.RequestFormLogin
 import com.drtaa.core_model.network.ResponseLogin
 import com.drtaa.core_network.api.SignAPI
+import com.drtaa.core_network.di.Auth
+import com.drtaa.core_network.di.NoAuth
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import okhttp3.MultipartBody
@@ -19,7 +21,12 @@ import javax.inject.Inject
 import javax.inject.Named
 
 class SignDataSourceImpl @Inject constructor(
+    @NoAuth
     private val signAPI: SignAPI,
+
+    @Auth
+    private val signAPIAuth: SignAPI,
+
     @Named("USER_DATASTORE")
     private val dataStore: DataStore<Preferences>
 ) : SignDataSource {
@@ -67,7 +74,7 @@ class SignDataSourceImpl @Inject constructor(
     }
 
     override suspend fun updateUserProfileImage(image: MultipartBody.Part?): String {
-        return signAPI.updateUserProfileImage(image)
+        return signAPIAuth.updateUserProfileImage(image)
     }
 
     companion object {
