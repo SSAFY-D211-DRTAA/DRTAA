@@ -250,21 +250,17 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
 
                     if (qrRentId != null) {
                         showSnackBar("차량 ID: $qrCarId, 렌트 ID: $qrRentId")
-                        carViewModel.currentRentDetail.flowWithLifecycle(viewLifecycleOwner.lifecycle)
-                            .onEach { result ->
-                                if (result != null) {
-                                    if(result.rentId ==qrRentId && result.rentCarId == qrCarId){
-                                        carViewModel.completeRent()
-                                        Timber.d("완료?")
-                                    }else{
-                                        showSnackBar("현재 배정 된 차량이 아닙니다!!")
-                                        Timber.d("배정 x")
-                                    }
-                                }else {
-                                    showSnackBar("예약 현황이 없습니다.")
-                                    Timber.d("예약 x")
-                                }
+                        val currentRentDetail = carViewModel.currentRentDetail.value
+                        if(currentRentDetail !=null){
+                            if(currentRentDetail.rentId == qrRentId && currentRentDetail.rentCarId == qrCarId){
+                                //여기서 확인하는 로직
+
+                            }else{
+                                showSnackBar("배정된 차량이 아닙니다!")
                             }
+                        }else{
+                            showSnackBar("배정된 차량이 없습니다!")
+                        }
                     } else {
                         showSnackBar("잘못된 QR 코드 형식입니다.")
                     }
