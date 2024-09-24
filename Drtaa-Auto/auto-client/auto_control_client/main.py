@@ -32,8 +32,6 @@ def load_config() -> Dict[str, Union[str, float, int]]:
     try:
         with open(CONFIG_FILE_PATH) as f:
             return json.load(f)
-        
-        logging.error(ws_server_url)
     except FileNotFoundError:
         logging.error("설정 파일을 찾을 수 없습니다.")
         sys.exit(1)
@@ -272,7 +270,7 @@ def on_ec2_close(ws: WebSocketApp, close_status_code: int, close_msg: str) -> No
 
 def on_ec2_open(ws: WebSocketApp) -> None:
     logging.info("EC2 WebSocket 연결 성공")
-    send_to_ec2({"action": "Auto Client Connect"})
+    send_to_ec2({"type": "connect",  "action": "Auto Client Connect"})
 
 def send_to_ec2(data: Dict[str, Any]) -> None:
     if ec2_ws and ec2_ws.sock and ec2_ws.sock.connected:
