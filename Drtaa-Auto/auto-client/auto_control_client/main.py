@@ -17,7 +17,7 @@ CONFIG_FILE_PATH = 'config.json'
 GPS_TOPIC = "/gps"
 COMPLETE_DRIVE_TOPIC = "/complete_drive"
 MOVE_BASE_GOAL_TOPIC = "/move_base_simple/goal"
-GLOBAL_PATH_TOPIC = "/global_path"
+GLOBAL_PATH_TOPIC = "/global_path_once"
 
 current_goal_index = 0
 gps_count_index = 0
@@ -195,18 +195,15 @@ def on_ros_bridge_message(ws: WebSocketApp, message: str) -> None:
 
                 publish_pose_from_gps(ws, config['next_goal_lat'], config['next_goal_lon'])
             elif data['topic'] == GLOBAL_PATH_TOPIC:
-                gps_data = data['msg']
+                path_data = data['msg']
 
                 try:
                     with open('global_path_data.json', 'w') as f:
-                        json.dump(gps_data, f)
+                        json.dump(path_data, f)
                 except IOError as e:
-                    logging.error(f"GPS 데이터를 파일에 저장하는 중 오류 발생: {e}")
+                    logging.error(f"Global Path 데이터를 파일에 저장하는 중 오류 발생: {e}")
 
-                # gps_count_index += 1
-                # if gps_count_index > 20:
-                #     gps_count_index = 0
-                #     send_to_ec2(gps_data)
+                # send_to_ec2(path_data)
 
     except json.JSONDecodeError:
         logging.error("잘못된 JSON 형식의 메시지를 받았습니다.")
@@ -233,14 +230,16 @@ def on_ec2_message(ws: WebSocketApp, message: str) -> None:
     logging.info(f"EC2로부터 메시지 수신: {message}")
     try:
         data: Dict[str, Any] = json.loads(message)
+        
+        action = data.get('action')
 
-        if data['action'] == 'vehicle_dispatch':
+        if action == 'vehicle_dispatch':
             publish_pose_from_gps(ros_bridge_ws, data['latitude'], data['longitude'])
-        elif data['action'] == 'vehicle_return':
+        elif action == 'vehicle_return':
             publish_pose_from_gps(ros_bridge_ws, config['lat_return'], config['lon_return'])
-        elif data['action'] == 'vehicle_drive':
+        elif action == 'vehicle_drive':
             publish_pose_from_gps(ros_bridge_ws, config['lat_return'], config['lon_return'])
-        elif data['action'] == 'vehicle_wait':
+        elif action == 'vehicle_wait':
             publish_next_goal(ros_bridge_ws)
 
         # 데이터를 파일에 저장
