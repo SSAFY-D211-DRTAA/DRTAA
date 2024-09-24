@@ -23,7 +23,7 @@ class RentRepositoryImpl @Inject constructor(
     private val rentDataSource: RentDataSource,
 ) : RentRepository {
 
-    override suspend fun completeRent(requestCompleteRent: RequestCompleteRent): Flow<Result<Unit>> =
+    override suspend fun completeRent(requestCompleteRent: RequestCompleteRent): Flow<Result<String>> =
         flow {
             when (
                 val response = safeApiCall { rentDataSource.completeRent(requestCompleteRent) }
@@ -145,25 +145,6 @@ class RentRepositoryImpl @Inject constructor(
                 }
             }
         }
-
-    override suspend fun getOnRentCar(rentId: Long): Flow<Result<String>> = flow {
-        when (val response = safeApiCall { rentDataSource.getOnRentCar(rentId) }) {
-            is ResultWrapper.Success -> {
-                emit(Result.success(response.data))
-                Timber.d("렌트 중인 차량 조회 성공")
-            }
-
-            is ResultWrapper.GenericError -> {
-                emit(Result.failure(Exception(response.message)))
-                Timber.d("렌트 중인 차량 조회 실패: ${response.message}")
-            }
-
-            is ResultWrapper.NetworkError -> {
-                emit(Result.failure(Exception("네트워크 에러")))
-                Timber.d("렌트 중인 차량 조회 네트워크 에러")
-            }
-        }
-    }
 
     override suspend fun getAllCompletedRent(rentId: Long): Flow<Result<List<ResponseRentStateAll>>> =
         flow {

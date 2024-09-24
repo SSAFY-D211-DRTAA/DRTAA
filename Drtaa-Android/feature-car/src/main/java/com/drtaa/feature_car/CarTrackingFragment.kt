@@ -40,7 +40,11 @@ class CarTrackingFragment :
         observeViewModelOnMap(naverMap)
         binding.btnCall.setOnClickListener {
             showLoading()
-            viewModel.callAssignedCar(DEFAULT_LATLNG)
+            if (viewModel.currentRentDetail.value == null) {
+                viewModel.callFirstAssignedCar()
+            } else {
+                viewModel.callAssignedCar(DEFAULT_LATLNG)
+            }
         }
         carMarker.map = naverMap
         naverMap.moveCameraTo(DEFAULT_LATLNG.latitude, DEFAULT_LATLNG.longitude)
@@ -61,6 +65,12 @@ class CarTrackingFragment :
             } else {
                 viewModel.stopPublish()
                 "차량추적 OFF"
+            }
+        }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+        viewModel.firstCall.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach {
+            if (it) {
+                showSnackBar("첫 렌트 요청 장소로 호출됩니다")
             }
         }.launchIn(viewLifecycleOwner.lifecycleScope)
 

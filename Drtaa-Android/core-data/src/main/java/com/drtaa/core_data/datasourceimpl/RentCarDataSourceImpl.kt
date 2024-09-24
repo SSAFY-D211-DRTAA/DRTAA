@@ -17,6 +17,14 @@ class RentCarDataSourceImpl @Inject constructor(
         return rentCarAPI.getUnassignedCar(rentSchedule)
     }
 
+    override suspend fun getOffCar(rentId: Long): String {
+        return rentCarAPI.getOffCar(rentId)
+    }
+
+    override suspend fun getOnCar(rentId: Long): String {
+        return rentCarAPI.getOnCar(rentId)
+    }
+
     override suspend fun callAssignedCar(requestCallCar: RequestRentCarCall): ResponseRentCarCall {
         return rentCarAPI.callAssignedCar(requestCallCar)
     }

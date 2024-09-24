@@ -10,6 +10,8 @@ import com.drtaa.core_model.rent.RentCar
 interface RentCarDataSource {
     // rent-car
     suspend fun getUnassignedCar(rentSchedule: RequestUnassignedCar): RentCar
+    suspend fun getOffCar(rentId: Long): String
+    suspend fun getOnCar(rentId: Long): String
     suspend fun callAssignedCar(requestCallCar: RequestRentCarCall): ResponseRentCarCall
     suspend fun callFirstAssignedCar(rentId: Long): ResponseRentCarCall
     suspend fun editDriveStatus(request: RequestDrivingCar): ResponseDrivingCar

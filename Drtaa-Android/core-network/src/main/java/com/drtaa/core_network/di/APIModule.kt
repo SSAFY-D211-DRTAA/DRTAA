@@ -28,11 +28,21 @@ object APIModule {
     ): TestAPI = retrofit.create(TestAPI::class.java)
 
     @Singleton
+    @NoAuth
     @Provides
-    fun provideSignAPI(
+    fun provideSignAPINoAuth(
         @DefaultRetrofit
         retrofit: Retrofit
     ): SignAPI = retrofit.create(SignAPI::class.java)
+
+    @Singleton
+    @Auth
+    @Provides
+    fun provideSignAPI(
+        @AuthRetrofit
+        retrofit: Retrofit
+    ): SignAPI = retrofit.create(SignAPI::class.java)
+
 
     @Singleton
     @Provides

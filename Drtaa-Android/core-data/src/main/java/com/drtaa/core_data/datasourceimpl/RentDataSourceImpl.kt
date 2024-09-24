@@ -30,16 +30,12 @@ class RentDataSourceImpl @Inject constructor(
         return rentAPI.extendRentTime(requestRentExtend)
     }
 
-    override suspend fun getOnRentCar(rentId: Long): String {
-        return rentAPI.getOnRentCar(rentId)
-    }
-
     override suspend fun getAllCompletedRent(rentId: Long): List<ResponseRentStateAll> {
         return rentAPI.getAllCompletedRent(rentId)
     }
 
-    override suspend fun completeRent(requestCompleteRent: RequestCompleteRent) {
-        rentAPI.completeRent(requestCompleteRent)
+    override suspend fun completeRent(requestCompleteRent: RequestCompleteRent): String {
+        return rentAPI.completeRent(requestCompleteRent)
     }
 
     override suspend fun cancelRent(requestCompleteRent: RequestCompleteRent): String {
