@@ -1,6 +1,7 @@
 package com.d211.drtaa.domain.travel.controller;
 
-import com.d211.drtaa.domain.travel.dto.request.PlacesRequestDTO;
+import com.d211.drtaa.domain.travel.dto.request.PlacesAddRequestDTO;
+import com.d211.drtaa.domain.travel.dto.request.PlacesUpdateRequestDTO;
 import com.d211.drtaa.domain.travel.dto.request.TravelNameRequestDTO;
 import com.d211.drtaa.domain.travel.dto.response.TravelDetailResponseDTO;
 import com.d211.drtaa.domain.travel.service.TravelService;
@@ -12,8 +13,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/travel")
@@ -40,9 +39,9 @@ public class TravelController {
 
     @PostMapping
     @Operation(summary = "장소 추가", description = "travelId의 해당하는 여행 중 travelDatesId의 해당하는 일정에 장소 추가")
-    public ResponseEntity createTravelDatesPlaces(@RequestBody PlacesRequestDTO placesRequestDTO) {
+    public ResponseEntity createTravelDatesPlaces(@RequestBody PlacesAddRequestDTO placesAddRequestDTO) {
         try {
-            travelService.createTravelDatesPlaces(placesRequestDTO);
+            travelService.createTravelDatesPlaces(placesAddRequestDTO);
 
             return ResponseEntity.ok("Success");
         } catch (TravelNotFoundException e) {
@@ -57,6 +56,20 @@ public class TravelController {
     public ResponseEntity updateTravelName(@RequestBody TravelNameRequestDTO travelNameRequestDTO) {
         try {
             travelService.updateTravelName(travelNameRequestDTO);
+
+            return ResponseEntity.ok("Success"); // 200
+        } catch(TravelNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage()); // 400
+        }
+    }
+
+    @PutMapping
+    @Operation(summary = "여행 일정 장소 변경", description = "travelId의 해당하고 travelDatesId의 해당하는 여행 장소들 변경")
+    public ResponseEntity updateTravelDatesPlaces(@RequestBody PlacesUpdateRequestDTO placesUpdateRequestDTO) {
+        try {
+            travelService.updateTravelDatesPlaces(placesUpdateRequestDTO);
 
             return ResponseEntity.ok("Success"); // 200
         } catch(TravelNotFoundException e) {
