@@ -13,6 +13,7 @@ import com.drtaa.core_ui.fitCenter
 import com.drtaa.core_ui.parseLocalDateTime
 import com.drtaa.core_ui.showSnackBar
 import com.drtaa.feature_car.databinding.FragmentCarBinding
+import com.drtaa.feature_car.viewmodel.CarStatus
 import com.drtaa.feature_car.viewmodel.CarViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
@@ -54,10 +55,33 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
                 // 탑승 처리
                 viewModel.getOnCar(rentId = viewModel.latestReservedId.value)
             }
+            btnGetOffQrcode.setOnClickListener {
+                viewModel.getOffCar(rentId = viewModel.latestReservedId.value)
+            }
         }
     }
 
     private fun initObserve() {
+        viewModel.drivingStatus.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach { drivingStatus ->
+                when (drivingStatus) {
+                    CarStatus.DRIVING -> {
+                        binding.btnTourQrcode.visibility = View.GONE
+                        binding.btnGetOffQrcode.visibility = View.VISIBLE
+                    }
+
+                    CarStatus.PARKING -> {
+                        binding.btnTourQrcode.visibility = View.VISIBLE
+                        binding.btnGetOffQrcode.visibility = View.GONE
+                    }
+
+                    CarStatus.IDLE -> {
+                        binding.btnTourQrcode.visibility = View.VISIBLE
+                        binding.btnGetOffQrcode.visibility = View.GONE
+                    }
+                }
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
+
         viewModel.rentState.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach { isOnCar ->
             if (isOnCar) {
                 viewModel.getCurrentRent()
@@ -78,7 +102,7 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
                     viewModel.getCurrentRent()
                     "사용 여부 확인 중.."
                 }
-                
+
                 else -> {
                     binding.clCarBottomTextGotoUse.isClickable = false
                     "불러오는 중.."

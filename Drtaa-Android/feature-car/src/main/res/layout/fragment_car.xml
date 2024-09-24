@@ -111,8 +111,8 @@
                         app:layout_constraintTop_toBottomOf="@+id/constraintLayout2">
 
                         <TextView
-                            style="@style/jua"
                             android:id="@+id/tv_reserved_state"
+                            style="@style/jua"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:gravity="center"
@@ -136,8 +136,8 @@
                             style="@style/ptd_light"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="13dp"
                             android:layout_marginStart="20dp"
+                            android:layout_marginTop="13dp"
                             android:text="차종"
                             android:textColor="@color/gray_5858"
                             android:textSize="14sp"
@@ -160,11 +160,11 @@
                             style="@style/ptd_light"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            app:layout_constraintStart_toEndOf="@id/tv_tour_title_cartype"
                             android:text="차량번호"
                             android:textColor="@color/gray_5858"
                             android:textSize="14sp"
                             app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@id/tv_tour_title_cartype"
                             app:layout_constraintTop_toTopOf="@+id/tv_tour_title_cartype" />
 
                         <TextView
@@ -249,14 +249,25 @@
                 android:layout_height="45dp"
                 android:layout_marginStart="30dp"
                 android:layout_marginTop="20dp"
-                android:layout_marginBottom="16dp"
                 android:layout_marginEnd="30dp"
+                android:layout_marginBottom="16dp"
                 android:text="연장하기"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/btn_tour_qrcode"
                 app:layout_constraintHorizontal_bias="0.4"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_tour_remain_time" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_get_off_qrcode"
+                style="@style/btn_short_black"
+                android:layout_width="150dp"
+                android:layout_height="45dp"
+                android:text="하차하기"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/btn_tour_extend"
+                app:layout_constraintTop_toTopOf="@+id/btn_tour_extend" />
 
             <ImageView
                 android:id="@+id/btn_tour_qrcode"

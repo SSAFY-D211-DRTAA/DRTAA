@@ -26,6 +26,11 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
+enum class CarStatus{
+    DRIVING,
+    PARKING,
+    IDLE
+}
 @HiltViewModel
 class CarViewModel @Inject constructor(
     private val gpsRepository: GPSRepository,
@@ -59,6 +64,9 @@ class CarViewModel @Inject constructor(
     private val _firstCall = MutableStateFlow<Boolean>(false)
     val firstCall: StateFlow<Boolean> = _firstCall
 
+    private val _drivingStatus = MutableStateFlow<CarStatus>(CarStatus.IDLE)
+    val drivingStatus: StateFlow<CarStatus> = _drivingStatus
+
     init {
         getLatestRent()
         getCurrentRent()
@@ -87,8 +95,10 @@ class CarViewModel @Inject constructor(
                     _currentRentDetail.value?.let {
                         rentCarRepository.getDriveStatus(it.rentCarId.toLong()).collect { result ->
                             result.onSuccess { data ->
+                                _drivingStatus.value = CarStatus.DRIVING
                                 Timber.tag("rent latest").d("성공 $data")
                             }.onFailure {
+                                _drivingStatus.value = CarStatus.IDLE
                                 Timber.tag("rent").d("현재 진행 중인 렌트가 없습니다.")
                             }
                         }
@@ -107,9 +117,11 @@ class CarViewModel @Inject constructor(
         viewModelScope.launch {
             rentCarRepository.getOffCar(rentId).collect { result ->
                 result.onSuccess { data ->
+                    _drivingStatus.value = CarStatus.PARKING
                     Timber.tag("rent latest").d("성공 $data")
                     _rentState.value = false
                 }.onFailure {
+                    _drivingStatus.value = CarStatus.IDLE
                     Timber.tag("rent").d("현재 진행 중인 렌트가 없습니다.")
                     _rentState.value = false
                 }
