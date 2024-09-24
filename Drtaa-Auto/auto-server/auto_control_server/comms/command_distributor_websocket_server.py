@@ -15,7 +15,7 @@ class CommandDistributorWebSocketServer:
         # self.clients = set()
         self.client = None
 
-        event_system.subscribe('recv_cmd', self.distribute_command)
+        event_system.subscribe('recv_command', self.distribute_command)
 
     async def handle_client(self, websocket, path):
         self.client = websocket
@@ -43,7 +43,6 @@ class CommandDistributorWebSocketServer:
     #         self.clients.remove(websocket)
 
     async def distribute_command(self, command):
-        logger.debug(f"dst cmd: {command}")
         message = json.dumps(command)
 
         # for client in self.clients:

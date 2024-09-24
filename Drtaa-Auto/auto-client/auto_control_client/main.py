@@ -243,12 +243,18 @@ def on_ros_bridge_open(ws: WebSocketApp) -> None:
     subscribe(ws, "/gps", "morai_msgs/GPSMessage")
     subscribe(ws, "/complete_drive", "std_msgs/Bool")
 
-    publish_pose_from_gps(ws, config['test_lat'], config['test_lon'])
+    # publish_pose_from_gps(ws, config['test_lat'], config['test_lon'])
 
 def on_ec2_message(ws: WebSocketApp, message: str) -> None:
     logging.info(f"EC2로부터 메시지 수신: {message}")
     try:
         data: Dict[str, Any] = json.loads(message)
+
+        if data['action'] == 'vehicle_dispatch':
+            publish_pose_from_gps(ws, data['latitude'], data['longitude'])
+        elif data['action'] == 'vehicle_return':
+            publish_pose_from_gps(ws, config['lat_return'], config['lon_return'])
+
         # 데이터를 파일에 저장
         try:
             with open('ec2_data.json', 'w') as f:
