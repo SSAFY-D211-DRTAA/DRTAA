@@ -29,7 +29,7 @@
             <androidx.cardview.widget.CardView
                 android:id="@+id/cv_tour_card"
                 android:layout_width="315dp"
-                android:layout_height="520dp"
+                android:layout_height="450dp"
                 android:layout_marginTop="20dp"
                 app:cardCornerRadius="15dp"
                 app:cardElevation="10dp"
@@ -63,7 +63,7 @@
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/constraintLayout2"
                         android:layout_width="match_parent"
-                        android:layout_height="375dp"
+                        android:layout_height="300dp"
                         android:background="#3c3b3f"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -80,9 +80,10 @@
 
                         <ImageView
                             android:id="@+id/img_car_carimage"
-                            android:layout_width="130dp"
-                            android:layout_height="wrap_content"
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
                             android:visibility="gone"
+                            app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
@@ -135,8 +136,8 @@
                             style="@style/ptd_light"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="30dp"
                             android:layout_marginTop="13dp"
+                            android:layout_marginStart="20dp"
                             android:text="차종"
                             android:textColor="@color/gray_5858"
                             android:textSize="14sp"
@@ -159,7 +160,7 @@
                             style="@style/ptd_light"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginEnd="80dp"
+                            app:layout_constraintStart_toEndOf="@id/tv_tour_title_cartype"
                             android:text="차량번호"
                             android:textColor="@color/gray_5858"
                             android:textSize="14sp"
@@ -192,10 +193,11 @@
                         <TextView
                             android:id="@+id/tv_tour_rentstart"
                             style="@style/ptd_semi_bold"
-                            android:layout_width="wrap_content"
+                            android:layout_width="120dp"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
                             android:text="2020.20.20\n20:20"
-                            android:textSize="17sp"
+                            android:textSize="16sp"
                             app:layout_constraintStart_toStartOf="@+id/tv_tour_title_rentstart"
                             app:layout_constraintTop_toBottomOf="@+id/tv_tour_title_rentstart" />
 
@@ -214,11 +216,11 @@
                         <TextView
                             android:id="@+id/tv_tour_rentend"
                             style="@style/ptd_semi_bold"
-                            android:layout_width="wrap_content"
+                            android:layout_width="120dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
+                            android:layout_marginTop="8dp"
                             android:text="2020.20.20\n20:20"
-                            android:textSize="17sp"
+                            android:textSize="16sp"
                             app:layout_constraintStart_toStartOf="@+id/tv_tour_title_rentend"
                             app:layout_constraintTop_toBottomOf="@+id/tv_tour_title_rentend" />
                     </androidx.constraintlayout.widget.ConstraintLayout>

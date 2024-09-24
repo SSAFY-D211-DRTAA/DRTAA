@@ -53,9 +53,15 @@ class CarViewModel @Inject constructor(
     private val _latestReservedId = MutableStateFlow<Long>(0L)
     val latestReservedId: StateFlow<Long> = _latestReservedId
 
+    private val _rentState = MutableStateFlow<Boolean>(false)
+    val rentState: StateFlow<Boolean> = _rentState
+
+    private val _firstCall = MutableStateFlow<Boolean>(false)
+    val firstCall: StateFlow<Boolean> = _firstCall
+
     init {
-        getCurrentRent()
         getLatestRent()
+        getCurrentRent()
         observeMqttMessages()
     }
 
@@ -66,21 +72,52 @@ class CarViewModel @Inject constructor(
                     Timber.tag("rent latest").d("성공 $data")
                     _latestReservedId.value = data
                 }.onFailure {
+                    _latestReservedId.value = -1L
                     Timber.tag("rent").d("현재 진행 중인 렌트가 없습니다.")
                 }
             }
         }
     }
 
-    /**
-     * 탑승처리 in-progress를 해줘야 렌트한 것으로 간주한다.
-     */
-    private fun getCurrentRent() {
+    fun getOnCar(rentId: Long) {
         viewModelScope.launch {
-            rentRepository.getCurrentRent().collect { result ->
+            rentCarRepository.getOnCar(rentId).collect { result ->
+                result.onSuccess { data ->
+                    Timber.tag("rent latest").d("성공 $data")
+                    _rentState.value = true
+                }.onFailure {
+                    Timber.tag("rent").d("현재 진행 중인 렌트가 없습니다.")
+                    _rentState.value = false
+                }
+            }
+        }
+    }
+
+    fun getOffCar(rentId: Long) {
+        viewModelScope.launch {
+            rentCarRepository.getOffCar(rentId).collect { result ->
+                result.onSuccess { data ->
+                    Timber.tag("rent latest").d("성공 $data")
+                    _rentState.value = false
+                }.onFailure {
+                    Timber.tag("rent").d("현재 진행 중인 렌트가 없습니다.")
+                    _rentState.value = false
+                }
+            }
+        }
+    }
+
+    /**
+     * 탑승처리를 해줘야 렌트한 것으로 간주한다.
+     */
+    fun getCurrentRent() {
+        viewModelScope.launch {
+            rentRepository.getRentDetail(_latestReservedId.value).collect { result ->
                 result.onSuccess { data ->
                     Timber.d("성공")
-                    _currentRentDetail.value = data
+                    if (data.rentStatus == "in_progress") {
+                        _currentRentDetail.value = data
+                    }
                 }.onFailure {
                     Timber.d("현재 진행 중인 렌트가 없습니다.")
                     _currentRentDetail.value = null
@@ -172,6 +209,21 @@ class CarViewModel @Inject constructor(
             }
         }
     }
+
+    fun callFirstAssignedCar() {
+        viewModelScope.launch {
+            rentCarRepository.callFirstAssignedCar(_latestReservedId.value).collect { result ->
+                result.onSuccess {
+                    _firstCall.value = true
+                    Timber.tag("첫 호출").d("성공")
+                }.onFailure {
+                    _firstCall.value = false
+                    Timber.tag("첫 호출").d("실패")
+                }
+            }
+        }
+    }
+
 
     companion object {
         private const val DEFAULT_INTERVAL = 2000L
