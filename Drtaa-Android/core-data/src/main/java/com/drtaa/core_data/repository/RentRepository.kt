@@ -15,7 +15,7 @@ interface RentRepository {
     suspend fun changeRent(requestChangeRent: RequestChangeRent): Flow<Result<String>>
     suspend fun extendRentTime(requestRentExtend: RequestRentExtend): Flow<Result<String>>
     suspend fun getAllCompletedRent(rentId: Long): Flow<Result<List<ResponseRentStateAll>>>
-    suspend fun completeRent(requestCompleteRent: RequestCompleteRent): Flow<Result<Unit>>
+    suspend fun completeRent(requestCompleteRent: RequestCompleteRent): Flow<Result<String>>
     suspend fun cancelRent(requestCompleteRent: RequestCompleteRent): Flow<Result<String>>
     suspend fun getRentDetail(rentId: Long): Flow<Result<RentDetail>>
     suspend fun getAllRentState(): Flow<Result<Long>>

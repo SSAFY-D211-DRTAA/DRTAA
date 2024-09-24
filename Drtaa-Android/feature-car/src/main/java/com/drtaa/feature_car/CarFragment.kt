@@ -78,16 +78,14 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
                     viewModel.getCurrentRent()
                     "사용 여부 확인 중.."
                 }
-
+                
                 else -> {
                     binding.clCarBottomTextGotoUse.isClickable = false
                     "불러오는 중.."
                 }
             }
 
-            if (it == -1L) {
-                "현재 예약된 차량이 없습니다"
-            }
+
         }.launchIn(viewLifecycleOwner.lifecycleScope)
 
         viewModel.currentRentDetail.flowWithLifecycle(viewLifecycleOwner.lifecycle)
@@ -139,6 +137,7 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
             .onEach { isSuccess ->
                 if (isSuccess) {
                     showSnackBar("반납 성공")
+                    navigatePopBackStack()
                 } else {
                     showSnackBar("반납 실패")
                 }

@@ -84,6 +84,16 @@ class CarViewModel @Inject constructor(
             rentCarRepository.getOnCar(rentId).collect { result ->
                 result.onSuccess { data ->
                     Timber.tag("rent latest").d("성공 $data")
+                    _currentRentDetail.value?.let {
+                        rentCarRepository.getDriveStatus(it.rentCarId.toLong()).collect { result ->
+                            result.onSuccess { data ->
+                                Timber.tag("rent latest").d("성공 $data")
+                            }.onFailure {
+                                Timber.tag("rent").d("현재 진행 중인 렌트가 없습니다.")
+                            }
+                        }
+                    }
+
                     _rentState.value = true
                 }.onFailure {
                     Timber.tag("rent").d("현재 진행 중인 렌트가 없습니다.")

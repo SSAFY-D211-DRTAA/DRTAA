@@ -43,7 +43,7 @@ interface RentCarAPI {
         @Body request: RequestDrivingCar,
     ): ResponseDrivingCar
 
-    @GET("rent-car/drive/{rentCarId}")
+    @GET("rent-car/{rentCarId}")
     suspend fun getDriveStatus(
         @Path("rentCarId") rentCarId: Long,
     ): ResponseDrivingCar

@@ -31,8 +31,8 @@ class RentDataSourceImpl @Inject constructor(
         return rentAPI.getAllCompletedRent(rentId)
     }
 
-    override suspend fun completeRent(requestCompleteRent: RequestCompleteRent) {
-        rentAPI.completeRent(requestCompleteRent)
+    override suspend fun completeRent(requestCompleteRent: RequestCompleteRent): String {
+        return rentAPI.completeRent(requestCompleteRent)
     }
 
     override suspend fun cancelRent(requestCompleteRent: RequestCompleteRent): String {

@@ -14,7 +14,7 @@ interface RentDataSource {
     suspend fun changeRent(requestChangeRent: RequestChangeRent): String
     suspend fun extendRentTime(requestRentExtend: RequestRentExtend): String
     suspend fun getAllCompletedRent(rentId: Long): List<ResponseRentStateAll>
-    suspend fun completeRent(requestCompleteRent: RequestCompleteRent)
+    suspend fun completeRent(requestCompleteRent: RequestCompleteRent): String
     suspend fun cancelRent(requestCompleteRent: RequestCompleteRent): String
     suspend fun getRentDetail(rentId: Long): RentDetail
     suspend fun getAllRentState(): List<ResponseRentStateAll>

@@ -37,7 +37,7 @@ interface RentAPI {
     @PATCH("rent/status/completed")
     suspend fun completeRent(
         @Body requestCompleteRent: RequestCompleteRent,
-    )
+    ): String
 
     @PATCH("rent/status/canceled")
     suspend fun cancelRent(

@@ -20,7 +20,7 @@ class RentRepositoryImpl @Inject constructor(
     private val rentDataSource: RentDataSource,
 ) : RentRepository {
 
-    override suspend fun completeRent(requestCompleteRent: RequestCompleteRent): Flow<Result<Unit>> =
+    override suspend fun completeRent(requestCompleteRent: RequestCompleteRent): Flow<Result<String>> =
         flow {
             when (
                 val response = safeApiCall { rentDataSource.completeRent(requestCompleteRent) }
