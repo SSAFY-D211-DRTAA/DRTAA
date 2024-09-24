@@ -21,7 +21,7 @@ public class DatePlaces {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "date_places_id", nullable = false)
     @Schema(description = "일정 장소 고유번호", example = "1")
-    private long travelDatesId;
+    private long datePlacesId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "travel_dates_id", nullable = false)
