@@ -74,6 +74,28 @@ def calc_pose_from_gps(latitude: float, longitude: float) -> Tuple[float, float]
 
     return x, y
 
+
+def calc_gps_from_pose(x: float, y: float) -> Tuple[float, float]:
+    """
+    로컬 좌표계를 GPS 좌표로 변환합니다.
+
+    :param x: 로컬 좌표계의 x 값
+    :param y: 로컬 좌표계의 y 값
+    :return: (latitude, longitude) GPS 좌표
+    """
+    crs_utm = CRS(proj='utm', zone=config['utm_zone'], ellps='WGS84')
+    transformer = Transformer.from_crs(crs_utm, "EPSG:4326")
+
+    # 오프셋을 다시 더해 원래의 UTM 좌표로 복원
+    utm_x = x + config['east_offset']
+    utm_y = y + config['north_offset']
+
+    # UTM 좌표를 위도와 경도로 변환
+    latitude, longitude = transformer.transform(utm_x, utm_y)
+
+    return latitude, longitude
+
+
 def publish_pose_from_gps(ws: WebSocketApp, lat: float, lon: float) -> None:
     """
     GPS 좌표를 이용하여 로봇의 목표 위치를 발행합니다.
@@ -193,7 +215,6 @@ def on_ros_bridge_message(ws: WebSocketApp, message: str) -> None:
                 
                 send_to_ec2(data)
 
-                publish_pose_from_gps(ws, config['next_goal_lat'], config['next_goal_lon'])
             elif data['topic'] == GLOBAL_PATH_TOPIC:
                 path_data = data['msg']
 
