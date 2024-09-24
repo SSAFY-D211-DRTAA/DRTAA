@@ -25,7 +25,7 @@ class AStarPathPublisher:
         # rospy.Subscriber('/initialpose', PoseWithCovarianceStamped, self.init_callback) 
         rospy.Subscriber('/odom', Odometry, self.odom_callback)
         self.global_path_pub = rospy.Publisher('/global_path', Path, queue_size=1)
-        self.destination_reached_pub = rospy.Publisher('/complete_drive', Bool, queue_size=1)
+        self.destination_reached_pub = rospy.Publisher('/complete_drive', PoseStamped, queue_size=1)
 
         # 초기 상태 변수 설정
         self.is_goal_pose = False
@@ -90,7 +90,14 @@ class AStarPathPublisher:
             if not self.destination_reached and self.is_destination_reached(self.current_position):
                     rospy.loginfo("Destination reached!")
                     self.destination_reached = True
-                    self.destination_reached_pub.publish(self.destination_reached)
+                    # Create PoseStamped message
+                    goal_pose_msg = PoseStamped()
+                    goal_pose_msg.header.stamp = rospy.Time.now()
+                    goal_pose_msg.header.frame_id = "map"  # Set appropriate frame ID   
+                    goal_pose_msg.pose.position.x = self.goal_position[0]
+                    goal_pose_msg.pose.position.y = self.goal_position[1]
+                    goal_pose_msg.pose.position.z = 0  # Assuming z=0 for 2D navigation
+                    self.destination_reached_pub.publish(goal_pose_msg) # 목적지 좌표 발행
                     # Reset state variables and global path
                     self.reset_global_path()
 
