@@ -71,7 +71,6 @@ class CarTrackingFragment :
         viewModel.firstCall.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach {
             if (it) {
                 showSnackBar("첫 렌트 요청 장소로 호출됩니다")
-                dismissLoading()
             }
         }.launchIn(viewLifecycleOwner.lifecycleScope)
 

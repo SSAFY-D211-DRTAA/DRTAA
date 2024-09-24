@@ -62,8 +62,8 @@ class CarViewModel @Inject constructor(
     private val _rentState = MutableStateFlow<Boolean>(false)
     val rentState: StateFlow<Boolean> = _rentState
 
-    private val _firstCall = MutableStateFlow<Boolean>(false)
-    val firstCall: StateFlow<Boolean> = _firstCall
+    private val _firstCall = MutableSharedFlow<Boolean>()
+    val firstCall: SharedFlow<Boolean> = _firstCall.asSharedFlow()
 
     private val _drivingStatus = MutableStateFlow<CarStatus>(CarStatus.IDLE)
     val drivingStatus: StateFlow<CarStatus> = _drivingStatus
@@ -176,6 +176,7 @@ class CarViewModel @Inject constructor(
     }
 
     fun stopPublish() {
+        _trackingState.value = false
         publishJob?.cancel()
         publishJob = null
     }
@@ -237,11 +238,11 @@ class CarViewModel @Inject constructor(
         viewModelScope.launch {
             rentCarRepository.callFirstAssignedCar(_latestReservedId.value).collect { result ->
                 result.onSuccess {
-                    _firstCall.value = true
                     _carPosition.emit(it)
+                    _firstCall.emit(true)
                     Timber.tag("첫 호출").d("성공")
                 }.onFailure {
-                    _firstCall.value = false
+                    _firstCall.emit(false)
                     Timber.tag("첫 호출").d("실패")
                 }
             }
