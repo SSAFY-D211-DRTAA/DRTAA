@@ -62,7 +62,7 @@ public class RentCarController {
                     .rentCarManufacturer("")
                     .rentCarModel("")
                     .rentCarImg("")
-                    .rentCarDrivingStatus(RentDrivingStatus.parked)
+                    .rentCarDrivingStatus(RentDrivingStatus.parking)
                     .build();
 
             return ResponseEntity.ok(response); // 200
@@ -71,21 +71,7 @@ public class RentCarController {
         }
     }
 
-    @PatchMapping("/drive")
-    @Operation(summary = "주행 상태 수정", description = "rentCarId의 맞는 렌트 차량의 주행 상태 수정")
-    public ResponseEntity updateDriveStatus(@RequestBody RentCarDriveStatusRequestDTO rentCarDriveStatusRequestDTO) {
-        try {
-            rentCarService.updateDriveStatus(rentCarDriveStatusRequestDTO);
-
-            return ResponseEntity.ok(rentCarDriveStatusRequestDTO); // 200
-        } catch (RentCarNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage()); // 400
-        }
-    }
-
-    @GetMapping("/drive/{rentCarId}")
+    @GetMapping("/{rentCarId}")
     @Operation(summary = "주행 상태 조회", description = "rentCarId의 맞는 렌트 차량의 주행 상태 조회")
     public ResponseEntity getDriveStatus(@PathVariable("rentCarId") Long rentCarId) {
         try {
@@ -100,7 +86,7 @@ public class RentCarController {
     }
 
     @PatchMapping("/call/{rentId}")
-    @Operation(summary = "렌트 차량 첫호출", description = "회원의 진행할 렌트 차량 첫호출(렌트 요청 시 입력했던 탑승 위치 전송)")
+    @Operation(summary = "렌트 차량 첫호출", description = "회원의 진행할 렌트 차량 첫호출(렌트 요청 시 입력했던 탑승 위치 전송), 렌트 상태 진행중으로 변경")
     public ResponseEntity callRentCar(@PathVariable("rentId") long rentId) {
         try{
             RentCarLocationResponseDTO response = rentCarService.callRentCar(rentId);
@@ -128,6 +114,38 @@ public class RentCarController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
         } catch (AuthenticationException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("권한 인증에 실패하였습니다."); // 401
+        } catch (WebSocketDisConnectedException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage()); // 500
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
+        }
+    }
+
+    @PatchMapping("/{rentId}/driving")
+    @Operation(summary = "렌트 차량 탑승", description = "회원이 진행중인 렌트 차량을 탑승한 경우 탑승(driving) 상태로 수정")
+    public ResponseEntity updateRentCarDriveStatustoDriving (@PathVariable("rentId") long rentId) {
+        try{
+            rentCarService.updateRentCarDriveStatustoDriving(rentId);
+
+            return ResponseEntity.ok("Success"); //200
+        } catch (RentNotFoundException | RentCarNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
+        } catch (WebSocketDisConnectedException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage()); // 500
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
+        }
+    }
+
+    @PatchMapping("/{rentId}/parking")
+    @Operation(summary = "렌트 차량 하차", description = "회원이 진행중인 렌트 차량을 탑승한 경우 하차(parking) 상태로 수정")
+    public ResponseEntity updateRentCarDriveStatustoParking (@PathVariable("rentId") long rentId) {
+        try{
+            rentCarService.updateRentCarDriveStatustoParking(rentId);
+
+            return ResponseEntity.ok("Success"); //200
+        } catch (RentNotFoundException | RentCarNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
         } catch (WebSocketDisConnectedException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage()); // 500
         } catch (Exception e) {

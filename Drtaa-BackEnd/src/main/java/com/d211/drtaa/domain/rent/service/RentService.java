@@ -31,9 +31,6 @@ public interface RentService {
     // rentId의 렌트 변경
     void updateRent(RentEditRequestDTO rentEditRequestDTO);
 
-    // rentId의 렌트 상태: 탑승
-    void rentStatusInProgress(long rentId);
-
     // rentId의 렌트 상태: 반납
     void rentStatusCompleted(RentStatusRequestDTO requestDTO);
 

@@ -311,7 +311,7 @@ public class RentServiceImpl implements RentService{
         rentRepository.save(rent);
 
         // 렌트 차량 상태 변경
-        availableCar.setRentCarDrivingStatus(RentDrivingStatus.parked); // 주차(기본값)
+        availableCar.setRentCarDrivingStatus(RentDrivingStatus.parking); // 주차(기본값)
 
         // 렌트 차량 변경 상태 저장
         rentCarRepository.save(availableCar);
@@ -366,20 +366,6 @@ public class RentServiceImpl implements RentService{
         rent.setRentHeadCount(rentEditRequestDTO.getRentHeadCount() != null ? rentEditRequestDTO.getRentHeadCount() : rent.getRentHeadCount());
         rent.setRentDptLat(rentEditRequestDTO.getRentDptLat() != null ? rentEditRequestDTO.getRentDptLat() : rent.getRentDptLat());
         rent.setRentDptLon(rentEditRequestDTO.getRentDptLon() != null ? rentEditRequestDTO.getRentDptLon() : rent.getRentDptLon());
-
-        // 변경 상태 저장
-        rentRepository.save(rent);
-    }
-
-    @Override
-    @Transactional
-    public void rentStatusInProgress(long rentId) {
-        // 렌트 찾기
-        Rent rent = rentRepository.findByRentId(rentId)
-                .orElseThrow(() -> new RentNotFoundException("해당 rentId의 맞는 렌트를 찾을 수 없습니다."));
-
-        // 상태 변경
-        rent.setRentStatus(RentStatus.in_progress);
 
         // 변경 상태 저장
         rentRepository.save(rent);

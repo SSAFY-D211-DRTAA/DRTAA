@@ -41,7 +41,7 @@ public class RentCar {
     @Enumerated(EnumType.STRING)
     @Column(name = "rent_car_driving_status", nullable = false)
     @ColumnDefault("parked")
-    @Schema(description = "렌트 차량 주행 상태", example = "parked")
+    @Schema(description = "렌트 차량 주행 상태", example = "parking")
     private RentDrivingStatus rentCarDrivingStatus;
 
     @OneToMany(mappedBy = "rentCar", fetch = FetchType.LAZY)
