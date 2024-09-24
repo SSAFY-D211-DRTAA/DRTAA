@@ -9,10 +9,23 @@
         android:id="@+id/planListFragment"
         android:name="com.drtaa.feature_plan.PlanListFragment"
         android:label="PlanListFragment"
-        tools:layout="@layout/fragment_plan_list" />
+        tools:layout="@layout/fragment_plan_list" >
+        <action
+            android:id="@+id/action_planListFragment_to_planSearchFragment"
+            app:destination="@id/planSearchFragment" />
+    </fragment>
     <fragment
         android:id="@+id/planSearchFragment"
         android:name="com.drtaa.feature_plan.PlanSearchFragment"
         android:label="PlanSearchFragment"
         tools:layout="@layout/fragment_plan_search" />
+    <fragment
+        android:id="@+id/dayPlanFragment"
+        android:name="com.drtaa.feature_plan.DayPlanFragment"
+        android:label="DayPlanFragment"
+        tools:layout="@layout/fragment_day_plan">
+        <action
+            android:id="@+id/action_dayPlanFragment_to_planSearchFragment"
+            app:destination="@id/planSearchFragment" />
+    </fragment>
 </navigation>

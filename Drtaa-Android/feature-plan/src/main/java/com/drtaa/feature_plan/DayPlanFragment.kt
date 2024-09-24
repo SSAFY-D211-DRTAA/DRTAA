@@ -15,5 +15,12 @@ class DayPlanFragment(
 
     override fun initView() {
         binding.tvDay.text = "Day $day"
+        initEvent()
+    }
+
+    private fun initEvent() {
+        binding.btnAddPlan.setOnClickListener {
+            navigateDestination(R.id.action_planListFragment_to_planSearchFragment)
+        }
     }
 }
