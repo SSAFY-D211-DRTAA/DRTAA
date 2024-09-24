@@ -238,6 +238,7 @@ class CarViewModel @Inject constructor(
             rentCarRepository.callFirstAssignedCar(_latestReservedId.value).collect { result ->
                 result.onSuccess {
                     _firstCall.value = true
+                    _carPosition.emit(it)
                     Timber.tag("첫 호출").d("성공")
                 }.onFailure {
                     _firstCall.value = false

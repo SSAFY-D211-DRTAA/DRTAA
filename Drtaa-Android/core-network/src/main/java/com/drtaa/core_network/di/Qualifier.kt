@@ -13,3 +13,9 @@ annotation class DefaultOkHttpClient
 
 @Qualifier
 annotation class DefaultRetrofit
+
+@Qualifier
+annotation class Auth
+
+@Qualifier
+annotation class NoAuth

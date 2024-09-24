@@ -34,7 +34,7 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
     override fun initView() {
         showLoading()
         initUI()
-        initObserve()
+        observeViewModel()
         observeStatus()
         setupCardTouchListener()
     }
@@ -62,19 +62,36 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
         }
     }
 
-    private fun initObserve() {
+    private fun toggleCarOption(input: Boolean) {
+        if (!input) {
+            binding.btnTourQrcode.visibility = View.GONE
+            binding.btnTourExtend.visibility = View.GONE
+        } else {
+            binding.btnTourQrcode.visibility = View.VISIBLE
+            binding.btnTourExtend.visibility = View.VISIBLE
+        }
+    }
+
+    private fun observeViewModel() {
         viewModel.latestReservedId.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach {
             binding.tvReservedState.text = when {
                 it == -1L -> {
                     binding.clCarBottomTextGotoUse.isClickable = false
+                    toggleCarOption(false)
                     dismissLoading()
                     "예약한 차량이 없습니다"
                 }
 
                 it > 0 -> {
                     binding.clCarBottomTextGotoUse.isClickable = true
+                    toggleCarOption(true)
                     viewModel.getCurrentRent()
-                    "사용 여부 확인 중.."
+                    if (viewModel.currentRentDetail.value == null) {
+                        dismissLoading()
+                        "예약한 차량 호출하기"
+                    } else {
+                        "사용 여부 확인 중.."
+                    }
                 }
 
                 else -> {
@@ -86,7 +103,7 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
 
         viewModel.currentRentDetail.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { currentRentDetail ->
-                Timber.tag("car").d("$currentRentDetail")
+                Timber.tag("car detail").d("$currentRentDetail")
                 binding.apply {
                     if (currentRentDetail != null) {
                         dismissLoading()
