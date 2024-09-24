@@ -1,6 +1,7 @@
 package com.drtaa.feature_plan
 
 import android.view.View
+import androidx.core.view.isVisible
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -45,13 +46,8 @@ class PlanListFragment :
     private fun initObserve() {
         planViewModel.isEditMode.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { isEditMode ->
-                if (isEditMode) {
-                    binding.tvEditPlan.visibility = View.GONE
-                    binding.tvEditFinish.visibility = View.VISIBLE
-                } else {
-                    binding.tvEditPlan.visibility = View.VISIBLE
-                    binding.tvEditFinish.visibility = View.GONE
-                }
+                binding.tvEditPlan.isVisible = !isEditMode
+                binding.tvEditFinish.isVisible = isEditMode
             }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
@@ -78,18 +74,14 @@ class PlanListFragment :
             vpPlanDay.getChildAt(0).overScrollMode = RecyclerView.OVER_SCROLL_NEVER
             vpPlanDay.isUserInputEnabled = false
 
-            val initialDayPlan = seoulTrip.datesDetail[0]
-            tvPlanDay.text =
-                "Day ${initialDayPlan.travelDatesId} ${initialDayPlan.travelDatesDate.toDate()}"
+            updateDayPlanText(seoulTrip.datesDetail[0])
 
             ivPlanDayPrev.setOnClickListener {
                 binding.vpPlanDay.apply {
                     if (currentItem > 0) {
                         currentItem -= 1
 
-                        val currentDayPlan = seoulTrip.datesDetail[currentItem]
-                        tvPlanDay.text =
-                            "Day ${currentDayPlan.travelDatesId} ${currentDayPlan.travelDatesDate.toDate()}"
+                        updateDayPlanText(seoulTrip.datesDetail[currentItem])
                     }
                 }
             }
@@ -99,14 +91,15 @@ class PlanListFragment :
                     if (currentItem < fragmentList.size - 1) {
                         currentItem += 1
 
-                        val currentDayPlan = seoulTrip.datesDetail[currentItem]
-                        tvPlanDay.text =
-                            "Day ${currentDayPlan.travelDatesId} ${currentDayPlan.travelDatesDate.toDate()}"
+                        updateDayPlanText(seoulTrip.datesDetail[currentItem])
                     }
                 }
             }
         }
     }
 
-
+    private fun updateDayPlanText(dayPlan: Plan.DayPlan) {
+        binding.tvPlanDay.text =
+            "Day ${dayPlan.travelDatesId} ${dayPlan.travelDatesDate.toDate()}"
+    }
 }
