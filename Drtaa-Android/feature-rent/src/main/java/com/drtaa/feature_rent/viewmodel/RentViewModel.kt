@@ -3,11 +3,12 @@ package com.drtaa.feature_rent.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.drtaa.core_data.repository.RentRepository
-import com.drtaa.core_model.rent.RentInfo
-import com.drtaa.core_model.rent.RentSchedule
 import com.drtaa.core_model.map.Search
 import com.drtaa.core_model.network.RequestDuplicatedSchedule
+import com.drtaa.core_model.rent.RentInfo
+import com.drtaa.core_model.rent.RentSchedule
 import com.drtaa.core_model.util.toLocalDateTime
+import com.naver.maps.geometry.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -43,13 +44,23 @@ class RentViewModel @Inject constructor(
     private val _isDuplicatedSchedule = MutableSharedFlow<Boolean?>()
     val isDuplicatedSchedule: SharedFlow<Boolean?> = _isDuplicatedSchedule
 
+    val DEFAULT_LATLNG = LatLng(37.57578754990568, 126.90027478459672)
+
     init {
         setRentValid()
     }
 
     fun setRentStartLocation(search: Search) {
         viewModelScope.launch {
-            _rentStartLocation.value = search
+            val jungryujang = Search(
+                title = search.title,
+                category = search.category,
+                roadAddress = search.roadAddress,
+                lng = DEFAULT_LATLNG.longitude,
+                lat = DEFAULT_LATLNG.latitude
+            )
+//            _rentStartLocation.value = search
+            _rentStartLocation.value = jungryujang
         }
     }
 

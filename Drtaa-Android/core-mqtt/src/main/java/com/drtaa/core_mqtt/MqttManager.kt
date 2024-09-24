@@ -126,6 +126,7 @@ class MqttManager @Inject constructor() {
 
     fun disconnect() {
         if (isConnected) {
+            Timber.tag("MQTT").d("disconnect success")
             client.disconnect()
             isConnected = false
         }

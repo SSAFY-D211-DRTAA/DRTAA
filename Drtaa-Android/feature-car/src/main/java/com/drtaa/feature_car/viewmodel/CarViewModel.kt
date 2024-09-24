@@ -155,6 +155,10 @@ class CarViewModel @Inject constructor(
         }
     }
 
+    fun disconnectMQTT(){
+        gpsRepository.disconnectMqtt()
+    }
+
     fun toggleTrackingState() {
         _trackingState.value = !_trackingState.value
     }
@@ -215,6 +219,9 @@ class CarViewModel @Inject constructor(
         return currentRentDetail.first()
     }
 
+    /**
+     * 재호출
+     */
     fun callAssignedCar(userPosition: LatLng) {
         viewModelScope.launch {
             val rentId = _latestReservedId.value

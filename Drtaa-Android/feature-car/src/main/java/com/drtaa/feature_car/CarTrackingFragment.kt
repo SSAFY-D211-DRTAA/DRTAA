@@ -17,6 +17,7 @@ import com.naver.maps.map.overlay.OverlayImage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import timber.log.Timber
 
 @AndroidEntryPoint
 class CarTrackingFragment :
@@ -43,11 +44,11 @@ class CarTrackingFragment :
             if (viewModel.currentRentDetail.value == null) {
                 viewModel.callFirstAssignedCar()
             } else {
-                viewModel.callAssignedCar(DEFAULT_LATLNG)
+                viewModel.callAssignedCar(STARBUCKS)
             }
         }
         carMarker.map = naverMap
-        naverMap.moveCameraTo(DEFAULT_LATLNG.latitude, DEFAULT_LATLNG.longitude)
+        naverMap.moveCameraTo(STARBUCKS.latitude, STARBUCKS.longitude)
         binding.btnTracking.setOnClickListener {
             viewModel.toggleTrackingState()
         }
@@ -101,17 +102,23 @@ class CarTrackingFragment :
     }
 
     override fun iniView() {
+    }
+
+    override fun onResume() {
+        super.onResume()
         viewModel.initMQTT()
     }
 
     override fun onDestroy() {
+        Timber.tag("onDestroy").d("onDestroy")
         super.onDestroy()
+        viewModel.disconnectMQTT()
         viewModel.stopPublish()
     }
 
     companion object {
         private const val ICON_SIZE = 100
-        private val DEFAULT_LATLNG = LatLng(37.576760, 126.898863)
+        private val STARBUCKS = LatLng(37.576636819990284, 126.89879021208397)
 //        private val SANGAM_LATLNG = LatLng(37.57569116736151, 126.90039723462993)
     }
 }
