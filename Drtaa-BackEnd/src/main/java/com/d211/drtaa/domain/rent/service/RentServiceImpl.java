@@ -145,6 +145,10 @@ public class RentServiceImpl implements RentService{
         RentCar rentCar = rent.getRentCar();
         Travel travel = rent.getTravel();
 
+        // 렌트 차량 스케즐 가져오기
+        RentCarSchedule carSchedule = rentCarScheduleRepository.findByRentRentId(rent.getRentId())
+                .orElseThrow(() -> new RentCarScheduleNotFoundException("해당 rentId의 맞는 렌트 차량 스케줄을 찾을 수 없습니다."));
+
         RentDetailResponseDTO response = RentDetailResponseDTO.builder()
                 // rent
                 .rentId(rent.getRentId())
@@ -163,6 +167,7 @@ public class RentServiceImpl implements RentService{
                 .rentCarManufacturer(rentCar.getRentCarManufacturer())
                 .rentCarModel(rentCar.getRentCarModel())
                 .rentCarImg(rentCar.getRentCarImg())
+                .rentCarScheduleId(carSchedule.getRentCarScheduleId())
                 // travel
                 .travelId(travel.getTravelId())
                 .build();
@@ -178,6 +183,10 @@ public class RentServiceImpl implements RentService{
         RentCar rentCar = rent.getRentCar();
         Travel travel = rent.getTravel();
 
+        // 렌트 차량 스케즐 가져오기
+        RentCarSchedule carSchedule = rentCarScheduleRepository.findByRentRentId(rent.getRentId())
+                .orElseThrow(() -> new RentCarScheduleNotFoundException("해당 rentId의 맞는 렌트 차량 스케줄을 찾을 수 없습니다."));
+
         RentDetailResponseDTO response = RentDetailResponseDTO.builder()
                 // rent
                 .rentId(rent.getRentId())
@@ -196,6 +205,7 @@ public class RentServiceImpl implements RentService{
                 .rentCarManufacturer(rentCar.getRentCarManufacturer())
                 .rentCarModel(rentCar.getRentCarModel())
                 .rentCarImg(rentCar.getRentCarImg())
+                .rentCarScheduleId(carSchedule.getRentCarScheduleId())
                 // travel
                 .travelId(travel.getTravelId())
                 .build();
@@ -348,6 +358,7 @@ public class RentServiceImpl implements RentService{
                 .rentCarManufacturer(rentCar.getRentCarManufacturer())
                 .rentCarModel(rentCar.getRentCarModel())
                 .rentCarImg(rentCar.getRentCarImg())
+                .rentCarScheduleId(rentCarSchedule.getRentCarScheduleId())
                 // travel
                 .travelId(travel.getTravelId())
                 .build();

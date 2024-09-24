@@ -12,4 +12,5 @@ public interface RentCarScheduleRepository extends JpaRepository<RentCarSchedule
     List<RentCarSchedule> findByRentCar(RentCar car);
     Optional<RentCarSchedule> findByRentCarScheduleId(long rentCarScheduleId);
     List<RentCarSchedule> findByRentCarAndRentCarScheduleIsDoneFalse(RentCar car);
+    Optional<RentCarSchedule> findByRentRentId(long rentId);
 }
