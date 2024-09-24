@@ -35,6 +35,7 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
         showLoading()
         initUI()
         initObserve()
+        observeStatus()
         setupCardTouchListener()
     }
 
@@ -62,33 +63,6 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
     }
 
     private fun initObserve() {
-        viewModel.drivingStatus.flowWithLifecycle(viewLifecycleOwner.lifecycle)
-            .onEach { drivingStatus ->
-                when (drivingStatus) {
-                    CarStatus.DRIVING -> {
-                        binding.btnTourQrcode.visibility = View.GONE
-                        binding.btnGetOffQrcode.visibility = View.VISIBLE
-                    }
-
-                    CarStatus.PARKING -> {
-                        binding.btnTourQrcode.visibility = View.VISIBLE
-                        binding.btnGetOffQrcode.visibility = View.GONE
-                    }
-
-                    CarStatus.IDLE -> {
-                        binding.btnTourQrcode.visibility = View.VISIBLE
-                        binding.btnGetOffQrcode.visibility = View.GONE
-                    }
-                }
-            }.launchIn(viewLifecycleOwner.lifecycleScope)
-
-        viewModel.rentState.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach { isOnCar ->
-            if (isOnCar) {
-                viewModel.getCurrentRent()
-            }
-            Timber.tag("rentState").d("$isOnCar")
-        }.launchIn(viewLifecycleOwner.lifecycleScope)
-
         viewModel.latestReservedId.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach {
             binding.tvReservedState.text = when {
                 it == -1L -> {
@@ -108,8 +82,6 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
                     "불러오는 중.."
                 }
             }
-
-
         }.launchIn(viewLifecycleOwner.lifecycleScope)
 
         viewModel.currentRentDetail.flowWithLifecycle(viewLifecycleOwner.lifecycle)
@@ -125,7 +97,7 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
                                 animeCarNorent.visibility = View.GONE
                                 btnTrackingCar.isClickable = true
                                 tvTourRemainTime.text =
-                                    "남은시간 : ${currentRentDetail.rentTime * 60} 분"
+                                    "남은시간 : ${currentRentDetail.rentTime * MIN} 분"
                                 currentRentDetail.rentCarImg?.let {
                                     imgCarCarimage.fitCenter(
                                         it,
@@ -156,7 +128,9 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
                     }
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
+    }
 
+    private fun observeStatus() {
         viewModel.isSuccessComplete.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { isSuccess ->
                 if (isSuccess) {
@@ -166,6 +140,33 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
                     showSnackBar("반납 실패")
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+        viewModel.drivingStatus.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach { drivingStatus ->
+                when (drivingStatus) {
+                    CarStatus.DRIVING -> {
+                        binding.btnTourQrcode.visibility = View.GONE
+                        binding.btnGetOffQrcode.visibility = View.VISIBLE
+                    }
+
+                    CarStatus.PARKING -> {
+                        binding.btnTourQrcode.visibility = View.VISIBLE
+                        binding.btnGetOffQrcode.visibility = View.GONE
+                    }
+
+                    CarStatus.IDLE -> {
+                        binding.btnTourQrcode.visibility = View.VISIBLE
+                        binding.btnGetOffQrcode.visibility = View.GONE
+                    }
+                }
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+        viewModel.rentState.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach { isOnCar ->
+            if (isOnCar) {
+                viewModel.getCurrentRent()
+            }
+            Timber.tag("rentState").d("$isOnCar")
+        }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -271,5 +272,6 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
         const val DURATION = 300L
         const val TOUCH_PRESS_TIME = 100
         const val MAX_ROTATION = 15f
+        const val MIN = 60
     }
 }

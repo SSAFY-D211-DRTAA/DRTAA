@@ -26,11 +26,12 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
-enum class CarStatus{
+enum class CarStatus {
     DRIVING,
     PARKING,
     IDLE
 }
+
 @HiltViewModel
 class CarViewModel @Inject constructor(
     private val gpsRepository: GPSRepository,
@@ -245,7 +246,6 @@ class CarViewModel @Inject constructor(
             }
         }
     }
-
 
     companion object {
         private const val DEFAULT_INTERVAL = 2000L
