@@ -39,7 +39,7 @@ object APIModule {
     @Auth
     @Provides
     fun provideSignAPI(
-        @DefaultRetrofit
+        @AuthRetrofit
         retrofit: Retrofit
     ): SignAPI = retrofit.create(SignAPI::class.java)
 
