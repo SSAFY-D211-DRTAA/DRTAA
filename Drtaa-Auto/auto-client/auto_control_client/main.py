@@ -17,6 +17,7 @@ CONFIG_FILE_PATH = 'config.json'
 GPS_TOPIC = "/gps"
 COMPLETE_DRIVE_TOPIC = "/complete_drive"
 MOVE_BASE_GOAL_TOPIC = "/move_base_simple/goal"
+GLOBAL_PATH_TOPIC = "/global_path_once"
 
 current_goal_index = 0
 gps_count_index = 0
@@ -73,6 +74,28 @@ def calc_pose_from_gps(latitude: float, longitude: float) -> Tuple[float, float]
 
     return x, y
 
+
+def calc_gps_from_pose(x: float, y: float) -> Tuple[float, float]:
+    """
+    로컬 좌표계를 GPS 좌표로 변환합니다.
+
+    :param x: 로컬 좌표계의 x 값
+    :param y: 로컬 좌표계의 y 값
+    :return: (latitude, longitude) GPS 좌표
+    """
+    crs_utm = CRS(proj='utm', zone=config['utm_zone'], ellps='WGS84')
+    transformer = Transformer.from_crs(crs_utm, "EPSG:4326")
+
+    # 오프셋을 다시 더해 원래의 UTM 좌표로 복원
+    utm_x = x + config['east_offset']
+    utm_y = y + config['north_offset']
+
+    # UTM 좌표를 위도와 경도로 변환
+    latitude, longitude = transformer.transform(utm_x, utm_y)
+
+    return latitude, longitude
+
+
 def publish_pose_from_gps(ws: WebSocketApp, lat: float, lon: float) -> None:
     """
     GPS 좌표를 이용하여 로봇의 목표 위치를 발행합니다.
@@ -125,6 +148,7 @@ def publish_next_goal(ws: websocket.WebSocketApp) -> None:
         current_goal_index += 1
     else:
         logging.info("모든 목표 위치에 도달했습니다.")
+        current_goal_index = 0
 
 def subscribe(ws: WebSocketApp, topic: str, type: str) -> None:
     """
@@ -167,29 +191,6 @@ def on_ros_bridge_message(ws: WebSocketApp, message: str) -> None:
         data: Dict[str, Any] = json.loads(message)
         if data['op'] == 'publish':
             if data['topic'] == GPS_TOPIC:
-                """
-                {
-                    "op": "publish",
-                    "topic": "/gps",
-                    "msg": {
-                        "header": {
-                            "seq": 2719,
-                            "stamp": {
-                                "secs": 1726724743, 
-                                "nsecs": 968000000
-                                },
-                            "frame_id": "gps"
-                        },
-                        "latitude": 37.58258292262119,
-                        "longitude": 126.88956050473249,
-                        "altitude": 36.98945840126462,
-                        "eastOffset": 313008.55819800857,
-                        "northOffset": 4161698.628368007,
-                        "status": 1
-                    }
-                }
-                """
-
                 gps_data = data['msg']
 
                 try:
@@ -205,15 +206,6 @@ def on_ros_bridge_message(ws: WebSocketApp, message: str) -> None:
 
             elif data['topic'] == COMPLETE_DRIVE_TOPIC:
                 logging.info("도착지에 도착했습니다.")
-                """
-                {
-                    "op": "publish",
-                    "topic": "/complete_drive",
-                    "msg": {
-                        "data": true
-                    }
-                }
-                """
                 
                 try:
                     with open('complete_drive_data.json', 'w') as f:
@@ -223,7 +215,17 @@ def on_ros_bridge_message(ws: WebSocketApp, message: str) -> None:
                 
                 send_to_ec2(data)
 
-                publish_pose_from_gps(ws, config['next_goal_lat'], config['next_goal_lon'])
+            elif data['topic'] == GLOBAL_PATH_TOPIC:
+                path_data = data['msg']
+
+                try:
+                    with open('global_path_data.json', 'w') as f:
+                        json.dump(path_data, f)
+                except IOError as e:
+                    logging.error(f"Global Path 데이터를 파일에 저장하는 중 오류 발생: {e}")
+
+                # send_to_ec2(path_data)
+
     except json.JSONDecodeError:
         logging.error("잘못된 JSON 형식의 메시지를 받았습니다.")
     except KeyError as e:
@@ -240,21 +242,34 @@ def on_ros_bridge_close(ws: WebSocketApp, close_status_code: int, close_msg: str
 def on_ros_bridge_open(ws: WebSocketApp) -> None:
     logging.info("ROS Bridge WebSocket 연결 성공")
 
-    subscribe(ws, "/gps", "morai_msgs/GPSMessage")
-    subscribe(ws, "/complete_drive", "std_msgs/Bool")
+    subscribe(ws, GPS_TOPIC, "morai_msgs/GPSMessage")
+    subscribe(ws, COMPLETE_DRIVE_TOPIC, "geometry_msgs/PoseStamped")
+    subscribe(ws, GLOBAL_PATH_TOPIC, "nav_msgs/Path")
 
-    publish_pose_from_gps(ws, config['test_lat'], config['test_lon'])
 
 def on_ec2_message(ws: WebSocketApp, message: str) -> None:
     logging.info(f"EC2로부터 메시지 수신: {message}")
     try:
         data: Dict[str, Any] = json.loads(message)
+        
+        action = data.get('action')
+
+        if action == 'vehicle_dispatch':
+            publish_pose_from_gps(ros_bridge_ws, data['latitude'], data['longitude'])
+        elif action == 'vehicle_return':
+            publish_pose_from_gps(ros_bridge_ws, config['lat_return'], config['lon_return'])
+        elif action == 'vehicle_drive':
+            publish_pose_from_gps(ros_bridge_ws, config['lat_return'], config['lon_return'])
+        elif action == 'vehicle_wait':
+            publish_next_goal(ros_bridge_ws)
+
         # 데이터를 파일에 저장
         try:
-            with open('ec2_data.json', 'w') as f:
+            with open('ec2_recv.json', 'w') as f:
                 json.dump(data, f)
         except IOError as e:
             logging.error(f"GPS 데이터를 파일에 저장하는 중 오류 발생: {e}")
+
     except json.JSONDecodeError:
         logging.error("잘못된 JSON 형식의 메시지를 받았습니다.")
     except KeyError as e:
@@ -272,6 +287,12 @@ def on_ec2_open(ws: WebSocketApp) -> None:
     logging.info("EC2 WebSocket 연결 성공")
     send_to_ec2({"type": "connect",  "action": "Auto Client Connect"})
 
+def send_to_ros_bridge(data: Dict[str, Any]) -> None:
+    if ros_bridge_ws and ros_bridge_ws.sock and ros_bridge_ws.sock.connected:
+        ros_bridge_ws.send(json.dumps(data))
+    else:
+        logging.error("ROS Bridge WebSocket 연결이 없거나 연결되지 않았습니다.")
+
 def send_to_ec2(data: Dict[str, Any]) -> None:
     if ec2_ws and ec2_ws.sock and ec2_ws.sock.connected:
         ec2_ws.send(json.dumps(data))
@@ -284,6 +305,8 @@ def signal_handler(sig: int, frame: Any) -> None:
     if ros_bridge_ws:
         unsubscribe(ros_bridge_ws, GPS_TOPIC)
         unsubscribe(ros_bridge_ws, COMPLETE_DRIVE_TOPIC)
+        unsubscribe(ros_bridge_ws, GLOBAL_PATH_TOPIC)
+
         ros_bridge_ws.close()
 
     if ec2_ws:

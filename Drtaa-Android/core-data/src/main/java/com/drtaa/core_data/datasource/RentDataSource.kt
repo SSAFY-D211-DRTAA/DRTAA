@@ -3,6 +3,9 @@ package com.drtaa.core_data.datasource
 import com.drtaa.core_model.network.RequestCallRent
 import com.drtaa.core_model.network.RequestChangeRent
 import com.drtaa.core_model.network.RequestCompleteRent
+import com.drtaa.core_model.network.RequestDuplicatedSchedule
+import com.drtaa.core_model.network.RequestUnassignedCar
+import com.drtaa.core_model.rent.RentCar
 import com.drtaa.core_model.network.RequestRentExtend
 import com.drtaa.core_model.network.ResponseRentStateAll
 import com.drtaa.core_model.rent.RentDetail
@@ -19,6 +22,7 @@ interface RentDataSource {
     suspend fun getRentDetail(rentId: Long): RentDetail
     suspend fun getAllRentState(): List<ResponseRentStateAll>
     suspend fun getCurrentRent(): RentDetail
+    suspend fun checkDuplicatedRent(rentSchedule: RequestDuplicatedSchedule): Boolean
     // history
     suspend fun getRentHistory(): List<RentSimple>
 }

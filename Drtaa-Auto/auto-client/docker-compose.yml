@@ -11,9 +11,10 @@ services:
     depends_on:
       rosbridge:
         condition: service_healthy
-    networks:
-      - ros_network
-      - external_network
+    network_mode: host
+    # networks:
+    #   - ros_network
+    #   - external_network
 
   rosbridge:
     build:
