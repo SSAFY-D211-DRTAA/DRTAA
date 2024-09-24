@@ -287,6 +287,12 @@ public class RentCarServiceImpl implements RentCarService {
                         JsonNode jsonNode = objectMapper.readTree(message.getPayload());
                         log.info("Received message: {}", jsonNode);
 
+                        // null 체크 추가
+                        JsonNode latNode = jsonNode.get("latitude");
+                        JsonNode lonNode = jsonNode.get("longitude");
+                        log.info("latitude: {}", latNode);
+                        log.info("longitude: {}", lonNode);
+
                     } catch (Exception e) {
                         log.error("Error processing received message: ", e);
                     }
@@ -294,7 +300,7 @@ public class RentCarServiceImpl implements RentCarService {
             }, webSocketConfig.getUrl()).get();
 
             // 상태와 렌트 탑승 위치 전송
-            MyMessage message = new MyMessage("vehicle_drive");
+            MyMessage message = new MyMessage("vehicle_drive", 37.576636819990284, 126.89879021208397);
             String jsonMessage = objectMapper.writeValueAsString(message);
             session.sendMessage(new TextMessage(jsonMessage));
             log.info("Sent message: {}", jsonMessage);
