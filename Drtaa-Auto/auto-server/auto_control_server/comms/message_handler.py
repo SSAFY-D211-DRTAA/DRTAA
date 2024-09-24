@@ -61,7 +61,7 @@ class MessageHandler:
 
     def handle_vehicle_drive(self, data):
         # 차량 주행 로직
-        return {"status": "success", "message": "Vehicle driving"}
+        return {"status": "success", "message": "Vehicle driving", "latitude": data['latitude'], "longitude": data['longitude']}
     
     def handle_vehicle_wait(self, data):
         # 차량 대기 로직
