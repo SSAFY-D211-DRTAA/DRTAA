@@ -7,10 +7,10 @@ import json
 # 스크립트 실행 관련 로거
 main_logger = setup_logger(__name__)
 # MQTT 메시지 처리 관련 로거
-message_logger = setup_logger('message_logger', 'mqtt_messages.log', logging.DEBUG)
+message_logger = setup_logger('message_logger', 'mqtt_messages.log', logging.INFO)
 
 class MQTTClient:
-    def __init__(self, broker='localhost', port=1883, topic="vehicle_control"):
+    def __init__(self, broker='mqtt-broker', port=1883, topic="vehicle_control"):
         self.broker = broker
         self.port = port
         self.topic = topic
@@ -44,15 +44,9 @@ class MQTTClient:
     def on_message(self, client, userdata, msg):
         message_logger.debug(f"Received message on topic {msg.topic}: {msg.payload}")
         response = self.message_handler.handle_message(msg.payload.decode(), "MQTT")
-
-        # 여기에 메시지 처리 로직을 추가합니다.
-        
-        # msg.payload를 문자열로 디코딩
-        command = msg.payload.decode('utf-8')
-        print(command)
         
         # MQTT로 응답을 보내는 로직 (필요한 경우)
-        self.client.publish(f"{msg.topic}/response", json.dumps(response))
+        self.client.publish(f"{self.pub_gps_topic}", json.dumps(response))
 
 
     def on_subscribe(self, client, userdata, mid, granted_qos, properties=None):
