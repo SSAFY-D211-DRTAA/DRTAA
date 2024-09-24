@@ -242,9 +242,7 @@ def on_ros_bridge_open(ws: WebSocketApp) -> None:
     logging.info("ROS Bridge WebSocket 연결 성공")
 
     subscribe(ws, "/gps", "morai_msgs/GPSMessage")
-    subscribe(ws, "/complete_drive", "std_msgs/Bool")
-
-    # publish_pose_from_gps(ws, config['test_lat'], config['test_lon'])
+    subscribe(ws, "/complete_drive", "geometry_msgs/PoseStamped")
 
 def on_ec2_message(ws: WebSocketApp, message: str) -> None:
     logging.info(f"EC2로부터 메시지 수신: {message}")

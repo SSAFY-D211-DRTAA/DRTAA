@@ -23,7 +23,7 @@ class CommandDistributorWebSocketServer:
             async for message in websocket:
                 try:
                     data = json.loads(message)
-                    logger.info(f"Received message on additional server: {data}")
+                    logger.info(f"recv cmd from client: {data}")
                     try:
                         with open('gps_data.json', 'w') as f:
                             json.dump(data, f)
