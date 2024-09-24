@@ -14,11 +14,8 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 
 interface RentAPI {
-    @GET("rent")
-    suspend fun getRentHistory(): List<RentSimple>
-
     @POST("rent")
-    suspend fun callAllRent(
+    suspend fun callRent(
         @Body requestCallRent: RequestCallRent,
     ): RentDetail
 
@@ -62,4 +59,8 @@ interface RentAPI {
 
     @GET("rent/current")
     suspend fun getCurrentRent(): RentDetail
+
+    // history
+    @GET("rent")
+    suspend fun getRentHistory(): List<RentSimple>
 }

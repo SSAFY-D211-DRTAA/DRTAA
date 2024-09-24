@@ -134,7 +134,7 @@ class CarViewModel @Inject constructor(
             val rentDetail = getRentDetail() ?: return@launch
             Timber.tag("complete").d("$rentDetail")
             val requestCompleteRent = RequestCompleteRent(
-                rentId = rentDetail.rentId,
+                rentId = rentDetail.rentId ?: -1,
                 rentCarScheduleId = rentDetail.rentCarScheduleId
             )
 
