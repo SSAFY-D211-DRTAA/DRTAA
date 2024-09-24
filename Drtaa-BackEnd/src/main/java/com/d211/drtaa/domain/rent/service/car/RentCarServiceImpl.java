@@ -276,6 +276,35 @@ public class RentCarServiceImpl implements RentCarService {
         RentCar car = rentCarRepository.findByRentCarId(rent.getRentCar().getRentCarId())
                 .orElseThrow(() -> new RentCarNotFoundException("해당 rentCarId의 맞는 차량을 찾을 수 없습니다."));
 
+        try {
+            StandardWebSocketClient client = new StandardWebSocketClient();
+            WebSocketSession session = client.execute(new TextWebSocketHandler() {
+                @Override
+                protected void handleTextMessage(WebSocketSession session, TextMessage message) {
+                    // 서버로부터 받은 메시지를 처리하는 로직
+                    try {
+                        // JSON 메시지를 JsonNode로 파싱
+                        JsonNode jsonNode = objectMapper.readTree(message.getPayload());
+                        log.info("Received message: {}", jsonNode);
+
+                    } catch (Exception e) {
+                        log.error("Error processing received message: ", e);
+                    }
+                }
+            }, webSocketConfig.getUrl()).get();
+
+            // 상태와 렌트 탑승 위치 전송
+            MyMessage message = new MyMessage("vehicle_drive");
+            String jsonMessage = objectMapper.writeValueAsString(message);
+            session.sendMessage(new TextMessage(jsonMessage));
+            log.info("Sent message: {}", jsonMessage);
+            Thread.sleep(1000); // 필요에 따라 대기 시간 조절
+
+        } catch (Exception e) {
+            log.error("Error during WebSocket communication: ", e);
+            throw new WebSocketDisConnectedException("WebSocket이 네트워크 연결을 거부했습니다.");
+        }
+
         // 렌트 차량 상태 변경
         car.setRentCarDrivingStatus(RentDrivingStatus.driving);
 
