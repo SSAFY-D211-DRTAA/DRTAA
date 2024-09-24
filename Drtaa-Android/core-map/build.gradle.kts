@@ -39,6 +39,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":core-ui"))
     implementation(libs.map.sdk)
     // Lifecycle
     implementation(libs.lifecycle.runtime.ktx)

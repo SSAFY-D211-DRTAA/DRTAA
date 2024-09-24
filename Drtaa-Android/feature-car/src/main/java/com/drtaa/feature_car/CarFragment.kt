@@ -29,6 +29,12 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
     private var touchStartTime: Long = 0
 
     override fun initView() {
+        initUI()
+        initObserve()
+        setupCardTouchListener()
+    }
+
+    private fun initUI() {
         binding.apply {
             cardView = cvTourCard
             overlayView = viewTourOverlay
@@ -37,23 +43,33 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
             btnTrackingCar.setOnClickListener {
                 navigateDestination(R.id.action_carFragment_to_carTrackingFragment)
             }
+
+            clCarBottomTextGotoUse.setOnClickListener {
+                navigateDestination(R.id.action_carFragment_to_carTrackingFragment)
+            }
         }
-        setupCardTouchListener()
-        initObserve()
     }
 
     private fun initObserve() {
-        carViewModel.currentRentDetail.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+        carviewModel.latestReservedId.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach {
+            binding.tvReservedState.text = if (it == 0L) {
+                "현재 예약된 차량이 없습니다"
+            } else {
+                "예약한 차량 호출하기"
+            }
+        }.launchIn(viewLifecycleOwner.lifecycleScope)
+        carviewModel.currentRentDetail.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { currentRentDetail ->
+                Timber.tag("car").d("$currentRentDetail")
                 binding.apply {
                     if (currentRentDetail != null) {
-                        binding.rentDetail = currentRentDetail
                         imgCarCarimage.visibility = View.VISIBLE
                     } else {
+                        clCarBottomTextGotoUse.visibility = View.VISIBLE
                         btnTrackingCar.isClickable = false
                         clCarBottomText.visibility = View.GONE
                         animeCarNorent.visibility = View.VISIBLE
-                        tvTourRemainTime.setText("현재 이용중인 차량이 없습니다..")
+                        tvTourRemainTime.text = "현재 이용중인 차량이 없습니다.."
                     }
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
@@ -61,10 +77,8 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
         carViewModel.isSuccessComplete.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { isSuccess ->
                 if (isSuccess) {
-                    Timber.d("반납 성공")
                     showSnackBar("반납 성공")
                 } else {
-                    Timber.d("반납 실패")
                     showSnackBar("반납 실패")
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
@@ -77,6 +91,8 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
                 MotionEvent.ACTION_DOWN -> { // 처음 눌렀을 때 시간을 재서 클릭과 드로잉을 구분해야지
                     isTouching = true
                     touchStartTime = System.currentTimeMillis()
+                    // 부모 ScrollView가 터치 이벤트를 가로채지 않도록 설정
+                    v.parent.requestDisallowInterceptTouchEvent(true)
                     true
                 }
 
@@ -92,6 +108,8 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
 
                     resetOverlay()
                     resetReflection()
+                    // 부모 ScrollView가 다시 터치 이벤트를 가로챌 수 있도록 원복
+                    v.parent.requestDisallowInterceptTouchEvent(false)
                     true
                 }
 

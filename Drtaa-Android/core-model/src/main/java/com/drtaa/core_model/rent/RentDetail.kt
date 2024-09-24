@@ -1,7 +1,7 @@
 package com.drtaa.core_model.rent
 
 data class RentDetail(
-    val rentId: Long,
+    val rentId: Long? = null,
     val rentCarId: Int,
     val rentCarManufacturer: String,
     val rentCarModel: String,
@@ -16,5 +16,5 @@ data class RentDetail(
     val rentPrice: Int,
     val rentStartTime: String,
     val rentStatus: String,
-    val rentTime: Int
+    val rentTime: Int,
 )

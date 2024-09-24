@@ -10,6 +10,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/main"
         android:layout_width="match_parent"
+        android:background="@color/white"
         android:layout_height="match_parent"
         tools:context="com.drtaa.feature_main.MainActivity">
 
@@ -29,8 +30,8 @@
             android:id="@+id/bottom_navigation_bar"
             android:layout_width="match_parent"
             android:layout_height="68dp"
-            android:layout_marginEnd="16dp"
-            android:background="@android:color/transparent"
+            android:backgroundTint="@color/white"
+            android:background="@android:color/white"
             android:paddingVertical="4dp"
             app:itemIconSize="24dp"
             app:itemRippleColor="@android:color/transparent"

@@ -15,12 +15,35 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-        <Button
+        <TextView
+            android:id="@+id/btn_call"
+            style="@style/jua"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/circle_call"
+            android:gravity="center"
+            android:text="호출"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
             android:id="@+id/btn_tracking"
+            style="@style/jua"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="차 추척 ON/OFF"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/rect_blue_rad30"
+            android:gravity="center"
+            android:padding="20dp"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
         <Button
@@ -28,8 +51,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="차량 반납"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/btn_tracking" />
+            app:layout_constraintBottom_toTopOf="@+id/btn_tracking"
+            app:layout_constraintStart_toStartOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

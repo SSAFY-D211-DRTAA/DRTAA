@@ -2,27 +2,49 @@ package com.drtaa.core_data.datasourceimpl
 
 import com.drtaa.core_data.datasource.RentDataSource
 import com.drtaa.core_model.network.RequestCallRent
+import com.drtaa.core_model.network.RequestChangeRent
 import com.drtaa.core_model.network.RequestCompleteRent
-import com.drtaa.core_model.network.RequestUnassignedCar
-import com.drtaa.core_model.rent.RentCar
+import com.drtaa.core_model.network.RequestRentExtend
+import com.drtaa.core_model.network.ResponseRentStateAll
 import com.drtaa.core_model.rent.RentDetail
 import com.drtaa.core_model.rent.RentSimple
 import com.drtaa.core_network.api.RentAPI
 import javax.inject.Inject
 
 class RentDataSourceImpl @Inject constructor(
-    private val rentAPI: RentAPI
+    private val rentAPI: RentAPI,
 ) : RentDataSource {
-    override suspend fun getUnassignedCar(rentSchedule: RequestUnassignedCar): RentCar {
-        return rentAPI.getUnassignedCar(rentSchedule)
-    }
 
     override suspend fun callRent(requestCallRent: RequestCallRent): RentDetail {
         return rentAPI.callRent(requestCallRent)
     }
 
+    override suspend fun changeRent(requestChangeRent: RequestChangeRent): String {
+        return rentAPI.changeRent(requestChangeRent)
+    }
+
+    override suspend fun extendRentTime(requestRentExtend: RequestRentExtend): String {
+        return rentAPI.extendRentTime(requestRentExtend)
+    }
+
+    override suspend fun getOnRentCar(rentId: Long): String {
+        return rentAPI.getOnRentCar(rentId)
+    }
+
+    override suspend fun getAllCompletedRent(rentId: Long): List<ResponseRentStateAll> {
+        return rentAPI.getAllCompletedRent(rentId)
+    }
+
     override suspend fun completeRent(requestCompleteRent: RequestCompleteRent) {
         rentAPI.completeRent(requestCompleteRent)
+    }
+
+    override suspend fun cancelRent(requestCompleteRent: RequestCompleteRent): String {
+        return rentAPI.cancelRent(requestCompleteRent)
+    }
+
+    override suspend fun getRentDetail(rentId: Long): RentDetail {
+        return rentAPI.getRentDetail(rentId)
     }
 
     override suspend fun getRentHistory(): List<RentSimple> {
@@ -31,5 +53,9 @@ class RentDataSourceImpl @Inject constructor(
 
     override suspend fun getCurrentRent(): RentDetail {
         return rentAPI.getCurrentRent()
+    }
+
+    override suspend fun getAllRentState(): List<ResponseRentStateAll> {
+        return rentAPI.getAllRentState()
     }
 }

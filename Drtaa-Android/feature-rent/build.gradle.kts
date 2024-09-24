@@ -46,8 +46,6 @@ dependencies {
     implementation(libs.material.calendarview)
     implementation(libs.threetenabp)
 
-//    implementation (libs.android)
-
     //location
-    implementation (libs.play.services.location.v2101)
+    implementation (libs.play.services.location)
 }
