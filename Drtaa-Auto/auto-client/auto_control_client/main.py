@@ -125,6 +125,7 @@ def publish_next_goal(ws: websocket.WebSocketApp) -> None:
         current_goal_index += 1
     else:
         logging.info("모든 목표 위치에 도달했습니다.")
+        current_goal_index = 0
 
 def subscribe(ws: WebSocketApp, topic: str, type: str) -> None:
     """
@@ -251,16 +252,21 @@ def on_ec2_message(ws: WebSocketApp, message: str) -> None:
         data: Dict[str, Any] = json.loads(message)
 
         if data['action'] == 'vehicle_dispatch':
-            publish_pose_from_gps(ws, data['latitude'], data['longitude'])
+            publish_pose_from_gps(ros_bridge_ws, data['latitude'], data['longitude'])
         elif data['action'] == 'vehicle_return':
-            publish_pose_from_gps(ws, config['lat_return'], config['lon_return'])
+            publish_pose_from_gps(ros_bridge_ws, config['lat_return'], config['lon_return'])
+        elif data['action'] == 'vehicle_drive':
+            publish_pose_from_gps(ros_bridge_ws, config['lat_return'], config['lon_return'])
+        elif data['action'] == 'vehicle_wait':
+            publish_next_goal(ros_bridge_ws)
 
         # 데이터를 파일에 저장
         try:
-            with open('ec2_data.json', 'w') as f:
+            with open('ec2_recv.json', 'w') as f:
                 json.dump(data, f)
         except IOError as e:
             logging.error(f"GPS 데이터를 파일에 저장하는 중 오류 발생: {e}")
+
     except json.JSONDecodeError:
         logging.error("잘못된 JSON 형식의 메시지를 받았습니다.")
     except KeyError as e:
@@ -277,6 +283,12 @@ def on_ec2_close(ws: WebSocketApp, close_status_code: int, close_msg: str) -> No
 def on_ec2_open(ws: WebSocketApp) -> None:
     logging.info("EC2 WebSocket 연결 성공")
     send_to_ec2({"type": "connect",  "action": "Auto Client Connect"})
+
+def send_to_ros_bridge(data: Dict[str, Any]) -> None:
+    if ros_bridge_ws and ros_bridge_ws.sock and ros_bridge_ws.sock.connected:
+        ros_bridge_ws.send(json.dumps(data))
+    else:
+        logging.error("ROS Bridge WebSocket 연결이 없거나 연결되지 않았습니다.")
 
 def send_to_ec2(data: Dict[str, Any]) -> None:
     if ec2_ws and ec2_ws.sock and ec2_ws.sock.connected:
