@@ -1,0 +1,41 @@
+services:
+  client:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    volumes:
+      - ./auto_control_client:/app
+    command: python3 main.py
+    env_file:
+      - ./auto_control_client/.env
+    depends_on:
+      rosbridge:
+        condition: service_healthy
+    networks:
+      - ros_network
+      - external_network
+
+  rosbridge:
+    build:
+      context: .
+      dockerfile: Dockerfile.rosbridge
+    ports:
+      - "9090:9090"
+    environment:
+      - ROS_HOSTNAME=rosbridge
+      - ROS_MASTER_URI=http://rosbridge:11311
+      - ROS_PACKAGE_PATH=/opt/ros/noetic/share
+    networks:
+      - ros_network
+    healthcheck:
+      test: ["CMD-SHELL", "netstat -tuln | grep 9090 || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
+networks:
+  ros_network:
+    driver: bridge
+  external_network:
+    external: true

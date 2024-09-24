@@ -1,0 +1,37 @@
+# ROS Noetic 기본 이미지 사용
+FROM ros:noetic-ros-core
+
+# 필요한 패키지 설치
+RUN apt-get update && apt-get install -y \
+    ros-noetic-rosbridge-server \ 
+    python3-catkin-tools \
+    build-essential \
+    cmake \
+    git \
+    net-tools \
+    && rm -rf /var/lib/apt/lists/*
+
+# catkin workspace 디렉토리 및 src 생성
+RUN mkdir -p /root/catkin_ws/src
+
+# MORAI ROS 메시지 패키지 클론
+RUN git clone https://github.com/MORAI-Autonomous/MORAI-ROS_morai_msgs.git /root/catkin_ws/src/MORAI-ROS_morai_msgs
+
+# catkin workspace 빌드
+RUN /bin/bash -c "source /opt/ros/noetic/setup.bash && cd /root/catkin_ws && catkin_make"
+
+# 환경 설정을 위한 setup.bash 소스 추가
+RUN echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
+RUN echo "source /root/catkin_ws/devel/setup.bash" >> ~/.bashrc
+
+# 환경 변수 설정
+ENV ROS_HOSTNAME=localhost
+ENV ROS_MASTER_URI=http://localhost:11311
+ENV ROS_PACKAGE_PATH=/opt/ros/noetic/share
+
+# 포트 노출
+EXPOSE 9090
+
+# rosbridge_websocket 실행
+CMD ["bash", "-c", "source /root/catkin_ws/devel/setup.bash && roslaunch rosbridge_server rosbridge_websocket.launch"]
+
