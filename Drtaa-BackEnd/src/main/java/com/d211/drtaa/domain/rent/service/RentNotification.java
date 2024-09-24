@@ -5,6 +5,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -22,6 +23,8 @@ public class RentNotification {
         log.info("RentNotification");
 
         return new JobBuilder("rentNotification", jobRepository)
+                .preventRestart()
+                .incrementer(new RunIdIncrementer())
                 .start(rentNotificationStep)
                 .build();
     }

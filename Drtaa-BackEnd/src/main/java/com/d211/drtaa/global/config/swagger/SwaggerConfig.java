@@ -68,5 +68,19 @@ public class SwaggerConfig {
                 .build();
     }
 
+    @Bean
+    public GroupedOpenApi travelApi() {
+        return GroupedOpenApi.builder()
+                .group("Travel")
+                .pathsToMatch("/travel/**")
+                .build();
+    }
 
+    @Bean
+    public GroupedOpenApi paymentApi() {
+        return GroupedOpenApi.builder()
+                .group("Payment")
+                .pathsToMatch("/payment/**")
+                .build();
+    }
 }

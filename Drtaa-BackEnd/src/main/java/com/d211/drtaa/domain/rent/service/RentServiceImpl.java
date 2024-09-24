@@ -20,14 +20,23 @@ import com.d211.drtaa.domain.travel.repository.TravelDatesRepository;
 import com.d211.drtaa.domain.travel.repository.TravelRepository;
 import com.d211.drtaa.domain.user.entity.User;
 import com.d211.drtaa.domain.user.repository.UserRepository;
+import com.d211.drtaa.global.config.websocket.MyMessage;
+import com.d211.drtaa.global.config.websocket.WebSocketConfig;
 import com.d211.drtaa.global.exception.rent.RentCarNotFoundException;
 import com.d211.drtaa.global.exception.rent.RentCarScheduleNotFoundException;
 import com.d211.drtaa.global.exception.rent.RentNotFoundException;
+import com.d211.drtaa.global.exception.websocket.WebSocketDisConnectedException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketSession;
+import org.springframework.web.socket.client.standard.StandardWebSocketClient;
+import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -49,6 +58,8 @@ public class RentServiceImpl implements RentService{
     private final RentHistoryRepository rentHistoryRepository;
     private final TravelRepository travelRepository;
     private final TravelDatesRepository travelDatesRepository;
+    private final WebSocketConfig webSocketConfig;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public List<RentResponseDTO> getAllRent(String userProviderId) {
@@ -128,12 +139,14 @@ public class RentServiceImpl implements RentService{
 
     @Override
     public RentDetailResponseDTO getDetailRent(long rentId) {
+        // 렌트 찾기
         Rent rent = rentRepository.findByRentId(rentId)
                 .orElseThrow(() -> new RentNotFoundException("해당 rentId의 맞는 렌트를 찾을 수 없습니다."));
-
         RentCar rentCar = rent.getRentCar();
+        Travel travel = rent.getTravel();
 
         RentDetailResponseDTO response = RentDetailResponseDTO.builder()
+                // rent
                 .rentId(rent.getRentId())
                 .rentStatus(rent.getRentStatus())
                 .rentHeadCount(rent.getRentHeadCount())
@@ -149,6 +162,9 @@ public class RentServiceImpl implements RentService{
                 .rentCarNumber(rentCar.getRentCarNumber())
                 .rentCarManufacturer(rentCar.getRentCarManufacturer())
                 .rentCarModel(rentCar.getRentCarModel())
+                .rentCarImg(rentCar.getRentCarImg())
+                // travel
+                .travelId(travel.getTravelId())
                 .build();
 
         return response;
@@ -159,10 +175,11 @@ public class RentServiceImpl implements RentService{
         // 현재 날짜에 진행중인 렌트 기록 찾기
         Rent rent = rentRepository.findCurrentRentByUserProviderId(userProviderId)
                 .orElseThrow(() -> new RentNotFoundException("현재 진행 중인 렌트가 없습니다."));
-
         RentCar rentCar = rent.getRentCar();
+        Travel travel = rent.getTravel();
 
         RentDetailResponseDTO response = RentDetailResponseDTO.builder()
+                // rent
                 .rentId(rent.getRentId())
                 .rentStatus(rent.getRentStatus())
                 .rentHeadCount(rent.getRentHeadCount())
@@ -178,6 +195,9 @@ public class RentServiceImpl implements RentService{
                 .rentCarNumber(rentCar.getRentCarNumber())
                 .rentCarManufacturer(rentCar.getRentCarManufacturer())
                 .rentCarModel(rentCar.getRentCarModel())
+                .rentCarImg(rentCar.getRentCarImg())
+                // travel
+                .travelId(travel.getTravelId())
                 .build();
 
         return response;
@@ -308,8 +328,10 @@ public class RentServiceImpl implements RentService{
         // 렌트 차량 일정 저장
         rentCarScheduleRepository.save(rentCarSchedule);
 
+        RentCar rentCar = rent.getRentCar();
         // 반환값 빌더
         RentDetailResponseDTO response = RentDetailResponseDTO.builder()
+                // rent
                 .rentId(rent.getRentId())
                 .rentStatus(rent.getRentStatus())
                 .rentHeadCount(rent.getRentHeadCount())
@@ -320,10 +342,14 @@ public class RentServiceImpl implements RentService{
                 .rentDptLat(rent.getRentDptLat())
                 .rentDptLon(rent.getRentDptLon())
                 .rentCreatedAt(rent.getRentCreatedAt())
-                .rentCarId(rent.getRentCar().getRentCarId())
-                .rentCarNumber(rent.getRentCar().getRentCarNumber())
-                .rentCarManufacturer(rent.getRentCar().getRentCarManufacturer())
-                .rentCarModel(rent.getRentCar().getRentCarModel())
+                // rent-car
+                .rentCarId(rentCar.getRentCarId())
+                .rentCarNumber(rentCar.getRentCarNumber())
+                .rentCarManufacturer(rentCar.getRentCarManufacturer())
+                .rentCarModel(rentCar.getRentCarModel())
+                .rentCarImg(rentCar.getRentCarImg())
+                // travel
+                .travelId(travel.getTravelId())
                 .build();
 
         return response;
@@ -390,6 +416,36 @@ public class RentServiceImpl implements RentService{
         // 변경 상태 저장
         rentRepository.save(rent);
         rentCarScheduleRepository.save(carSchedule);
+
+        // 자율주행 서버로 반납 상태 전송
+        try {
+            StandardWebSocketClient client = new StandardWebSocketClient();
+            WebSocketSession session = client.execute(new TextWebSocketHandler() {
+                @Override
+                protected void handleTextMessage(WebSocketSession session, TextMessage message) {
+                    // 서버로부터 받은 메시지를 처리하는 로직
+                    try {
+                        // JSON 메시지를 JsonNode로 파싱
+                        JsonNode jsonNode = objectMapper.readTree(message.getPayload());
+                        log.info("Received message: {}", jsonNode);
+
+                    } catch (Exception e) {
+                        log.error("Error processing received message: ", e);
+                    }
+                }
+            }, webSocketConfig.getUrl()).get();
+
+            // 상태와 렌트 탑승 위치 전송
+            MyMessage message = new MyMessage("vehicle_return");
+            String jsonMessage = objectMapper.writeValueAsString(message);
+            session.sendMessage(new TextMessage(jsonMessage));
+            log.info("Sent message: {}", jsonMessage);
+            Thread.sleep(1000); // 필요에 따라 대기 시간 조절
+
+        } catch (Exception e) {
+            log.error("Error during WebSocket communication: ", e);
+            throw new WebSocketDisConnectedException("WebSocket이 네트워크 연결을 거부했습니다.");
+        }
     }
 
     @Override
