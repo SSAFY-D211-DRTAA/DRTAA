@@ -145,7 +145,7 @@ public class UserController {
         }
     }
 
-    @PatchMapping("/img")
+    @PatchMapping(value = "/img", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "회원 이미지 수정", description = "마이 페이지에서 회원 이미지 수정")
     public ResponseEntity updateImg
             (Authentication authentication, @RequestPart(value = "image", required = false) MultipartFile image) {
