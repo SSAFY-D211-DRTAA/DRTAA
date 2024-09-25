@@ -26,15 +26,12 @@ class DayPlanFragment(
 ) : BaseFragment<FragmentDayPlanBinding>(R.layout.fragment_day_plan) {
 
     private val planViewModel: PlanViewModel by hiltNavGraphViewModels(R.id.nav_graph_plan)
-    private val dayViewModel: DayViewModel by viewModels()
 
     private val planListAdapter = PlanListAdapter(context, onPlanSelectListener)
     private val itemTouchHelperCallback = ItemTouchHelperCallback(planListAdapter)
     private val helper = ItemTouchHelper(itemTouchHelperCallback)
 
     override fun initView() {
-        dayViewModel.setDayAndPlan(day, planViewModel.dayPlanList.value?.get(day - 1))
-
         initObserve()
         initEvent()
         initRVAdapter()
@@ -49,10 +46,11 @@ class DayPlanFragment(
                 )
             }.launchIn(viewLifecycleOwner.lifecycleScope)
 
-        dayViewModel.dayPlan.flowWithLifecycle(viewLifecycleOwner.lifecycle)
-            .onEach { dayPlan ->
-                if (dayPlan == null) return@onEach
+        planViewModel.dayPlanList.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach { dayPlanList ->
+                if (dayPlanList == null) return@onEach
 
+                val dayPlan = dayPlanList[day-1]
                 if (dayPlan.placesDetail.isEmpty()) {
                     binding.llNoPlan.visibility = View.VISIBLE
                 } else {
