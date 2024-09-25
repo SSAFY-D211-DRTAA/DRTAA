@@ -400,7 +400,7 @@ public class RentCarServiceImpl implements RentCarService {
         if(rentCarDriveStatusRequestDTO.getRentCarDrivingStatus().equals(RentDrivingStatus.driving))
             body = "🚗 주행중";
 
-        if(rentCarDriveStatusRequestDTO.getRentCarDrivingStatus().equals(RentDrivingStatus.driving))
+        if(rentCarDriveStatusRequestDTO.getRentCarDrivingStatus().equals(RentDrivingStatus.parking))
             body = "\uD83C\uDD7F\uFE0F 주차중";
 
         if(rentCarDriveStatusRequestDTO.getRentCarDrivingStatus().equals(RentDrivingStatus.waiting))
