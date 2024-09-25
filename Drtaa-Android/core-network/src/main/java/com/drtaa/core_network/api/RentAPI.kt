@@ -62,6 +62,6 @@ interface RentAPI {
 
     @POST("rent/chk")
     suspend fun checkDuplicatedRent(
-        @Body rentSchedule: RequestDuplicatedSchedule
+        @Body rentSchedule: RequestDuplicatedSchedule,
     ): Boolean
 }

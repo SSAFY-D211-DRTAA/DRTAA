@@ -21,6 +21,7 @@ interface RentDataSource {
     suspend fun getAllRentState(): List<ResponseRentStateAll>
     suspend fun getCurrentRent(): RentDetail
     suspend fun checkDuplicatedRent(rentSchedule: RequestDuplicatedSchedule): Boolean
+
     // history
     suspend fun getRentHistory(): List<RentSimple>
 }

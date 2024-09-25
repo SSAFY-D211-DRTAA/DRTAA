@@ -68,24 +68,34 @@ class CarViewModel @Inject constructor(
     private val _drivingStatus = MutableStateFlow<CarStatus>(CarStatus.IDLE)
     val drivingStatus: StateFlow<CarStatus> = _drivingStatus
 
+    private val _mqttConnectionStatus = MutableStateFlow<Int>(-1)
+    val mqttConnectionStatus: StateFlow<Int> = _mqttConnectionStatus
+
     init {
+        initMQTT()
         getLatestRent()
-        getCurrentRent()
+        observeMqttConnectionStatus()
         observeMqttMessages()
     }
 
-    private fun getLatestRent() {
+    override fun onCleared() {
+        super.onCleared()
+        Timber.tag("mqtt_viewmodel").d("onCleared")
+        disconnectMQTT()
+        stopPublish()
+    }
+
+    private fun observeMqttConnectionStatus() {
         viewModelScope.launch {
-            rentRepository.getAllRentState().collect { result ->
-                result.onSuccess { data ->
-                    Timber.tag("rent latest").d("성공 $data")
-                    _latestReservedId.value = data
-                }.onFailure {
-                    _latestReservedId.value = -1L
-                    Timber.tag("rent").d("현재 진행 중인 렌트가 없습니다.")
-                }
+            gpsRepository.observeConnectionStatus().collectLatest {
+                Timber.tag("mqtt_viewmodel").d("observeMqttConnectionStatus: $it")
+                _mqttConnectionStatus.value = it
             }
         }
+    }
+
+    fun clearMqttStatus() {
+        _mqttConnectionStatus.value = -1
     }
 
     fun getOnCar(rentId: Long) {
@@ -130,6 +140,21 @@ class CarViewModel @Inject constructor(
         }
     }
 
+    fun getLatestRent() {
+        viewModelScope.launch {
+            rentRepository.getAllRentState().collect { result ->
+                result.onSuccess { data ->
+                    Timber.tag("rent latest").d("성공 $data")
+                    _latestReservedId.value = data
+                    getCurrentRent()
+                }.onFailure {
+                    _latestReservedId.value = -1L
+                    Timber.tag("rent").d("현재 진행 중인 렌트가 없습니다.")
+                }
+            }
+        }
+    }
+
     /**
      * 탑승처리를 해줘야 렌트한 것으로 간주한다.
      */
@@ -149,10 +174,14 @@ class CarViewModel @Inject constructor(
         }
     }
 
-    fun initMQTT() {
+    private fun initMQTT() {
         viewModelScope.launch {
             gpsRepository.setupMqttConnection()
         }
+    }
+
+    private fun disconnectMQTT() {
+        gpsRepository.disconnectMqtt()
     }
 
     fun toggleTrackingState() {
@@ -172,6 +201,7 @@ class CarViewModel @Inject constructor(
                 delay(intervalMillis)
             }
         }
+        toggleTrackingState()
         gpsRepository.publishGpsData(data)
     }
 
@@ -215,6 +245,9 @@ class CarViewModel @Inject constructor(
         return currentRentDetail.first()
     }
 
+    /**
+     * 재호출
+     */
     fun callAssignedCar(userPosition: LatLng) {
         viewModelScope.launch {
             val rentId = _latestReservedId.value

@@ -29,8 +29,8 @@ class MqttManager @Inject constructor() {
     val receivedMessages: SharedFlow<ResponseGPS> = _receivedMessages.asSharedFlow()
     private var reconnectAttempts = 0
     private var isConnected = false
-    private val _connectionStatus = MutableSharedFlow<Boolean>()
-    val connectionStatus: SharedFlow<Boolean> = _connectionStatus.asSharedFlow()
+    private val _connectionStatus = MutableSharedFlow<Int>()
+    val connectionStatus: SharedFlow<Int> = _connectionStatus.asSharedFlow()
 
     suspend fun setupMqttClient() {
         client = MqttClient.builder()
@@ -50,7 +50,11 @@ class MqttManager @Inject constructor() {
                         if (throwable != null) {
                             Timber.tag(TAG).e(throwable, "MQTT 연결실패")
                             CoroutineScope(Dispatchers.Main).launch {
-                                _connectionStatus.emit(false)
+                                if (reconnectAttempts == MAX_TRY) {
+                                    _connectionStatus.emit(0)
+                                } else {
+                                    _connectionStatus.emit(-1)
+                                }
                             }
                         } else {
                             Timber.tag(TAG).d("MQTT 연결성공")
@@ -58,21 +62,18 @@ class MqttManager @Inject constructor() {
                             reconnectAttempts = 0
                             subscribeToTopic()
                             CoroutineScope(Dispatchers.Main).launch {
-                                _connectionStatus.emit(true)
+                                _connectionStatus.emit(1)
                             }
                         }
                     }
                 }
             } catch (e: Exception) {
                 Timber.tag(TAG).e(e, "MQTT 연결실패")
-                CoroutineScope(Dispatchers.Main).launch {
-                    _connectionStatus.emit(false)
-                }
             }
 
             if (!isConnected) {
                 val delay = calculateReconnectDelay()
-                Timber.tag(TAG).d("재연결 시도 중... ${delay}ms 후 다시 시도합니다.")
+                Timber.tag(TAG).d("#$reconnectAttempts 재연결 시도 중... ${delay}ms 후 다시 시도합니다.")
                 delay(delay)
             }
         }
@@ -90,6 +91,7 @@ class MqttManager @Inject constructor() {
             .callback { publish: Mqtt5Publish ->
                 val message = String(publish.payloadAsBytes)
                 CoroutineScope(Dispatchers.IO).launch {
+                    _connectionStatus.emit(1)
                     val parsedMessage = gson.fromJson(message, ResponseGPS::class.java)
                     _receivedMessages.emit(parsedMessage)
                     Timber.tag(TAG).d("MQTT 응답: $parsedMessage")
@@ -126,6 +128,7 @@ class MqttManager @Inject constructor() {
 
     fun disconnect() {
         if (isConnected) {
+            Timber.tag("MQTT").d("disconnect success")
             client.disconnect()
             isConnected = false
         }
@@ -135,6 +138,7 @@ class MqttManager @Inject constructor() {
         private const val MQTT_SERVER = BuildConfig.MQTT_URL
         private const val PORT = 1883
         private const val DELAY = 5
+        private const val MAX_TRY = 10
         private const val MAX_RECONNECT_DELAY = 20000L // 최대 30초
         private const val INITIAL_RECONNECT_DELAY = 1000L // 초기 1초
         private const val GPS_SUB = "gps/data/v1/subscribe"
