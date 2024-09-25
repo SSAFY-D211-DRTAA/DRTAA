@@ -19,7 +19,6 @@ import com.drtaa.feature_main.databinding.ActivityMainBinding
 import com.drtaa.feature_main.util.Page
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.OnFailureListener
-import com.google.firebase.FirebaseApp
 import com.google.firebase.messaging.FirebaseMessaging
 import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.normal.TedPermission
@@ -78,13 +77,12 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
 
     @SuppressLint("MissingPermission")
     private fun initNotificationChannel(id: String, name: String) {
+        val notificationManager: NotificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             TedPermission.create().setPermissionListener(object : PermissionListener {
                 override fun onPermissionGranted() {
-                    initFCM()
-                    val notificationManager: NotificationManager =
-                        getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
                     notificationManager.createNotificationChannel(
                         NotificationChannel(
                             id,
@@ -104,6 +102,14 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
                     android.Manifest.permission.POST_NOTIFICATIONS,
                 )
                 .check()
+        } else {
+            notificationManager.createNotificationChannel(
+                NotificationChannel(
+                    id,
+                    name,
+                    NotificationManager.IMPORTANCE_HIGH
+                )
+            )
         }
     }
 
