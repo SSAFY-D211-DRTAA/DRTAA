@@ -3,6 +3,7 @@ import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.gms)
     id("drtaa.plugin.common")
     id("drtaa.plugin.hilt")
 }
@@ -74,4 +75,8 @@ dependencies {
     //Sign
     implementation(libs.naver.oauth)
     implementation(libs.play.services.location)
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.messaging)
+    implementation(libs.firebase.messaging.ktx)
 }

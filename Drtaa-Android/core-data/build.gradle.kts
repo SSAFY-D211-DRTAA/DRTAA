@@ -3,6 +3,7 @@ import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.gms)
     id("drtaa.plugin.core")
 }
 
@@ -59,4 +60,8 @@ dependencies {
     // MQTT
     implementation(project(":core-mqtt"))
     implementation(libs.hivemq.mqtt.client)
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.messaging)
+    implementation(libs.firebase.messaging.ktx)
 }
