@@ -26,6 +26,14 @@ public interface RentRepository extends JpaRepository<Rent, Long> {
     List<Rent> findByUserAndRentStatusCompleted(User user);
     List<Rent> findByUserAndRentStatusInOrderByRentStatusDesc(User user, List<RentStatus> rentStatuses);
     List<Rent> findByRentStartTimeBetween(LocalDateTime startDate, LocalDateTime endDate);
+    Optional<Rent> findFirstByRentCar_RentCarIdAndRentStatusAndRentStartTimeLessThanEqualAndRentEndTimeGreaterThanEqual(
+            Long rentCarId,
+            RentStatus rentStatus,
+            LocalDateTime rentStartTime,
+            LocalDateTime rentEndTime
+    );
+
+
 
     // exists
     boolean existsByUserAndRentStatusAndRentStartTimeBetweenOrRentEndTimeBetween(User user, RentStatus rentStatus, LocalDateTime localDateTime, LocalDateTime localDateTime1, LocalDateTime localDateTime2, LocalDateTime localDateTime3);

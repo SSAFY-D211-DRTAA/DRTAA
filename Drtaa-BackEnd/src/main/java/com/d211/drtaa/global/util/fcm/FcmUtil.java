@@ -21,10 +21,12 @@ public class FcmUtil {
     @Async("taskExecutor") // 비동기 처리
     public void singleFcmSend(User user, FcmDTO fcmDTO) {
         String fcmToken = user.getFcmToken(); // 사용자 FCM 토큰 가져오기
+        log.info("fcmToken: {}", fcmToken );
 
         // FCM 토큰이 유효한 경우 메시지 생성 및 전송
         if (fcmToken != null && !fcmToken.isEmpty()) {
             Message message = makeMessage(fcmDTO.getTitle(), fcmDTO.getBody(), fcmToken); // 메시지 생성
+            log.info("message: {}", message);
             sendMessage(message); // 메시지 전송
         }
     }
@@ -51,6 +53,7 @@ public class FcmUtil {
     public void sendMessage(Message message) {
         try {
             FirebaseMessaging.getInstance().send(message); // 메시지 전송
+            log.info("전송 완료");
         } catch (FirebaseMessagingException e) {
             log.error("FCM send error");    // 전송 오류 로그
         }

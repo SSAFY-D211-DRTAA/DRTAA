@@ -152,4 +152,18 @@ public class RentCarController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
         }
     }
+
+    @PostMapping("/alarm")
+    @Operation(summary = "렌트 차량 상태 변경 알림", description = "회원의 진행중인 렌트 차량의 상태가 변경되어 안드로이드로 알림 전송")
+    public ResponseEntity alarmToAndroid(@RequestBody RentCarDriveStatusRequestDTO rentCarDriveStatusRequestDTO) {
+        try {
+            rentCarService.alarmToAndroid(rentCarDriveStatusRequestDTO);
+
+            return ResponseEntity.ok("Success"); // 200
+        } catch (RentCarNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
+        }
+    }
 }

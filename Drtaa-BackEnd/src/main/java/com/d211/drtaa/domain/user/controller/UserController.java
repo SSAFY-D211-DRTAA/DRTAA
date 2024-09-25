@@ -245,6 +245,7 @@ public class UserController {
     @Operation(summary = "fcm 토큰 발급", description = "Android에서 발급한 FCM 토큰 저장")
     public ResponseEntity<String> getToken(Authentication authentication, @Valid @RequestBody PostTokenReq postTokenReq) {
         try {
+            log.info("Received token request: {}", postTokenReq);
             String response = fcmService.getToken(authentication.getName(), postTokenReq.getToken());
 
             return ResponseEntity.ok(response); // 200

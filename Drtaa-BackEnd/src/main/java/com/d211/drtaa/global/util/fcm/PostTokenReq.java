@@ -8,5 +8,5 @@ import lombok.Getter;
 public class PostTokenReq {
     @NotBlank(message="토큰을 입력해야 합니다.")
     @Schema(description = "FCM Token", example = "")
-    String Token;
+    String token;
 }
