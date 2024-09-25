@@ -182,7 +182,7 @@ public class RentCarServiceImpl implements RentCarService {
         }
 
         // 렌트 차량 상태 변경
-        car.setRentCarDrivingStatus(RentDrivingStatus.call);
+        car.setRentCarDrivingStatus(RentDrivingStatus.calling);
 
         // 렌트 차량 변경 상태 저장
         rentCarRepository.save(car);
@@ -260,7 +260,7 @@ public class RentCarServiceImpl implements RentCarService {
         }
 
         // 렌트 차량 상태 변경
-        car.setRentCarDrivingStatus(RentDrivingStatus.call);
+        car.setRentCarDrivingStatus(RentDrivingStatus.calling);
 
         // 렌트 차량 변경 상태 저장
         rentCarRepository.save(car);
