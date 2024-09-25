@@ -1,11 +1,13 @@
 package com.drtaa.feature_plan
 
+import android.content.Context
 import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
+import com.drtaa.core_model.plan.Plan
 import com.drtaa.core_ui.base.BaseFragment
 import com.drtaa.feature_plan.adapter.ItemTouchHelperCallback
 import com.drtaa.feature_plan.adapter.PlanListAdapter
@@ -18,18 +20,20 @@ import kotlinx.coroutines.flow.onEach
 
 @AndroidEntryPoint
 class DayPlanFragment(
-    private val day: Int
+    private val context: Context,
+    private val day: Int,
+    private val onPlanSelectListener: (planItem: Plan.DayPlan.PlanItem) -> Unit,
 ) : BaseFragment<FragmentDayPlanBinding>(R.layout.fragment_day_plan) {
 
     private val planViewModel: PlanViewModel by hiltNavGraphViewModels(R.id.nav_graph_plan)
     private val dayViewModel: DayViewModel by viewModels()
 
-    private val planListAdapter = PlanListAdapter()
+    private val planListAdapter = PlanListAdapter(context, onPlanSelectListener)
     private val itemTouchHelperCallback = ItemTouchHelperCallback(planListAdapter)
     private val helper = ItemTouchHelper(itemTouchHelperCallback)
 
     override fun initView() {
-        dayViewModel.setDay(day)
+        dayViewModel.setDayAndPlan(day, planViewModel.dayPlanList.value?.get(day - 1))
 
         initObserve()
         initEvent()
@@ -60,13 +64,6 @@ class DayPlanFragment(
 
     private fun initRVAdapter() {
         binding.rvDayPlan.adapter = planListAdapter
-//        planListAdapter.submitList(dayPlan!!.placesDetail)
-
-//        planListAdapter.setItemClickListener(object : PlanListAdapter.ItemClickListener {
-//            override fun onItemClicked(planItem: DayPlan.PlanItem) {
-//
-//            }
-//        })
     }
 
     private fun initEvent() {

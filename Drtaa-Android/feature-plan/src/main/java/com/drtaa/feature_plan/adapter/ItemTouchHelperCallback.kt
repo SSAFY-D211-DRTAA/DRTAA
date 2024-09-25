@@ -14,10 +14,9 @@ class ItemTouchHelperCallback(
     ): Int {
         // 드래그 방향
         val dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN
-        // 스와이프 방향
-        val swipeFlags = ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+
         // 이동을 만드는 메소드
-        return makeMovementFlags(dragFlags, swipeFlags)
+        return makeMovementFlags(dragFlags, 0)
     }
 
     // 드래그된 item을 이전 위치에서 새로운 위치로 옮길 때 호출
@@ -31,6 +30,6 @@ class ItemTouchHelperCallback(
 
     // 사용자에 의해 swipe될 때 호출
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-        return listener.onItemSwipe(viewHolder.adapterPosition)
+
     }
 }

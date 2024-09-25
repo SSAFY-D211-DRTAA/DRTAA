@@ -2,6 +2,7 @@ package com.drtaa.feature_plan
 
 import android.view.View
 import androidx.core.view.isVisible
+import androidx.fragment.app.viewModels
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -18,6 +19,7 @@ import com.naver.maps.map.NaverMap
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import timber.log.Timber
 
 @AndroidEntryPoint
 class PlanListFragment :
@@ -25,6 +27,8 @@ class PlanListFragment :
 
     private val planViewModel: PlanViewModel by hiltNavGraphViewModels(R.id.nav_graph_plan)
     private lateinit var viewPagerAdapter: PlanViewPagerAdapter
+
+    private val editPlanList = arrayListOf<ArrayList<Plan.DayPlan.PlanItem>>()
 
     override var mapView: MapView? = null
 
@@ -41,6 +45,12 @@ class PlanListFragment :
         initViewPager()
         initEvent()
         initObserve()
+
+        planViewModel.plan.value?.let {
+            binding.tvPlanTitle.text = it.travelName
+            binding.tvPlanDate.text =
+                "${(it.travelStartDate + " ~ " + it.travelEndDate).replace('-', '.')}"
+        }
     }
 
     private fun initObserve() {
@@ -59,12 +69,32 @@ class PlanListFragment :
         binding.tvEditFinish.setOnClickListener {
             planViewModel.setEditMode(false)
         }
+
+        binding.btnDeletePlan.setOnClickListener {
+            val dayIdx = binding.vpPlanDay.currentItem
+            planViewModel.deletePlan(dayIdx, editPlanList[dayIdx])
+            Timber.d("dayIdx: $dayIdx, ${editPlanList[dayIdx]}")
+        }
+
+        binding.btnChangeDate.setOnClickListener {
+
+        }
     }
 
     private fun initViewPager() {
-        val fragmentList = planViewModel.plan.value?.let {
-            it.datesDetail.map { dayPlan ->
-                DayPlanFragment(dayPlan.travelDatesId)
+        val fragmentList = planViewModel.dayPlanList.value?.let {
+            it.map { dayPlan ->
+                editPlanList.add(arrayListOf())
+
+                DayPlanFragment(
+                    context = requireActivity(),
+                    day = dayPlan.travelDatesId,
+                    onPlanSelectListener = { planItem ->
+                        if (planViewModel.isEditMode.value) {
+                            editPlan(planItem)
+                        }
+                    }
+                )
             }
         } ?: emptyList()
         viewPagerAdapter = PlanViewPagerAdapter(requireActivity(), fragmentList)
@@ -95,6 +125,18 @@ class PlanListFragment :
                     }
                 }
             }
+        }
+    }
+
+    private fun editPlan(planItem: Plan.DayPlan.PlanItem) {
+        binding.clEditBottomSheet.visibility = View.VISIBLE
+
+        val dayIdx = binding.vpPlanDay.currentItem
+
+        if (planItem.isSelected) {
+            editPlanList[dayIdx].add(planItem)
+        } else {
+            editPlanList[dayIdx].remove(planItem)
         }
     }
 

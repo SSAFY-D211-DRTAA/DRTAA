@@ -1,22 +1,29 @@
 package com.drtaa.feature_plan.adapter
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.MutableLiveData
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.drtaa.core_model.plan.Plan.DayPlan.PlanItem
 import com.drtaa.core_ui.base.BaseDiffUtil
 import com.drtaa.feature_plan.databinding.ItemPlanBinding
-import kotlinx.coroutines.flow.MutableStateFlow
 import timber.log.Timber
 
-class PlanListAdapter :
+class PlanListAdapter(
+    private val context: Context,
+    private val onPlanSelectListener: (planItem: PlanItem) -> Unit,
+) :
     ListAdapter<PlanItem, PlanListAdapter.PlanItemViewHolder>(BaseDiffUtil<PlanItem>()),
     ItemTouchHelperListener {
 
     private var isEditMode: Boolean = false
+    private val backgroundBlueCircle =
+        AppCompatResources.getDrawable(context, com.drtaa.core_ui.R.drawable.circle_call)
+    private val backgroundGrayCircle =
+        AppCompatResources.getDrawable(context, com.drtaa.core_ui.R.drawable.circle_gray_d9d9)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlanItemViewHolder {
         val binding = ItemPlanBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -29,11 +36,20 @@ class PlanListAdapter :
 
     inner class PlanItemViewHolder(private val binding: ItemPlanBinding) :
         RecyclerView.ViewHolder(binding.root) {
+
         fun bind(planItem: PlanItem, position: Int) {
+            Timber.d("planItem $planItem")
             binding.plan = planItem
             binding.executePendingBindings()
 
             binding.tvPlanOrder.text = (position + 1).toString()
+
+            binding.viewCircleEdit.background =
+                if (planItem.isSelected) {
+                    backgroundBlueCircle
+                } else {
+                    backgroundGrayCircle
+                }
 
             if (isEditMode) {
                 binding.clPlanEditMode.visibility = View.VISIBLE
@@ -43,20 +59,19 @@ class PlanListAdapter :
                 binding.clPlanViewMode.visibility = View.VISIBLE
             }
 
-//            binding.root.setOnClickListener {
-//                itemClickListener.onItemClicked(planItem)
-//            }
+            binding.root.setOnClickListener {
+                if (isEditMode) {
+                    planItem.isSelected = !planItem.isSelected
+                    onPlanSelectListener(planItem)
+                    binding.viewCircleEdit.background =
+                        if (planItem.isSelected) {
+                            backgroundBlueCircle
+                        } else {
+                            backgroundGrayCircle
+                        }
+                }
+            }
         }
-    }
-
-    interface ItemClickListener {
-        fun onItemClicked(planItem: PlanItem)
-    }
-
-    private lateinit var itemClickListener: ItemClickListener
-
-    fun setItemClickListener(itemClickListener: ItemClickListener) {
-        this.itemClickListener = itemClickListener
     }
 
     fun enableEditMode(isEditMode: Boolean) {
