@@ -72,10 +72,17 @@ class CarViewModel @Inject constructor(
     val mqttConnectionStatus: StateFlow<Int> = _mqttConnectionStatus
 
     init {
+        initMQTT()
         getLatestRent()
-        getCurrentRent()
         observeMqttConnectionStatus()
         observeMqttMessages()
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        Timber.tag("mqtt_viewmodel").d("onCleared")
+        disconnectMQTT()
+        stopPublish()
     }
 
     private fun observeMqttConnectionStatus() {
@@ -89,20 +96,6 @@ class CarViewModel @Inject constructor(
 
     fun clearMqttStatus() {
         _mqttConnectionStatus.value = -1
-    }
-
-    private fun getLatestRent() {
-        viewModelScope.launch {
-            rentRepository.getAllRentState().collect { result ->
-                result.onSuccess { data ->
-                    Timber.tag("rent latest").d("성공 $data")
-                    _latestReservedId.value = data
-                }.onFailure {
-                    _latestReservedId.value = -1L
-                    Timber.tag("rent").d("현재 진행 중인 렌트가 없습니다.")
-                }
-            }
-        }
     }
 
     fun getOnCar(rentId: Long) {
@@ -147,10 +140,25 @@ class CarViewModel @Inject constructor(
         }
     }
 
+    fun getLatestRent() {
+        viewModelScope.launch {
+            rentRepository.getAllRentState().collect { result ->
+                result.onSuccess { data ->
+                    Timber.tag("rent latest").d("성공 $data")
+                    _latestReservedId.value = data
+                    getCurrentRent()
+                }.onFailure {
+                    _latestReservedId.value = -1L
+                    Timber.tag("rent").d("현재 진행 중인 렌트가 없습니다.")
+                }
+            }
+        }
+    }
+
     /**
      * 탑승처리를 해줘야 렌트한 것으로 간주한다.
      */
-    fun getCurrentRent() {
+    private fun getCurrentRent() {
         viewModelScope.launch {
             rentRepository.getRentDetail(_latestReservedId.value).collect { result ->
                 result.onSuccess { data ->
@@ -166,13 +174,13 @@ class CarViewModel @Inject constructor(
         }
     }
 
-    fun initMQTT() {
+    private fun initMQTT() {
         viewModelScope.launch {
             gpsRepository.setupMqttConnection()
         }
     }
 
-    fun disconnectMQTT() {
+    private fun disconnectMQTT() {
         gpsRepository.disconnectMqtt()
     }
 
@@ -193,6 +201,7 @@ class CarViewModel @Inject constructor(
                 delay(intervalMillis)
             }
         }
+        toggleTrackingState()
         gpsRepository.publishGpsData(data)
     }
 

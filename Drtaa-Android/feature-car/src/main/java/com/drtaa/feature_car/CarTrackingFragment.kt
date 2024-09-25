@@ -66,6 +66,7 @@ class CarTrackingFragment :
                 Timber.tag("connect mqtt").d("$status")
                 if (status == 1) {
                     dismissLoading()
+                    viewModel.startPublish()
                     showSnackBar("MQTT 연결 성공")
                 } else if (status == -1) {
                     Timber.tag("mqtt").d("mqtt 연결 실패")
@@ -80,10 +81,8 @@ class CarTrackingFragment :
     private fun observeViewModelOnMap(naverMap: NaverMap) {
         viewModel.trackingState.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach {
             binding.btnTracking.text = if (it) {
-                viewModel.startPublish()
                 "차량추적 ON"
             } else {
-                viewModel.stopPublish()
                 "차량추적 OFF"
             }
         }.launchIn(viewLifecycleOwner.lifecycleScope)
@@ -121,19 +120,7 @@ class CarTrackingFragment :
     }
 
     override fun iniView() {
-    }
 
-    override fun onResume() {
-        super.onResume()
-        viewModel.initMQTT()
-    }
-
-    override fun onDestroy() {
-        Timber.tag("onDestroy").d("onDestroy")
-        super.onDestroy()
-        viewModel.disconnectMQTT()
-        viewModel.stopPublish()
-        viewModel.clearMqttStatus()
     }
 
     companion object {

@@ -40,6 +40,7 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
     }
 
     private fun initUI() {
+        viewModel.getLatestRent()
         binding.apply {
             cardView = cvTourCard
             overlayView = viewTourOverlay
@@ -85,7 +86,7 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
                 it > 0 -> {
                     binding.clCarBottomTextGotoUse.isClickable = true
                     toggleCarOption(true)
-                    viewModel.getCurrentRent()
+                    viewModel.getLatestRent()
                     if (viewModel.currentRentDetail.value == null) {
                         dismissLoading()
                         "예약한 차량 호출하기"
@@ -147,6 +148,11 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
             }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        viewModel.stopPublish()
+    }
+
     private fun observeStatus() {
         viewModel.isSuccessComplete.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { isSuccess ->
@@ -180,7 +186,7 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
 
         viewModel.rentState.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach { isOnCar ->
             if (isOnCar) {
-                viewModel.getCurrentRent()
+//                viewModel.getCurrentRent()
             }
             Timber.tag("rentState").d("$isOnCar")
         }.launchIn(viewLifecycleOwner.lifecycleScope)
