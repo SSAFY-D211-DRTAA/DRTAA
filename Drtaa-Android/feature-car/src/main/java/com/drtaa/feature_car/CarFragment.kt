@@ -8,6 +8,7 @@ import android.view.View
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.drtaa.core_model.rent.RentDetail
 import com.drtaa.core_ui.base.BaseFragment
 import com.drtaa.core_ui.fitCenter
 import com.drtaa.core_ui.parseLocalDateTime
@@ -108,35 +109,7 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
                 binding.apply {
                     if (currentRentDetail != null) {
                         dismissLoading()
-                        when (currentRentDetail.rentStatus) {
-                            "in_progress" -> {
-                                binding.tvReservedState.visibility = View.GONE
-                                clCarBottomText.visibility = View.VISIBLE
-                                animeCarNorent.visibility = View.GONE
-                                btnTrackingCar.isClickable = true
-                                tvTourRemainTime.text =
-                                    "남은시간 : ${currentRentDetail.rentTime * MIN} 분"
-                                currentRentDetail.rentCarImg?.let {
-                                    imgCarCarimage.fitCenter(
-                                        it,
-                                        requireContext()
-                                    )
-                                }
-                                tvTourCarnumber.text = currentRentDetail.rentCarNumber
-                                tvTourCarname.text =
-                                    "${currentRentDetail.rentCarManufacturer} ${currentRentDetail.rentCarModel}"
-                                tvTourRentend.text =
-                                    currentRentDetail.rentEndTime.parseLocalDateTime()
-                                tvTourRentstart.text =
-                                    currentRentDetail.rentStartTime.parseLocalDateTime()
-                                imgCarCarimage.visibility = View.VISIBLE
-                            }
-
-                            "reserved" -> {
-                                binding.tvReservedState.visibility = View.VISIBLE
-                                binding.tvReservedState.text = "예약한 차량 호출하기"
-                            }
-                        }
+                        updateCarStateUi(currentRentDetail)
                     } else {
                         clCarBottomTextGotoUse.visibility = View.VISIBLE
                         btnTrackingCar.isClickable = false
@@ -146,6 +119,40 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
                     }
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
+    }
+
+    private fun updateCarStateUi(currentRentDetail: RentDetail) {
+        binding.apply {
+            when (currentRentDetail.rentStatus) {
+                "in_progress" -> {
+                    tvReservedState.visibility = View.GONE
+                    clCarBottomText.visibility = View.VISIBLE
+                    animeCarNorent.visibility = View.GONE
+                    btnTrackingCar.isClickable = true
+                    tvTourRemainTime.text =
+                        "남은시간 : ${currentRentDetail.rentTime * MIN} 분"
+                    currentRentDetail.rentCarImg?.let {
+                        imgCarCarimage.fitCenter(
+                            it,
+                            requireContext()
+                        )
+                    }
+                    tvTourCarnumber.text = currentRentDetail.rentCarNumber
+                    tvTourCarname.text =
+                        "${currentRentDetail.rentCarManufacturer} ${currentRentDetail.rentCarModel}"
+                    tvTourRentend.text =
+                        currentRentDetail.rentEndTime.parseLocalDateTime()
+                    tvTourRentstart.text =
+                        currentRentDetail.rentStartTime.parseLocalDateTime()
+                    imgCarCarimage.visibility = View.VISIBLE
+                }
+
+                "reserved" -> {
+                    tvReservedState.visibility = View.VISIBLE
+                    tvReservedState.text = "예약한 차량 호출하기"
+                }
+            }
+        }
     }
 
     override fun onDestroy() {
