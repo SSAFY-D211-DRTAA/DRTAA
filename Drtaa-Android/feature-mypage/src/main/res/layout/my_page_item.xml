@@ -33,7 +33,7 @@
         android:layout_width="20dp"
         android:layout_height="20dp"
         app:srcCompat="@drawable/ic_into"
-        android:id="@+id/imageView9"
+        android:id="@+id/img_mypage_item_img"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"

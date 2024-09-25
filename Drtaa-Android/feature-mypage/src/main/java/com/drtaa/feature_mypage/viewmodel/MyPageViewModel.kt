@@ -66,6 +66,8 @@ class MyPageViewModel @Inject constructor(
                         _updateResult.emit(true)
                         _currentUser.value = updatedUser
                         _profileImageUri.value = Uri.parse(updatedUser.profileImageUrl)
+                        val userData = signRepository.getUserData().first()
+                        Timber.d("$userData 마이페이지 바뀌고 유저")
                     }.onFailure {
                         _updateResult.emit(false)
                         Timber.d("유저 이미지 업데이트 실패")

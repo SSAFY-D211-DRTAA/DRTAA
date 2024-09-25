@@ -3,6 +3,8 @@ package com.drtaa.feature_mypage
 import android.content.Context
 import android.net.Uri
 import android.os.Environment
+import android.view.ViewGroup
+import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
@@ -31,9 +33,9 @@ class MyPageFragment : BaseFragment<FragmentMyPageBinding>(R.layout.fragment_my_
     }
 
     override fun initView() {
+        setupMyPageItems()
         initObserve()
         initEvent()
-        setupMyPageItems()
         binding.apply {
             viewModel = this@MyPageFragment.myPageViewModel
         }
@@ -68,14 +70,29 @@ class MyPageFragment : BaseFragment<FragmentMyPageBinding>(R.layout.fragment_my_
 
     private fun setupMyPageItems() {
         with(binding) {
-            llMypageItem1.setOnClickListener {
-                showSnackBar("1클릭")
+            llMypageItem1.apply {
+                findViewById<TextView>(R.id.tv_mypage_item_title).text = "내 정보"
+                setOnClickListener {
+                    showSnackBar("1클릭")
+                }
             }
-            llMypageItem2.setOnClickListener {
-                showSnackBar("2클릭")
+            llMypageItem2.apply {
+                findViewById<TextView>(R.id.tv_mypage_item_title).text = "머하죠?"
+                setOnClickListener {
+                    showSnackBar("2클릭")
+                }
             }
-            llMypageItem3.setOnClickListener {
-                showSnackBar("3클릭")
+            llMypageItem3.apply {
+                findViewById<TextView>(R.id.tv_mypage_item_title).text = "알림설정?"
+                setOnClickListener {
+                    showSnackBar("3클릭")
+                }
+            }
+            llMypageItem4.apply {
+                findViewById<TextView>(R.id.tv_mypage_item_title).text = "내 정보?"
+                setOnClickListener {
+                    showSnackBar("4클릭")
+                }
             }
         }
     }
