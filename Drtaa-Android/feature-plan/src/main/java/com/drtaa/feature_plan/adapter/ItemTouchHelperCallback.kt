@@ -28,8 +28,7 @@ class ItemTouchHelperCallback(
         return listener.onItemMove(viewHolder.adapterPosition, target.adapterPosition)
     }
 
-    // 사용자에 의해 swipe될 때 호출
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-
+        // 스와이프 될 때
     }
 }

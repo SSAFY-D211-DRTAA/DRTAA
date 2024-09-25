@@ -4,7 +4,6 @@ import android.view.KeyEvent
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.viewModels
-import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.drtaa.core_map.base.BaseMapFragment
@@ -16,7 +15,6 @@ import com.drtaa.core_ui.showSnackBar
 import com.drtaa.feature_plan.adapter.SearchListAdapter
 import com.drtaa.feature_plan.databinding.FragmentPlanSearchBinding
 import com.drtaa.feature_plan.viewmodel.PlanSearchViewModel
-import com.drtaa.feature_plan.viewmodel.PlanViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
 import com.naver.maps.map.LocationTrackingMode
@@ -31,7 +29,7 @@ import timber.log.Timber
 @AndroidEntryPoint
 class PlanSearchFragment :
     BaseMapFragment<FragmentPlanSearchBinding>(R.layout.fragment_plan_search) {
-    private val planViewModel: PlanViewModel by hiltNavGraphViewModels(R.id.nav_graph_plan)
+//    private val planViewModel: PlanViewModel by hiltNavGraphViewModels(R.id.nav_graph_plan)
     private val planSearchViewModel: PlanSearchViewModel by viewModels()
 
     override var mapView: MapView? = null

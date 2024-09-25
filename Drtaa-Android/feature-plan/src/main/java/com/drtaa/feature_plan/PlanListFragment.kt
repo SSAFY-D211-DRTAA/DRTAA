@@ -28,7 +28,17 @@ class PlanListFragment :
 
     private val editPlanList = arrayListOf<ArrayList<Plan.DayPlan.PlanItem>>()
 
+    private lateinit var fragmentList: List<DayPlanFragment>
+
     override var mapView: MapView? = null
+
+    override fun onResume() {
+        super.onResume()
+
+        if (planViewModel.isViewPagerLoaded) {
+            initViewPager()
+        }
+    }
 
     override fun initMapView() {
         mapView = binding.mvPlanMap
@@ -56,13 +66,18 @@ class PlanListFragment :
                 binding.tvEditPlan.isVisible = !isEditMode
                 binding.tvEditFinish.isVisible = isEditMode
 
+                if (!isEditMode) {
+                    binding.clEditBottomSheet.visibility = View.GONE
+
+                }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
 
         planViewModel.plan.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { plan ->
-                if(plan == null) return@onEach
+                if (plan == null || planViewModel.isViewPagerLoaded) return@onEach
 
                 initViewPager()
+                planViewModel.isViewPagerLoaded = true
                 Timber.d("plan: $plan")
             }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
@@ -73,22 +88,31 @@ class PlanListFragment :
         }
 
         binding.tvEditFinish.setOnClickListener {
+            val dayIdx = binding.vpPlanDay.currentItem
+            //순서 변경된 데이터 저장
+            val newData = getRVAdapterList()
+            planViewModel.updatePlan(dayIdx, newData)
+
             planViewModel.setEditMode(false)
         }
 
         binding.btnDeletePlan.setOnClickListener {
             val dayIdx = binding.vpPlanDay.currentItem
-            planViewModel.deletePlan(dayIdx, editPlanList[dayIdx])
+            val isSuccess = planViewModel.deletePlan(dayIdx, editPlanList[dayIdx])
             Timber.d("dayIdx: $dayIdx, ${editPlanList[dayIdx]}")
+
+            if (isSuccess) {
+                planViewModel.setEditMode(false)
+            }
         }
 
         binding.btnChangeDate.setOnClickListener {
-
+            // 날짜 변경
         }
     }
 
     private fun initViewPager() {
-        val fragmentList = planViewModel.dayPlanList.value?.let {
+        fragmentList = planViewModel.dayPlanList.value?.let {
             it.map { dayPlan ->
                 editPlanList.add(arrayListOf())
 
@@ -132,6 +156,11 @@ class PlanListFragment :
                 }
             }
         }
+    }
+
+    private fun getRVAdapterList(): List<Plan.DayPlan.PlanItem> {
+        val dayIdx = binding.vpPlanDay.currentItem
+        return fragmentList[dayIdx].planListAdapter.currentList
     }
 
     private fun editPlan(planItem: Plan.DayPlan.PlanItem) {

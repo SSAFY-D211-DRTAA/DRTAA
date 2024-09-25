@@ -2,7 +2,6 @@ package com.drtaa.feature_plan
 
 import android.content.Context
 import android.view.View
-import androidx.fragment.app.viewModels
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -12,11 +11,11 @@ import com.drtaa.core_ui.base.BaseFragment
 import com.drtaa.feature_plan.adapter.ItemTouchHelperCallback
 import com.drtaa.feature_plan.adapter.PlanListAdapter
 import com.drtaa.feature_plan.databinding.FragmentDayPlanBinding
-import com.drtaa.feature_plan.viewmodel.DayViewModel
 import com.drtaa.feature_plan.viewmodel.PlanViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import timber.log.Timber
 
 @AndroidEntryPoint
 class DayPlanFragment(
@@ -27,7 +26,7 @@ class DayPlanFragment(
 
     private val planViewModel: PlanViewModel by hiltNavGraphViewModels(R.id.nav_graph_plan)
 
-    private val planListAdapter = PlanListAdapter(context, onPlanSelectListener)
+    val planListAdapter = PlanListAdapter(context, onPlanSelectListener)
     private val itemTouchHelperCallback = ItemTouchHelperCallback(planListAdapter)
     private val helper = ItemTouchHelper(itemTouchHelperCallback)
 
@@ -48,9 +47,10 @@ class DayPlanFragment(
 
         planViewModel.dayPlanList.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { dayPlanList ->
+                Timber.d("dayPlanList : $dayPlanList")
                 if (dayPlanList == null) return@onEach
 
-                val dayPlan = dayPlanList[day-1]
+                val dayPlan = dayPlanList[day - 1]
                 if (dayPlan.placesDetail.isEmpty()) {
                     binding.llNoPlan.visibility = View.VISIBLE
                     binding.clDayPlan.visibility = View.GONE
@@ -63,7 +63,10 @@ class DayPlanFragment(
     }
 
     private fun initRVAdapter() {
-        binding.rvDayPlan.adapter = planListAdapter
+        binding.rvDayPlan.apply {
+            itemAnimator = null
+            adapter = planListAdapter
+        }
     }
 
     private fun initEvent() {

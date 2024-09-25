@@ -42,7 +42,7 @@ class PlanListAdapter(
             binding.plan = planItem
             binding.executePendingBindings()
 
-            binding.tvPlanOrder.text = (position + 1).toString()
+            binding.tvPlanOrder.text = adapterPosition.toString()
 
             binding.viewCircleEdit.background =
                 if (planItem.isSelected) {
@@ -93,14 +93,5 @@ class PlanListAdapter(
         // 새로운 리스트로 submit
         submitList(mutableList)
         return true
-    }
-
-    override fun onItemSwipe(position: Int) {
-        // currentList를 가변 리스트로 변환
-        val mutableList = currentList.toMutableList()
-
-        mutableList.removeAt(position)
-        // 새로운 리스트로 submit
-        submitList(mutableList)
     }
 }

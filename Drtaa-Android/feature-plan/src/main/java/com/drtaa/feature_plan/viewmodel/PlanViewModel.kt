@@ -6,14 +6,13 @@ import com.drtaa.core_model.plan.Plan
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
-class PlanViewModel @Inject constructor(
-
-) : ViewModel() {
+class PlanViewModel @Inject constructor() : ViewModel() {
     private val _plan = MutableStateFlow<Plan?>(null)
     val plan: StateFlow<Plan?> = _plan
 
@@ -22,6 +21,8 @@ class PlanViewModel @Inject constructor(
 
     private val _isEditMode = MutableStateFlow(false)
     val isEditMode: StateFlow<Boolean> = _isEditMode
+
+    var isViewPagerLoaded = false
 
     private var seoulTrip: Plan
 
@@ -106,11 +107,24 @@ class PlanViewModel @Inject constructor(
     private fun getPlan() {
         _plan.value = seoulTrip
         Timber.d("getPlan ${_plan.value}")
-        Timber.d("seoul ${seoulTrip}")
     }
 
     fun setEditMode(isEditMode: Boolean) {
         _isEditMode.value = isEditMode
+
+        if (!isEditMode) {
+            val viewModePlan = _plan.value?.datesDetail?.map { dayPlan ->
+                dayPlan.copy(
+                    placesDetail = dayPlan.placesDetail.map { planItem ->
+                        planItem.copy(isSelected = false)
+                    }
+                )
+            }
+
+            if (viewModePlan != null){
+                _plan.value = _plan.value?.copy(datesDetail = viewModePlan)
+            }
+        }
     }
 
     private fun observePlan() {
@@ -121,7 +135,33 @@ class PlanViewModel @Inject constructor(
         }
     }
 
-    fun deletePlan(dayIdx: Int, deletedPlanList: List<Plan.DayPlan.PlanItem>) {
+    fun updatePlan(dayIdx: Int, newPlanList: List<Plan.DayPlan.PlanItem>): Boolean {
+        var isSuccess = false
+
+        // 현재 _plan 값을 가져옴
+        val currentPlan = _plan.value
+
+        currentPlan?.let { plan ->
+            // datesDetail 리스트에서 해당 day에 맞는 DayPlan을 찾아 수정
+            val updatedDatesDetail = plan.datesDetail.map { dayPlan ->
+                if (dayPlan.travelDatesId == dayIdx + 1) {
+                    dayPlan.copy(placesDetail = newPlanList)
+                } else {
+                    dayPlan
+                }
+            }
+
+            // 서버에 저장시키는 코드 추가
+            // 수정된 datesDetail을 갖는 새로운 Plan 객체를 _plan에 방출
+            _plan.value = plan.copy(datesDetail = updatedDatesDetail)
+            Timber.tag("update plan").d("updated plan ${_plan.value}")
+        }
+        return isSuccess
+    }
+
+    fun deletePlan(dayIdx: Int, deletedPlanList: List<Plan.DayPlan.PlanItem>): Boolean {
+        var isSuccess = false
+
         // 현재 _plan 값을 가져옴
         val currentPlan = _plan.value
 
@@ -130,7 +170,7 @@ class PlanViewModel @Inject constructor(
             val updatedDatesDetail = plan.datesDetail.map { dayPlan ->
                 if (dayPlan.travelDatesId == dayIdx + 1) {
                     val newPlanList = dayPlan.placesDetail.toMutableList()
-                    newPlanList.removeAll(deletedPlanList)
+                    isSuccess = newPlanList.removeAll(deletedPlanList)
 
                     dayPlan.copy(placesDetail = newPlanList)
                 } else {
@@ -138,9 +178,15 @@ class PlanViewModel @Inject constructor(
                 }
             }
 
+            if (!isSuccess) {
+                return false
+            }
+
+            // 서버에 저장시키는 코드 추가
             // 수정된 datesDetail을 갖는 새로운 Plan 객체를 _plan에 방출
             _plan.value = plan.copy(datesDetail = updatedDatesDetail)
-            Timber.d("$plan")
+            Timber.d("delete $plan")
         }
+        return isSuccess
     }
 }
