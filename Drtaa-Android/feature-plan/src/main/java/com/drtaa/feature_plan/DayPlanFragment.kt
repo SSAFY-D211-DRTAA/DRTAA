@@ -53,8 +53,10 @@ class DayPlanFragment(
                 val dayPlan = dayPlanList[day-1]
                 if (dayPlan.placesDetail.isEmpty()) {
                     binding.llNoPlan.visibility = View.VISIBLE
+                    binding.clDayPlan.visibility = View.GONE
                 } else {
                     binding.clDayPlan.visibility = View.VISIBLE
+                    binding.llNoPlan.visibility = View.GONE
                     planListAdapter.submitList(dayPlan.placesDetail)
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)

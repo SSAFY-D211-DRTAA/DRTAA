@@ -2,7 +2,6 @@ package com.drtaa.feature_plan
 
 import android.view.View
 import androidx.core.view.isVisible
-import androidx.fragment.app.viewModels
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -13,7 +12,6 @@ import com.drtaa.core_model.util.toDate
 import com.drtaa.feature_plan.adapter.PlanViewPagerAdapter
 import com.drtaa.feature_plan.databinding.FragmentPlanListBinding
 import com.drtaa.feature_plan.viewmodel.PlanViewModel
-import com.drtaa.feature_plan.viewmodel.PlanViewModel.Companion.seoulTrip
 import com.naver.maps.map.MapView
 import com.naver.maps.map.NaverMap
 import dagger.hilt.android.AndroidEntryPoint
@@ -42,7 +40,6 @@ class PlanListFragment :
     }
 
     override fun iniView() {
-        initViewPager()
         initEvent()
         initObserve()
 
@@ -58,6 +55,15 @@ class PlanListFragment :
             .onEach { isEditMode ->
                 binding.tvEditPlan.isVisible = !isEditMode
                 binding.tvEditFinish.isVisible = isEditMode
+
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+        planViewModel.plan.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach { plan ->
+                if(plan == null) return@onEach
+
+                initViewPager()
+                Timber.d("plan: $plan")
             }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
@@ -104,14 +110,14 @@ class PlanListFragment :
             vpPlanDay.getChildAt(0).overScrollMode = RecyclerView.OVER_SCROLL_NEVER
             vpPlanDay.isUserInputEnabled = false
 
-            updateDayPlanText(seoulTrip.datesDetail[0])
+            updateDayPlanText(planViewModel.plan.value!!.datesDetail[0])
 
             ivPlanDayPrev.setOnClickListener {
                 binding.vpPlanDay.apply {
                     if (currentItem > 0) {
                         currentItem -= 1
 
-                        updateDayPlanText(seoulTrip.datesDetail[currentItem])
+                        updateDayPlanText(planViewModel.plan.value!!.datesDetail[currentItem])
                     }
                 }
             }
@@ -121,7 +127,7 @@ class PlanListFragment :
                     if (currentItem < fragmentList.size - 1) {
                         currentItem += 1
 
-                        updateDayPlanText(seoulTrip.datesDetail[currentItem])
+                        updateDayPlanText(planViewModel.plan.value!!.datesDetail[currentItem])
                     }
                 }
             }
