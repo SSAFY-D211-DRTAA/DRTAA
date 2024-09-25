@@ -6,11 +6,14 @@ import com.d211.drtaa.domain.user.dto.response.UserInfoResponseDTO;
 import com.d211.drtaa.domain.user.service.CustomUserDetailsService;
 import com.d211.drtaa.domain.user.service.UserService;
 import com.d211.drtaa.global.exception.auth.InvalidTokenException;
+import com.d211.drtaa.global.service.fcm.FcmService;
+import com.d211.drtaa.global.util.fcm.PostTokenReq;
 import com.d211.drtaa.global.util.jwt.JwtToken;
 import com.d211.drtaa.global.exception.user.UserCreationException;
 import com.d211.drtaa.global.exception.user.UserNicknameDuplicateException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -34,6 +37,7 @@ public class UserController {
 
     private final CustomUserDetailsService userDetailsService;
     private final UserService userService;
+    private final FcmService fcmService;
 
     @PostMapping(value = "/signup", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "회원가입", description = "Form 회원가입")
@@ -102,25 +106,6 @@ public class UserController {
             return ResponseEntity.ok(tokens);
         } catch (Exception e) {
             // 400, 잘못된 요청
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-
-    @PostMapping("/token")
-    @Operation(summary = "토큰 재발급", description = "유효기간 만료로 인한 JWT 토큰 재발급")
-    public ResponseEntity<?> updateToken(@RequestParam String userRefreshToken) {
-        try {
-            JwtToken tokens = userService.updateToken(userRefreshToken);
-
-            return ResponseEntity.ok(tokens);
-        } catch (InvalidTokenException e) {
-            // 리프레시 토큰이 만료된 경우
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("리프레시 토큰이 만료되었습니다. 다시 로그인해주세요.");
-        } catch (UsernameNotFoundException e) {
-            // 사용자 없음
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (Exception e) {
-            // 기타 예외
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
@@ -230,8 +215,43 @@ public class UserController {
             userService.delete(authentication.getName());
 
             return ResponseEntity.ok("회원 탈퇴 성공");
+        } catch (AccessDeniedException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage()); // 401, 클라이언트 인증 실패
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/jwt-token")
+    @Operation(summary = "jwt 토큰 재발급", description = "유효기간 만료로 인한 JWT 토큰 재발급")
+    public ResponseEntity<?> updateToken(@RequestParam String userRefreshToken) {
+        try {
+            JwtToken tokens = userService.updateToken(userRefreshToken);
+
+            return ResponseEntity.ok(tokens);
+        } catch (InvalidTokenException e) {
+            // 리프레시 토큰이 만료된 경우
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("리프레시 토큰이 만료되었습니다. 다시 로그인해주세요.");
+        } catch (UsernameNotFoundException e) {
+            // 사용자 없음
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            // 기타 예외
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/fcm-token")
+    @Operation(summary = "fcm 토큰 발급", description = "Android에서 발급한 FCM 토큰 저장")
+    public ResponseEntity<String> getToken(Authentication authentication, @Valid @RequestBody PostTokenReq postTokenReq) {
+        try {
+            String response = fcmService.getToken(authentication.getName(), postTokenReq.getToken());
+
+            return ResponseEntity.ok(response); // 200
+        } catch (AccessDeniedException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage()); // 401, 클라이언트 인증 실패
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
         }
     }
 }

@@ -44,10 +44,6 @@ public class User implements UserDetails {
     @Schema(description = "회원 프로필 사진", example = "multipart 이미지")
     private String userProfileImg;
 
-    @Column(name = "user_refreshtoken", nullable = false)
-    @Schema(description = "회원 refreshToken", example = "ex7534487435468~~")
-    private String userRefreshToken;
-
     @Column(name = "user_login", nullable = false)
     @Schema(description = "회원 로그인처", example = "Form")
     private String userLogin;
@@ -55,6 +51,14 @@ public class User implements UserDetails {
     @Column(name = "user_is_admin", nullable = false)
     @Schema(description = "회원 관리자 유무", example = "false")
     private boolean userIsAdmin;
+
+    @Column(name = "user_refreshtoken", nullable = false)
+    @Schema(description = "회원 refreshToken", example = "ex7534487435468~~")
+    private String userRefreshToken;
+
+    @Column(name = "user_fcm_token")
+    @Schema(description = "FCM의 회원 식별 토큰")
+    private String fcmToken;
 
     @Column(name = "user_signup_date")
     @Schema(description = "회원 가입 일자", example = "2024.09.12 14:00:00")
