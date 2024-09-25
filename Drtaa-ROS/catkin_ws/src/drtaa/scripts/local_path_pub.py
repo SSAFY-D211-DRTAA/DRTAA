@@ -31,7 +31,7 @@ class local_path_pub:
         self.y = 0
         self.local_path_size = 70
         self.prev_current_waypoint = 0
-        self.smoothing_factor = 0.5  # 경로 평활화 계수
+        self.smoothing_factor = 0.8  # 경로 평활화 계수
 
         rate = rospy.Rate(20)  # 20hz
         while not rospy.is_shutdown():
