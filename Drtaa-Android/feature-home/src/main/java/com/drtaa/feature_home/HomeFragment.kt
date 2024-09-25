@@ -16,11 +16,17 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
     private val homeviewModel: HomeViewModel by viewModels()
 
     override fun initView() {
+        initObserve()
+        initEvent()
+
         binding.apply {
             binding.homeviewModel = this@HomeFragment.homeviewModel
         }
-        initObserve()
-        initEvent()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        homeviewModel.refreshUserData()
     }
 
     private fun initObserve() {
@@ -28,7 +34,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
             .onEach { result ->
                 if (result == null) return@onEach
                 binding.socialUser = result
-                Timber.d("$result")
+                Timber.d("지금 현재 유저는?? $result")
             }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
 

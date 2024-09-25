@@ -127,7 +127,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     @Transactional
-    public void updateImg(String userName, MultipartFile image) throws Exception {
+    public String updateImg(String userName, MultipartFile image) throws Exception {
         // 사용자 조회
         User user = userRepository.findByUserProviderId(userName)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 userProviderId의 맞는 회원을 찾을 수 없습니다."));
@@ -146,6 +146,8 @@ public class UserServiceImpl implements UserService{
 
         // DB 저장
         userRepository.save(user);
+
+        return newImgUrl;
     }
 
     @Override

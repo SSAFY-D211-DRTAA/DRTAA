@@ -251,7 +251,7 @@ class pure_pursuit:
                         self.target_velocity = self.calculate_approach_velocity(distance_to_stop_line)
                         
                     elif self.traffic_light_manager.traffic_light_status & 4:  # Yellow light
-                        r#ospy.loginfo("Yellow light detected, slowing down")
+                        #rospy.loginfo("Yellow light detected, slowing down")
                         approach_velocity = self.calculate_approach_velocity(distance_to_stop_line)
                         self.target_velocity = min(approach_velocity, self.target_velocity)
                         
@@ -263,7 +263,7 @@ class pure_pursuit:
             self.target_velocity = 0
 
     def calculate_approach_velocity(self, distance):
-        max_approach_speed = 20  ## km/h
+        max_approach_speed = 40  ## km/h # 20
         min_approach_speed = 0   # km/h
         
         if distance > self.stop_line_threshold:

@@ -13,4 +13,5 @@ interface SignDataSource {
     suspend fun getUserData(): SocialUser
     suspend fun setUserData(user: SocialUser)
     suspend fun clearUserData()
+    suspend fun updateUserProfileImage(image: MultipartBody.Part?): SocialUser
 }

@@ -147,8 +147,10 @@ public class RentCarServiceImpl implements RentCarService {
                         // null 체크 추가
                         JsonNode latNode = jsonNode.get("latitude");
                         JsonNode lonNode = jsonNode.get("longitude");
+                        JsonNode rentCarId = jsonNode.get("rentCarId");
                         log.info("latitude: {}", latNode);
                         log.info("longitude: {}", lonNode);
+                        log.info("rentCarId: {}", rentCarId);
 
                         if (latNode != null && lonNode != null && !latNode.isNull() && !lonNode.isNull()) {
                             // DTO 생성
@@ -168,7 +170,7 @@ public class RentCarServiceImpl implements RentCarService {
             }, webSocketConfig.getUrl()).get();
 
             // 상태와 렌트 탑승 위치 전송
-            MyMessage message = new MyMessage("vehicle_dispatch", rent.getRentDptLat(), rent.getRentDptLon());
+            MyMessage message = new MyMessage("vehicle_dispatch", rent.getRentDptLat(), rent.getRentDptLon(), rent.getRentCar().getRentCarId());
             String jsonMessage = objectMapper.writeValueAsString(message);
             session.sendMessage(new TextMessage(jsonMessage));
             log.info("Sent message: {}", jsonMessage);
@@ -180,7 +182,7 @@ public class RentCarServiceImpl implements RentCarService {
         }
 
         // 렌트 차량 상태 변경
-        car.setRentCarDrivingStatus(RentDrivingStatus.call);
+        car.setRentCarDrivingStatus(RentDrivingStatus.calling);
 
         // 렌트 차량 변경 상태 저장
         rentCarRepository.save(car);
@@ -223,8 +225,10 @@ public class RentCarServiceImpl implements RentCarService {
                         // null 체크 추가
                         JsonNode latNode = jsonNode.get("latitude");
                         JsonNode lonNode = jsonNode.get("longitude");
+                        JsonNode rentCarId = jsonNode.get("rentCarId");
                         log.info("latitude: {}", latNode);
                         log.info("longitude: {}", lonNode);
+                        log.info("rentCarId: {}", rentCarId);
 
                         if (latNode != null && lonNode != null && !latNode.isNull() && !lonNode.isNull()) {
                             // DTO 생성
@@ -244,7 +248,7 @@ public class RentCarServiceImpl implements RentCarService {
             }, webSocketConfig.getUrl()).get();
 
             // 상태와 사용자 탑승 호출 위치 전송
-            MyMessage message = new MyMessage("vehicle_dispatch", rentCarCallRequestDTO.getUserLat(), rentCarCallRequestDTO.getUserLon());
+            MyMessage message = new MyMessage("vehicle_dispatch", rentCarCallRequestDTO.getUserLat(), rentCarCallRequestDTO.getUserLon(), rent.getRentCar().getRentCarId());
             String jsonMessage = objectMapper.writeValueAsString(message);
             session.sendMessage(new TextMessage(jsonMessage));
             log.info("Sent message: {}", jsonMessage);
@@ -256,7 +260,7 @@ public class RentCarServiceImpl implements RentCarService {
         }
 
         // 렌트 차량 상태 변경
-        car.setRentCarDrivingStatus(RentDrivingStatus.call);
+        car.setRentCarDrivingStatus(RentDrivingStatus.calling);
 
         // 렌트 차량 변경 상태 저장
         rentCarRepository.save(car);
@@ -287,6 +291,14 @@ public class RentCarServiceImpl implements RentCarService {
                         JsonNode jsonNode = objectMapper.readTree(message.getPayload());
                         log.info("Received message: {}", jsonNode);
 
+                        // null 체크 추가
+                        JsonNode latNode = jsonNode.get("latitude");
+                        JsonNode lonNode = jsonNode.get("longitude");
+                        JsonNode rentCarId = jsonNode.get("rentCarId");
+                        log.info("latitude: {}", latNode);
+                        log.info("longitude: {}", lonNode);
+                        log.info("rentCarId: {}", rentCarId);
+
                     } catch (Exception e) {
                         log.error("Error processing received message: ", e);
                     }
@@ -294,7 +306,7 @@ public class RentCarServiceImpl implements RentCarService {
             }, webSocketConfig.getUrl()).get();
 
             // 상태와 렌트 탑승 위치 전송
-            MyMessage message = new MyMessage("vehicle_drive");
+            MyMessage message = new MyMessage("vehicle_drive", 37.576636819990284, 126.89879021208397, rent.getRentCar().getRentCarId());
             String jsonMessage = objectMapper.writeValueAsString(message);
             session.sendMessage(new TextMessage(jsonMessage));
             log.info("Sent message: {}", jsonMessage);
@@ -342,7 +354,7 @@ public class RentCarServiceImpl implements RentCarService {
             }, webSocketConfig.getUrl()).get();
 
             // 상태와 렌트 탑승 위치 전송
-            MyMessage message = new MyMessage("vehicle_wait");
+            MyMessage message = new MyMessage("vehicle_wait", rent.getRentCar().getRentCarId());
             String jsonMessage = objectMapper.writeValueAsString(message);
             session.sendMessage(new TextMessage(jsonMessage));
             log.info("Sent message: {}", jsonMessage);
@@ -359,6 +371,4 @@ public class RentCarServiceImpl implements RentCarService {
         // 변경 상태 저장
         rentCarRepository.save(car);
     }
-
-
 }

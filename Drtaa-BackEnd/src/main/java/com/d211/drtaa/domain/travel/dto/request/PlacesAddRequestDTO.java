@@ -8,7 +8,7 @@ import lombok.Getter;
 @Data
 @AllArgsConstructor
 @Getter
-public class PlacesRequestDTO {
+public class PlacesAddRequestDTO {
     @Schema(description = "여행 고유 번호", example = "1")
     private Long travelId;
     @Schema(description = "여행 일정 고유번호", example = "1")

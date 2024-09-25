@@ -12,6 +12,8 @@ from geometry_msgs.msg import PoseStamped, PoseWithCovarianceStamped
 from nav_msgs.msg import Path, Odometry
 from scipy.spatial import KDTree
 from std_msgs.msg import Bool
+from morai_msgs.srv import MoraiEventCmdSrv
+from morai_msgs.msg import EventInfo
 
 current_path = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(current_path)
@@ -25,7 +27,10 @@ class AStarPathPublisher:
         # rospy.Subscriber('/initialpose', PoseWithCovarianceStamped, self.init_callback) 
         rospy.Subscriber('/odom', Odometry, self.odom_callback)
         self.global_path_pub = rospy.Publisher('/global_path', Path, queue_size=1)
-        self.destination_reached_pub = rospy.Publisher('/complete_drive', Bool, queue_size=1)
+        self.global_path_once_pub = rospy.Publisher('/global_path_once', Path, queue_size=1)
+        self.destination_reached_pub = rospy.Publisher('/complete_drive', PoseStamped, queue_size=1)
+
+        self.event_cmd_client = rospy.ServiceProxy('/Service_MoraiEventCmd', MoraiEventCmdSrv)
 
         # 초기 상태 변수 설정
         self.is_goal_pose = False
@@ -38,6 +43,7 @@ class AStarPathPublisher:
         # Flag to check if destination reached message is published
         self.destination_reached = False
         self.goal_position = None
+        self.is_global_path_once_pub = False
 
         try:
             # MGeo 데이터 로드
@@ -53,10 +59,28 @@ class AStarPathPublisher:
         self.global_planner = AStar(self.nodes, self.links)
 
         # 메인 루프
-        rate = rospy.Rate(20) # 50Hz
+        rate = rospy.Rate(1) # 1Hz
         while not rospy.is_shutdown():
             if self.global_path_msg is not None:
                 self.global_path_pub.publish(self.global_path_msg)
+
+                if self.is_global_path_once_pub is not True:
+                    self.global_path_once_pub.publish(self.global_path_msg)
+                    self.is_global_path_once_pub = True
+
+                    # Change ctrl_mode to automode
+                    event_info = EventInfo()
+                    event_info.option = 1  # ctrl_mode option
+                    event_info.ctrl_mode = 3  # automode
+                    
+                    try:
+                        response = self.event_cmd_client(event_info)
+                        if response.success:
+                            rospy.loginfo("Control mode changed to automode.")
+                        else:
+                            rospy.logwarn("Failed to change control mode.")
+                    except rospy.ServiceException as e:
+                        rospy.logerr(f"Service call failed: {e}")
             # else:
             #     rospy.loginfo('Waiting for goal and current position data')
             rate.sleep()
@@ -65,6 +89,7 @@ class AStarPathPublisher:
    
         self.end_node = self.find_closest_node(msg.pose.position)
         self.is_goal_pose = True
+        self.is_global_path_once_pub = False
         rospy.loginfo(f"목적지 노드: {self.end_node}")
         # [INFO] [1727033826.562245]: 목적지 노드: A119AS319285
 
@@ -90,7 +115,14 @@ class AStarPathPublisher:
             if not self.destination_reached and self.is_destination_reached(self.current_position):
                     rospy.loginfo("Destination reached!")
                     self.destination_reached = True
-                    self.destination_reached_pub.publish(self.destination_reached)
+                    # Create PoseStamped message
+                    goal_pose_msg = PoseStamped()
+                    goal_pose_msg.header.stamp = rospy.Time.now()
+                    goal_pose_msg.header.frame_id = "map"  # Set appropriate frame ID   
+                    goal_pose_msg.pose.position.x = self.goal_position[0]
+                    goal_pose_msg.pose.position.y = self.goal_position[1]
+                    goal_pose_msg.pose.position.z = 0  # Assuming z=0 for 2D navigation
+                    self.destination_reached_pub.publish(goal_pose_msg) # 목적지 좌표 발행
                     # Reset state variables and global path
                     self.reset_global_path()
 
