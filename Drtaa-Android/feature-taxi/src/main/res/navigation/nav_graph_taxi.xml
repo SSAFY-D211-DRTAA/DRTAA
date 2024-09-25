@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph_taxi"
+    app:startDestination="@id/taxiFragment">
+
+    <fragment
+        android:id="@+id/taxiFragment"
+        android:name="com.drtaa.feature_taxi.TaxiFragment"
+        android:label="TaxiFragment"
+        tools:layout="@layout/fragment_taxi">
+    </fragment>
+
+</navigation>
