@@ -72,7 +72,7 @@ public class SwaggerConfig {
     public GroupedOpenApi travelApi() {
         return GroupedOpenApi.builder()
                 .group("Travel")
-                .pathsToMatch("/travel/**", "travel/blog/**")
+                .pathsToMatch("/travel/**", "travel/blog/**", "travel/weather/**")
                 .build();
     }
 
