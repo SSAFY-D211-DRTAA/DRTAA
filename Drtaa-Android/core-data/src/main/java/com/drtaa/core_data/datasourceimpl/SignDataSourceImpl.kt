@@ -26,7 +26,7 @@ class SignDataSourceImpl @Inject constructor(
     @Auth
     private val authSignAPI: SignAPI,
     @Named("USER_DATASTORE")
-    private val dataStore: DataStore<Preferences>
+    private val dataStore: DataStore<Preferences>,
 ) : SignDataSource {
     override suspend fun getTokens(userLoginInfo: UserLoginInfo): ResponseLogin {
         return when (userLoginInfo) {

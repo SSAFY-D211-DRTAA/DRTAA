@@ -21,7 +21,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RentViewModel @Inject constructor(
-    private val rentRepository: RentRepository
+    private val rentRepository: RentRepository,
 ) : ViewModel() {
     private val _rentStartLocation = MutableStateFlow<Search?>(null)
     val rentStartLocation: StateFlow<Search?> = _rentStartLocation
@@ -44,8 +44,6 @@ class RentViewModel @Inject constructor(
     private val _isDuplicatedSchedule = MutableSharedFlow<Boolean?>()
     val isDuplicatedSchedule: SharedFlow<Boolean?> = _isDuplicatedSchedule
 
-    val DEFAULT_LATLNG = LatLng(37.57578754990568, 126.90027478459672)
-
     init {
         setRentValid()
     }
@@ -56,8 +54,8 @@ class RentViewModel @Inject constructor(
                 title = search.title,
                 category = search.category,
                 roadAddress = search.roadAddress,
-                lng = DEFAULT_LATLNG.longitude,
-                lat = DEFAULT_LATLNG.latitude
+                lng = default_position.longitude,
+                lat = default_position.latitude
             )
 //            _rentStartLocation.value = search
             _rentStartLocation.value = jungryujang
@@ -171,7 +169,7 @@ class RentViewModel @Inject constructor(
 
         private const val PRICE_PER_HOUR = 20000
         private const val DISCOUNT_PER_DAY = 240000
-
+        val default_position = LatLng(37.57578754990568, 126.90027478459672)
         private const val ONE_DAY = 24
         private const val ONE_HOUR_TO_MINUTE = 60
     }

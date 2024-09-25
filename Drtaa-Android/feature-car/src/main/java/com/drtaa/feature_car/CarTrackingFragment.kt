@@ -70,7 +70,7 @@ class CarTrackingFragment :
                     showSnackBar("MQTT 연결 성공")
                 } else if (status == -1) {
                     Timber.tag("mqtt").d("mqtt 연결 실패")
-                }else{
+                } else {
                     dismissLoading()
                     navigatePopBackStack()
                     showSnackBar("다시 접속해 주세요")
@@ -120,7 +120,7 @@ class CarTrackingFragment :
     }
 
     override fun iniView() {
-
+        //
     }
 
     companion object {

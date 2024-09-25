@@ -43,7 +43,6 @@ object APIModule {
         retrofit: Retrofit
     ): SignAPI = retrofit.create(SignAPI::class.java)
 
-
     @Singleton
     @Provides
     fun provideMapAPI(

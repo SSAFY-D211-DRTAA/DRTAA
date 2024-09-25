@@ -50,7 +50,7 @@ class MqttManager @Inject constructor() {
                         if (throwable != null) {
                             Timber.tag(TAG).e(throwable, "MQTT 연결실패")
                             CoroutineScope(Dispatchers.Main).launch {
-                                if (reconnectAttempts == 10) {
+                                if (reconnectAttempts == MAX_TRY) {
                                     _connectionStatus.emit(0)
                                 } else {
                                     _connectionStatus.emit(-1)
@@ -138,6 +138,7 @@ class MqttManager @Inject constructor() {
         private const val MQTT_SERVER = BuildConfig.MQTT_URL
         private const val PORT = 1883
         private const val DELAY = 5
+        private const val MAX_TRY = 10
         private const val MAX_RECONNECT_DELAY = 20000L // 최대 30초
         private const val INITIAL_RECONNECT_DELAY = 1000L // 초기 1초
         private const val GPS_SUB = "gps/data/v1/subscribe"
