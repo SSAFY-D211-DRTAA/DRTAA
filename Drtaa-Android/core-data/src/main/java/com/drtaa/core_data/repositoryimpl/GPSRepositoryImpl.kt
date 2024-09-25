@@ -15,6 +15,12 @@ class GPSRepositoryImpl @Inject constructor(
         }
     }
 
+    override fun observeConnectionStatus() = flow {
+        mqttManager.connectionStatus.collect { status ->
+            emit(status)
+        }
+    }
+
     override suspend fun setupMqttConnection() {
         mqttManager.setupMqttClient()
     }

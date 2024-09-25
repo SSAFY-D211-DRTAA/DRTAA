@@ -33,12 +33,14 @@ class CarTrackingFragment :
     }
 
     override fun initMapView() {
+        showLoading()
         mapView = binding.mapView
         mapView?.getMapAsync(this)
     }
 
     override fun initOnMapReady(naverMap: NaverMap) {
         observeViewModelOnMap(naverMap)
+        observeState()
         binding.btnCall.setOnClickListener {
             showLoading()
             if (viewModel.currentRentDetail.value == null) {
@@ -56,6 +58,22 @@ class CarTrackingFragment :
         binding.btnReturn.setOnClickListener {
             viewModel.completeRent()
         }
+    }
+
+    private fun observeState() {
+        viewModel.mqttConnectionStatus.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach { status ->
+                if (status == 1) {
+                    dismissLoading()
+                    showSnackBar("MQTT 연결 성공")
+                } else if (status == -1) {
+                    dismissLoading()
+                    showSnackBar("MQTT 연결 실패")
+                }else{
+                    dismissLoading()
+                    showSnackBar("다시 접속해 주세요")
+                }
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
     private fun observeViewModelOnMap(naverMap: NaverMap) {
