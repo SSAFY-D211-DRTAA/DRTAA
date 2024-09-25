@@ -19,12 +19,15 @@ public interface RentCarService {
     // rentCarId의 맞는 렌트 차량 주행 상태 조회
     RentCarDriveStatusResponseDTO getDriveStatus(Long rentCarId);
 
-    // rentCarId의 맞는 렌트 차량 주행 상태 수정
-    void updateDriveStatus(RentCarDriveStatusRequestDTO rentCarDriveStatusRequestDTO);
-
     // rentId의 맞는 렌트 차량 첫호출
     RentCarLocationResponseDTO callRentCar(long rentId);
 
     // rentId의 맞는 렌트 차량 재호출
     RentCarLocationResponseDTO reCallRentCar(RentCarCallRequestDTO rentCarCallRequestDTO);
+
+    // rentId의 맞는 렌트 차량 탑승(driving) 상태로 변경
+    void updateRentCarDriveStatustoDriving(long rentId);
+
+    // rentId의 맞는 렌트 차량 하차(parking) 상태로 변경
+    void updateRentCarDriveStatustoParking(long rentId);
 }

@@ -23,7 +23,7 @@ public interface UserService {
     void delete(String userProviderId);
 
     // 회원 기존 프로필 이미지(userProfileImg)를 image로 변경
-    void updateImg(String userName, MultipartFile image) throws Exception;
+    String updateImg(String userName, MultipartFile image) throws Exception;
 
     // 회원 기존 프로필 이미지(userProfileImg)를 삭제
     void deleteImg(String userName) throws Exception;

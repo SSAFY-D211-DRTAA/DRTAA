@@ -5,6 +5,8 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.drtaa.core_data.datasource.SignDataSource
+import com.drtaa.core_model.network.RequestFormLogin
+import com.drtaa.core_model.network.ResponseLogin
 import com.drtaa.core_model.sign.SocialUser
 import com.drtaa.core_model.sign.UserLoginInfo
 import com.drtaa.core_model.util.toRequestLogin
@@ -22,27 +24,25 @@ import javax.inject.Named
 
 class SignDataSourceImpl @Inject constructor(
     @NoAuth
-    private val signAPI: SignAPI,
-
+    private val noAuthSignAPI: SignAPI,
     @Auth
-    private val signAPIAuth: SignAPI,
-
+    private val authSignAPI: SignAPI,
     @Named("USER_DATASTORE")
     private val dataStore: DataStore<Preferences>
 ) : SignDataSource {
     override suspend fun getTokens(userLoginInfo: UserLoginInfo): ResponseLogin {
         return when (userLoginInfo) {
-            is SocialUser -> signAPI.socialLogin(userLoginInfo.toRequestLogin())
-            else -> signAPI.formLogin(userLoginInfo as RequestFormLogin)
+            is SocialUser -> noAuthSignAPI.socialLogin(userLoginInfo.toRequestLogin())
+            else -> noAuthSignAPI.formLogin(userLoginInfo as RequestFormLogin)
         }
     }
 
     override suspend fun signUp(requestSignUp: RequestBody, image: MultipartBody.Part?): String {
-        return signAPI.signUp(requestSignUp, image)
+        return noAuthSignAPI.signUp(requestSignUp, image)
     }
 
     override suspend fun checkDuplicatedId(userProviderId: String): Boolean {
-        return signAPI.checkDuplicatedId(userProviderId)
+        return noAuthSignAPI.checkDuplicatedId(userProviderId)
     }
 
     override suspend fun getUserData(): SocialUser {

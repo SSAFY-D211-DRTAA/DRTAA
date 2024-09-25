@@ -6,6 +6,9 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.google.android.material.snackbar.Snackbar
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 fun Fragment.showSnackBar(message: String, view: View = requireView()) {
     Snackbar.make(view, message, Snackbar.LENGTH_SHORT).show()
@@ -36,4 +39,11 @@ fun Boolean.doOnFalse(func: () -> Unit): Boolean {
         func()
     }
     return this
+}
+
+fun String.parseLocalDateTime(): String {
+    val dateTime = LocalDateTime.parse(this)
+    val formatter = DateTimeFormatter.ofPattern("yyyy년 M월 d일\na h시 m분", Locale.KOREAN)
+    val formatted = dateTime.format(formatter)
+    return formatted.replace("AM", "오전").replace("PM", "오후")
 }

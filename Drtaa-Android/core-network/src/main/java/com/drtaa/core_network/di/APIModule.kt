@@ -38,7 +38,7 @@ object APIModule {
     @Singleton
     @Auth
     @Provides
-    fun provideSignAPIAuth(
+    fun provideSignAPI(
         @AuthRetrofit
         retrofit: Retrofit
     ): SignAPI = retrofit.create(SignAPI::class.java)

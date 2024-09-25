@@ -7,6 +7,9 @@ import com.drtaa.core_data.util.safeApiCall
 import com.drtaa.core_model.network.RequestCallRent
 import com.drtaa.core_model.network.RequestChangeRent
 import com.drtaa.core_model.network.RequestCompleteRent
+import com.drtaa.core_model.network.RequestDuplicatedSchedule
+import com.drtaa.core_model.network.RequestUnassignedCar
+import com.drtaa.core_model.rent.RentCar
 import com.drtaa.core_model.network.RequestRentExtend
 import com.drtaa.core_model.network.ResponseRentStateAll
 import com.drtaa.core_model.rent.RentDetail
@@ -20,7 +23,7 @@ class RentRepositoryImpl @Inject constructor(
     private val rentDataSource: RentDataSource,
 ) : RentRepository {
 
-    override suspend fun completeRent(requestCompleteRent: RequestCompleteRent): Flow<Result<Unit>> =
+    override suspend fun completeRent(requestCompleteRent: RequestCompleteRent): Flow<Result<String>> =
         flow {
             when (
                 val response = safeApiCall { rentDataSource.completeRent(requestCompleteRent) }
@@ -143,25 +146,6 @@ class RentRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun getOnRentCar(rentId: Long): Flow<Result<String>> = flow {
-        when (val response = safeApiCall { rentDataSource.getOnRentCar(rentId) }) {
-            is ResultWrapper.Success -> {
-                emit(Result.success(response.data))
-                Timber.d("렌트 중인 차량 조회 성공")
-            }
-
-            is ResultWrapper.GenericError -> {
-                emit(Result.failure(Exception(response.message)))
-                Timber.d("렌트 중인 차량 조회 실패: ${response.message}")
-            }
-
-            is ResultWrapper.NetworkError -> {
-                emit(Result.failure(Exception("네트워크 에러")))
-                Timber.d("렌트 중인 차량 조회 네트워크 에러")
-            }
-        }
-    }
-
     override suspend fun getAllCompletedRent(rentId: Long): Flow<Result<List<ResponseRentStateAll>>> =
         flow {
             when (val response = safeApiCall { rentDataSource.getAllCompletedRent(rentId) }) {
@@ -249,4 +233,26 @@ class RentRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    override suspend fun checkDuplicatedRent(rentSchedule: RequestDuplicatedSchedule): Flow<Result<Boolean>> =
+        flow {
+            when (
+                val response = safeApiCall { rentDataSource.checkDuplicatedRent(rentSchedule) }
+            ) {
+                is ResultWrapper.Success -> {
+                    emit(Result.success(response.data))
+                    Timber.d("스케줄 중복 확인 성공")
+                }
+
+                is ResultWrapper.GenericError -> {
+                    emit(Result.failure(Exception(response.message)))
+                    Timber.d("스케줄 중복 확인 실패: ${response.message}")
+                }
+
+                is ResultWrapper.NetworkError -> {
+                    emit(Result.failure(Exception("네트워크 에러")))
+                    Timber.d("스케줄 중복 확인 네트워크 에러")
+                }
+            }
+        }
 }

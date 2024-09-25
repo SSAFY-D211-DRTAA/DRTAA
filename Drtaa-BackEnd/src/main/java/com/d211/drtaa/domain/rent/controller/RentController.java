@@ -155,22 +155,6 @@ public class RentController {
         }
     }
 
-    @PatchMapping("/status/{rentId}/in-progress")
-    @Operation(summary = "렌트 상태 변경(탑승)", description = "렌트 취소")
-    public ResponseEntity rentStatusInProgress(@PathVariable("rentId") Long rentId) {
-        try {
-            rentService.rentStatusInProgress(rentId);
-
-            return ResponseEntity.ok("Success");
-        } catch(RentNotFoundException e) {
-            log.error(e.getMessage());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
-        }
-    }
-
     @PatchMapping("/status/completed")
     @Operation(summary = "렌트 상태 변경(반납)", description = "렌트 취소")
     public ResponseEntity rentStatusCompleted(@RequestBody RentStatusRequestDTO requestDTO) {

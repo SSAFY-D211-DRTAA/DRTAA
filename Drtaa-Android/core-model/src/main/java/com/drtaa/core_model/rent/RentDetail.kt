@@ -13,6 +13,7 @@ data class RentDetail(
     val rentDptLon: Double,
     val rentEndTime: String,
     val rentHeadCount: Int,
+    val rentCarImg: String? = null,
     val rentPrice: Int,
     val rentStartTime: String,
     val rentStatus: String,

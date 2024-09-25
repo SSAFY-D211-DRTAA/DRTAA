@@ -9,6 +9,8 @@ import kotlinx.coroutines.flow.Flow
 interface RentCarRepository {
     // rent-car
     suspend fun getUnassignedCar(rentSchedule: RequestUnassignedCar): Flow<Result<RentCar>>
+    suspend fun getOffCar(rentId: Long): Flow<Result<String>>
+    suspend fun getOnCar(rentId: Long): Flow<Result<String>>
     suspend fun callAssignedCar(
         rentId: Long,
         userLat: Double,

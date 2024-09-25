@@ -1,0 +1,20 @@
+{
+    "log_level": "DEBUG",
+    "ros_bridge_websocket_url": "ws://localhost:9090",
+    "ec2_websocket_url": "ws://WS_SERVER_URL",
+    "east_offset": 313008.55819800857,
+    "north_offset": 4161698.628368007,
+    "utm_zone": 52,
+
+    "lat_return": 37.5752094492325,
+    "lon_return": 126.90113699112598,
+    
+    "test_lat":  37.57569116736151,
+    "test_lon":  126.90039723462993,
+    
+    "goals": [
+        {"lat": 37.57598929553398, "lon": 126.89995368612401},
+        {"lat": 37.57628742370645, "lon": 126.89951013501809},
+        {"lat": 37.57658555187892, "lon": 126.89906658391217}
+    ]
+}

@@ -7,6 +7,7 @@ import com.d211.drtaa.domain.rent.dto.response.RentCarDriveStatusResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentCarLocationResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentCarResponseDTO;
 import com.d211.drtaa.domain.rent.entity.Rent;
+import com.d211.drtaa.domain.rent.entity.RentStatus;
 import com.d211.drtaa.domain.rent.entity.car.RentCar;
 import com.d211.drtaa.domain.rent.entity.car.RentCarSchedule;
 import com.d211.drtaa.domain.rent.entity.car.RentDrivingStatus;
@@ -120,19 +121,6 @@ public class RentCarServiceImpl implements RentCarService {
     }
 
     @Override
-    public void updateDriveStatus(RentCarDriveStatusRequestDTO rentCarDriveStatusRequestDTO) {
-        // rentCarId에 해당하는 렌트 차량 찾기
-        RentCar car = rentCarRepository.findByRentCarId(rentCarDriveStatusRequestDTO.getRentCarId())
-                .orElseThrow(() -> new RentCarNotFoundException("해당 rentCarId의 맞는 차량을 찾을 수 없습니다."));
-
-        // 상태 변경
-        car.setRentCarDrivingStatus(rentCarDriveStatusRequestDTO.getRentCarDrivingStatus());
-
-        // 저장
-        rentCarRepository.save(car);
-    }
-
-    @Override
     @Transactional
     public RentCarLocationResponseDTO callRentCar(long rentId) {
         // rentId에 해당하는 렌트 찾기
@@ -196,6 +184,12 @@ public class RentCarServiceImpl implements RentCarService {
 
         // 렌트 차량 변경 상태 저장
         rentCarRepository.save(car);
+
+        // 렌트 상태 진행중으로 변경
+        rent.setRentStatus(RentStatus.in_progress);
+
+        // 렌트 변경 상태 저장
+        rentRepository.save(rent);
 
         // 응답이 없으면 빈 DTO 반환
         return response[0] != null ? response[0] : RentCarLocationResponseDTO.builder().build();
@@ -269,6 +263,107 @@ public class RentCarServiceImpl implements RentCarService {
 
         // 응답이 없으면 빈 DTO 반환
         return response[0] != null ? response[0] : RentCarLocationResponseDTO.builder().build();
+    }
+
+    @Override
+    @Transactional
+    public void updateRentCarDriveStatustoDriving(long rentId) {
+        // rentId에 해당하는 렌트 찾기
+        Rent rent = rentRepository.findByRentId(rentId)
+                .orElseThrow(() -> new RentNotFoundException("해당 rentId의 맞는 렌트를 찾을 수 없습니다."));
+
+        // rentCarId에 해당하는 렌트 차량 찾기
+        RentCar car = rentCarRepository.findByRentCarId(rent.getRentCar().getRentCarId())
+                .orElseThrow(() -> new RentCarNotFoundException("해당 rentCarId의 맞는 차량을 찾을 수 없습니다."));
+
+        try {
+            StandardWebSocketClient client = new StandardWebSocketClient();
+            WebSocketSession session = client.execute(new TextWebSocketHandler() {
+                @Override
+                protected void handleTextMessage(WebSocketSession session, TextMessage message) {
+                    // 서버로부터 받은 메시지를 처리하는 로직
+                    try {
+                        // JSON 메시지를 JsonNode로 파싱
+                        JsonNode jsonNode = objectMapper.readTree(message.getPayload());
+                        log.info("Received message: {}", jsonNode);
+
+                        // null 체크 추가
+                        JsonNode latNode = jsonNode.get("latitude");
+                        JsonNode lonNode = jsonNode.get("longitude");
+                        log.info("latitude: {}", latNode);
+                        log.info("longitude: {}", lonNode);
+
+                    } catch (Exception e) {
+                        log.error("Error processing received message: ", e);
+                    }
+                }
+            }, webSocketConfig.getUrl()).get();
+
+            // 상태와 렌트 탑승 위치 전송
+            MyMessage message = new MyMessage("vehicle_drive", 37.576636819990284, 126.89879021208397);
+            String jsonMessage = objectMapper.writeValueAsString(message);
+            session.sendMessage(new TextMessage(jsonMessage));
+            log.info("Sent message: {}", jsonMessage);
+            Thread.sleep(1000); // 필요에 따라 대기 시간 조절
+
+        } catch (Exception e) {
+            log.error("Error during WebSocket communication: ", e);
+            throw new WebSocketDisConnectedException("WebSocket이 네트워크 연결을 거부했습니다.");
+        }
+
+        // 렌트 차량 상태 변경
+        car.setRentCarDrivingStatus(RentDrivingStatus.driving);
+
+        // 변경 상태 저장
+        rentCarRepository.save(car);
+    }
+
+    @Override
+    @Transactional
+    public void updateRentCarDriveStatustoParking(long rentId) {
+        // rentId에 해당하는 렌트 찾기
+        Rent rent = rentRepository.findByRentId(rentId)
+                .orElseThrow(() -> new RentNotFoundException("해당 rentId의 맞는 렌트를 찾을 수 없습니다."));
+
+        // rentCarId에 해당하는 렌트 차량 찾기
+        RentCar car = rentCarRepository.findByRentCarId(rent.getRentCar().getRentCarId())
+                .orElseThrow(() -> new RentCarNotFoundException("해당 rentCarId의 맞는 차량을 찾을 수 없습니다."));
+
+        try {
+            StandardWebSocketClient client = new StandardWebSocketClient();
+            WebSocketSession session = client.execute(new TextWebSocketHandler() {
+                @Override
+                protected void handleTextMessage(WebSocketSession session, TextMessage message) {
+                    // 서버로부터 받은 메시지를 처리하는 로직
+                    try {
+                        // JSON 메시지를 JsonNode로 파싱
+                        JsonNode jsonNode = objectMapper.readTree(message.getPayload());
+                        log.info("Received message: {}", jsonNode);
+
+
+                    } catch (Exception e) {
+                        log.error("Error processing received message: ", e);
+                    }
+                }
+            }, webSocketConfig.getUrl()).get();
+
+            // 상태와 렌트 탑승 위치 전송
+            MyMessage message = new MyMessage("vehicle_wait");
+            String jsonMessage = objectMapper.writeValueAsString(message);
+            session.sendMessage(new TextMessage(jsonMessage));
+            log.info("Sent message: {}", jsonMessage);
+            Thread.sleep(1000); // 필요에 따라 대기 시간 조절
+
+        } catch (Exception e) {
+            log.error("Error during WebSocket communication: ", e);
+            throw new WebSocketDisConnectedException("WebSocket이 네트워크 연결을 거부했습니다.");
+        }
+
+        // 렌트 차량 상태 변경
+        car.setRentCarDrivingStatus(RentDrivingStatus.parking);
+
+        // 변경 상태 저장
+        rentCarRepository.save(car);
     }
 
 

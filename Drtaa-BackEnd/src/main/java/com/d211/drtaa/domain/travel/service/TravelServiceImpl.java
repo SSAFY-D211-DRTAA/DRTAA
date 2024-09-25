@@ -46,7 +46,7 @@ public class TravelServiceImpl implements TravelService {
             // 일정 장소 DTO 리스트 생성
             List<PlacesDetailResponseDTO> placesDtoList = placesList.stream().map(places ->
                     PlacesDetailResponseDTO.builder()
-                            .travelDatesId(places.getTravelDatesId())
+                            .datePlacesId(places.getDatePlacesId())
                             .datePlacesName(places.getDatePlacesName())
                             .datePlacesCategory(places.getDatePlacesCategory())
                             .datePlacesAddress(places.getDatePlacesAddress())
