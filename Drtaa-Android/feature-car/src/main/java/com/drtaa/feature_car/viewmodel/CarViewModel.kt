@@ -68,8 +68,8 @@ class CarViewModel @Inject constructor(
     private val _drivingStatus = MutableStateFlow<CarStatus>(CarStatus.IDLE)
     val drivingStatus: StateFlow<CarStatus> = _drivingStatus
 
-    private val _mqttConnectionStatus = MutableSharedFlow<Int>()
-    val mqttConnectionStatus: SharedFlow<Int> = _mqttConnectionStatus.asSharedFlow()
+    private val _mqttConnectionStatus = MutableStateFlow<Int>(-1)
+    val mqttConnectionStatus: StateFlow<Int> = _mqttConnectionStatus
 
     init {
         getLatestRent()
@@ -82,9 +82,13 @@ class CarViewModel @Inject constructor(
         viewModelScope.launch {
             gpsRepository.observeConnectionStatus().collectLatest {
                 Timber.tag("mqtt_viewmodel").d("observeMqttConnectionStatus: $it")
-                _mqttConnectionStatus.emit(it)
+                _mqttConnectionStatus.value = it
             }
         }
+    }
+
+    fun clearMqttStatus() {
+        _mqttConnectionStatus.value = -1
     }
 
     private fun getLatestRent() {
@@ -168,7 +172,7 @@ class CarViewModel @Inject constructor(
         }
     }
 
-    fun disconnectMQTT(){
+    fun disconnectMQTT() {
         gpsRepository.disconnectMqtt()
     }
 

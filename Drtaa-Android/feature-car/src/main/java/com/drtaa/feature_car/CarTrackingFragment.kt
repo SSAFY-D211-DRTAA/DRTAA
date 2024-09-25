@@ -63,14 +63,15 @@ class CarTrackingFragment :
     private fun observeState() {
         viewModel.mqttConnectionStatus.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { status ->
+                Timber.tag("connect mqtt").d("$status")
                 if (status == 1) {
                     dismissLoading()
                     showSnackBar("MQTT 연결 성공")
                 } else if (status == -1) {
-                    dismissLoading()
-                    showSnackBar("MQTT 연결 실패")
+                    Timber.tag("mqtt").d("mqtt 연결 실패")
                 }else{
                     dismissLoading()
+                    navigatePopBackStack()
                     showSnackBar("다시 접속해 주세요")
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
@@ -132,6 +133,7 @@ class CarTrackingFragment :
         super.onDestroy()
         viewModel.disconnectMQTT()
         viewModel.stopPublish()
+        viewModel.clearMqttStatus()
     }
 
     companion object {
