@@ -112,7 +112,7 @@ class SignRepositoryImpl @Inject constructor(
         signDataSource.clearUserData()
     }
 
-    override suspend fun updateProfileImage(image: File?): Flow<Result<String>> = flow {
+    override suspend fun updateProfileImage(image: File?): Flow<Result<SocialUser>> = flow {
         when (
             val response = safeApiCall {
                 val filePart: MultipartBody.Part? =
@@ -121,6 +121,8 @@ class SignRepositoryImpl @Inject constructor(
             }
         ) {
             is ResultWrapper.Success -> {
+                val updateUser = response.data
+                //setUserData(updateUser)
                 emit(Result.success(response.data))
             }
 

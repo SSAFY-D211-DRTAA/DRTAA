@@ -6,8 +6,11 @@ import androidx.lifecycle.viewModelScope
 import com.drtaa.core_data.repository.SignRepository
 import com.drtaa.core_model.sign.SocialUser
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
@@ -21,8 +24,8 @@ class MyPageViewModel @Inject constructor(
     private val _currentUser = MutableStateFlow<SocialUser?>(null)
     val currentUser: StateFlow<SocialUser?> = _currentUser
 
-    private val _updateResult = MutableStateFlow<Boolean>(false)
-    val updateResult: StateFlow<Boolean> = _updateResult
+    private val _updateResult = MutableSharedFlow<Boolean>()
+    val updateResult: SharedFlow<Boolean> = _updateResult
 
     private val _profileImageUri = MutableStateFlow<Uri?>(null)
     val profileImageUri: StateFlow<Uri?> = _profileImageUri
@@ -57,12 +60,16 @@ class MyPageViewModel @Inject constructor(
 
     private fun updateProfileImage() {
         viewModelScope.launch {
-            signRepository.updateProfileImage(profileImageFile.value).collect { result ->
-                result.onSuccess {
-                    _updateResult.emit(true)
-                }.onFailure {
-                    _updateResult.emit(false)
-                    Timber.d("유저 이미지 업데이트 실패")
+            profileImageFile.value.let { file ->
+                signRepository.updateProfileImage(file).collect { result ->
+                    result.onSuccess { updatedUser ->
+                        _updateResult.emit(true)
+                        _currentUser.value = updatedUser
+                        _profileImageUri.value = Uri.parse(updatedUser.profileImageUrl)
+                    }.onFailure {
+                        _updateResult.emit(false)
+                        Timber.d("유저 이미지 업데이트 실패")
+                    }
                 }
             }
         }

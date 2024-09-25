@@ -23,6 +23,11 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         initEvent()
     }
 
+    override fun onResume() {
+        super.onResume()
+        homeviewModel.refreshUserData()
+    }
+
     private fun initObserve() {
         homeviewModel.currentUser.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { result ->

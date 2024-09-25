@@ -10,8 +10,6 @@ import com.drtaa.core_model.network.ResponseLogin
 import com.drtaa.core_model.sign.SocialUser
 import com.drtaa.core_model.sign.UserLoginInfo
 import com.drtaa.core_model.util.toRequestLogin
-import com.drtaa.core_model.network.RequestFormLogin
-import com.drtaa.core_model.network.ResponseLogin
 import com.drtaa.core_network.api.SignAPI
 import com.drtaa.core_network.di.Auth
 import com.drtaa.core_network.di.NoAuth
@@ -73,8 +71,16 @@ class SignDataSourceImpl @Inject constructor(
         }
     }
 
-    override suspend fun updateUserProfileImage(image: MultipartBody.Part?): String {
-        return signAPIAuth.updateUserProfileImage(image)
+    override suspend fun updateUserProfileImage(image: MultipartBody.Part?): SocialUser {
+        val newImageUrl = authSignAPI.updateUserProfileImage(image)
+
+        val currentUser = getUserData()
+
+        val updateUser = currentUser.copy(profileImageUrl = newImageUrl)
+
+        setUserData(updateUser)
+
+        return updateUser
     }
 
     companion object {

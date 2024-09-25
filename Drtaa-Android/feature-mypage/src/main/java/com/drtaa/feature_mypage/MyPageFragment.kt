@@ -48,7 +48,13 @@ class MyPageFragment : BaseFragment<FragmentMyPageBinding>(R.layout.fragment_my_
 
         myPageViewModel.profileImageUri.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { imageUri ->
-                binding.imgMypageProfile .setImageURI(imageUri)
+                binding.imgMypageProfile.setImageURI(imageUri)
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+        myPageViewModel.updateResult.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach { result ->
+                if (result) showSnackBar("프로필 이미지가 변경되었습니다.")
+                else showSnackBar("프로필 이미지 변경에 실패했습니다.")
             }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
@@ -75,7 +81,6 @@ class MyPageFragment : BaseFragment<FragmentMyPageBinding>(R.layout.fragment_my_
     private fun handleImage(imageUri: Uri) {
         val imageFile = uriToFile(requireActivity(), imageUri)
         myPageViewModel.setProfileImage(imageUri, imageFile)
-        Timber.d("이미지는 ${imageFile}")
     }
 
     private fun uriToFile(context: Context, uri: Uri): File {

@@ -41,5 +41,4 @@ interface SignAPI {
     suspend fun updateUserProfileImage(
         @Part image: MultipartBody.Part?
     ): String
-
 }

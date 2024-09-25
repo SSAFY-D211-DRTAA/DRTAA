@@ -5,7 +5,6 @@ data class RentDetail(
     val rentCarId: Int,
     val rentCarManufacturer: String,
     val rentCarModel: String,
-    val rentCarImg: String,
     val rentCarNumber: String,
     val rentCarScheduleId: Int,
     val rentCreatedAt: String,
