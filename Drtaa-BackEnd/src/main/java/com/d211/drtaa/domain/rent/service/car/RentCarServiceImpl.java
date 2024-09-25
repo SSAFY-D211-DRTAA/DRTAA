@@ -395,16 +395,19 @@ public class RentCarServiceImpl implements RentCarService {
         // Android에게 알림 보내기
         String body = null;
         if(rentCarDriveStatusRequestDTO.getRentCarDrivingStatus().equals(RentDrivingStatus.calling))
-            body = "📞호출중";
+            body = "📞 호출중";
 
         if(rentCarDriveStatusRequestDTO.getRentCarDrivingStatus().equals(RentDrivingStatus.driving))
-            body = "🚗주행중";
+            body = "🚗 주행중";
+
+        if(rentCarDriveStatusRequestDTO.getRentCarDrivingStatus().equals(RentDrivingStatus.driving))
+            body = "\uD83C\uDD7F\uFE0F 주차중";
 
         if(rentCarDriveStatusRequestDTO.getRentCarDrivingStatus().equals(RentDrivingStatus.waiting))
-            body = "🌀배회중";
+            body = "🌀 배회중";
 
         if(rentCarDriveStatusRequestDTO.getRentCarDrivingStatus().equals(RentDrivingStatus.charging))
-            body = "⚡충전중";
+            body = "⚡ 충전중";
 
         FcmMessage.FcmDTO fcmDTO = fcmUtil.makeFcmDTO("렌트 차량 상태", "렌트 차량이 " + body + "입니다.");
         log.info("Message: {}", fcmDTO.getBody());
