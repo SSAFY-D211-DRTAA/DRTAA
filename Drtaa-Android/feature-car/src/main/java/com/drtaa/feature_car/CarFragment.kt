@@ -48,7 +48,7 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
     }
 
     private fun initUI() {
-        viewModel.getLatestRent()
+        carViewModel.getLatestRent()
         binding.apply {
             cardView = cvTourCard
             overlayView = viewTourOverlay
@@ -345,7 +345,7 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
     override fun onActivityResult(
         requestCode: Int,
         resultCode: Int,
-        data: Intent?
+        data: Intent?,
     ) {
         val result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
         if (result != null) {

@@ -158,7 +158,7 @@ class CarViewModel @Inject constructor(
     /**
      * 탑승처리를 해줘야 렌트한 것으로 간주한다.
      */
-    private fun getCurrentRent() {
+    fun getCurrentRent() {
         viewModelScope.launch {
             rentRepository.getRentDetail(_latestReservedId.value).collect { result ->
                 result.onSuccess { data ->
