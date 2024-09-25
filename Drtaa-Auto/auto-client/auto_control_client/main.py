@@ -17,7 +17,9 @@ CONFIG_FILE_PATH = 'config.json'
 GPS_TOPIC = "/gps"
 COMPLETE_DRIVE_TOPIC = "/complete_drive"
 MOVE_BASE_GOAL_TOPIC = "/move_base_simple/goal"
-GLOBAL_PATH_TOPIC = "/global_path_once"
+COMMAND_STATUS_TOPIC = "/command_status"
+
+GLOBAL_PATH_TOPIC = "/global_path"
 
 current_goal_index = 0
 gps_count_index = 0
@@ -150,6 +152,24 @@ def publish_next_goal(ws: websocket.WebSocketApp) -> None:
         logging.info("모든 목표 위치에 도달했습니다.")
         current_goal_index = 0
 
+def publish_command_status(ws: WebSocketApp, status: str) -> None:
+    """
+    GPS 좌표를 이용하여 로봇의 목표 위치를 발행합니다.
+
+    :param ws: WebSocket 연결
+    :param status: 상태
+    """
+
+    msg = {
+        "op": "publish",
+        "topic": COMMAND_STATUS_TOPIC,
+        "type": "std_msgs/String",
+        "msg": {
+            "data": status
+        }
+    }
+    ws.send(json.dumps(msg))
+
 def subscribe(ws: WebSocketApp, topic: str, type: str) -> None:
     """
     지정된 토픽을 구독합니다.
@@ -224,6 +244,8 @@ def on_ros_bridge_message(ws: WebSocketApp, message: str) -> None:
                 except IOError as e:
                     logging.error(f"Global Path 데이터를 파일에 저장하는 중 오류 발생: {e}")
 
+                # Pose 데이터를 GPS 값으로 변환
+
                 # send_to_ec2(path_data)
 
     except json.JSONDecodeError:
@@ -245,6 +267,7 @@ def on_ros_bridge_open(ws: WebSocketApp) -> None:
     subscribe(ws, GPS_TOPIC, "morai_msgs/GPSMessage")
     subscribe(ws, COMPLETE_DRIVE_TOPIC, "geometry_msgs/PoseStamped")
     subscribe(ws, GLOBAL_PATH_TOPIC, "nav_msgs/Path")
+    subscribe(ws, COMMAND_STATUS_TOPIC, "std_msgs/String")
 
 
 def on_ec2_message(ws: WebSocketApp, message: str) -> None:
@@ -255,12 +278,16 @@ def on_ec2_message(ws: WebSocketApp, message: str) -> None:
         action = data.get('action')
 
         if action == 'vehicle_dispatch':
+            publish_command_status(ros_bridge_ws, 'dispatch')
             publish_pose_from_gps(ros_bridge_ws, data['latitude'], data['longitude'])
         elif action == 'vehicle_return':
+            publish_command_status(ros_bridge_ws, 'return')
             publish_pose_from_gps(ros_bridge_ws, config['lat_return'], config['lon_return'])
         elif action == 'vehicle_drive':
-            publish_pose_from_gps(ros_bridge_ws, config['lat_return'], config['lon_return'])
+            publish_command_status(ros_bridge_ws, 'drive')
+            publish_pose_from_gps(ros_bridge_ws, data['latitude'], data['longitude'])
         elif action == 'vehicle_wait':
+            publish_command_status(ros_bridge_ws, 'wait')
             publish_next_goal(ros_bridge_ws)
 
         # 데이터를 파일에 저장
@@ -306,6 +333,7 @@ def signal_handler(sig: int, frame: Any) -> None:
         unsubscribe(ros_bridge_ws, GPS_TOPIC)
         unsubscribe(ros_bridge_ws, COMPLETE_DRIVE_TOPIC)
         unsubscribe(ros_bridge_ws, GLOBAL_PATH_TOPIC)
+        unsubscribe(ros_bridge_ws, COMMAND_STATUS_TOPIC)
 
         ros_bridge_ws.close()
 
