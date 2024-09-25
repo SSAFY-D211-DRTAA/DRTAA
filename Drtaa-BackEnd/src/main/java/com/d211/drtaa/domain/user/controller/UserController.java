@@ -150,9 +150,7 @@ public class UserController {
     public ResponseEntity updateImg
             (Authentication authentication, @RequestPart(value = "image", required = false) MultipartFile image) {
         try {
-            userService.updateImg(authentication.getName(), image);
-
-            return ResponseEntity.ok("이미지 수정 성공");
+            return ResponseEntity.ok(userService.updateImg(authentication.getName(), image));
         } catch (UsernameNotFoundException e) {
             // 401, 클라이언트 인증 실패
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
