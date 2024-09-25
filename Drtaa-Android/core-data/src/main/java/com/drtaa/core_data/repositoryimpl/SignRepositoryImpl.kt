@@ -97,6 +97,7 @@ class SignRepositoryImpl @Inject constructor(
     override suspend fun getUserData(): Flow<Result<SocialUser>> {
         return flow {
             val user = signDataSource.getUserData()
+            Timber.d("유저 정보 조회: $user")
             when (user.isVaild()) {
                 true -> emit(Result.success(user))
                 false -> emit(Result.failure(Exception("유저 정보가 없습니다.")))

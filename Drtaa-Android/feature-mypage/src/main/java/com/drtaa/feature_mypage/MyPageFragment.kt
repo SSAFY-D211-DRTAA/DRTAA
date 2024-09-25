@@ -25,6 +25,7 @@ class MyPageFragment : BaseFragment<FragmentMyPageBinding>(R.layout.fragment_my_
 
     private val getContent = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         uri?.let {
+            showLoading()
             handleImage(it)
         }
     }
@@ -53,6 +54,7 @@ class MyPageFragment : BaseFragment<FragmentMyPageBinding>(R.layout.fragment_my_
 
         myPageViewModel.updateResult.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { result ->
+                dismissLoading()
                 if (result) showSnackBar("프로필 이미지가 변경되었습니다.")
                 else showSnackBar("프로필 이미지 변경에 실패했습니다.")
             }.launchIn(viewLifecycleOwner.lifecycleScope)
