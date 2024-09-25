@@ -79,10 +79,8 @@ class SignDataSourceImpl @Inject constructor(
         val currentUser = getUserData()
 
         val updateUser = currentUser.copy(profileImageUrl = newImageUrl)
-        Timber.tag("updateUser").d("$updateUser")
-        dataStore.edit { pref->
-            pref[USER_PROFILE_IMAGE] = newImageUrl
-        }
+
+        setUserData(updateUser)
 
         return updateUser
     }

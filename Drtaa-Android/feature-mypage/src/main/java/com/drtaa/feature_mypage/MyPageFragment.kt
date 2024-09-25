@@ -3,7 +3,6 @@ package com.drtaa.feature_mypage
 import android.content.Context
 import android.net.Uri
 import android.os.Environment
-import android.view.ViewGroup
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.viewModels
@@ -25,12 +24,13 @@ import java.security.SecureRandom
 class MyPageFragment : BaseFragment<FragmentMyPageBinding>(R.layout.fragment_my_page) {
     private val myPageViewModel: MyPageViewModel by viewModels()
 
-    private val getContent = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        uri?.let {
-            showLoading()
-            handleImage(it)
+    private val getContent =
+        registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+            uri?.let {
+                showLoading()
+                handleImage(it)
+            }
         }
-    }
 
     override fun initView() {
         setupMyPageItems()
@@ -57,8 +57,11 @@ class MyPageFragment : BaseFragment<FragmentMyPageBinding>(R.layout.fragment_my_
         myPageViewModel.updateResult.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { result ->
                 dismissLoading()
-                if (result) showSnackBar("프로필 이미지가 변경되었습니다.")
-                else showSnackBar("프로필 이미지 변경에 실패했습니다.")
+                if (result) {
+                    showSnackBar("프로필 이미지가 변경되었습니다.")
+                } else {
+                    showSnackBar("프로필 이미지 변경에 실패했습니다.")
+                }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
 

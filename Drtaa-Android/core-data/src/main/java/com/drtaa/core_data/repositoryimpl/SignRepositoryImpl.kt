@@ -122,8 +122,6 @@ class SignRepositoryImpl @Inject constructor(
             }
         ) {
             is ResultWrapper.Success -> {
-                val updateUser = response.data
-                //setUserData(updateUser)
                 emit(Result.success(response.data))
             }
 

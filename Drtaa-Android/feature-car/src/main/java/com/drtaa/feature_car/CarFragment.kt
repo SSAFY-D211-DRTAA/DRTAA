@@ -343,34 +343,40 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
             } else {
                 // QR 코드 스캔 성공
                 val scannedContent = result.contents
-
-                // 스캔된 내용을 공백으로 분리
-                val parts = scannedContent.split(" ")
-                if (parts.size == 2) {
-                    val qrCarId = parts[0].trim().toInt()
-                    val qrRentId = parts[1].trim().toLong()
-
-                    if (qrRentId != null) {
-                        showSnackBar("차량 ID: $qrCarId, 렌트 ID: $qrRentId")
-                        val currentRentDetail = carViewModel.currentRentDetail.value
-                        if (currentRentDetail != null) {
-                            if (currentRentDetail.rentId == qrRentId && currentRentDetail.rentCarId == qrCarId) {
-                                carViewModel.getOnCar(rentId = carViewModel.latestReservedId.value)
-                            } else {
-                                showSnackBar("배정된 차량이 아닙니다!")
-                            }
-                        } else {
-                            showSnackBar("배정된 차량이 없습니다!")
-                        }
-                    } else {
-                        showSnackBar("잘못된 QR 코드 형식입니다.")
-                    }
-                } else {
-                    showSnackBar("잘못된 QR 코드 형식입니다.")
-                }
+                setQRCode(scannedContent)
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data)
+        }
+    }
+
+    private fun setQRCode(qrCode: String) {
+        val parts = qrCode.split(" ")
+        if (parts.size == 2) {
+            val qrCarId = parts[0].trim().toInt()
+            val qrRentId = parts[1].trim().toLong()
+
+            if (qrRentId != null) {
+                showSnackBar("차량 ID: $qrCarId, 렌트 ID: $qrRentId")
+                checkRentReservation(qrRentId, qrCarId)
+            } else {
+                showSnackBar("잘못된 QR 코드 형식입니다.")
+            }
+        } else {
+            showSnackBar("잘못된 QR 코드 형식입니다.")
+        }
+    }
+
+    private fun checkRentReservation(qrRentId: Long, qrCarId: Int) {
+        val currentRentDetail = carViewModel.currentRentDetail.value
+        if (currentRentDetail != null) {
+            if (currentRentDetail.rentId == qrRentId && currentRentDetail.rentCarId == qrCarId) {
+                carViewModel.getOnCar(rentId = carViewModel.latestReservedId.value)
+            } else {
+                showSnackBar("배정된 차량이 아닙니다!")
+            }
+        } else {
+            showSnackBar("배정된 차량이 없습니다!")
         }
     }
 
