@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -44,6 +45,7 @@ class SignDataSourceImpl @Inject constructor(
     }
 
     override suspend fun getUserData(): SocialUser {
+        Timber.tag("getUserData").d("${dataStore.data.first()}")
         return dataStore.data.map { prefs ->
             SocialUser(
                 prefs[USER_LOGIN_TYPE] ?: "",
@@ -69,6 +71,18 @@ class SignDataSourceImpl @Inject constructor(
         dataStore.edit { preferences ->
             preferences.clear()
         }
+    }
+
+    override suspend fun updateUserProfileImage(image: MultipartBody.Part?): SocialUser {
+        val newImageUrl = authSignAPI.updateUserProfileImage(image)
+
+        val currentUser = getUserData()
+
+        val updateUser = currentUser.copy(profileImageUrl = newImageUrl)
+
+        setUserData(updateUser)
+
+        return updateUser
     }
 
     companion object {

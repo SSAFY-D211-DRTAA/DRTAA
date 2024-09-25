@@ -1,10 +1,16 @@
 package com.drtaa.feature_car
 
+import android.Manifest
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.drawable.GradientDrawable
 import android.view.MotionEvent
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -15,6 +21,7 @@ import com.drtaa.core_ui.showSnackBar
 import com.drtaa.feature_car.databinding.FragmentCarBinding
 import com.drtaa.feature_car.viewmodel.CarStatus
 import com.drtaa.feature_car.viewmodel.CarViewModel
+import com.google.zxing.integration.android.IntentIntegrator
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -23,7 +30,7 @@ import timber.log.Timber
 @AndroidEntryPoint
 class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
 
-    private val viewModel: CarViewModel by hiltNavGraphViewModels<CarViewModel>(R.id.nav_graph_car)
+    private val carViewModel: CarViewModel by hiltNavGraphViewModels<CarViewModel>(R.id.nav_graph_car)
 
     private lateinit var cardView: View
     private lateinit var overlayView: View
@@ -52,12 +59,17 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
             clCarBottomTextGotoUse.setOnClickListener {
                 navigateDestination(R.id.action_carFragment_to_carTrackingFragment)
             }
+
             btnTourQrcode.setOnClickListener {
-                // 탑승 처리
-                viewModel.getOnCar(rentId = viewModel.latestReservedId.value)
+                if (checkCameraPermission()) {
+                    startQRCodeScanner()
+                } else {
+                    requestCameraPermission()
+                }
             }
+
             btnGetOffQrcode.setOnClickListener {
-                viewModel.getOffCar(rentId = viewModel.latestReservedId.value)
+                carViewModel.getOffCar(rentId = carViewModel.latestReservedId.value)
             }
         }
     }
@@ -73,35 +85,36 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
     }
 
     private fun observeViewModel() {
-        viewModel.latestReservedId.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach {
-            binding.tvReservedState.text = when {
-                it == -1L -> {
-                    binding.clCarBottomTextGotoUse.isClickable = false
-                    toggleCarOption(false)
-                    dismissLoading()
-                    "예약한 차량이 없습니다"
-                }
-
-                it > 0 -> {
-                    binding.clCarBottomTextGotoUse.isClickable = true
-                    toggleCarOption(true)
-                    viewModel.getCurrentRent()
-                    if (viewModel.currentRentDetail.value == null) {
+        carViewModel.latestReservedId.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach {
+                binding.tvReservedState.text = when {
+                    it == -1L -> {
+                        binding.clCarBottomTextGotoUse.isClickable = false
+                        toggleCarOption(false)
                         dismissLoading()
-                        "예약한 차량 호출하기"
-                    } else {
-                        "사용 여부 확인 중.."
+                        "예약한 차량이 없습니다"
+                    }
+
+                    it > 0 -> {
+                        binding.clCarBottomTextGotoUse.isClickable = true
+                        toggleCarOption(true)
+                        carViewModel.getCurrentRent()
+                        if (carViewModel.currentRentDetail.value == null) {
+                            dismissLoading()
+                            "예약한 차량 호출하기"
+                        } else {
+                            "사용 여부 확인 중.."
+                        }
+                    }
+
+                    else -> {
+                        binding.clCarBottomTextGotoUse.isClickable = false
+                        "불러오는 중.."
                     }
                 }
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
 
-                else -> {
-                    binding.clCarBottomTextGotoUse.isClickable = false
-                    "불러오는 중.."
-                }
-            }
-        }.launchIn(viewLifecycleOwner.lifecycleScope)
-
-        viewModel.currentRentDetail.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+        carViewModel.currentRentDetail.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { currentRentDetail ->
                 Timber.tag("car detail").d("$currentRentDetail")
                 binding.apply {
@@ -148,7 +161,7 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
     }
 
     private fun observeStatus() {
-        viewModel.isSuccessComplete.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+        carViewModel.isSuccessComplete.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { isSuccess ->
                 if (isSuccess) {
                     showSnackBar("반납 성공")
@@ -158,7 +171,7 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
 
-        viewModel.drivingStatus.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+        carViewModel.drivingStatus.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { drivingStatus ->
                 when (drivingStatus) {
                     CarStatus.DRIVING -> {
@@ -178,9 +191,9 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
 
-        viewModel.rentState.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach { isOnCar ->
+        carViewModel.rentState.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach { isOnCar ->
             if (isOnCar) {
-                viewModel.getCurrentRent()
+                carViewModel.getCurrentRent()
             }
             Timber.tag("rentState").d("$isOnCar")
         }.launchIn(viewLifecycleOwner.lifecycleScope)
@@ -280,6 +293,91 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
                 duration = DURATION
                 start()
             }
+    }
+
+    private fun checkCameraPermission(): Boolean {
+        return ContextCompat.checkSelfPermission(
+            requireContext(),
+            Manifest.permission.CAMERA
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun requestCameraPermission() {
+        ActivityCompat.shouldShowRequestPermissionRationale(
+            requireActivity(),
+            Manifest.permission.CAMERA
+        )
+        requestPermissionLauncher.launch(Manifest.permission.CAMERA)
+    }
+
+    private val requestPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+            if (isGranted) {
+                startQRCodeScanner()
+            } else {
+                Timber.d("카메라 권한 없음")
+            }
+        }
+
+    private fun startQRCodeScanner() {
+        val integrator = IntentIntegrator.forSupportFragment(this)
+
+        integrator.apply {
+            setDesiredBarcodeFormats(IntentIntegrator.QR_CODE)
+            setPrompt("QR 코드를 스캔하세요")
+            setCameraId(0)
+            setBeepEnabled(false)
+            initiateScan()
+        }
+    }
+
+    override fun onActivityResult(
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ) {
+        val result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
+        if (result != null) {
+            if (result.contents == null) {
+                // QR 코드 스캔이 취소됨
+            } else {
+                // QR 코드 스캔 성공
+                val scannedContent = result.contents
+                setQRCode(scannedContent)
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data)
+        }
+    }
+
+    private fun setQRCode(qrCode: String) {
+        val parts = qrCode.split(" ")
+        if (parts.size == 2) {
+            val qrCarId = parts[0].trim().toInt()
+            val qrRentId = parts[1].trim().toLong()
+
+            if (qrRentId != null) {
+                showSnackBar("차량 ID: $qrCarId, 렌트 ID: $qrRentId")
+                checkRentReservation(qrRentId, qrCarId)
+            } else {
+                showSnackBar("잘못된 QR 코드 형식입니다.")
+            }
+        } else {
+            showSnackBar("잘못된 QR 코드 형식입니다.")
+        }
+    }
+
+    private fun checkRentReservation(qrRentId: Long, qrCarId: Int) {
+        val currentRentDetail = carViewModel.currentRentDetail.value
+        if (currentRentDetail != null) {
+            if (currentRentDetail.rentId == qrRentId && currentRentDetail.rentCarId == qrCarId) {
+                carViewModel.getOnCar(rentId = carViewModel.latestReservedId.value)
+            } else {
+                showSnackBar("배정된 차량이 아닙니다!")
+            }
+        } else {
+            showSnackBar("배정된 차량이 없습니다!")
+        }
     }
 
     companion object {

@@ -17,4 +17,5 @@ interface SignRepository {
     suspend fun getUserData(): Flow<Result<SocialUser>>
     suspend fun setUserData(user: SocialUser)
     suspend fun clearUserData()
+    suspend fun updateProfileImage(image: File?): Flow<Result<SocialUser>>
 }
