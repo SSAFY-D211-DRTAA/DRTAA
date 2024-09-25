@@ -7,6 +7,11 @@ import sys
 import time
 import threading
 
+from .scripts.curve_simplification import simplify_curve
+from .scripts.gps_converter import GPSConverter
+from .scripts.convert_json import convert_points_to_json
+
+
 from websocket import WebSocketApp
 from typing import Tuple, Dict, Any, Union
 from pyproj import CRS, Transformer
@@ -244,8 +249,17 @@ def on_ros_bridge_message(ws: WebSocketApp, message: str) -> None:
                 except IOError as e:
                     logging.error(f"Global Path 데이터를 파일에 저장하는 중 오류 발생: {e}")
 
-                # Pose 데이터를 GPS 값으로 변환
+                # 경로 최적화
+                epsilon = 0.1
+                original_points = [(pose["pose"]["position"]["x"], pose["pose"]["position"]["y"]) for pose in path_data["poses"]]
+                optimized_path = simplify_curve(original_points, epsilon)
+                # GPS 데이터로 변환
+                converter = GPSConverter(config['utm_zone'], config['east_offset'], config['north_offset'])
 
+                gps_coordinates = converter.calc_gps_from_pose_batch(optimized_path)
+
+                path_data = convert_points_to_json(gps_coordinates)
+                print(path_data)
                 # send_to_ec2(path_data)
 
     except json.JSONDecodeError:
