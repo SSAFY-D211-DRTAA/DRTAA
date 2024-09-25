@@ -28,16 +28,21 @@ class PlanListFragment :
 
     private val editPlanList = arrayListOf<ArrayList<Plan.DayPlan.PlanItem>>()
 
-    private lateinit var fragmentList: List<DayPlanFragment>
+    private var fragmentList = listOf<DayPlanFragment>()
 
     override var mapView: MapView? = null
 
     override fun onResume() {
         super.onResume()
 
-        if (planViewModel.isViewPagerLoaded) {
+        if (!planViewModel.isViewPagerLoaded) {
             initViewPager()
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        planViewModel.isViewPagerLoaded = false
     }
 
     override fun initMapView() {
@@ -91,6 +96,7 @@ class PlanListFragment :
             val dayIdx = binding.vpPlanDay.currentItem
             //순서 변경된 데이터 저장
             val newData = getRVAdapterList()
+            Timber.d("dayIdx: $dayIdx, $newData")
             planViewModel.updatePlan(dayIdx, newData)
 
             planViewModel.setEditMode(false)
@@ -98,10 +104,11 @@ class PlanListFragment :
 
         binding.btnDeletePlan.setOnClickListener {
             val dayIdx = binding.vpPlanDay.currentItem
-            val isSuccess = planViewModel.deletePlan(dayIdx, editPlanList[dayIdx])
             Timber.d("dayIdx: $dayIdx, ${editPlanList[dayIdx]}")
+            val isSuccess = planViewModel.deletePlan(dayIdx, editPlanList[dayIdx])
 
             if (isSuccess) {
+                editPlanList[dayIdx] = arrayListOf()
                 planViewModel.setEditMode(false)
             }
         }
@@ -112,21 +119,23 @@ class PlanListFragment :
     }
 
     private fun initViewPager() {
-        fragmentList = planViewModel.dayPlanList.value?.let {
-            it.map { dayPlan ->
-                editPlanList.add(arrayListOf())
+        if (fragmentList.isEmpty()) {
+            fragmentList = planViewModel.dayPlanList.value?.let {
+                it.map { dayPlan ->
+                    editPlanList.add(arrayListOf())
 
-                DayPlanFragment(
-                    context = requireActivity(),
-                    day = dayPlan.travelDatesId,
-                    onPlanSelectListener = { planItem ->
-                        if (planViewModel.isEditMode.value) {
-                            editPlan(planItem)
+                    DayPlanFragment(
+                        context = requireActivity(),
+                        day = dayPlan.travelDatesId,
+                        onPlanSelectListener = { planItem ->
+                            if (planViewModel.isEditMode.value) {
+                                editPlan(planItem)
+                            }
                         }
-                    }
-                )
-            }
-        } ?: emptyList()
+                    )
+                }
+            } ?: emptyList()
+        }
         viewPagerAdapter = PlanViewPagerAdapter(requireActivity(), fragmentList)
 
         binding.apply {

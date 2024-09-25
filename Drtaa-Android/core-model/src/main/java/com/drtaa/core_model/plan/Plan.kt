@@ -18,7 +18,7 @@ data class Plan(
             val datePlacesLat: Double,
             val datePlacesLon: Double,
             val datePlacesName: String,
-            val datePlacesId: Int,
+            val datePlacesId: Int = 0,
             var isSelected: Boolean = false
         )
     }

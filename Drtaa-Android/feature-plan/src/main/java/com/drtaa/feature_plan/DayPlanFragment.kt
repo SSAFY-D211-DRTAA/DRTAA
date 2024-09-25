@@ -1,6 +1,7 @@
 package com.drtaa.feature_plan
 
 import android.content.Context
+import android.view.MotionEvent
 import android.view.View
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.flowWithLifecycle
@@ -39,6 +40,7 @@ class DayPlanFragment(
     private fun initObserve() {
         planViewModel.isEditMode.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { isEditMode ->
+                Timber.d("isEditMode : $isEditMode")
                 planListAdapter.enableEditMode(isEditMode)
                 helper.attachToRecyclerView(
                     if (isEditMode) binding.rvDayPlan else null
@@ -55,9 +57,10 @@ class DayPlanFragment(
                     binding.llNoPlan.visibility = View.VISIBLE
                     binding.clDayPlan.visibility = View.GONE
                 } else {
+                    planListAdapter.submitList(dayPlan.placesDetail.toMutableList())
+                    Timber.d("placesDetail : ${dayPlan.placesDetail}")
                     binding.clDayPlan.visibility = View.VISIBLE
                     binding.llNoPlan.visibility = View.GONE
-                    planListAdapter.submitList(dayPlan.placesDetail)
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
@@ -71,7 +74,25 @@ class DayPlanFragment(
 
     private fun initEvent() {
         binding.btnAddPlan.setOnClickListener {
-            navigateDestination(R.id.action_planListFragment_to_planSearchFragment)
+            navigateDestination(
+                PlanListFragmentDirections.actionPlanListFragmentToPlanSearchFragment(
+                    day = day
+                )
+            )
         }
+
+//        binding.rvDayPlan.setOnTouchListener { view, event ->
+//            when (event.action) {
+//                MotionEvent.ACTION_DOWN -> {
+//                    // 드래그를 시작할 때 상위 ScrollView가 터치 이벤트를 가로채지 않도록 설정
+//                    view.parent.requestDisallowInterceptTouchEvent(true)
+//                }
+//                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+//                    // 드래그가 끝나면 원래대로 되돌리기
+//                    view.parent.requestDisallowInterceptTouchEvent(false)
+//                }
+//            }
+//            false
+//        }
     }
 }

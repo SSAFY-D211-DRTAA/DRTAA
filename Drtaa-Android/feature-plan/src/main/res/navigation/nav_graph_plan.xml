@@ -18,7 +18,11 @@
         android:id="@+id/planSearchFragment"
         android:name="com.drtaa.feature_plan.PlanSearchFragment"
         android:label="PlanSearchFragment"
-        tools:layout="@layout/fragment_plan_search" />
+        tools:layout="@layout/fragment_plan_search" >
+        <argument
+            android:name="day"
+            app:argType="integer" />
+    </fragment>
     <fragment
         android:id="@+id/dayPlanFragment"
         android:name="com.drtaa.feature_plan.DayPlanFragment"

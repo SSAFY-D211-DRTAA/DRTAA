@@ -4,17 +4,21 @@ import android.view.KeyEvent
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.viewModels
+import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.navArgs
 import com.drtaa.core_map.base.BaseMapFragment
 import com.drtaa.core_map.moveCameraTo
 import com.drtaa.core_map.setCustomLocationButton
 import com.drtaa.core_model.map.Search
+import com.drtaa.core_model.util.toPlanItem
 import com.drtaa.core_ui.hideKeyboard
 import com.drtaa.core_ui.showSnackBar
 import com.drtaa.feature_plan.adapter.SearchListAdapter
 import com.drtaa.feature_plan.databinding.FragmentPlanSearchBinding
 import com.drtaa.feature_plan.viewmodel.PlanSearchViewModel
+import com.drtaa.feature_plan.viewmodel.PlanViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
 import com.naver.maps.map.LocationTrackingMode
@@ -29,8 +33,10 @@ import timber.log.Timber
 @AndroidEntryPoint
 class PlanSearchFragment :
     BaseMapFragment<FragmentPlanSearchBinding>(R.layout.fragment_plan_search) {
-//    private val planViewModel: PlanViewModel by hiltNavGraphViewModels(R.id.nav_graph_plan)
+    private val planViewModel: PlanViewModel by hiltNavGraphViewModels(R.id.nav_graph_plan)
     private val planSearchViewModel: PlanSearchViewModel by viewModels()
+
+    private val args: PlanSearchFragmentArgs by navArgs()
 
     override var mapView: MapView? = null
 
@@ -125,12 +131,17 @@ class PlanSearchFragment :
             }
 
             this.btnSearchSelect.setOnClickListener {
-//                if (planSearchViewModel.selectedSearchItem.value != null) {
-//                    planViewModel.setRentStartLocation(planSearchViewModel.selectedSearchItem.value!!)
-//                    navigatePopBackStack()
-//                } else {
-//                    showSnackBar("장소를 선택해주세요.")
-//                }
+                planSearchViewModel.selectedSearchItem.value.apply {
+                    if (this != null) {
+                        planViewModel.addPlan(
+                            dayIdx = args.day - 1,
+                            addPlanList = arrayListOf(this.toPlanItem())
+                        )
+                        navigatePopBackStack()
+                    } else {
+                        showSnackBar("장소를 선택해주세요.")
+                    }
+                }
             }
         }
     }

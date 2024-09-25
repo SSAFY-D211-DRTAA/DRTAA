@@ -31,7 +31,18 @@ class PlanListAdapter(
     }
 
     override fun onBindViewHolder(holder: PlanItemViewHolder, position: Int) {
-        holder.bind(getItem(position), position)
+        holder.bind(getItem(position), position + 1)
+    }
+
+    override fun onCurrentListChanged(
+        previousList: MutableList<PlanItem>,
+        currentList: MutableList<PlanItem>
+    ) {
+        super.onCurrentListChanged(previousList, currentList)
+        Timber.d("previousList $previousList,\n currentList $currentList")
+        if(previousList.size != currentList.size){
+            notifyDataSetChanged()
+        }
     }
 
     inner class PlanItemViewHolder(private val binding: ItemPlanBinding) :
@@ -42,14 +53,8 @@ class PlanListAdapter(
             binding.plan = planItem
             binding.executePendingBindings()
 
-            binding.tvPlanOrder.text = adapterPosition.toString()
-
-            binding.viewCircleEdit.background =
-                if (planItem.isSelected) {
-                    backgroundBlueCircle
-                } else {
-                    backgroundGrayCircle
-                }
+            binding.tvPlanOrder.text = position.toString()
+            setEditItemBackGround(planItem.isSelected)
 
             if (isEditMode) {
                 binding.clPlanEditMode.visibility = View.VISIBLE
@@ -63,18 +68,23 @@ class PlanListAdapter(
                 if (isEditMode) {
                     planItem.isSelected = !planItem.isSelected
                     onPlanSelectListener(planItem)
-                    binding.viewCircleEdit.background =
-                        if (planItem.isSelected) {
-                            backgroundBlueCircle
-                        } else {
-                            backgroundGrayCircle
-                        }
+                    setEditItemBackGround(planItem.isSelected)
                 }
             }
+        }
+
+        private fun setEditItemBackGround(isSelected: Boolean) {
+            binding.viewCircleEdit.background =
+                if (isSelected) {
+                    backgroundBlueCircle
+                } else {
+                    backgroundGrayCircle
+                }
         }
     }
 
     fun enableEditMode(isEditMode: Boolean) {
+        Timber.d("isEditMode $isEditMode")
         this.isEditMode = isEditMode
         notifyDataSetChanged()
     }

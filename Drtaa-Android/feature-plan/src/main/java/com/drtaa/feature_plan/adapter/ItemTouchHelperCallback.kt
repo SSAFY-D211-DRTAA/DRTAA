@@ -25,6 +25,12 @@ class ItemTouchHelperCallback(
         viewHolder: RecyclerView.ViewHolder,
         target: RecyclerView.ViewHolder
     ): Boolean {
+//        if (viewHolder.itemView.y < 100) {
+//            recyclerView.smoothScrollBy(0, -20)  // 위쪽 스크롤
+//        } else if (viewHolder.itemView.y > recyclerView.height - 100) {
+//            recyclerView.smoothScrollBy(0, 20)  // 아래쪽 스크롤
+//        }
+
         return listener.onItemMove(viewHolder.adapterPosition, target.adapterPosition)
     }
 
