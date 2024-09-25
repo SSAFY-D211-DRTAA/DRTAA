@@ -1,1 +1,1 @@
-{"header": {"seq": 58379, "stamp": {"secs": 1727152666, "nsecs": 370000000}, "frame_id": "gps"}, "latitude": 37.5760837062891, "longitude": 126.89971529027827, "altitude": 39.09924014336057, "eastOffset": 313008.55819800857, "northOffset": 4161698.628368007, "status": 1}
+{"header": {"seq": 5493, "stamp": {"secs": 1727242804, "nsecs": 975000000}, "frame_id": "gps"}, "latitude": 37.5756031837567, "longitude": 126.9005161823071, "altitude": 39.13879879242368, "eastOffset": 313008.55819800857, "northOffset": 4161698.628368007, "status": 1}
