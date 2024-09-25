@@ -129,7 +129,7 @@ public class TravelServiceImpl implements TravelService {
                 .orElseThrow(() -> new TravelNotFoundException("해당 travelDatesId의 맞는 일정을 찾을 수 없습니다."));
 
         // 이전 일정 모두 지우기
-//        datePlacesRepository.deleteByTravelDates(dates);
+        datePlacesRepository.deleteAllByTravelDates(dates);
 
         // 기본값 auto_increment를 1로 설정해야 하는 쿼리문 수행
         entityManager.createNativeQuery("ALTER TABLE date_places AUTO_INCREMENT = 1").executeUpdate();

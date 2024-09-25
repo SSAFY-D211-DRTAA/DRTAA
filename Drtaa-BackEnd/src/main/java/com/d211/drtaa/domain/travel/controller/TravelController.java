@@ -38,7 +38,7 @@ public class TravelController {
     }
 
     @PostMapping
-    @Operation(summary = "장소 추가", description = "travelId의 해당하는 여행 중 travelDatesId의 해당하는 일정에 장소 추가")
+    @Operation(summary = "(마지막)장소 추가", description = "travelId의 해당하는 여행 중 travelDatesId의 해당하는 일정에 가장 마지막 장소로 추가")
     public ResponseEntity createTravelDatesPlaces(@RequestBody PlacesAddRequestDTO placesAddRequestDTO) {
         try {
             travelService.createTravelDatesPlaces(placesAddRequestDTO);
