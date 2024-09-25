@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import com.drtaa.core_data.datasource.SignDataSource
 import com.drtaa.core_model.network.RequestFormLogin
 import com.drtaa.core_model.network.ResponseLogin
+import com.drtaa.core_model.sign.FCMToken
 import com.drtaa.core_model.sign.SocialUser
 import com.drtaa.core_model.sign.UserLoginInfo
 import com.drtaa.core_model.util.toRequestLogin
@@ -29,6 +30,10 @@ class SignDataSourceImpl @Inject constructor(
     @Named("USER_DATASTORE")
     private val dataStore: DataStore<Preferences>,
 ) : SignDataSource {
+    override suspend fun setFCMToken(fcmToken: String): String {
+        return authSignAPI.setFCMToken(FCMToken(fcmToken))
+    }
+
     override suspend fun getTokens(userLoginInfo: UserLoginInfo): ResponseLogin {
         return when (userLoginInfo) {
             is SocialUser -> noAuthSignAPI.socialLogin(userLoginInfo.toRequestLogin())

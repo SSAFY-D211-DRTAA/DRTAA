@@ -63,6 +63,7 @@ android {
 dependencies {
     implementation(project(":feature-main"))
     implementation(project(":feature-sign"))
+    implementation(project(":core-data"))
 
     // Datastore
     implementation(libs.datastore.preferences)
@@ -77,6 +78,5 @@ dependencies {
     implementation(libs.play.services.location)
     // Firebase
     implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.messaging)
     implementation(libs.firebase.messaging.ktx)
 }
