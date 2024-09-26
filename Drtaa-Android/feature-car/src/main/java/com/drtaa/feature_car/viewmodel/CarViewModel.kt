@@ -72,8 +72,8 @@ class CarViewModel @Inject constructor(
     private val _mqttConnectionStatus = MutableStateFlow<Int>(-1)
     val mqttConnectionStatus: StateFlow<Int> = _mqttConnectionStatus
 
-    private val _routeData = MutableSharedFlow<List<CarRoute>>()
-    val routeData: SharedFlow<List<CarRoute>> = _routeData.asSharedFlow()
+    private val _routeData = MutableStateFlow<List<CarRoute>>(emptyList())
+    val routeData: StateFlow<List<CarRoute>> = _routeData
 
     init {
         initMQTT()
@@ -166,9 +166,10 @@ class CarViewModel @Inject constructor(
         viewModelScope.launch {
             rentRepository.getRentDetail(_latestReservedId.value).collect { result ->
                 result.onSuccess { data ->
-                    Timber.d("성공")
-                    if (data.rentStatus == "in_progress") {
-                        _currentRentDetail.value = data
+                    Timber.tag("getCR").d("성공 $data")
+                    when(data.rentStatus){
+                        "reserved" -> _currentRentDetail.value = data
+                        "in_progress" -> _currentRentDetail.value = data
                     }
                 }.onFailure {
                     Timber.d("현재 진행 중인 렌트가 없습니다.")
@@ -217,9 +218,9 @@ class CarViewModel @Inject constructor(
 
     private fun observeMqttMessages() {
         viewModelScope.launch {
-            gpsRepository.observeMqttMessages().collectLatest {
+            gpsRepository.observeMqttGPSMessages().collectLatest {
                 Timber.tag("mqtt_viewmodel").d("observeMqttMessages: $it")
-                _gpsData.emit(LatLng(it.latitude, it.longitude))
+                _gpsData.emit(LatLng(it.msg.latitude, it.msg.longitude))
             }
         }
     }
@@ -261,10 +262,10 @@ class CarViewModel @Inject constructor(
                 userPosition.longitude
             ).collect { result ->
                 result.onSuccess {
-                    Timber.tag("call car").d("성공")
+                    Timber.tag("call car").d("성공 $it")
                     _carPosition.emit(it)
                 }.onFailure {
-                    Timber.tag("call car").d("실패")
+                    Timber.tag("call car").d("실패 $it")
                     _carPosition.emit(CarPosition(0.0, 0.0))
                 }
             }
@@ -288,13 +289,9 @@ class CarViewModel @Inject constructor(
 
     fun getRoute() {
         viewModelScope.launch {
-            gpsRepository.getRoute().collect { result ->
-                result.onSuccess { data ->
-                    Timber.tag("path").d("$data")
-                    _routeData.emit(data)
-                }.onFailure {
-
-                }
+            gpsRepository.observeMqttPathMessages().collect { path ->
+                Timber.tag("path").d("$path")
+                _routeData.value = path
             }
         }
     }

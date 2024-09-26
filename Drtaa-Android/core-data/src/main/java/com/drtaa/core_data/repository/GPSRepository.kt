@@ -5,10 +5,10 @@ import com.drtaa.core_model.map.ResponseGPS
 import kotlinx.coroutines.flow.Flow
 
 interface GPSRepository {
-    fun observeMqttMessages(): Flow<ResponseGPS>
+    fun observeMqttGPSMessages(): Flow<ResponseGPS>
+    fun observeMqttPathMessages(): Flow<List<CarRoute>>
     suspend fun setupMqttConnection()
     fun publishGpsData(data: String)
     fun disconnectMqtt()
     fun observeConnectionStatus(): Flow<Int>
-    fun getRoute(): Flow<Result<List<CarRoute>>>
 }

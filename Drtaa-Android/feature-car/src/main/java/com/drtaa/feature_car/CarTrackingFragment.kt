@@ -34,6 +34,18 @@ class CarTrackingFragment :
         position = LatLng(0.0, 0.0)
     }
 
+    private val pathOverlay by lazy {
+        PathOverlay().apply {
+            color = ContextCompat.getColor(requireContext(), com.drtaa.core_ui.R.color.blue_a0ba)
+            outlineColor =
+                ContextCompat.getColor(requireContext(), com.drtaa.core_ui.R.color.blue_a0ba_80)
+            passedColor = ContextCompat.getColor(requireContext(), android.R.color.transparent)
+            passedOutlineColor =
+                ContextCompat.getColor(requireContext(), android.R.color.transparent)
+            outlineWidth = 5
+        }
+    }
+
     override fun initMapView() {
         showLoading()
         mapView = binding.mapView
@@ -46,7 +58,7 @@ class CarTrackingFragment :
         viewModel.getRoute()
         binding.btnCall.setOnClickListener {
             showLoading()
-            if (viewModel.currentRentDetail.value == null) {
+            if (viewModel.currentRentDetail.value?.rentStatus == "reserved") {
                 viewModel.callFirstAssignedCar()
             } else {
                 viewModel.callAssignedCar(STARBUCKS)
@@ -97,6 +109,8 @@ class CarTrackingFragment :
         }.launchIn(viewLifecycleOwner.lifecycleScope)
 
         viewModel.gpsData.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach { gps ->
+            Timber.tag("gps").d("$gps")
+            pathOverlayProgress(gps)
             carMarker.apply {
                 position = gps
                 if (viewModel.trackingState.value) {
@@ -114,23 +128,35 @@ class CarTrackingFragment :
                     position = LatLng(it.latitude, it.longitude)
                     naverMap.moveCameraTo(position.latitude, position.longitude)
                     viewModel.toggleTrackingState()
-                    binding.btnCall.visibility = View.GONE
-                    binding.btnTracking.visibility = View.VISIBLE
                     showSnackBar("차량을 호출합니다")
                 }
             }
         }.launchIn(viewLifecycleOwner.lifecycleScope)
 
         viewModel.routeData.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach { routeData ->
+            if(routeData.isEmpty()) return@onEach
             Timber.tag("pathFrag").d("$routeData")
-            val pathOverlay = PathOverlay()
             pathOverlay.apply {
                 coords = routeData.map { LatLng(it.lat, it.lon) }
-                color = ContextCompat.getColor(requireContext(), com.drtaa.core_ui.R.color.blue_a0ba)
-                outlineWidth = 5
                 map = naverMap
             }
         }.launchIn(viewLifecycleOwner.lifecycleScope)
+    }
+
+    private fun pathOverlayProgress(gps: LatLng) {
+        val path = viewModel.routeData.value
+        val end = path.last().index
+        Timber.tag("gps progress").d("$path || $end")
+        runCatching {
+            path.first {
+                it.lat == gps.latitude && it.lon == gps.longitude
+            }.index
+        }.onSuccess { progress ->
+            Timber.tag("gps progress").d("path and end: $path || $end -- ${(progress.toFloat() / end.toFloat()).toDouble()}")
+            pathOverlay.progress = (progress.toFloat() / end.toFloat()).toDouble()
+        }.onFailure {
+            Timber.tag("gps progress").d("매칭 안됨")
+        }
     }
 
     override fun iniView() {
