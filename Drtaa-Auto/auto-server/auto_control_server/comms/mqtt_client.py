@@ -49,10 +49,10 @@ class MQTTClient:
         message_logger.debug(f"Received message on topic {msg.topic}: {msg.payload}")
 
         response = self.message_handler.handle_message(msg.payload.decode(), "MQTT")
-        
-        if msg.topic == self.pub_gps_topic:
+
+        if msg.topic == self.sub_gps_topic:
             self.client.publish(f"{self.pub_gps_topic}", json.dumps(response))
-        elif msg.topic == self.pub_path_topic:
+        elif msg.topic == self.sub_path_topic:
             self.client.publish(f"{self.pub_path_topic}", json.dumps(response))
 
     def on_subscribe(self, client, userdata, mid, granted_qos, properties=None):
