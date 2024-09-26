@@ -120,7 +120,7 @@ class PlanViewModel @Inject constructor() : ViewModel() {
                 )
             }
 
-            if (viewModePlan != null){
+            if (viewModePlan != null) {
                 _plan.value = _plan.value?.copy(datesDetail = viewModePlan)
             }
         }
@@ -152,7 +152,47 @@ class PlanViewModel @Inject constructor() : ViewModel() {
             // 서버에 저장시키는 코드 추가
             // 수정된 datesDetail을 갖는 새로운 Plan 객체를 _plan에 방출
             _plan.value = plan.copy(datesDetail = updatedDatesDetail)
-            Timber.d("delete ${_plan.value}")
+            Timber.d("add ${_plan.value}")
+        }
+        return isSuccess
+    }
+
+    fun updateDate(
+        dayIdxFrom: Int,
+        dayIdxTo: Int,
+        movePlanList: List<Plan.DayPlan.PlanItem>
+    ): Boolean {
+        var isSuccess = false
+
+        // 현재 _plan 값을 가져옴
+        val currentPlan = _plan.value
+
+        currentPlan?.let { plan ->
+            // datesDetail 리스트에서 해당 day에 맞는 DayPlan을 찾아 수정
+            val updatedDatesDetail = plan.datesDetail.map { dayPlan ->
+                if (dayPlan.travelDatesId == dayIdxFrom + 1) {
+                    val newPlanList = dayPlan.placesDetail.toMutableList()
+                    isSuccess = newPlanList.removeAll(movePlanList)
+
+                    dayPlan.copy(placesDetail = newPlanList)
+                } else if (dayPlan.travelDatesId == dayIdxTo + 1) {
+                    val newPlanList = dayPlan.placesDetail.toMutableList()
+                    isSuccess = newPlanList.addAll(movePlanList)
+
+                    dayPlan.copy(placesDetail = newPlanList)
+                } else {
+                    dayPlan
+                }
+            }
+
+            if (!isSuccess) {
+                return false
+            }
+
+            // 서버에 저장시키는 코드 추가
+            // 수정된 datesDetail을 갖는 새로운 Plan 객체를 _plan에 방출
+            _plan.value = plan.copy(datesDetail = updatedDatesDetail)
+            Timber.d("update date ${_plan.value}")
         }
         return isSuccess
     }

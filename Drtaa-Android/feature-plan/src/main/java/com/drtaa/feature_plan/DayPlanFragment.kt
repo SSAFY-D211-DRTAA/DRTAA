@@ -1,7 +1,6 @@
 package com.drtaa.feature_plan
 
 import android.content.Context
-import android.view.MotionEvent
 import android.view.View
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.flowWithLifecycle
@@ -33,7 +32,6 @@ class DayPlanFragment(
 
     override fun initView() {
         initObserve()
-        initEvent()
         initRVAdapter()
     }
 
@@ -70,29 +68,5 @@ class DayPlanFragment(
             itemAnimator = null
             adapter = planListAdapter
         }
-    }
-
-    private fun initEvent() {
-        binding.btnAddPlan.setOnClickListener {
-            navigateDestination(
-                PlanListFragmentDirections.actionPlanListFragmentToPlanSearchFragment(
-                    day = day
-                )
-            )
-        }
-
-//        binding.rvDayPlan.setOnTouchListener { view, event ->
-//            when (event.action) {
-//                MotionEvent.ACTION_DOWN -> {
-//                    // 드래그를 시작할 때 상위 ScrollView가 터치 이벤트를 가로채지 않도록 설정
-//                    view.parent.requestDisallowInterceptTouchEvent(true)
-//                }
-//                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-//                    // 드래그가 끝나면 원래대로 되돌리기
-//                    view.parent.requestDisallowInterceptTouchEvent(false)
-//                }
-//            }
-//            false
-//        }
     }
 }

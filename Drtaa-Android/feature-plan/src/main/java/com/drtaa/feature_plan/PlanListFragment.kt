@@ -30,6 +30,8 @@ class PlanListFragment :
 
     private var fragmentList = listOf<DayPlanFragment>()
 
+    private lateinit var datePickerDialog: DatePickerDialog
+
     override var mapView: MapView? = null
 
     override fun onResume() {
@@ -57,11 +59,37 @@ class PlanListFragment :
     override fun iniView() {
         initEvent()
         initObserve()
+        initDatePickerDialog()
 
         planViewModel.plan.value?.let {
             binding.tvPlanTitle.text = it.travelName
             binding.tvPlanDate.text =
                 "${(it.travelStartDate + " ~ " + it.travelEndDate).replace('-', '.')}"
+        }
+    }
+
+    private fun initDatePickerDialog() {
+        val dayIdx = binding.vpPlanDay.currentItem
+        val dateArray = planViewModel.plan.value?.datesDetail?.map {
+            it.travelDatesDate
+        }?.toTypedArray() ?: arrayOf()
+
+        datePickerDialog = DatePickerDialog(requireActivity(), dateArray, dayIdx)
+        datePickerDialog.onCheckClickListener = object : DatePickerDialog.OnCheckClickListener {
+            override fun onCheckClick(selectedDateIdx: Int) {
+                // 날짜 변경 작업
+                val currentDayIdx = binding.vpPlanDay.currentItem
+                val isSuccess = planViewModel.updateDate(
+                    dayIdxFrom = currentDayIdx,
+                    dayIdxTo = selectedDateIdx,
+                    movePlanList = editPlanList[currentDayIdx]
+                )
+
+                if (isSuccess) {
+                    editPlanList[dayIdx] = arrayListOf()
+                    planViewModel.setEditMode(false)
+                }
+            }
         }
     }
 
@@ -73,7 +101,6 @@ class PlanListFragment :
 
                 if (!isEditMode) {
                     binding.clEditBottomSheet.visibility = View.GONE
-
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
 
@@ -94,7 +121,7 @@ class PlanListFragment :
 
         binding.tvEditFinish.setOnClickListener {
             val dayIdx = binding.vpPlanDay.currentItem
-            //순서 변경된 데이터 저장
+            // 순서 변경된 데이터 저장
             val newData = getRVAdapterList()
             Timber.d("dayIdx: $dayIdx, $newData")
             planViewModel.updatePlan(dayIdx, newData)
@@ -115,6 +142,18 @@ class PlanListFragment :
 
         binding.btnChangeDate.setOnClickListener {
             // 날짜 변경
+            val dayIdx = binding.vpPlanDay.currentItem
+            datePickerDialog.setDate(dayIdx)
+            datePickerDialog.show()
+        }
+
+        binding.ivAddPlan.setOnClickListener {
+            val dayIdx = binding.vpPlanDay.currentItem
+            navigateDestination(
+                PlanListFragmentDirections.actionPlanListFragmentToPlanSearchFragment(
+                    day = dayIdx + 1
+                )
+            )
         }
     }
 

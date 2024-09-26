@@ -7,83 +7,66 @@
 
     </data>
 
-    <androidx.core.widget.NestedScrollView
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:overScrollMode="never"
-        android:scrollbars="none">
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/ll_no_plan"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="30dp"
+            android:background="@drawable/rect_blue_rad30"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingVertical="40dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:src="@drawable/ic_circle_plus"
+                app:tint="@color/white" />
+
+            <TextView
+                android:id="@+id/tv_day_plan_title"
+                style="@style/ptd_regular"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="등록된 일정이 없습니다.\n일정을 추가해주세요!"
+                android:textAlignment="center"
+                android:textColor="@color/white" />
+        </LinearLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_day_plan"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:visibility="visible">
 
-            <LinearLayout
-                android:id="@+id/ll_no_plan"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_day_plan"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="30dp"
-                android:background="@drawable/rect_blue_rad30"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:paddingVertical="40dp"
-                android:visibility="gone"
+                android:layout_height="0dp"
+                android:layout_marginTop="10dp"
+                android:overScrollMode="never"
+                android:scrollbars="none"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
-                    android:src="@drawable/ic_circle_plus"
-                    app:tint="@color/white" />
-
-                <TextView
-                    android:id="@+id/tv_day_plan_title"
-                    style="@style/ptd_regular"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="등록된 일정이 없습니다.\n일정을 추가해주세요!"
-                    android:textAlignment="center"
-                    android:textColor="@color/white" />
-            </LinearLayout>
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/cl_day_plan"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:visibility="visible">
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rv_day_plan"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:overScrollMode="never"
-                    android:scrollbars="none"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:listitem="@layout/item_plan" />
-
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/btn_add_plan"
-                    style="@style/btn_long_blue"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="20dp"
-                    android:text="일정 추가"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/rv_day_plan" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                tools:listitem="@layout/item_plan" />
         </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.core.widget.NestedScrollView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

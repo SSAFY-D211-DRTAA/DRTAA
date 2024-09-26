@@ -40,7 +40,7 @@ class PlanListAdapter(
     ) {
         super.onCurrentListChanged(previousList, currentList)
         Timber.d("previousList $previousList,\n currentList $currentList")
-        if(previousList.size != currentList.size){
+        if (previousList.size != currentList.size) {
             notifyDataSetChanged()
         }
     }
