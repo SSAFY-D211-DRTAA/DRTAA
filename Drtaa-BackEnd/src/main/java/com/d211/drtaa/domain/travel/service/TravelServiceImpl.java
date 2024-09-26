@@ -6,6 +6,7 @@ import com.d211.drtaa.domain.travel.dto.request.TravelNameRequestDTO;
 import com.d211.drtaa.domain.travel.dto.response.DatesDetailResponseDTO;
 import com.d211.drtaa.domain.travel.dto.response.PlacesDetailResponseDTO;
 import com.d211.drtaa.domain.travel.dto.response.TravelDetailResponseDTO;
+import com.d211.drtaa.domain.travel.dto.response.WeatherResponseDTO;
 import com.d211.drtaa.domain.travel.entity.DatePlaces;
 import com.d211.drtaa.domain.travel.entity.Travel;
 import com.d211.drtaa.domain.travel.entity.TravelDates;
@@ -13,6 +14,7 @@ import com.d211.drtaa.domain.travel.repository.DatePlacesRepository;
 import com.d211.drtaa.domain.travel.repository.TravelDatesRepository;
 import com.d211.drtaa.domain.travel.repository.TravelRepository;
 import com.d211.drtaa.global.exception.travel.TravelNotFoundException;
+import com.d211.drtaa.global.service.weather.WeatherService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
@@ -20,7 +22,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -32,6 +37,7 @@ public class TravelServiceImpl implements TravelService {
     @PersistenceContext
     private EntityManager entityManager;
 
+    private final WeatherService weatherService;
     private final TravelRepository travelRepository;
     private final TravelDatesRepository travelDatesRepository;
     private final DatePlacesRepository datePlacesRepository;
@@ -150,5 +156,61 @@ public class TravelServiceImpl implements TravelService {
             // 저장
             datePlacesRepository.save(place);
         }
+    }
+
+    @Override
+    public List<WeatherResponseDTO> getWeather(double datePlacesLat, double datePlacesLon) throws Exception {
+        double latitude = datePlacesLat;
+        double longitude = datePlacesLon;
+
+        Map<String, Object> weatherData = weatherService.getWeekWeather(latitude, longitude);
+        List<Map<String, Object>> weatherList = (List<Map<String, Object>>) weatherData.get("list");
+
+        String[] dayOfWeek = {"일", "월", "화", "수", "목", "금", "토"};
+        LocalDate now = LocalDate.now();
+        int dayOfWeekValue = now.getDayOfWeek().getValue();
+        int dayOfMonth = now.getDayOfMonth();
+        List<WeatherResponseDTO> weeklyWeather = new ArrayList<>();
+
+        for (int i = 0; i < 5; i++) {
+            WeatherResponseDTO dayDto = new WeatherResponseDTO(dayOfWeek[(dayOfWeekValue + i) % 7], dayOfMonth + i);
+            double minOfDay = Double.MAX_VALUE;
+            double maxOfDay = Double.MIN_VALUE;
+            double totalFeelsLike = 0;
+            int totalHumidity = 0;
+            double totalPop = 0;
+
+            for (int j = 0; j < 8; j++) {
+                int index = i * 8 + j;
+                Map<String, Object> dayWeather = weatherList.get(index);
+                Map<String, Object> main = (Map<String, Object>) dayWeather.get("main");
+                double min = ((Number) main.get("temp_min")).doubleValue();
+                double max = ((Number) main.get("temp_max")).doubleValue();
+                double feelsLike = ((Number) main.get("feels_like")).doubleValue();
+                int humidity = ((Number) main.get("humidity")).intValue();
+                double pop = ((Number) dayWeather.get("pop")).doubleValue();
+
+                if (min < minOfDay) minOfDay = min;
+                if (max > maxOfDay) maxOfDay = max;
+                totalFeelsLike += feelsLike;
+                totalHumidity += humidity;
+                totalPop += pop;
+
+                if (j == 0) {
+                    List<Map<String, Object>> weather = (List<Map<String, Object>>) dayWeather.get("weather");
+                    Map<String, Object> weatherObj = weather.get(0);
+                    dayDto.setDescription((String) weatherObj.get("icon"));
+                }
+            }
+
+            dayDto.setMin(minOfDay);
+            dayDto.setMax(maxOfDay);
+            dayDto.setFeelsLike(totalFeelsLike / 8);
+            dayDto.setHumidity(totalHumidity / 8);
+            dayDto.setPop(totalPop / 8);
+            weeklyWeather.add(dayDto);
+        }
+
+        return weeklyWeather;
     }
 }

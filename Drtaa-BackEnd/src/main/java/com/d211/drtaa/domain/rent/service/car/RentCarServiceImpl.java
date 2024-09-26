@@ -20,6 +20,8 @@ import com.d211.drtaa.global.exception.rent.NoAvailableRentCarException;
 import com.d211.drtaa.global.exception.rent.RentCarNotFoundException;
 import com.d211.drtaa.global.exception.rent.RentNotFoundException;
 import com.d211.drtaa.global.exception.websocket.WebSocketDisConnectedException;
+import com.d211.drtaa.global.util.fcm.FcmMessage;
+import com.d211.drtaa.global.util.fcm.FcmUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
@@ -32,6 +34,7 @@ import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -46,6 +49,7 @@ public class RentCarServiceImpl implements RentCarService {
     private final RentCarScheduleRepository rentCarScheduleRepository;
     private final WebSocketConfig webSocketConfig;
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final FcmUtil fcmUtil;
 
     @Override
     public List<RentCarResponseDTO> getAllDispatchStatus() {
@@ -370,5 +374,43 @@ public class RentCarServiceImpl implements RentCarService {
 
         // 변경 상태 저장
         rentCarRepository.save(car);
+    }
+
+    @Override
+    public void alarmToAndroid(RentCarDriveStatusRequestDTO rentCarDriveStatusRequestDTO) {
+        // rentCarId의 맞는 Rent를 찾기
+        Long rentCarId = rentCarDriveStatusRequestDTO.getRentCarId();
+        LocalDateTime now = LocalDateTime.now(); // 현재 시간
+
+        // 렌트 조회
+        Rent rent = rentRepository.findFirstByRentCar_RentCarIdAndRentStatusAndRentStartTimeLessThanEqualAndRentEndTimeGreaterThanEqual(
+                rentCarId,
+                RentStatus.in_progress,
+                now,
+                now
+        ).orElseThrow(() -> new RentNotFoundException("rentCarId의 맞는 진행중인 렌트를 찾지 못했습니다."));
+
+        log.info("RentId: {}", rent.getRentId());
+
+        // Android에게 알림 보내기
+        String body = null;
+        if(rentCarDriveStatusRequestDTO.getRentCarDrivingStatus().equals(RentDrivingStatus.calling))
+            body = "📞 호출중";
+
+        if(rentCarDriveStatusRequestDTO.getRentCarDrivingStatus().equals(RentDrivingStatus.driving))
+            body = "🚗 주행중";
+
+        if(rentCarDriveStatusRequestDTO.getRentCarDrivingStatus().equals(RentDrivingStatus.parking))
+            body = "\uD83C\uDD7F\uFE0F 주차중";
+
+        if(rentCarDriveStatusRequestDTO.getRentCarDrivingStatus().equals(RentDrivingStatus.waiting))
+            body = "🌀 배회중";
+
+        if(rentCarDriveStatusRequestDTO.getRentCarDrivingStatus().equals(RentDrivingStatus.charging))
+            body = "⚡ 충전중";
+
+        FcmMessage.FcmDTO fcmDTO = fcmUtil.makeFcmDTO("렌트 차량 상태", "렌트 차량이 " + body + "입니다.");
+        log.info("Message: {}", fcmDTO.getBody());
+        fcmUtil.singleFcmSend(rent.getUser(), fcmDTO); // 비동기로 전송
     }
 }

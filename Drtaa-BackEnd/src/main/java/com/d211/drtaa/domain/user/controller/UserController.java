@@ -222,7 +222,7 @@ public class UserController {
         }
     }
 
-    @GetMapping("/jwt-token")
+    @PostMapping("/jwt-token")
     @Operation(summary = "jwt 토큰 재발급", description = "유효기간 만료로 인한 JWT 토큰 재발급")
     public ResponseEntity<?> updateToken(@RequestParam String userRefreshToken) {
         try {
@@ -241,10 +241,11 @@ public class UserController {
         }
     }
 
-    @GetMapping("/fcm-token")
+    @PostMapping("/fcm-token")
     @Operation(summary = "fcm 토큰 발급", description = "Android에서 발급한 FCM 토큰 저장")
     public ResponseEntity<String> getToken(Authentication authentication, @Valid @RequestBody PostTokenReq postTokenReq) {
         try {
+            log.info("Received token request: {}", postTokenReq);
             String response = fcmService.getToken(authentication.getName(), postTokenReq.getToken());
 
             return ResponseEntity.ok(response); // 200
