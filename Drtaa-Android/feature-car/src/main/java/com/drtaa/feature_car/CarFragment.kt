@@ -86,47 +86,46 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
 
     private fun observeViewModel() {
         carViewModel.latestReservedId.flowWithLifecycle(viewLifecycleOwner.lifecycle)
-            .onEach {
-                binding.tvReservedState.text = when {
-                    it == -1L -> {
+            .onEach { latestId ->
+                when {
+                    latestId == -1L -> {
+                        // 예약한 차량이 없을 때
                         binding.clCarBottomTextGotoUse.isClickable = false
                         toggleCarOption(false)
                         dismissLoading()
-                        "예약한 차량이 없습니다"
+                        binding.tvReservedState.text = "예약한 차량이 없습니다"
                     }
 
-                    it > 0 -> {
+                    latestId > 0 -> {
+                        // 예약한 차량이 있을 때
                         binding.clCarBottomTextGotoUse.isClickable = true
                         toggleCarOption(true)
+                        showLoading() // 로딩 시작
+                        binding.tvReservedState.text = "불러오는 중.."
                         carViewModel.getCurrentRent()
-                        if (carViewModel.currentRentDetail.value == null) {
-                            dismissLoading()
-                            "예약한 차량 호출하기"
-                        } else {
-                            "사용 여부 확인 중.."
-                        }
+                        // currentRentDetail의 Observer에서 UI 업데이트를 처리합니다.
                     }
 
                     else -> {
                         binding.clCarBottomTextGotoUse.isClickable = false
-                        "불러오는 중.."
+                        binding.tvReservedState.text = "불러오는 중.."
                     }
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
 
         carViewModel.currentRentDetail.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { currentRentDetail ->
-                Timber.tag("car detail").d("$currentRentDetail")
-                binding.apply {
-                    if (currentRentDetail != null) {
-                        dismissLoading()
-                        updateCarStateUi(currentRentDetail)
-                    } else {
+                dismissLoading() // 로딩 종료
+                if (currentRentDetail != null) {
+                    updateCarStateUi(currentRentDetail)
+                } else {
+                    // 현재 이용중인 차량이 없을 때의 UI 처리
+                    binding.apply {
                         clCarBottomTextGotoUse.visibility = View.VISIBLE
                         btnTrackingCar.isClickable = false
                         clCarBottomText.visibility = View.GONE
                         animeCarNorent.visibility = View.VISIBLE
-                        tvTourRemainTime.text = "현재 이용중인 차량이 없습니다.."
+                        tvTourRemainTime.text = "현재 이용중인 차량이 없습니다."
                     }
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
