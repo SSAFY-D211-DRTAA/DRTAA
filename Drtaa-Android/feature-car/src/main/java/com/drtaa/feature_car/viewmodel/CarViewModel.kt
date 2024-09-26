@@ -167,7 +167,7 @@ class CarViewModel @Inject constructor(
             rentRepository.getRentDetail(_latestReservedId.value).collect { result ->
                 result.onSuccess { data ->
                     Timber.tag("getCR").d("성공 $data")
-                    when(data.rentStatus){
+                    when (data.rentStatus) {
                         "reserved" -> _currentRentDetail.value = data
                         "in_progress" -> _currentRentDetail.value = data
                     }
@@ -237,6 +237,8 @@ class CarViewModel @Inject constructor(
             rentRepository.completeRent(requestCompleteRent).collect { result ->
                 result.onSuccess {
                     Timber.tag("complete").d("성공")
+                    _currentRentDetail.value = null
+                    _rentState.value = false
                     _isSuccessComplete.emit(true)
                 }.onFailure {
                     Timber.tag("complete").d("실패")
