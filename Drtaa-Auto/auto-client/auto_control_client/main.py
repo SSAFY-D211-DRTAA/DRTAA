@@ -326,7 +326,7 @@ def on_ec2_message(ws: WebSocketApp, message: str) -> None:
     logging.info(f"EC2로부터 메시지 수신: {message}")
     try:
         data: Dict[str, Any] = json.loads(message)
-        
+
         action = data.get('action', 'default')
 
         if action == 'vehicle_dispatch':

@@ -63,7 +63,6 @@ class CommandDistributorWebSocketServer:
     #         self.clients.remove(websocket)
 
     async def distribute_command(self, command):
-        message = json.dumps(command)
 
         # for client in self.clients:
         #     try:
@@ -73,8 +72,8 @@ class CommandDistributorWebSocketServer:
         
         if self.client:
             try:
-                logger.info(f"Send command to local client: {message}")
-                await self.client.send(json.dumps(message))
+                logger.info(f"Send command to local client: {command}")
+                await self.client.send(command)
             except websockets.exceptions.ConnectionClosed:
                 logger.info("Failed to send command to a client")
 

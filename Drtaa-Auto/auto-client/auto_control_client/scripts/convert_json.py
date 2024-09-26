@@ -13,4 +13,4 @@ def convert_points_to_json(points):
             "path": [{"idx": i, "lat": lat, "lon": lon} for i, (lat, lon) in enumerate(points)]
         }
     }
-    return json.dumps(data)
+    return data
