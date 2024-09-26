@@ -23,13 +23,33 @@ class CommandDistributorWebSocketServer:
             async for message in websocket:
                 try:
                     data = json.loads(message)
-                    logger.info(f"recv cmd from client: {data}")
-                    try:
-                        with open('gps_data.json', 'w') as f:
-                            json.dump(data, f)
-                    except IOError as e:
-                        logger.error(f"GPS file save error: {e}")
-                    await websocket.send(json.dumps(data))
+                    tag = data.get("tag")
+                    response = None
+
+                    if tag == "gps":
+                        logger.info(f"saved gps data")
+                        response = "gps"
+                        try:
+                            with open('gps_data.json', 'w') as f:
+                                json.dump(data, f)
+                        except IOError as e:
+                            logger.error(f"GPS file save error: {e}")
+                    elif tag == "global_path":
+                        logger.info(f"saved global path data")
+                        response = "global path"
+                        try:
+                            with open('global_path.json', 'w') as f:
+                                json.dump(data, f)
+                        except IOError as e:
+                            logger.error(f"Global Path file save error: {e}")
+                    elif tag == "complete_drive":
+                        logger.info(f"ack complete drive")
+                        response = "complete drive"
+                        
+                    else:
+                        logger.warning(f"unknown tag: {tag}")
+                    
+                    await websocket.send(json.dumps({f"success": response}))
                 except json.JSONDecodeError:
                     await websocket.send(json.dumps({"error": "Invalid JSON"}))
         except websockets.exceptions.ConnectionClosed:

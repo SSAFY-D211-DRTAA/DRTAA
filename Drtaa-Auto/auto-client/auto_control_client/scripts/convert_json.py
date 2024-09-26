@@ -8,6 +8,7 @@ def convert_points_to_json(points):
     :return: JSON 문자열
     """
     data = {
+        "tag": "global_path",
         "msg": {
             "path": [{"idx": i, "lat": lat, "lon": lon} for i, (lat, lon) in enumerate(points)]
         }

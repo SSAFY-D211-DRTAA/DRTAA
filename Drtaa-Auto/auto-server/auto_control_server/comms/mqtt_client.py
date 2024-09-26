@@ -27,27 +27,33 @@ class MQTTClient:
         self.sub_gps_topic = "gps/data/v1/subscribe"
         self.pub_gps_topic = "gps/data/v1/publish"
 
+        self.sub_path_topic = "path/data/v1/subscribe"
+        self.pub_path_topic = "path/data/v1/publish"
+
         self.sub_cmd_topic = "cmd/data/v1/subscribe"
         self.pub_cmd_topic = "cmd/data/v1/publish"
 
         self.message_handler = MessageHandler()
 
     def on_connect(self, client, userdata, flags, rc, properties=None):
-        client.subscribe(self.topic)
+        client.subscribe(self.topic, qos=2)
 
         client.subscribe(self.sub_topic, qos=2)
         client.subscribe(self.sub_gps_topic, qos=2)
+        client.subscribe(self.sub_path_topic, qos=2)
         client.subscribe(self.sub_cmd_topic, qos=2)
 
         main_logger.info(f"Connected with result code {rc}")
 
     def on_message(self, client, userdata, msg):
         message_logger.debug(f"Received message on topic {msg.topic}: {msg.payload}")
+
         response = self.message_handler.handle_message(msg.payload.decode(), "MQTT")
         
-        # MQTT로 응답을 보내는 로직 (필요한 경우)
-        self.client.publish(f"{self.pub_gps_topic}", json.dumps(response))
-
+        if msg.topic == self.pub_gps_topic:
+            self.client.publish(f"{self.pub_gps_topic}", json.dumps(response))
+        elif msg.topic == self.pub_path_topic:
+            self.client.publish(f"{self.pub_path_topic}", json.dumps(response))
 
     def on_subscribe(self, client, userdata, mid, granted_qos, properties=None):
         main_logger.info(f"Subscribed: {mid} {granted_qos}")

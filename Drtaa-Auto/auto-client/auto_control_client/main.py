@@ -246,8 +246,11 @@ def on_ros_bridge_message(ws: WebSocketApp, message: str) -> None:
         data: Dict[str, Any] = json.loads(message)
         if data['op'] == 'publish':
             if data['topic'] == GPS_TOPIC:
-                gps_data = data['msg']
-
+                msg_data = data['msg']
+                gps_data = {
+                    "tag": "gps",
+                    "msg": msg_data
+                }
                 try:
                     with open('gps_data.json', 'w') as f:
                         json.dump(gps_data, f)
@@ -261,10 +264,14 @@ def on_ros_bridge_message(ws: WebSocketApp, message: str) -> None:
 
             elif data['topic'] == COMPLETE_DRIVE_TOPIC:
                 logging.info("도착지에 도착했습니다.")
-                
+                msg_data = data['msg']
+                complete_data = {
+                    "tag": "complete_drive",
+                    "msg": msg_data
+                }
                 try:
                     with open('complete_drive_data.json', 'w') as f:
-                        json.dump(data, f)
+                        json.dump(complete_data, f)
                 except IOError as e:
                     logging.error(f"완료 데이터를 파일에 저장하는 중 오류 발생: {e}")
                 
@@ -320,7 +327,7 @@ def on_ec2_message(ws: WebSocketApp, message: str) -> None:
     try:
         data: Dict[str, Any] = json.loads(message)
         
-        action = data.get('action')
+        action = data.get('action', 'default')
 
         if action == 'vehicle_dispatch':
             publish_command_status(ros_bridge_ws, 'dispatch')
@@ -338,6 +345,9 @@ def on_ec2_message(ws: WebSocketApp, message: str) -> None:
             publish_command_status(ros_bridge_ws, 'wait')
             db_api_client.update_rent_car_status(car_id=1, status=VehicleStatus.WAITING)
             publish_next_goal(ros_bridge_ws)
+        elif action == 'default':
+            logging.info(f"recv from ec2: {data}")
+            
 
         # 데이터를 파일에 저장
         try:
