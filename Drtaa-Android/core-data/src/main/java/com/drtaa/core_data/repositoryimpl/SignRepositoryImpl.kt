@@ -21,6 +21,22 @@ class SignRepositoryImpl @Inject constructor(
     private val signDataSource: SignDataSource
 ) : SignRepository {
 
+    override suspend fun setFCMToken(fcmToken: String): Flow<Result<String>> = flow {
+        when (val result = safeApiCall { signDataSource.setFCMToken(fcmToken) }) {
+            is ResultWrapper.Success -> {
+                emit(Result.success(result.data))
+            }
+
+            is ResultWrapper.GenericError -> {
+                emit(Result.failure(Exception(result.message)))
+            }
+
+            is ResultWrapper.NetworkError -> {
+                emit(Result.failure(Exception("네트워크 에러")))
+            }
+        }
+    }
+
     override suspend fun getTokens(userLoginInfo: UserLoginInfo): Flow<Result<Tokens>> = flow {
         when (
             val response = safeApiCall { signDataSource.getTokens(userLoginInfo) }

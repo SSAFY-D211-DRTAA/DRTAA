@@ -3,6 +3,7 @@ package com.drtaa.core_network.api
 import com.drtaa.core_model.network.RequestFormLogin
 import com.drtaa.core_model.network.RequestSocialLogin
 import com.drtaa.core_model.network.ResponseLogin
+import com.drtaa.core_model.sign.RequestFCMToken
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.http.Body
@@ -40,5 +41,10 @@ interface SignAPI {
     @PATCH("user/img")
     suspend fun updateUserProfileImage(
         @Part image: MultipartBody.Part?
+    ): String
+
+    @POST("user/fcm-token")
+    suspend fun setFCMToken(
+        @Body request: RequestFCMToken
     ): String
 }
