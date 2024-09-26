@@ -1,7 +1,7 @@
 package com.d211.drtaa.domain.travel.controller;
 
 import com.d211.drtaa.domain.travel.dto.request.PlacesAddRequestDTO;
-import com.d211.drtaa.domain.travel.dto.request.PlacesUpdateRequestDTO;
+import com.d211.drtaa.domain.travel.dto.request.TravelDetailRequestDTO;
 import com.d211.drtaa.domain.travel.dto.request.TravelNameRequestDTO;
 import com.d211.drtaa.domain.travel.dto.response.TravelDetailResponseDTO;
 import com.d211.drtaa.domain.travel.service.TravelService;
@@ -67,9 +67,9 @@ public class TravelController {
 
     @PutMapping
     @Operation(summary = "여행 일정 장소 변경", description = "travelId의 해당하고 travelDatesId의 해당하는 여행 장소들 변경")
-    public ResponseEntity updateTravelDatesPlaces(@RequestBody PlacesUpdateRequestDTO placesUpdateRequestDTO) {
+    public ResponseEntity updateTravelDatesPlaces(@RequestBody TravelDetailRequestDTO travelDetailRequestDTO) {
         try {
-            travelService.updateTravelDatesPlaces(placesUpdateRequestDTO);
+            travelService.updateTravelDatesPlaces(travelDetailRequestDTO);
 
             return ResponseEntity.ok("Success"); // 200
         } catch(TravelNotFoundException e) {

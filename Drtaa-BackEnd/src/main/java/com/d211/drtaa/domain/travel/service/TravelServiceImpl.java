@@ -1,8 +1,6 @@
 package com.d211.drtaa.domain.travel.service;
 
-import com.d211.drtaa.domain.travel.dto.request.PlacesAddRequestDTO;
-import com.d211.drtaa.domain.travel.dto.request.PlacesUpdateRequestDTO;
-import com.d211.drtaa.domain.travel.dto.request.TravelNameRequestDTO;
+import com.d211.drtaa.domain.travel.dto.request.*;
 import com.d211.drtaa.domain.travel.dto.response.DatesDetailResponseDTO;
 import com.d211.drtaa.domain.travel.dto.response.PlacesDetailResponseDTO;
 import com.d211.drtaa.domain.travel.dto.response.TravelDetailResponseDTO;
@@ -125,36 +123,47 @@ public class TravelServiceImpl implements TravelService {
 
     @Override
     @Transactional
-    public void updateTravelDatesPlaces(PlacesUpdateRequestDTO placesUpdateRequestDTO) {
+    public void updateTravelDatesPlaces(TravelDetailRequestDTO travelDetailRequestDTO) {
         // 여행 찾기
-        Travel travel = travelRepository.findByTravelId(placesUpdateRequestDTO.getTravelId())
+        Travel travel = travelRepository.findByTravelId(travelDetailRequestDTO.getTravelId())
                 .orElseThrow(() -> new TravelNotFoundException("해당 travelId의 맞는 여행을 찾을 수 없습니다."));
 
-        // 여행 일정 찾기
-        TravelDates dates = travelDatesRepository.findByTravelDatesId(placesUpdateRequestDTO.getTravelDatesId())
-                .orElseThrow(() -> new TravelNotFoundException("해당 travelDatesId의 맞는 일정을 찾을 수 없습니다."));
+        // 여행 일정 리스트 찾기
+        List<DatesDetailRequestDTO> datesList = travelDetailRequestDTO.getDatesDetail();
 
-        // 이전 일정 모두 지우기
-        datePlacesRepository.deleteAllByTravelDates(dates);
+        // 여행 일정 별 반복
+        for(DatesDetailRequestDTO date : datesList) {
+            // 일정 찾기
+            TravelDates dates = travelDatesRepository.findByTravelDatesId(date.getTravelDatesId())
+                    .orElseThrow(() -> new TravelNotFoundException("TravelDatesId에 해당하는 일정이 없습니다."));
 
-        // 기본값 auto_increment를 1로 설정해야 하는 쿼리문 수행
-        entityManager.createNativeQuery("ALTER TABLE date_places AUTO_INCREMENT = 1").executeUpdate();
+            // 여행 일정 별 장소 테이블 비우기
+            datePlacesRepository.deleteAllByTravelDates(dates);
 
-        // 전달 받은 placesUpdateRequestDTO내 places리스트 자료들 저장
-        for(PlacesDetailResponseDTO places: placesUpdateRequestDTO.getPlaces()) {
-            // 생성
-            DatePlaces place = DatePlaces.builder()
-                    .travelDates(dates)
-                    .datePlacesName(places.getDatePlacesName())
-                    .datePlacesCategory(places.getDatePlacesCategory())
-                    .datePlacesAddress(places.getDatePlacesAddress())
-                    .datePlacesLat(places.getDatePlacesLat())
-                    .datePlacesLon(places.getDatePlacesLon())
-                    .datePlacesIsVisited(places.getDatePlacesIsVisited())
-                    .build();
+            // 입력받은 여행 일정 별 장소
+            List<PlacesDetailRequestDTO> placesDetail = date.getPlacesDetail();
 
-            // 저장
-            datePlacesRepository.save(place);
+            if (placesDetail != null && !placesDetail.isEmpty()) {
+                // 일정 장소 저장할 리스트
+                List<DatePlaces> datePlacesList = new ArrayList<>();
+
+                // 일정 장소 별 반복해 리스트에 추가
+                for (PlacesDetailRequestDTO places : placesDetail) {
+                    DatePlaces datePlaces = DatePlaces.builder()
+                            .travelDates(dates)
+                            .datePlacesName(places.getDatePlacesName())
+                            .datePlacesCategory(places.getDatePlacesCategory())
+                            .datePlacesAddress(places.getDatePlacesAddress())
+                            .datePlacesLat(places.getDatePlacesLat())
+                            .datePlacesLon(places.getDatePlacesLon())
+                            .datePlacesIsVisited(places.getDatePlacesIsVisited())
+                            .build();
+                    datePlacesList.add(datePlaces);
+                }
+
+                // DB에 한 번에 저장
+                datePlacesRepository.saveAll(datePlacesList);
+            }
         }
     }
 
