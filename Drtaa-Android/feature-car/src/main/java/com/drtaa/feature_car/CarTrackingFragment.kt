@@ -1,6 +1,7 @@
 package com.drtaa.feature_car
 
 import android.view.View
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -14,6 +15,7 @@ import com.naver.maps.map.MapView
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
+import com.naver.maps.map.overlay.PathOverlay
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -41,6 +43,7 @@ class CarTrackingFragment :
     override fun initOnMapReady(naverMap: NaverMap) {
         observeViewModelOnMap(naverMap)
         observeState()
+        viewModel.getRoute()
         binding.btnCall.setOnClickListener {
             showLoading()
             if (viewModel.currentRentDetail.value == null) {
@@ -117,10 +120,21 @@ class CarTrackingFragment :
                 }
             }
         }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+        viewModel.routeData.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach { routeData ->
+            Timber.tag("pathFrag").d("$routeData")
+            val pathOverlay = PathOverlay()
+            pathOverlay.apply {
+                coords = routeData.map { LatLng(it.lat, it.lon) }
+                color = ContextCompat.getColor(requireContext(), com.drtaa.core_ui.R.color.blue_a0ba)
+                outlineWidth = 5
+                map = naverMap
+            }
+        }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
     override fun iniView() {
-        //
+
     }
 
     companion object {

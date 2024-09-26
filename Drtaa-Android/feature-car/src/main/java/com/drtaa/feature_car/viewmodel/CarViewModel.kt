@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.drtaa.core_data.repository.GPSRepository
 import com.drtaa.core_data.repository.RentCarRepository
 import com.drtaa.core_data.repository.RentRepository
+import com.drtaa.core_model.map.CarRoute
 import com.drtaa.core_model.network.RequestCompleteRent
 import com.drtaa.core_model.rent.CarPosition
 import com.drtaa.core_model.rent.RentDetail
@@ -70,6 +71,9 @@ class CarViewModel @Inject constructor(
 
     private val _mqttConnectionStatus = MutableStateFlow<Int>(-1)
     val mqttConnectionStatus: StateFlow<Int> = _mqttConnectionStatus
+
+    private val _routeData = MutableSharedFlow<List<CarRoute>>()
+    val routeData: SharedFlow<List<CarRoute>> = _routeData.asSharedFlow()
 
     init {
         initMQTT()
@@ -277,6 +281,19 @@ class CarViewModel @Inject constructor(
                 }.onFailure {
                     _firstCall.emit(false)
                     Timber.tag("첫 호출").d("실패")
+                }
+            }
+        }
+    }
+
+    fun getRoute() {
+        viewModelScope.launch {
+            gpsRepository.getRoute().collect { result ->
+                result.onSuccess { data ->
+                    Timber.tag("path").d("$data")
+                    _routeData.emit(data)
+                }.onFailure {
+
                 }
             }
         }
