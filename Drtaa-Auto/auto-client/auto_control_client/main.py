@@ -269,6 +269,7 @@ def on_ros_bridge_message(ws: WebSocketApp, message: str) -> None:
                     logging.error(f"완료 데이터를 파일에 저장하는 중 오류 발생: {e}")
                 
                 send_to_ec2(data)
+                rent_car_api_client.send_arrival_info(rent_car_id=1, expected_minutes=0, arrived=True)
 
             elif data['topic'] == GLOBAL_PATH_TOPIC:
                 path_data = data['msg']
@@ -289,7 +290,7 @@ def on_ros_bridge_message(ws: WebSocketApp, message: str) -> None:
                 gps_coordinates = converter.calc_gps_from_pose_batch(optimized_path)
 
                 path_data = convert_points_to_json(gps_coordinates)
-                print(path_data)
+
                 send_to_ec2(path_data)
 
     except json.JSONDecodeError:
