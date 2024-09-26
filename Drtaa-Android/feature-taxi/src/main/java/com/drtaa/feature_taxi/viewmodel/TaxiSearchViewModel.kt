@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.drtaa.core_data.repository.NaverRepository
 import com.drtaa.core_model.map.Search
+import com.drtaa.core_model.network.ResponseReverseGeocode
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,6 +25,9 @@ class TaxiSearchViewModel @Inject constructor(
     private val _selectedSearchItem = MutableStateFlow<Search?>(null)
     val selectedSearchItem: StateFlow<Search?> = _selectedSearchItem
 
+    private val _reverseGeocode = MutableStateFlow<Result<String>?>(null)
+    val reverseGeocode: StateFlow<Result<String>?> = _reverseGeocode
+
     fun setSelectedSearchItem(search: Search) {
         viewModelScope.launch {
             _selectedSearchItem.emit(search)
@@ -41,6 +45,28 @@ class TaxiSearchViewModel @Inject constructor(
                     _searchList.emit(Result.failure(Exception("실패")))
                 }
             }
+        }
+    }
+
+    fun getReverseGeocode(latitude: Double, longitude: Double) {
+        viewModelScope.launch {
+            naverRepository.getReverseGeocode(latitude, longitude).collect { result ->
+                result.onSuccess { data ->
+                    _reverseGeocode.emit(Result.success(formatAddress(data)))
+                }.onFailure {
+                    _reverseGeocode.emit(Result.failure(Exception("fail")))
+                }
+            }
+        }
+    }
+
+    private fun formatAddress(response: ResponseReverseGeocode): String {
+        val result = response.results.firstOrNull()
+        return if (result !=null) {
+            val region = result.region
+            "${region.area1.name} ${region.area2.name} ${region.area3.name}"
+        } else {
+            "주소를 찾을 수 없습니다."
         }
     }
 }

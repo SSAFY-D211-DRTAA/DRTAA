@@ -3,6 +3,7 @@ package com.drtaa.feature_taxi
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.drtaa.core_ui.base.BaseFragment
 import com.drtaa.feature_taxi.databinding.FragmentTaxiBinding
 import com.drtaa.feature_taxi.viewmodel.TaxiViewModel
@@ -43,17 +44,22 @@ class TaxiFragment : BaseFragment<FragmentTaxiBinding>(R.layout.fragment_taxi) {
 
     private fun initEvent() {
         binding.clTaxiStartLocation.setOnClickListener {
-            navigateDestination(R.id.action_taxiFragment_to_taxiSearchFragment)
+            navigationToSearch(isStartLocation = true)
         }
 
         binding.clTaxiEndLocation.setOnClickListener {
-            navigateDestination(R.id.action_taxiFragment_to_taxiSearchFragment)
+            navigationToSearch(isStartLocation = false)
         }
 
         binding.btnTaxiNext.setOnClickListener {
 
         }
 
+    }
+
+    private fun navigationToSearch(isStartLocation: Boolean) {
+        val action = TaxiFragmentDirections.actionTaxiFragmentToTaxiSearchFragment(isStartLocation)
+        findNavController().navigate(action)
     }
 
 }

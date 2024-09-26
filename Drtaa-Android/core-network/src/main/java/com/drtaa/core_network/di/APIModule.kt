@@ -1,5 +1,6 @@
 package com.drtaa.core_network.di
 
+import com.drtaa.core_network.api.GeoAPI
 import com.drtaa.core_network.api.MapAPI
 import com.drtaa.core_network.api.PaymentAPI
 import com.drtaa.core_network.api.RentAPI
@@ -19,6 +20,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object APIModule {
     const val MAP_SEARCH_URL = "https://openapi.naver.com/v1/search/"
+    const val MAP_GEOCODE_URL = "https://naveropenapi.apigw.ntruss.com/"
     const val TOUR_URL = "http://apis.data.go.kr/B551011/KorService1/"
 
     @Singleton
@@ -51,6 +53,15 @@ object APIModule {
     ): MapAPI {
         return retrofitFactory.create(MAP_SEARCH_URL)
             .create(MapAPI::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideGeoAPI(
+        retrofitFactory: RetrofitFactory
+    ): GeoAPI {
+        return retrofitFactory.create(MAP_GEOCODE_URL)
+            .create(GeoAPI::class.java)
     }
 
     @Singleton
