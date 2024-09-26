@@ -1,6 +1,7 @@
 package com.d211.drtaa.domain.travel.service;
 
 import com.d211.drtaa.domain.rent.entity.Rent;
+import com.d211.drtaa.domain.rent.entity.RentStatus;
 import com.d211.drtaa.domain.rent.repository.RentRepository;
 import com.d211.drtaa.domain.travel.dto.request.*;
 import com.d211.drtaa.domain.travel.dto.response.*;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -60,6 +62,69 @@ public class TravelServiceImpl implements TravelService {
             Travel travel = rent.getTravel();
 
             TravelResponseDTO dto = TravelResponseDTO.builder()
+                    .rentId(rent.getRentId())
+                    .rentStatus(rent.getRentStatus())
+                    .travelId(travel.getTravelId())
+                    .travelName(travel.getTravelName())
+                    .travelStartDate(travel.getTravelStartDate())
+                    .travelEndDate(travel.getTravelEndDate())
+                    .build();
+
+            travels.add(dto);
+        }
+
+        return travels;
+    }
+
+    @Override
+    public List<TravelResponseDTO> getAllTravelsCompleted(String userProviderId) {
+        // 사용자 찾기
+        User user = userRepository.findByUserProviderId(userProviderId)
+                .orElseThrow(() -> new UsernameNotFoundException("해당 userProviderId의 맞는 회원을 찾을 수 없습니다."));
+
+        // 사용자의 완료된 렌트 찾기
+        List<Rent> rents = rentRepository.findByUserAndRentStatusCompleted(user);
+
+        // 사용자의 여행 찾기
+        List<TravelResponseDTO> travels = new ArrayList<>();
+        for(Rent rent : rents) {
+            // 여행 찾기
+            Travel travel = rent.getTravel();
+
+            TravelResponseDTO dto = TravelResponseDTO.builder()
+                    .rentId(rent.getRentId())
+                    .rentStatus(rent.getRentStatus())
+                    .travelId(travel.getTravelId())
+                    .travelName(travel.getTravelName())
+                    .travelStartDate(travel.getTravelStartDate())
+                    .travelEndDate(travel.getTravelEndDate())
+                    .build();
+
+            travels.add(dto);
+        }
+
+        return travels;
+    }
+
+    @Override
+    public List<TravelResponseDTO> getAllTravelsActive(String userProviderId) {
+        // 사용자 찾기
+        User user = userRepository.findByUserProviderId(userProviderId)
+                .orElseThrow(() -> new UsernameNotFoundException("해당 userProviderId의 맞는 회원을 찾을 수 없습니다."));
+
+        // 사용자의 진행중 & 예약된 렌트 찾기
+        List<Rent> rents = rentRepository.findByUserAndRentStatusInOrderByRentStatusDesc(
+                user, Arrays.asList(RentStatus.in_progress, RentStatus.reserved));
+
+        // 사용자의 여행 찾기
+        List<TravelResponseDTO> travels = new ArrayList<>();
+        for(Rent rent : rents) {
+            // 여행 찾기
+            Travel travel = rent.getTravel();
+
+            TravelResponseDTO dto = TravelResponseDTO.builder()
+                    .rentId(rent.getRentId())
+                    .rentStatus(rent.getRentStatus())
                     .travelId(travel.getTravelId())
                     .travelName(travel.getTravelName())
                     .travelStartDate(travel.getTravelStartDate())

@@ -46,6 +46,38 @@ public class TravelController {
         }
     }
 
+    @GetMapping("/status/completed")
+    @Operation(summary = "완료된 여행 조회", description = "해당 회원의 완료된 렌트의 여행 조회")
+    public ResponseEntity getAllTravelsCompleted(Authentication authentication) {
+        try {
+            List<TravelResponseDTO> response = travelService.getAllTravelsCompleted(authentication.getName());
+
+            return ResponseEntity.ok(response);
+        } catch (UsernameNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
+        } catch (AuthenticationException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("권한 인증에 실패하였습니다."); // 401
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
+        }
+    }
+
+    @GetMapping("/status/active")
+    @Operation(summary = "진행중 & 예약된 여행 조회", description = "해당 회원의 진행중인 렌트의 여행 한개와 예약된 렌트의 여행 전체 조회")
+    public ResponseEntity getAllTravelsActive(Authentication authentication) {
+        try {
+            List<TravelResponseDTO> response = travelService.getAllTravelsActive(authentication.getName());
+
+            return ResponseEntity.ok(response);
+        } catch (UsernameNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
+        } catch (AuthenticationException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("권한 인증에 실패하였습니다."); // 401
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
+        }
+    }
+
     @GetMapping("/{travelId}")
     @Operation(summary = "여행 상세 조회", description = "travelId의 해당하는 여행 일정 전체를 조회")
     public ResponseEntity getTravel(@PathVariable Long travelId) {

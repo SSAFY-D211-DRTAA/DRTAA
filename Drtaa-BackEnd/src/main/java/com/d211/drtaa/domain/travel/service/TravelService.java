@@ -13,6 +13,12 @@ public interface TravelService {
     // 회원의 모든 여행 일정 조회
     List<TravelResponseDTO> getAllTravels(String userProviderId);
 
+    // 해당 회원의 완료된 렌트의 여행 조회
+    List<TravelResponseDTO> getAllTravelsCompleted(String userProviderId);
+
+    // 해당 회원의 진행중인 렌트의 여행 한개와 예약된 렌트의 여행 전체 조회
+    List<TravelResponseDTO> getAllTravelsActive(String userProviderId);
+
     // travelId의 해당하는 여행 일정, 장소 상세 조회
     TravelDetailResponseDTO getTravel(Long travelId);
 
