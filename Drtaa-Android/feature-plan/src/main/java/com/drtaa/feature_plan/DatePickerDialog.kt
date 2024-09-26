@@ -12,7 +12,6 @@ class DatePickerDialog(
 ) : BaseDialog<DialogDatePickerBinding>(context, R.layout.dialog_date_picker) {
 
     private var date: String = dateList[dayIdx]
-//    private var dayIdx: Int = 0
 
     override fun onCreateDialog() {
         initDatePicker()
@@ -60,10 +59,4 @@ class DatePickerDialog(
     }
 
     lateinit var onCheckClickListener: OnCheckClickListener
-
-    companion object {
-        const val HOUR_LENGTH = 24
-        const val DEFAULT_HOUR = 9
-        const val DEFAULT_MINUTE = 0
-    }
 }

@@ -5,10 +5,12 @@ import androidx.core.view.isVisible
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView
 import com.drtaa.core_map.base.BaseMapFragment
 import com.drtaa.core_model.plan.Plan
 import com.drtaa.core_model.util.toDate
+import com.drtaa.core_ui.showSnackBar
 import com.drtaa.feature_plan.adapter.PlanViewPagerAdapter
 import com.drtaa.feature_plan.databinding.FragmentPlanListBinding
 import com.drtaa.feature_plan.viewmodel.PlanViewModel
@@ -22,6 +24,8 @@ import timber.log.Timber
 @AndroidEntryPoint
 class PlanListFragment :
     BaseMapFragment<FragmentPlanListBinding>(R.layout.fragment_plan_list) {
+
+    private val args: PlanListFragmentArgs by navArgs()
 
     private val planViewModel: PlanViewModel by hiltNavGraphViewModels(R.id.nav_graph_plan)
     private lateinit var viewPagerAdapter: PlanViewPagerAdapter
@@ -57,6 +61,8 @@ class PlanListFragment :
     }
 
     override fun iniView() {
+        initData()
+
         initEvent()
         initObserve()
         initDatePickerDialog()
@@ -66,6 +72,11 @@ class PlanListFragment :
             binding.tvPlanDate.text =
                 "${(it.travelStartDate + " ~ " + it.travelEndDate).replace('-', '.')}"
         }
+    }
+
+    private fun initData() {
+        planViewModel.setTravelId(args.travelId)
+        planViewModel.getPlan()
     }
 
     private fun initDatePickerDialog() {
@@ -79,18 +90,21 @@ class PlanListFragment :
             override fun onCheckClick(selectedDateIdx: Int) {
                 // 날짜 변경 작업
                 val currentDayIdx = binding.vpPlanDay.currentItem
-                val isSuccess = planViewModel.updateDate(
+                planViewModel.updateDate(
                     dayIdxFrom = currentDayIdx,
                     dayIdxTo = selectedDateIdx,
                     movePlanList = editPlanList[currentDayIdx]
                 )
-
-                if (isSuccess) {
-                    editPlanList[dayIdx] = arrayListOf()
-                    planViewModel.setEditMode(false)
-                }
+//                   //////////////////////////////////////////////// completeEdit(dayIdx)
             }
         }
+    }
+
+    private fun completeEdit() {
+        editPlanList.forEachIndexed { index, _ ->
+            editPlanList[index] = arrayListOf()  // 각 내부 리스트를 빈 배열로 대체
+        }
+        planViewModel.setEditMode(false)
     }
 
     private fun initObserve() {
@@ -106,15 +120,34 @@ class PlanListFragment :
 
         planViewModel.plan.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { plan ->
-                if (plan == null || planViewModel.isViewPagerLoaded) return@onEach
+                if(plan == null) return@onEach
 
+                binding.tvPlanTitle.text = plan.travelName
+
+                if (planViewModel.isViewPagerLoaded) return@onEach
                 initViewPager()
                 planViewModel.isViewPagerLoaded = true
                 Timber.d("plan: $plan")
             }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+        planViewModel.isEditSuccess.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach { isEditSuccess ->
+                if (isEditSuccess == null) return@onEach
+
+                if (isEditSuccess) {
+                    completeEdit()
+                } else {
+                    showSnackBar("오류가 발생했습니다. 다시 시도해주세요.")
+                }
+                planViewModel.setIsEditSuccess(null)
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
     private fun initEvent() {
+        binding.ivEditTitle.setOnClickListener {
+            // 여행 이름 변경 다이얼로그 띄우기
+        }
+
         binding.tvEditPlan.setOnClickListener {
             planViewModel.setEditMode(true)
         }
@@ -132,12 +165,10 @@ class PlanListFragment :
         binding.btnDeletePlan.setOnClickListener {
             val dayIdx = binding.vpPlanDay.currentItem
             Timber.d("dayIdx: $dayIdx, ${editPlanList[dayIdx]}")
-            val isSuccess = planViewModel.deletePlan(dayIdx, editPlanList[dayIdx])
+            planViewModel.deletePlan(dayIdx, editPlanList[dayIdx])
 
-            if (isSuccess) {
-                editPlanList[dayIdx] = arrayListOf()
-                planViewModel.setEditMode(false)
-            }
+//                //////////////////////////////////////////////////////////////////////////////////////
+
         }
 
         binding.btnChangeDate.setOnClickListener {

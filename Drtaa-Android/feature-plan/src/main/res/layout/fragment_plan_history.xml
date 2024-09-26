@@ -15,18 +15,18 @@
         android:background="@color/gray_eeee">
 
         <TextView
-            android:id="@+id/tv_no_rent_history"
+            android:id="@+id/tv_no_plan_history"
             style="@style/ptd_regular"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="렌트 이용기록이 없습니다."
+            android:text="여행 기록이 없습니다."
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_rent_history"
+            android:id="@+id/rv_plan_history"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:overScrollMode="never"
@@ -37,7 +37,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:listitem="@layout/item_rent_history"
+            tools:listitem="@layout/item_plan_history"
             tools:visibility="visible" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

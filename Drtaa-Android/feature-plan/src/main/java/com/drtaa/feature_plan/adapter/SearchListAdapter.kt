@@ -7,13 +7,13 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.drtaa.core_model.map.Search
 import com.drtaa.core_ui.base.BaseDiffUtil
-import com.drtaa.feature_plan.databinding.ItemSearchBinding
+import com.drtaa.feature_plan.databinding.ItemSearchPlanBinding
 
 class SearchListAdapter :
     ListAdapter<Search, SearchListAdapter.SearchViewHolder>(BaseDiffUtil<Search>()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchViewHolder {
-        val binding = ItemSearchBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = ItemSearchPlanBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return SearchViewHolder(binding)
     }
 
@@ -22,7 +22,7 @@ class SearchListAdapter :
         holder.bind(getItem(position), isLastItem)
     }
 
-    inner class SearchViewHolder(private val binding: ItemSearchBinding) :
+    inner class SearchViewHolder(private val binding: ItemSearchPlanBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(search: Search, isLastItem: Boolean) {
             binding.search = search

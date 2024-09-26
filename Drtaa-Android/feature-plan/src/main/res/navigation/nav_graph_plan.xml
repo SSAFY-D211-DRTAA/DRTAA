@@ -3,13 +3,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph_plan"
-    app:startDestination="@id/planListFragment">
+    app:startDestination="@id/planHistoryFragment">
 
     <fragment
         android:id="@+id/planListFragment"
         android:name="com.drtaa.feature_plan.PlanListFragment"
         android:label="PlanListFragment"
         tools:layout="@layout/fragment_plan_list">
+        <argument
+            android:name="travelId"
+            app:argType="integer" />
         <action
             android:id="@+id/action_planListFragment_to_planSearchFragment"
             app:destination="@id/planSearchFragment" />
@@ -18,7 +21,7 @@
         android:id="@+id/planSearchFragment"
         android:name="com.drtaa.feature_plan.PlanSearchFragment"
         android:label="PlanSearchFragment"
-        tools:layout="@layout/fragment_plan_search" >
+        tools:layout="@layout/fragment_plan_search">
         <argument
             android:name="day"
             app:argType="integer" />
@@ -28,4 +31,13 @@
         android:name="com.drtaa.feature_plan.DayPlanFragment"
         android:label="DayPlanFragment"
         tools:layout="@layout/fragment_day_plan" />
+    <fragment
+        android:id="@+id/planHistoryFragment"
+        android:name="com.drtaa.feature_plan.PlanHistoryFragment"
+        android:label="PlanHistoryFragment"
+        tools:layout="@layout/fragment_plan_history">
+        <action
+            android:id="@+id/action_planHistoryFragment_to_planListFragment"
+            app:destination="@id/planListFragment" />
+    </fragment>
 </navigation>
