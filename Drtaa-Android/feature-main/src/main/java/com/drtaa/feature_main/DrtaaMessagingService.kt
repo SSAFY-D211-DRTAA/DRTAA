@@ -32,7 +32,7 @@ class DrtaaMessagingService : FirebaseMessagingService() {
                 PendingIntent.getActivity(this, 0, mainIntent, PendingIntent.FLAG_IMMUTABLE)
 
             val builder = NotificationCompat.Builder(this, MainActivity.CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_launcher_foreground)  // 반드시 작은 아이콘을 설정
+                .setSmallIcon(R.drawable.ic_launcher_foreground) // 반드시 작은 아이콘을 설정
                 .setContentIntent(pIntent)
                 .setContentTitle(title)
                 .setContentText(body)

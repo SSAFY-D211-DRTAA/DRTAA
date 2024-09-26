@@ -47,5 +47,4 @@ interface SignAPI {
     suspend fun setFCMToken(
         @Body request: RequestFCMToken
     ): String
-
 }
