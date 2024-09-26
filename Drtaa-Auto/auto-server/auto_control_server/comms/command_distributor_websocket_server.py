@@ -73,7 +73,8 @@ class CommandDistributorWebSocketServer:
         
         if self.client:
             try:
-                await self.client.send(message)
+                logger.info(f"Send command to local client: {message}")
+                await self.client.send(json.dumps(message))
             except websockets.exceptions.ConnectionClosed:
                 logger.info("Failed to send command to a client")
 
