@@ -7,15 +7,20 @@ import sys
 import time
 import threading
 
-from .scripts.curve_simplification import simplify_curve
-from .scripts.gps_converter import GPSConverter
-from .scripts.convert_json import convert_points_to_json
-
-
-from websocket import WebSocketApp
-from typing import Tuple, Dict, Any, Union
-from pyproj import CRS, Transformer
 from dotenv import load_dotenv
+from enum import StrEnum, unique
+from pyproj import CRS, Transformer
+from typing import Tuple, Dict, Any, Union
+from websocket import WebSocketApp
+
+
+from apis.rent_car_api import RentCarAPI
+from apis.db_client import DBClient
+
+from scripts.curve_simplification import simplify_curve
+from scripts.gps_converter import GPSConverter
+from scripts.convert_json import convert_points_to_json
+
 
 # 상수 정의
 CONFIG_FILE_PATH = 'config.json'
@@ -32,8 +37,16 @@ gps_count_index = 0
 # .env 파일 로드
 load_dotenv()
 
-# 환경 변수에서 WS_SERVER_URL 읽기
+# 환경 변수
 ws_server_url = os.getenv('WS_SERVER_URL')
+backend_server_url = os.getenv('BACKEND_SERVER_URL')
+backend_token = os.getenv('BACKEND_TOKEN')
+db_host = os.getenv('DB_HOST')
+db_port = int(os.getenv('DB_PORT'))
+db_user = os.getenv('DB_USER')
+db_password = os.getenv('DB_PASSWD')
+db_database = os.getenv('DB_DATABASE')
+
 
 # 설정 파일 로드
 def load_config() -> Dict[str, Union[str, float, int]]:
@@ -62,6 +75,17 @@ validate_config(config)
 # 로깅 설정
 # logging.basicConfig(level=config.get('log_level', 'DEBUG'), format='%(asctime)s - %(levelname)s - %(message)s', filename='/app/logs/debug.log')
 logging.basicConfig(level=config.get('log_level', 'DEBUG'), format='%(asctime)s - %(levelname)s - %(message)s')
+
+
+@unique
+class VehicleStatus(StrEnum):
+    IDLING = "idling"
+    CALLING = "calling"
+    DRIVING = "driving"
+    PARKING = "parking"
+    WAITING = "waiting"
+    CHARGING = "charging"
+
 
 def calc_pose_from_gps(latitude: float, longitude: float) -> Tuple[float, float]:
     """
@@ -210,6 +234,12 @@ ros_bridge_ws: WebSocketApp = None
 # EC2 WebSocket 클라이언트
 ec2_ws: WebSocketApp = None
 
+# Backend API 클라이언트
+rent_car_api_client: RentCarAPI = None
+
+# DB 클라이언트
+db_api_client: DBClient = None
+
 def on_ros_bridge_message(ws: WebSocketApp, message: str) -> None:
     global gps_count_index
     try:
@@ -260,7 +290,7 @@ def on_ros_bridge_message(ws: WebSocketApp, message: str) -> None:
 
                 path_data = convert_points_to_json(gps_coordinates)
                 print(path_data)
-                # send_to_ec2(path_data)
+                send_to_ec2(path_data)
 
     except json.JSONDecodeError:
         logging.error("잘못된 JSON 형식의 메시지를 받았습니다.")
@@ -293,15 +323,19 @@ def on_ec2_message(ws: WebSocketApp, message: str) -> None:
 
         if action == 'vehicle_dispatch':
             publish_command_status(ros_bridge_ws, 'dispatch')
+            db_api_client.update_rent_car_status(car_id=1, status=VehicleStatus.CALLING)
             publish_pose_from_gps(ros_bridge_ws, data['latitude'], data['longitude'])
         elif action == 'vehicle_return':
             publish_command_status(ros_bridge_ws, 'return')
+            db_api_client.update_rent_car_status(car_id=1, status=VehicleStatus.IDLING)
             publish_pose_from_gps(ros_bridge_ws, config['lat_return'], config['lon_return'])
         elif action == 'vehicle_drive':
             publish_command_status(ros_bridge_ws, 'drive')
+            db_api_client.update_rent_car_status(car_id=1, status=VehicleStatus.DRIVING)
             publish_pose_from_gps(ros_bridge_ws, data['latitude'], data['longitude'])
         elif action == 'vehicle_wait':
             publish_command_status(ros_bridge_ws, 'wait')
+            db_api_client.update_rent_car_status(car_id=1, status=VehicleStatus.WAITING)
             publish_next_goal(ros_bridge_ws)
 
         # 데이터를 파일에 저장
@@ -383,6 +417,14 @@ if __name__ == "__main__":
                                         on_message=on_ec2_message,
                                         on_error=on_ec2_error,
                                         on_close=on_ec2_close)
+    
+    rent_car_api_client: RentCarAPI = RentCarAPI(backend_server_url, backend_token)
+
+    db_api_client: DBClient = DBClient(host=db_host,
+                                   port=db_port,
+                                   user=db_user,
+                                   password=db_password,
+                                   database=db_database)
 
     signal.signal(signal.SIGINT, signal_handler)
 
