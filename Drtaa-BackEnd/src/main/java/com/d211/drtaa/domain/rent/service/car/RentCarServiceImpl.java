@@ -1,5 +1,6 @@
 package com.d211.drtaa.domain.rent.service.car;
 
+import com.d211.drtaa.domain.rent.dto.request.RentCarArriveStatusRequestDTO;
 import com.d211.drtaa.domain.rent.dto.request.RentCarCallRequestDTO;
 import com.d211.drtaa.domain.rent.dto.request.RentCarDriveStatusRequestDTO;
 import com.d211.drtaa.domain.rent.dto.request.RentCarUnassignedDispatchStatusRequestDTO;
@@ -394,22 +395,54 @@ public class RentCarServiceImpl implements RentCarService {
 
         // Android에게 알림 보내기
         String body = null;
-        if(rentCarDriveStatusRequestDTO.getRentCarDrivingStatus().equals(RentDrivingStatus.calling))
-            body = "📞 호출중";
-
-        if(rentCarDriveStatusRequestDTO.getRentCarDrivingStatus().equals(RentDrivingStatus.driving))
-            body = "🚗 주행중";
-
-        if(rentCarDriveStatusRequestDTO.getRentCarDrivingStatus().equals(RentDrivingStatus.parking))
-            body = "\uD83C\uDD7F\uFE0F 주차중";
-
-        if(rentCarDriveStatusRequestDTO.getRentCarDrivingStatus().equals(RentDrivingStatus.waiting))
-            body = "🌀 배회중";
-
-        if(rentCarDriveStatusRequestDTO.getRentCarDrivingStatus().equals(RentDrivingStatus.charging))
-            body = "⚡ 충전중";
+        switch (rentCarDriveStatusRequestDTO.getRentCarDrivingStatus()) {
+            case calling:
+                body = "📞 호출중";
+                break;
+            case driving:
+                body = "🚗 주행중";
+                break;
+            case parking:
+                body = "\uD83C\uDD7F\uFE0F 주차중";
+                break;
+            case waiting:
+                body = "🌀 배회중";
+                break;
+            case charging:
+                body = "⚡ 충전중";
+                break;
+        }
 
         FcmMessage.FcmDTO fcmDTO = fcmUtil.makeFcmDTO("렌트 차량 상태", "렌트 차량이 " + body + "입니다.");
+        log.info("Message: {}", fcmDTO.getBody());
+        fcmUtil.singleFcmSend(rent.getUser(), fcmDTO); // 비동기로 전송
+    }
+
+    @Override
+    public void arrivalToAndroid(RentCarArriveStatusRequestDTO rentCarArriveStatusRequestDTO) {
+        // rentCarId의 맞는 Rent를 찾기
+        Long rentCarId = rentCarArriveStatusRequestDTO.getRentCarId();
+        LocalDateTime now = LocalDateTime.now(); // 현재 시간
+
+        // 렌트 조회
+        Rent rent = rentRepository.findFirstByRentCar_RentCarIdAndRentStatusAndRentStartTimeLessThanEqualAndRentEndTimeGreaterThanEqual(
+                rentCarId,
+                RentStatus.in_progress,
+                now,
+                now
+        ).orElseThrow(() -> new RentNotFoundException("rentCarId의 맞는 진행중인 렌트를 찾지 못했습니다."));
+
+        log.info("RentId: {}", rent.getRentId());
+
+        // Android에게 알림 보내기
+        String body = null;
+        if(rentCarArriveStatusRequestDTO.isArrived()) {
+            body = "렌트 차량이 호출 장소로 도착했습니다. 확인해주세요 !!";
+        } else {
+            body = "렌트 차량의 도착 예상 시간이 " + rentCarArriveStatusRequestDTO.getExpectedMinutes() + "분 남았습니다.";
+        }
+
+        FcmMessage.FcmDTO fcmDTO = fcmUtil.makeFcmDTO("렌트 차량 도착 여부", body);
         log.info("Message: {}", fcmDTO.getBody());
         fcmUtil.singleFcmSend(rent.getUser(), fcmDTO); // 비동기로 전송
     }
