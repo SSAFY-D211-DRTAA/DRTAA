@@ -10,6 +10,15 @@
         android:name="com.drtaa.feature_taxi.TaxiFragment"
         android:label="TaxiFragment"
         tools:layout="@layout/fragment_taxi">
+        <action
+            android:id="@+id/action_taxiFragment_to_taxiSearchFragment"
+            app:destination="@id/taxiSearchFragment">
+        </action>
     </fragment>
 
+    <fragment
+        android:id="@+id/taxiSearchFragment"
+        android:name="com.drtaa.feature_taxi.TaxiSearchFragment"
+        android:label="TaxiSearchFragment"
+        tools:layout="@layout/fragment_taxi_search" />
 </navigation>

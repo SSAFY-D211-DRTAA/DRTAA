@@ -5,6 +5,7 @@ import com.drtaa.core_data.repository.NaverRepository
 import com.drtaa.core_data.repository.RentCarRepository
 import com.drtaa.core_data.repository.RentRepository
 import com.drtaa.core_data.repository.SignRepository
+import com.drtaa.core_data.repository.TaxiRepository
 import com.drtaa.core_data.repository.TokenRepository
 import com.drtaa.core_data.repository.TourRepository
 import com.drtaa.core_data.repositoryimpl.GPSRepositoryImpl
@@ -12,6 +13,7 @@ import com.drtaa.core_data.repositoryimpl.NaverRepositoryImpl
 import com.drtaa.core_data.repositoryimpl.RentCarRepositoryImpl
 import com.drtaa.core_data.repositoryimpl.RentRepositoryImpl
 import com.drtaa.core_data.repositoryimpl.SignRepositoryImpl
+import com.drtaa.core_data.repositoryimpl.TaxiRepositoryImpl
 import com.drtaa.core_data.repositoryimpl.TokenRepositoryImpl
 import com.drtaa.core_data.repositoryimpl.TourRepositoryImpl
 import dagger.Binds
@@ -50,4 +52,9 @@ interface RepositoryModule {
     @Singleton
     @Binds
     fun bindRentCarRepository(rentCarRepositoryImpl: RentCarRepositoryImpl): RentCarRepository
+
+    @Singleton
+    @Binds
+    fun bindTaxiRepository(taxiRepositoryImpl: TaxiRepositoryImpl): TaxiRepository
+
 }

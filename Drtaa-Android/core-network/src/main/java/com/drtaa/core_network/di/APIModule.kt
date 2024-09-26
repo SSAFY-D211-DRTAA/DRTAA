@@ -5,6 +5,7 @@ import com.drtaa.core_network.api.PaymentAPI
 import com.drtaa.core_network.api.RentAPI
 import com.drtaa.core_network.api.RentCarAPI
 import com.drtaa.core_network.api.SignAPI
+import com.drtaa.core_network.api.TaxiAPI
 import com.drtaa.core_network.api.TestAPI
 import com.drtaa.core_network.api.TourAPI
 import dagger.Module
@@ -84,5 +85,14 @@ object APIModule {
         retrofit: Retrofit
     ): RentCarAPI {
         return retrofit.create(RentCarAPI::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideTaxiAPI(
+        @AuthRetrofit
+        retrofit: Retrofit
+    ): TaxiAPI {
+        return retrofit.create(TaxiAPI::class.java)
     }
 }
