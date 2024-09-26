@@ -4,11 +4,15 @@ import com.d211.drtaa.domain.travel.dto.request.PlacesAddRequestDTO;
 import com.d211.drtaa.domain.travel.dto.request.TravelDetailRequestDTO;
 import com.d211.drtaa.domain.travel.dto.request.TravelNameRequestDTO;
 import com.d211.drtaa.domain.travel.dto.response.TravelDetailResponseDTO;
+import com.d211.drtaa.domain.travel.dto.response.TravelResponseDTO;
 import com.d211.drtaa.domain.travel.dto.response.WeatherResponseDTO;
 
 import java.util.List;
 
 public interface TravelService {
+    // 회원의 모든 여행 일정 조회
+    List<TravelResponseDTO> getAllTravels(String userProviderId);
+
     // travelId의 해당하는 여행 일정, 장소 상세 조회
     TravelDetailResponseDTO getTravel(Long travelId);
 

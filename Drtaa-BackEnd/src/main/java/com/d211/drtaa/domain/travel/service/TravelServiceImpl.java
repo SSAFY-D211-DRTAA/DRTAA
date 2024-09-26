@@ -1,16 +1,17 @@
 package com.d211.drtaa.domain.travel.service;
 
+import com.d211.drtaa.domain.rent.entity.Rent;
+import com.d211.drtaa.domain.rent.repository.RentRepository;
 import com.d211.drtaa.domain.travel.dto.request.*;
-import com.d211.drtaa.domain.travel.dto.response.DatesDetailResponseDTO;
-import com.d211.drtaa.domain.travel.dto.response.PlacesDetailResponseDTO;
-import com.d211.drtaa.domain.travel.dto.response.TravelDetailResponseDTO;
-import com.d211.drtaa.domain.travel.dto.response.WeatherResponseDTO;
+import com.d211.drtaa.domain.travel.dto.response.*;
 import com.d211.drtaa.domain.travel.entity.DatePlaces;
 import com.d211.drtaa.domain.travel.entity.Travel;
 import com.d211.drtaa.domain.travel.entity.TravelDates;
 import com.d211.drtaa.domain.travel.repository.DatePlacesRepository;
 import com.d211.drtaa.domain.travel.repository.TravelDatesRepository;
 import com.d211.drtaa.domain.travel.repository.TravelRepository;
+import com.d211.drtaa.domain.user.entity.User;
+import com.d211.drtaa.domain.user.repository.UserRepository;
 import com.d211.drtaa.global.exception.travel.TravelNotFoundException;
 import com.d211.drtaa.global.service.weather.WeatherService;
 import jakarta.persistence.EntityManager;
@@ -18,6 +19,7 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -39,6 +41,36 @@ public class TravelServiceImpl implements TravelService {
     private final TravelRepository travelRepository;
     private final TravelDatesRepository travelDatesRepository;
     private final DatePlacesRepository datePlacesRepository;
+    private final UserRepository userRepository;
+    private final RentRepository rentRepository;
+
+    @Override
+    public List<TravelResponseDTO> getAllTravels(String userProviderId) {
+        // 사용자 찾기
+        User user = userRepository.findByUserProviderId(userProviderId)
+                .orElseThrow(() -> new UsernameNotFoundException("해당 userProviderId의 맞는 회원을 찾을 수 없습니다."));
+
+        // 사용자의 렌트 찾기
+        List<Rent> rents = rentRepository.findByUser(user);
+
+        // 사용자의 여행 찾기
+        List<TravelResponseDTO> travels = new ArrayList<>();
+        for(Rent rent : rents) {
+            // 여행 찾기
+            Travel travel = rent.getTravel();
+
+            TravelResponseDTO dto = TravelResponseDTO.builder()
+                    .travelId(travel.getTravelId())
+                    .travelName(travel.getTravelName())
+                    .travelStartDate(travel.getTravelStartDate())
+                    .travelEndDate(travel.getTravelEndDate())
+                    .build();
+
+            travels.add(dto);
+        }
+
+        return travels;
+    }
 
     @Override
     public TravelDetailResponseDTO getTravel(Long travelId) {
