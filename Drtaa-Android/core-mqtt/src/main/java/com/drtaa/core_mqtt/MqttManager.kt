@@ -175,7 +175,7 @@ class MqttManager @Inject constructor() {
         private const val INITIAL_RECONNECT_DELAY = 1000L // 초기 1초
         private const val GPS_SUB = "gps/data/v1/subscribe"
         private const val GPS_PUB = "gps/data/v1/publish"
-        private const val PATH_SUB = "path/data/v1/subscribe"
+//        private const val PATH_SUB = "path/data/v1/subscribe"
         private const val PATH_PUB = "path/data/v1/publish"
     }
 }
