@@ -41,6 +41,44 @@ class RentCarRepositoryImpl @Inject constructor(
             }
         }
 
+    override suspend fun getOffCar(rentId: Long): Flow<Result<String>> = flow {
+        when (val response = safeApiCall { rentCarDataSource.getOffCar(rentId) }) {
+            is ResultWrapper.Success -> {
+                emit(Result.success(response.data))
+                Timber.d("성공")
+            }
+
+            is ResultWrapper.GenericError -> {
+                emit(Result.failure(Exception(response.message)))
+                Timber.d("실패")
+            }
+
+            is ResultWrapper.NetworkError -> {
+                emit(Result.failure(Exception("네트워크 에러")))
+                Timber.d("네트워크 에러")
+            }
+        }
+    }
+
+    override suspend fun getOnCar(rentId: Long): Flow<Result<String>> = flow {
+        when (val response = safeApiCall { rentCarDataSource.getOnCar(rentId) }) {
+            is ResultWrapper.Success -> {
+                emit(Result.success(response.data))
+                Timber.d("성공")
+            }
+
+            is ResultWrapper.GenericError -> {
+                emit(Result.failure(Exception(response.message)))
+                Timber.d("실패")
+            }
+
+            is ResultWrapper.NetworkError -> {
+                emit(Result.failure(Exception("네트워크 에러")))
+                Timber.d("네트워크 에러")
+            }
+        }
+    }
+
     override suspend fun callAssignedCar(
         rentId: Long,
         userLat: Double,

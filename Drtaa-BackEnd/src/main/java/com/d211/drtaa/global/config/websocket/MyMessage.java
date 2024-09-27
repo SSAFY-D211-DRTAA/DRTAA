@@ -15,8 +15,14 @@ public class MyMessage {
     private String action;
     private double latitude;
     private double longitude;
+    private long rentCarId;
 
     public MyMessage(String action) {
         this.action = action;
+    }
+
+    public MyMessage(String action, long rentCarId) {
+        this.action = action;
+        this.rentCarId = rentCarId;
     }
 }

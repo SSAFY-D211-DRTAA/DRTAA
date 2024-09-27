@@ -17,6 +17,7 @@ import com.naver.maps.map.overlay.OverlayImage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import timber.log.Timber
 
 @AndroidEntryPoint
 class CarTrackingFragment :
@@ -32,18 +33,24 @@ class CarTrackingFragment :
     }
 
     override fun initMapView() {
+        showLoading()
         mapView = binding.mapView
         mapView?.getMapAsync(this)
     }
 
     override fun initOnMapReady(naverMap: NaverMap) {
         observeViewModelOnMap(naverMap)
+        observeState()
         binding.btnCall.setOnClickListener {
             showLoading()
-            viewModel.callAssignedCar(DEFAULT_LATLNG)
+            if (viewModel.currentRentDetail.value == null) {
+                viewModel.callFirstAssignedCar()
+            } else {
+                viewModel.callAssignedCar(STARBUCKS)
+            }
         }
         carMarker.map = naverMap
-        naverMap.moveCameraTo(DEFAULT_LATLNG.latitude, DEFAULT_LATLNG.longitude)
+        naverMap.moveCameraTo(STARBUCKS.latitude, STARBUCKS.longitude)
         binding.btnTracking.setOnClickListener {
             viewModel.toggleTrackingState()
         }
@@ -53,14 +60,36 @@ class CarTrackingFragment :
         }
     }
 
+    private fun observeState() {
+        viewModel.mqttConnectionStatus.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach { status ->
+                Timber.tag("connect mqtt").d("$status")
+                if (status == 1) {
+                    dismissLoading()
+                    viewModel.startPublish()
+                    showSnackBar("MQTT 연결 성공")
+                } else if (status == -1) {
+                    Timber.tag("mqtt").d("mqtt 연결 실패")
+                } else {
+                    dismissLoading()
+                    navigatePopBackStack()
+                    showSnackBar("다시 접속해 주세요")
+                }
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
+    }
+
     private fun observeViewModelOnMap(naverMap: NaverMap) {
         viewModel.trackingState.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach {
             binding.btnTracking.text = if (it) {
-                viewModel.startPublish()
                 "차량추적 ON"
             } else {
-                viewModel.stopPublish()
                 "차량추적 OFF"
+            }
+        }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+        viewModel.firstCall.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach {
+            if (it) {
+                showSnackBar("첫 렌트 요청 장소로 호출됩니다")
             }
         }.launchIn(viewLifecycleOwner.lifecycleScope)
 
@@ -91,17 +120,12 @@ class CarTrackingFragment :
     }
 
     override fun iniView() {
-        viewModel.initMQTT()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        viewModel.stopPublish()
+        //
     }
 
     companion object {
         private const val ICON_SIZE = 100
-        private val DEFAULT_LATLNG = LatLng(37.576760, 126.898863)
+        private val STARBUCKS = LatLng(37.576636819990284, 126.89879021208397)
 //        private val SANGAM_LATLNG = LatLng(37.57569116736151, 126.90039723462993)
     }
 }

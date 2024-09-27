@@ -21,6 +21,22 @@ class SignRepositoryImpl @Inject constructor(
     private val signDataSource: SignDataSource
 ) : SignRepository {
 
+    override suspend fun setFCMToken(fcmToken: String): Flow<Result<String>> = flow {
+        when (val result = safeApiCall { signDataSource.setFCMToken(fcmToken) }) {
+            is ResultWrapper.Success -> {
+                emit(Result.success(result.data))
+            }
+
+            is ResultWrapper.GenericError -> {
+                emit(Result.failure(Exception(result.message)))
+            }
+
+            is ResultWrapper.NetworkError -> {
+                emit(Result.failure(Exception("네트워크 에러")))
+            }
+        }
+    }
+
     override suspend fun getTokens(userLoginInfo: UserLoginInfo): Flow<Result<Tokens>> = flow {
         when (
             val response = safeApiCall { signDataSource.getTokens(userLoginInfo) }
@@ -97,6 +113,7 @@ class SignRepositoryImpl @Inject constructor(
     override suspend fun getUserData(): Flow<Result<SocialUser>> {
         return flow {
             val user = signDataSource.getUserData()
+            Timber.d("유저 정보 조회: $user")
             when (user.isVaild()) {
                 true -> emit(Result.success(user))
                 false -> emit(Result.failure(Exception("유저 정보가 없습니다.")))
@@ -110,5 +127,27 @@ class SignRepositoryImpl @Inject constructor(
 
     override suspend fun clearUserData() {
         signDataSource.clearUserData()
+    }
+
+    override suspend fun updateProfileImage(image: File?): Flow<Result<SocialUser>> = flow {
+        when (
+            val response = safeApiCall {
+                val filePart: MultipartBody.Part? =
+                    FormDataConverterUtil.getNullableMultiPartBody("image", image)
+                signDataSource.updateUserProfileImage(filePart)
+            }
+        ) {
+            is ResultWrapper.Success -> {
+                emit(Result.success(response.data))
+            }
+
+            is ResultWrapper.GenericError -> {
+                emit(Result.failure(Exception(response.message)))
+            }
+
+            is ResultWrapper.NetworkError -> {
+                emit(Result.failure(Exception("네트워크 에러")))
+            }
+        }
     }
 }

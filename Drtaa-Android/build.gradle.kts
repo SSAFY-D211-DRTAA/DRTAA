@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.navigation.safe.args) apply false
     alias(libs.plugins.jetbrains.kotlin.jvm) apply false
     alias(libs.plugins.detekt) apply false
+    alias(libs.plugins.gms) apply false
 }
 
 apply(from = "gradle/projectDependencyGraph.gradle")

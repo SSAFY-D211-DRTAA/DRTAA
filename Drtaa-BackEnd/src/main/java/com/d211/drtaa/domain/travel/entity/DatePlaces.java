@@ -3,10 +3,7 @@ package com.d211.drtaa.domain.travel.entity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
-import org.checkerframework.checker.units.qual.N;
 import org.hibernate.annotations.ColumnDefault;
-
-import java.time.LocalDate;
 
 @Entity
 @Table(name = "date_places")
@@ -21,7 +18,7 @@ public class DatePlaces {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "date_places_id", nullable = false)
     @Schema(description = "일정 장소 고유번호", example = "1")
-    private long travelDatesId;
+    private long datePlacesId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "travel_dates_id", nullable = false)

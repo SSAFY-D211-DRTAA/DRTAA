@@ -8,11 +8,9 @@ import lombok.Getter;
 @Data
 @AllArgsConstructor
 @Getter
-public class PlacesRequestDTO {
-    @Schema(description = "여행 고유 번호", example = "1")
-    private Long travelId;
-    @Schema(description = "여행 일정 고유번호", example = "1")
-    private Long travelDatesId;
+public class PlacesDetailRequestDTO {
+    @Schema(description = "일정 장소 고유번호", example = "1")
+    private long datePlacesId;
     @Schema(description = "일정 장소 이름", example = "디지털미디어시티역")
     private String datePlacesName;
     @Schema(description = "일정 장소 카테고리", example = "지하철역")
@@ -23,4 +21,10 @@ public class PlacesRequestDTO {
     private double datePlacesLat;
     @Schema(description = "일정 장소 경도", example = "0.0")
     private double datePlacesLon;
+    @Schema(description = "일정 장소 방문 여부", example = "false")
+    private boolean datePlacesIsVisited;
+
+    public boolean getDatePlacesIsVisited() {
+        return this.datePlacesIsVisited;
+    }
 }

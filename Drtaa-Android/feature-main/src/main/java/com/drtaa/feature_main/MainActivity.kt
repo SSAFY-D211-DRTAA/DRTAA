@@ -1,5 +1,11 @@
 package com.drtaa.feature_main
 
+import android.annotation.SuppressLint
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
+import android.os.Build
+import androidx.activity.viewModels
 import androidx.core.view.isVisible
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -11,6 +17,10 @@ import com.drtaa.core_ui.component.LocationHelper
 import com.drtaa.core_ui.showToast
 import com.drtaa.feature_main.databinding.ActivityMainBinding
 import com.drtaa.feature_main.util.Page
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.messaging.FirebaseMessaging
+import com.gun0912.tedpermission.PermissionListener
+import com.gun0912.tedpermission.normal.TedPermission
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -23,10 +33,30 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
     @Inject
     lateinit var locationHelper: LocationHelper
     private lateinit var navController: NavController
-
+    private val viewModel: MainViewModel by viewModels()
     override fun init() {
         initBottomNavBar()
         initLocationPermission()
+        initFCM()
+        initNotificationChannel(CHANNEL_ID, CHANNEL_NAME)
+    }
+
+    private fun initFCM() {
+        FirebaseMessaging.getInstance().token
+            .addOnCompleteListener(
+                OnCompleteListener { task ->
+                    if (!task.isSuccessful) {
+                        Timber.tag("fcm").d("FCM토큰 얻기 실패 ${task.exception}")
+                        return@OnCompleteListener
+                    }
+                    val token = task.result
+                    Timber.tag("fcm").d("FCM토큰 얻기 성공 $token")
+                    viewModel.setFCMToken(token)
+                }
+            )
+            .addOnFailureListener { task ->
+                Timber.tag("fcm").d("FCM토큰 얻기 실패 $task")
+            }
     }
 
     private fun initLocationPermission() {
@@ -45,6 +75,43 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
                             .d("Lat: ${location.latitude}, Lng: ${location.longitude}")
                     }.launchIn(lifecycleScope)
             }
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun initNotificationChannel(id: String, name: String) {
+        val notificationManager: NotificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            TedPermission.create().setPermissionListener(object : PermissionListener {
+                override fun onPermissionGranted() {
+                    notificationManager.createNotificationChannel(
+                        NotificationChannel(
+                            id,
+                            name,
+                            NotificationManager.IMPORTANCE_HIGH
+                        )
+                    )
+                }
+
+                override fun onPermissionDenied(deniedPermissions: MutableList<String>?) {
+                    showToast("알림 권한이 거부되었습니다")
+                }
+            })
+                .setDeniedMessage("알림 권한을 허용해주세요")
+                .setPermissions(
+                    android.Manifest.permission.POST_NOTIFICATIONS,
+                )
+                .check()
+        } else {
+            notificationManager.createNotificationChannel(
+                NotificationChannel(
+                    id,
+                    name,
+                    NotificationManager.IMPORTANCE_HIGH
+                )
+            )
         }
     }
 
@@ -69,5 +136,11 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
             val page = Page.fromId(destination.id)
             binding.bottomNavigationBar.isVisible = page?.hideBottomNav != true
         }
+    }
+
+    companion object FCM {
+        const val CHANNEL_NAME = "DRTAA"
+        const val CHANNEL_ID = "DRTAA"
+        const val NOTIFICATION_ID = 1001
     }
 }

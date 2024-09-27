@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.gms)
     id("drtaa.plugin.feature")
 }
 
@@ -54,4 +55,7 @@ dependencies {
     implementation(project(":feature-payment"))
     implementation(project(":feature-plan"))
     implementation(libs.map.sdk)
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.messaging.ktx)
 }

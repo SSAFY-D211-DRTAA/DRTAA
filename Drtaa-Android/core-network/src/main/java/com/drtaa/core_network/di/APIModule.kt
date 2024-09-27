@@ -21,9 +21,18 @@ object APIModule {
     const val TOUR_URL = "http://apis.data.go.kr/B551011/KorService1/"
 
     @Singleton
+    @NoAuth
+    @Provides
+    fun provideSignAPINoAuth(
+        @DefaultRetrofit
+        retrofit: Retrofit
+    ): SignAPI = retrofit.create(SignAPI::class.java)
+
+    @Singleton
+    @Auth
     @Provides
     fun provideSignAPI(
-        @DefaultRetrofit
+        @AuthRetrofit
         retrofit: Retrofit
     ): SignAPI = retrofit.create(SignAPI::class.java)
 

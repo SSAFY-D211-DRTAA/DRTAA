@@ -46,4 +46,7 @@ dependencies {
     implementation(libs.map.sdk)
 
     implementation (libs.lottie)
+
+    //QRCode
+    implementation (libs.zxing.android.embedded)
 }

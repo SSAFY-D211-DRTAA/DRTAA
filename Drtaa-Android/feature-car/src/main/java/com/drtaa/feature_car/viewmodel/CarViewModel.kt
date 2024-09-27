@@ -26,6 +26,12 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
+enum class CarStatus {
+    DRIVING,
+    PARKING,
+    IDLE
+}
+
 @HiltViewModel
 class CarViewModel @Inject constructor(
     private val gpsRepository: GPSRepository,
@@ -53,19 +59,96 @@ class CarViewModel @Inject constructor(
     private val _latestReservedId = MutableStateFlow<Long>(0L)
     val latestReservedId: StateFlow<Long> = _latestReservedId
 
+    private val _rentState = MutableStateFlow<Boolean>(false)
+    val rentState: StateFlow<Boolean> = _rentState
+
+    private val _firstCall = MutableSharedFlow<Boolean>()
+    val firstCall: SharedFlow<Boolean> = _firstCall.asSharedFlow()
+
+    private val _drivingStatus = MutableStateFlow<CarStatus>(CarStatus.IDLE)
+    val drivingStatus: StateFlow<CarStatus> = _drivingStatus
+
+    private val _mqttConnectionStatus = MutableStateFlow<Int>(-1)
+    val mqttConnectionStatus: StateFlow<Int> = _mqttConnectionStatus
+
     init {
-        getCurrentRent()
+        initMQTT()
         getLatestRent()
+        observeMqttConnectionStatus()
         observeMqttMessages()
     }
 
-    private fun getLatestRent() {
+    override fun onCleared() {
+        super.onCleared()
+        Timber.tag("mqtt_viewmodel").d("onCleared")
+        disconnectMQTT()
+        stopPublish()
+    }
+
+    private fun observeMqttConnectionStatus() {
+        viewModelScope.launch {
+            gpsRepository.observeConnectionStatus().collectLatest {
+                Timber.tag("mqtt_viewmodel").d("observeMqttConnectionStatus: $it")
+                _mqttConnectionStatus.value = it
+            }
+        }
+    }
+
+    fun clearMqttStatus() {
+        _mqttConnectionStatus.value = -1
+    }
+
+    fun getOnCar(rentId: Long) {
+        viewModelScope.launch {
+            rentCarRepository.getOnCar(rentId).collect { result ->
+                result.onSuccess { data ->
+                    Timber.tag("rent latest").d("성공 $data")
+                    _currentRentDetail.value?.let {
+                        rentCarRepository.getDriveStatus(it.rentCarId.toLong()).collect { result ->
+                            result.onSuccess { data ->
+                                _drivingStatus.value = CarStatus.DRIVING
+                                Timber.tag("rent latest").d("성공 $data")
+                            }.onFailure {
+                                _drivingStatus.value = CarStatus.IDLE
+                                Timber.tag("rent").d("현재 진행 중인 렌트가 없습니다.")
+                            }
+                        }
+                    }
+
+                    _rentState.value = true
+                }.onFailure {
+                    Timber.tag("rent").d("현재 진행 중인 렌트가 없습니다.")
+                    _rentState.value = false
+                }
+            }
+        }
+    }
+
+    fun getOffCar(rentId: Long) {
+        viewModelScope.launch {
+            rentCarRepository.getOffCar(rentId).collect { result ->
+                result.onSuccess { data ->
+                    _drivingStatus.value = CarStatus.PARKING
+                    Timber.tag("rent latest").d("성공 $data")
+                    _rentState.value = false
+                }.onFailure {
+                    _drivingStatus.value = CarStatus.IDLE
+                    Timber.tag("rent").d("현재 진행 중인 렌트가 없습니다.")
+                    _rentState.value = false
+                }
+            }
+        }
+    }
+
+    fun getLatestRent() {
         viewModelScope.launch {
             rentRepository.getAllRentState().collect { result ->
                 result.onSuccess { data ->
                     Timber.tag("rent latest").d("성공 $data")
                     _latestReservedId.value = data
+                    getCurrentRent()
                 }.onFailure {
+                    _latestReservedId.value = -1L
                     Timber.tag("rent").d("현재 진행 중인 렌트가 없습니다.")
                 }
             }
@@ -73,14 +156,16 @@ class CarViewModel @Inject constructor(
     }
 
     /**
-     * 탑승처리 in-progress를 해줘야 렌트한 것으로 간주한다.
+     * 탑승처리를 해줘야 렌트한 것으로 간주한다.
      */
-    private fun getCurrentRent() {
+    fun getCurrentRent() {
         viewModelScope.launch {
-            rentRepository.getCurrentRent().collect { result ->
+            rentRepository.getRentDetail(_latestReservedId.value).collect { result ->
                 result.onSuccess { data ->
                     Timber.d("성공")
-                    _currentRentDetail.value = data
+                    if (data.rentStatus == "in_progress") {
+                        _currentRentDetail.value = data
+                    }
                 }.onFailure {
                     Timber.d("현재 진행 중인 렌트가 없습니다.")
                     _currentRentDetail.value = null
@@ -89,10 +174,14 @@ class CarViewModel @Inject constructor(
         }
     }
 
-    fun initMQTT() {
+    private fun initMQTT() {
         viewModelScope.launch {
             gpsRepository.setupMqttConnection()
         }
+    }
+
+    private fun disconnectMQTT() {
+        gpsRepository.disconnectMqtt()
     }
 
     fun toggleTrackingState() {
@@ -112,10 +201,12 @@ class CarViewModel @Inject constructor(
                 delay(intervalMillis)
             }
         }
+        toggleTrackingState()
         gpsRepository.publishGpsData(data)
     }
 
     fun stopPublish() {
+        _trackingState.value = false
         publishJob?.cancel()
         publishJob = null
     }
@@ -154,6 +245,9 @@ class CarViewModel @Inject constructor(
         return currentRentDetail.first()
     }
 
+    /**
+     * 재호출
+     */
     fun callAssignedCar(userPosition: LatLng) {
         viewModelScope.launch {
             val rentId = _latestReservedId.value
@@ -168,6 +262,21 @@ class CarViewModel @Inject constructor(
                 }.onFailure {
                     Timber.tag("call car").d("실패")
                     _carPosition.emit(CarPosition(0.0, 0.0))
+                }
+            }
+        }
+    }
+
+    fun callFirstAssignedCar() {
+        viewModelScope.launch {
+            rentCarRepository.callFirstAssignedCar(_latestReservedId.value).collect { result ->
+                result.onSuccess {
+                    _carPosition.emit(it)
+                    _firstCall.emit(true)
+                    Timber.tag("첫 호출").d("성공")
+                }.onFailure {
+                    _firstCall.emit(false)
+                    Timber.tag("첫 호출").d("실패")
                 }
             }
         }

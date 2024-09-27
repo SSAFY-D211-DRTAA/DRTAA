@@ -5,40 +5,52 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.drtaa.core_data.datasource.SignDataSource
+import com.drtaa.core_model.network.RequestFormLogin
+import com.drtaa.core_model.network.ResponseLogin
+import com.drtaa.core_model.sign.RequestFCMToken
 import com.drtaa.core_model.sign.SocialUser
 import com.drtaa.core_model.sign.UserLoginInfo
 import com.drtaa.core_model.util.toRequestLogin
-import com.drtaa.core_model.network.RequestFormLogin
-import com.drtaa.core_model.network.ResponseLogin
 import com.drtaa.core_network.api.SignAPI
+import com.drtaa.core_network.di.Auth
+import com.drtaa.core_network.di.NoAuth
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Named
 
 class SignDataSourceImpl @Inject constructor(
-    private val signAPI: SignAPI,
+    @NoAuth
+    private val noAuthSignAPI: SignAPI,
+    @Auth
+    private val authSignAPI: SignAPI,
     @Named("USER_DATASTORE")
-    private val dataStore: DataStore<Preferences>
+    private val dataStore: DataStore<Preferences>,
 ) : SignDataSource {
+    override suspend fun setFCMToken(fcmToken: String): String {
+        return authSignAPI.setFCMToken(RequestFCMToken(fcmToken))
+    }
+
     override suspend fun getTokens(userLoginInfo: UserLoginInfo): ResponseLogin {
         return when (userLoginInfo) {
-            is SocialUser -> signAPI.socialLogin(userLoginInfo.toRequestLogin())
-            else -> signAPI.formLogin(userLoginInfo as RequestFormLogin)
+            is SocialUser -> noAuthSignAPI.socialLogin(userLoginInfo.toRequestLogin())
+            else -> noAuthSignAPI.formLogin(userLoginInfo as RequestFormLogin)
         }
     }
 
     override suspend fun signUp(requestSignUp: RequestBody, image: MultipartBody.Part?): String {
-        return signAPI.signUp(requestSignUp, image)
+        return noAuthSignAPI.signUp(requestSignUp, image)
     }
 
     override suspend fun checkDuplicatedId(userProviderId: String): Boolean {
-        return signAPI.checkDuplicatedId(userProviderId)
+        return noAuthSignAPI.checkDuplicatedId(userProviderId)
     }
 
     override suspend fun getUserData(): SocialUser {
+        Timber.tag("getUserData").d("${dataStore.data.first()}")
         return dataStore.data.map { prefs ->
             SocialUser(
                 prefs[USER_LOGIN_TYPE] ?: "",
@@ -64,6 +76,18 @@ class SignDataSourceImpl @Inject constructor(
         dataStore.edit { preferences ->
             preferences.clear()
         }
+    }
+
+    override suspend fun updateUserProfileImage(image: MultipartBody.Part?): SocialUser {
+        val newImageUrl = authSignAPI.updateUserProfileImage(image)
+
+        val currentUser = getUserData()
+
+        val updateUser = currentUser.copy(profileImageUrl = newImageUrl)
+
+        setUserData(updateUser)
+
+        return updateUser
     }
 
     companion object {

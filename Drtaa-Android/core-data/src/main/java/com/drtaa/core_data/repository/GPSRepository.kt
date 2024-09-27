@@ -8,4 +8,5 @@ interface GPSRepository {
     suspend fun setupMqttConnection()
     fun publishGpsData(data: String)
     fun disconnectMqtt()
+    fun observeConnectionStatus(): Flow<Int>
 }
