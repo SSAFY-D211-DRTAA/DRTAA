@@ -25,4 +25,10 @@ public class RentCreateRequestDTO {
     private double rentDptLat;
     @Schema(description = "렌트 탑승 장소 경도", example = "0.0")
     private double rentDptLon;
+    @Schema(description = "탑승 장소 이름", example = "디지털미디어시티역")
+    private String datePlacesName;
+    @Schema(description = "탑승 장소 카테고리", example = "지하철역")
+    private String datePlacesCategory;
+    @Schema(description = "탑승 장소 주소", example = "서울특별시 마포구 월드컵북로 366")
+    private String datePlacesAddress;
 }
