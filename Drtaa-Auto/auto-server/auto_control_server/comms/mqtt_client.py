@@ -71,6 +71,10 @@ class MQTTClient:
         self.client.loop_stop()
         self.client.disconnect()
         main_logger.info("MQTT client stopped")
+    
+    def publish_global_path(self, msg):
+        self.client.publish(self.pub_path_topic, msg)
+
 
 def run_mqtt_client():
     client = MQTTClient()

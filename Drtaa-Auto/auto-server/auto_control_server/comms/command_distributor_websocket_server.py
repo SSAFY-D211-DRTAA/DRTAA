@@ -3,15 +3,18 @@ import json
 import websockets
 
 from utils.logger import setup_logger
+from .mqtt_client import MQTTClient
 from .event_system import event_system
 from .message_handler import MessageHandler
 
 logger = setup_logger(__name__)
 
 class CommandDistributorWebSocketServer:
-    def __init__(self, host='0.0.0.0', port=8766):
+    def __init__(self, host='0.0.0.0', port: int=8766, mqtt_client: MQTTClient=None):
         self.host = host
         self.port = port
+        self.mqtt_client: MQTTClient = mqtt_client
+
         # self.clients = set()
         self.client = None
 
@@ -42,10 +45,14 @@ class CommandDistributorWebSocketServer:
                                 json.dump(data, f)
                         except IOError as e:
                             logger.error(f"Global Path file save error: {e}")
+                        
+                        self.mqtt_client.publish_global_path(data)
                     elif tag == "complete_drive":
                         logger.info(f"ack complete drive")
                         response = "complete drive"
-                        
+                    elif tag == "connect":
+                        logger.info(f"Local client connected")
+                        response = data
                     else:
                         logger.warning(f"unknown tag: {tag}")
                     

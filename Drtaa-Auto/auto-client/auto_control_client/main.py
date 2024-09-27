@@ -1,6 +1,5 @@
 import websocket
 import json
-import logging
 import os
 import signal
 import sys
@@ -16,11 +15,13 @@ from websocket import WebSocketApp
 
 from apis.rent_car_api import RentCarAPI
 from apis.db_client import DBClient
+from utils.logger import setup_logger
 
 from scripts.curve_simplification import simplify_curve
 from scripts.gps_converter import GPSConverter
 from scripts.convert_json import convert_points_to_json
 
+logger = setup_logger(__name__)
 
 # 상수 정의
 CONFIG_FILE_PATH = 'config.json'
@@ -54,10 +55,10 @@ def load_config() -> Dict[str, Union[str, float, int]]:
         with open(CONFIG_FILE_PATH) as f:
             return json.load(f)
     except FileNotFoundError:
-        logging.error("설정 파일을 찾을 수 없습니다.")
+        logger.error("설정 파일을 찾을 수 없습니다.")
         sys.exit(1)
     except json.JSONDecodeError:
-        logging.error("설정 파일 형식이 잘못되었습니다.")
+        logger.error("설정 파일 형식이 잘못되었습니다.")
         sys.exit(1)
 
 def validate_config(config: Dict[str, Any]) -> None:
@@ -70,12 +71,6 @@ def validate_config(config: Dict[str, Any]) -> None:
 config = load_config()
 config['ec2_websocket_url'] = ws_server_url
 validate_config(config)
-
-
-# 로깅 설정
-# logging.basicConfig(level=config.get('log_level', 'DEBUG'), format='%(asctime)s - %(levelname)s - %(message)s', filename='/app/logs/debug.log')
-logging.basicConfig(level=config.get('log_level', 'DEBUG'), format='%(asctime)s - %(levelname)s - %(message)s')
-
 
 @unique
 class VehicleStatus(StrEnum):
@@ -175,10 +170,10 @@ def publish_next_goal(ws: websocket.WebSocketApp) -> None:
     if current_goal_index < len(config['goals']):
         goal = config['goals'][current_goal_index]
         publish_pose_from_gps(ws, goal['lat'], goal['lon'])
-        logging.info(f"목표 위치 발행: {goal['lat']}, {goal['lon']}")
+        logger.info(f"목표 위치 발행: {goal['lat']}, {goal['lon']}")
         current_goal_index += 1
     else:
-        logging.info("모든 목표 위치에 도달했습니다.")
+        logger.info("모든 목표 위치에 도달했습니다.")
         current_goal_index = 0
 
 def publish_command_status(ws: WebSocketApp, status: str) -> None:
@@ -255,7 +250,7 @@ def on_ros_bridge_message(ws: WebSocketApp, message: str) -> None:
                     with open('gps_data.json', 'w') as f:
                         json.dump(gps_data, f)
                 except IOError as e:
-                    logging.error(f"GPS 데이터를 파일에 저장하는 중 오류 발생: {e}")
+                    logger.error(f"GPS 데이터를 파일에 저장하는 중 오류 발생: {e}")
 
                 gps_count_index += 1
                 if gps_count_index > 20:
@@ -263,7 +258,7 @@ def on_ros_bridge_message(ws: WebSocketApp, message: str) -> None:
                     send_to_ec2(gps_data)
 
             elif data['topic'] == COMPLETE_DRIVE_TOPIC:
-                logging.info("도착지에 도착했습니다.")
+                logger.info("도착지에 도착했습니다.")
                 msg_data = data['msg']
                 complete_data = {
                     "tag": "complete_drive",
@@ -273,10 +268,9 @@ def on_ros_bridge_message(ws: WebSocketApp, message: str) -> None:
                     with open('complete_drive_data.json', 'w') as f:
                         json.dump(complete_data, f)
                 except IOError as e:
-                    logging.error(f"완료 데이터를 파일에 저장하는 중 오류 발생: {e}")
+                    logger.error(f"완료 데이터를 파일에 저장하는 중 오류 발생: {e}")
                 
                 send_to_ec2(data)
-                rent_car_api_client.send_arrival_info(rent_car_id=1, expected_minutes=0, arrived=True)
 
             elif data['topic'] == GLOBAL_PATH_TOPIC:
                 path_data = data['msg']
@@ -285,7 +279,7 @@ def on_ros_bridge_message(ws: WebSocketApp, message: str) -> None:
                     with open('global_path_data.json', 'w') as f:
                         json.dump(path_data, f)
                 except IOError as e:
-                    logging.error(f"Global Path 데이터를 파일에 저장하는 중 오류 발생: {e}")
+                    logger.error(f"Global Path 데이터를 파일에 저장하는 중 오류 발생: {e}")
 
                 # 경로 최적화
                 epsilon = 0.1
@@ -301,20 +295,20 @@ def on_ros_bridge_message(ws: WebSocketApp, message: str) -> None:
                 send_to_ec2(path_data)
 
     except json.JSONDecodeError:
-        logging.error("잘못된 JSON 형식의 메시지를 받았습니다.")
+        logger.error("잘못된 JSON 형식의 메시지를 받았습니다.")
     except KeyError as e:
-        logging.error(f"메시지에서 필요한 키를 찾을 수 없습니다: {e}")
+        logger.error(f"메시지에서 필요한 키를 찾을 수 없습니다: {e}")
     except Exception as e:
-        logging.error(f"메시지 처리 중 오류 발생: {e}")
+        logger.error(f"메시지 처리 중 오류 발생: {e}")
 
 def on_ros_bridge_error(ws: WebSocketApp, error: Exception) -> None:
-    logging.error(f"ROS Bridge 연결 에러 발생: {error}")
+    logger.error(f"ROS Bridge 연결 에러 발생: {error}")
 
 def on_ros_bridge_close(ws: WebSocketApp, close_status_code: int, close_msg: str) -> None:
-    logging.info("ROS Bridge WebSocket 연결 종료")
+    logger.info("ROS Bridge WebSocket 연결 종료")
 
 def on_ros_bridge_open(ws: WebSocketApp) -> None:
-    logging.info("ROS Bridge WebSocket 연결 성공")
+    logger.info("ROS Bridge WebSocket 연결 성공")
 
     subscribe(ws, GPS_TOPIC, "morai_msgs/GPSMessage")
     subscribe(ws, COMPLETE_DRIVE_TOPIC, "geometry_msgs/PoseStamped")
@@ -323,7 +317,7 @@ def on_ros_bridge_open(ws: WebSocketApp) -> None:
 
 
 def on_ec2_message(ws: WebSocketApp, message: str) -> None:
-    logging.info(f"EC2로부터 메시지 수신: {message}")
+    logger.info(f"EC2로부터 메시지 수신: {message}")
     try:
         data: Dict[str, Any] = json.loads(message)
 
@@ -346,7 +340,7 @@ def on_ec2_message(ws: WebSocketApp, message: str) -> None:
             db_api_client.update_rent_car_status(car_id=1, status=VehicleStatus.WAITING)
             publish_next_goal(ros_bridge_ws)
         elif action == 'default':
-            logging.info(f"recv from ec2: {data}")
+            logger.info(f"recv from ec2: {data}")
             
 
         # 데이터를 파일에 저장
@@ -354,39 +348,39 @@ def on_ec2_message(ws: WebSocketApp, message: str) -> None:
             with open('ec2_recv.json', 'w') as f:
                 json.dump(data, f)
         except IOError as e:
-            logging.error(f"GPS 데이터를 파일에 저장하는 중 오류 발생: {e}")
+            logger.error(f"GPS 데이터를 파일에 저장하는 중 오류 발생: {e}")
 
     except json.JSONDecodeError:
-        logging.error("잘못된 JSON 형식의 메시지를 받았습니다.")
+        logger.error("잘못된 JSON 형식의 메시지를 받았습니다.")
     except KeyError as e:
-        logging.error(f"메시지에서 필요한 키를 찾을 수 없습니다: {e}")
+        logger.error(f"메시지에서 필요한 키를 찾을 수 없습니다: {e}")
     except Exception as e:
-        logging.error(f"메시지 처리 중 오류 발생: {e}")
+        logger.error(f"메시지 처리 중 오류 발생: {e}")
 
 def on_ec2_error(ws: WebSocketApp, error: Exception) -> None:
-    logging.error(f"EC2 연결 에러 발생: {error}")
+    logger.error(f"EC2 연결 에러 발생: {error}")
 
 def on_ec2_close(ws: WebSocketApp, close_status_code: int, close_msg: str) -> None:
-    logging.info("EC2 WebSocket 연결 종료")
+    logger.info("EC2 WebSocket 연결 종료")
 
 def on_ec2_open(ws: WebSocketApp) -> None:
-    logging.info("EC2 WebSocket 연결 성공")
-    send_to_ec2({"type": "connect",  "action": "Auto Client Connect"})
+    logger.info("EC2 WebSocket 연결 성공")
+    send_to_ec2({"tag": "connect",  "action": "Auto Client Connect"})
 
 def send_to_ros_bridge(data: Dict[str, Any]) -> None:
     if ros_bridge_ws and ros_bridge_ws.sock and ros_bridge_ws.sock.connected:
         ros_bridge_ws.send(json.dumps(data))
     else:
-        logging.error("ROS Bridge WebSocket 연결이 없거나 연결되지 않았습니다.")
+        logger.error("ROS Bridge WebSocket 연결이 없거나 연결되지 않았습니다.")
 
 def send_to_ec2(data: Dict[str, Any]) -> None:
     if ec2_ws and ec2_ws.sock and ec2_ws.sock.connected:
         ec2_ws.send(json.dumps(data))
     else:
-        logging.error("EC2 WebSocket 연결이 없거나 연결되지 않았습니다.")
+        logger.error("EC2 WebSocket 연결이 없거나 연결되지 않았습니다.")
 
 def signal_handler(sig: int, frame: Any) -> None:
-    logging.info("프로그램 종료 중...")
+    logger.info("프로그램 종료 중...")
 
     if ros_bridge_ws:
         unsubscribe(ros_bridge_ws, GPS_TOPIC)
@@ -407,10 +401,10 @@ def signal_handler(sig: int, frame: Any) -> None:
         time.sleep(0.1)
 
     if ros_bridge_ws and ros_bridge_ws.keep_running:
-        logging.warning("ROS Bridge WebSocket 연결을 강제로 종료합니다.")
+        logger.warning("ROS Bridge WebSocket 연결을 강제로 종료합니다.")
         ros_bridge_ws.keep_running = False
     if ec2_ws and ec2_ws.keep_running:
-        logging.warning("EC2 WebSocket 연결을 강제로 종료합니다.")
+        logger.warning("EC2 WebSocket 연결을 강제로 종료합니다.")
         ec2_ws.keep_running = False
 
     sys.exit(0)
