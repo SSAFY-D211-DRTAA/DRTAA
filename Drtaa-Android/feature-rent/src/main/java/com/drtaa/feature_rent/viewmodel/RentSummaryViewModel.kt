@@ -137,7 +137,10 @@ class RentSummaryViewModel @Inject constructor(
                 rentStartTime = dateFormatter.format(rentInfo.startSchedule.toDate()),
                 rentEndTime = dateFormatter.format(rentInfo.endSchedule.toDate()),
                 rentDptLat = rentStartLocation!!.lat,
-                rentDptLon = rentStartLocation.lng
+                rentDptLon = rentStartLocation.lng,
+                datePlacesName = rentStartLocation.title,
+                datePlacesCategory = rentStartLocation.category,
+                datePlacesAddress = rentStartLocation.roadAddress
             )
 
             rentRepository.callRent(requestCallRent).collect { result ->
