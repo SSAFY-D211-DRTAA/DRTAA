@@ -48,7 +48,6 @@ detektAnalysis:
       changes:    
         - Drtaa-Android/**/*
 
-
 assembleDebug:
   interruptible: true
   stage: build
