@@ -149,7 +149,7 @@ class CarTrackingFragment :
             Timber.tag("gps path").d("$path || $end")
 
             // 허용 가능한 오차 범위 설정
-            val tolerance = 10.0 // meters
+            val tolerance = THRESHOLD
 
             // 현재 GPS와 경로의 점들 간의 거리를 계산하여 tolerance 범위 내에서 가장 가까운 지점을 찾음
             val closestPoint = path.minByOrNull { point ->
@@ -158,14 +158,16 @@ class CarTrackingFragment :
 
             // 가장 가까운 지점과의 거리가 tolerance 범위 이내일 경우에만 진행 상황 계산
             closestPoint?.let { matchedPoint ->
-                val distanceToClosestPoint = gps.distanceTo(LatLng(matchedPoint.lat, matchedPoint.lon))
+                val distanceToClosestPoint =
+                    gps.distanceTo(LatLng(matchedPoint.lat, matchedPoint.lon))
                 if (distanceToClosestPoint <= tolerance) {
                     val progress = matchedPoint.idx
                     Timber.tag("gps progress")
                         .d("path and end: $path || $end -- ${(progress.toFloat() / end.toFloat()).toDouble()}")
                     pathOverlay.progress = (progress.toFloat() / end.toFloat()).toDouble()
                 } else {
-                    Timber.tag("gps progress").d("매칭 안됨: 가장 가까운 지점이 허용 범위 밖입니다. $distanceToClosestPoint")
+                    Timber.tag("gps progress")
+                        .d("매칭 안됨: 가장 가까운 지점이 허용 범위 밖입니다. $distanceToClosestPoint")
                 }
             } ?: run {
                 Timber.tag("gps progress").d("매칭 안됨: 경로가 존재하지 않음.")
@@ -174,10 +176,11 @@ class CarTrackingFragment :
     }
 
     override fun iniView() {
-
+//
     }
 
     companion object {
+        private const val THRESHOLD = 10.0
         private const val ICON_SIZE = 100
         private val STARBUCKS = LatLng(37.576636819990284, 126.89879021208397)
 //        private val SANGAM_LATLNG = LatLng(37.57569116736151, 126.90039723462993)
