@@ -230,7 +230,7 @@ public class RentServiceImpl implements RentService{
         LocalDate endDate = rentCheckRequestDTO.getRentEndTime();
 
         // 해당 날짜의 rentStatus가 reserved인 렌트가 존재하는지 확인하기
-        boolean isRentExist = rentRepository.existsByUserAndRentStatusAndRentStartTimeBetweenOrRentEndTimeBetween(
+        boolean isRentExist = rentRepository.existsByUserAndRentStatusAndRentStartTimeBetweenAndRentEndTimeBetween(
                 user,                           // 조회하려는 대상 사용자
                 RentStatus.reserved,            // 렌트 상태가 reserved인지 확인
                 startDate.atStartOfDay(),       // 렌트 시작 시간을 해당 시작일의 00:00:00로 설정

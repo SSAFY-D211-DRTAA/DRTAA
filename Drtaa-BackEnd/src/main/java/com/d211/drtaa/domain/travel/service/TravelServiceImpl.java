@@ -279,7 +279,7 @@ public class TravelServiceImpl implements TravelService {
         double rentDptLon = placeDetail.getDatePlacesLon();
 
         // 렌트 찾기
-        Rent rent = rentRepository.findByTravelId(travel.getTravelId())
+        Rent rent = rentRepository.findByTravel(travel)
                 .orElseThrow(() -> new RentNotFoundException("해당 travelId의 맞는 렌트를 찾을 수 없습니다."));
 
         // 렌트 탑승 장소 위도, 경도 변경

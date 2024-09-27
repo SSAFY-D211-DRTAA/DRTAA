@@ -28,6 +28,7 @@ public class RentScheduledJob {
 
     @Scheduled(cron = "0 0 10 * * *") // 매일 오전 10시에 실행
     public void runRentNotificationJob() {
+        log.info("매일 오전 10시에 시작되는 Job");
         try {
             log.info("Rent notification job started");
             jobLauncher.run(rentNotificationJob, new JobParameters());
