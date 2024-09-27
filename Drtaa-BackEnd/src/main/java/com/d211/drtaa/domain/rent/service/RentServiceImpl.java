@@ -13,7 +13,6 @@ import com.d211.drtaa.domain.rent.repository.RentRepository;
 import com.d211.drtaa.domain.rent.repository.car.RentCarRepository;
 import com.d211.drtaa.domain.rent.repository.car.RentCarScheduleRepository;
 import com.d211.drtaa.domain.rent.repository.history.RentHistoryRepository;
-import com.d211.drtaa.domain.rent.service.history.RentHistoryService;
 import com.d211.drtaa.domain.travel.entity.Travel;
 import com.d211.drtaa.domain.travel.entity.TravelDates;
 import com.d211.drtaa.domain.travel.repository.TravelDatesRepository;
@@ -26,8 +25,11 @@ import com.d211.drtaa.global.exception.rent.RentCarNotFoundException;
 import com.d211.drtaa.global.exception.rent.RentCarScheduleNotFoundException;
 import com.d211.drtaa.global.exception.rent.RentNotFoundException;
 import com.d211.drtaa.global.exception.websocket.WebSocketDisConnectedException;
+import com.d211.drtaa.global.util.fcm.FcmMessage;
+import com.d211.drtaa.global.util.fcm.FcmUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.firebase.messaging.Message;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -58,6 +60,7 @@ public class RentServiceImpl implements RentService{
     private final RentHistoryRepository rentHistoryRepository;
     private final TravelRepository travelRepository;
     private final TravelDatesRepository travelDatesRepository;
+    private final FcmUtil fcmUtil;
     private final WebSocketConfig webSocketConfig;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -339,7 +342,6 @@ public class RentServiceImpl implements RentService{
         rentCarScheduleRepository.save(rentCarSchedule);
 
         RentCar rentCar = rent.getRentCar();
-        // 반환값 빌더
         RentDetailResponseDTO response = RentDetailResponseDTO.builder()
                 // rent
                 .rentId(rent.getRentId())
@@ -362,6 +364,10 @@ public class RentServiceImpl implements RentService{
                 // travel
                 .travelId(travel.getTravelId())
                 .build();
+
+        // 일정 추가 유도 알림 보내기
+        FcmMessage.FcmDTO fcmDTO = fcmUtil.makeFcmDTO("📆"+ travel.getTravelName(), "해당 여행 일정들의 장소를 추가해주세요 !");
+        fcmUtil.singleFcmSend(user, fcmDTO); // 비동기로 전송
 
         return response;
     }

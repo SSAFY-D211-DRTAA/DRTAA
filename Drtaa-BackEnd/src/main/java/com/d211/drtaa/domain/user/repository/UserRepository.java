@@ -9,6 +9,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // find
     Optional<User> findByUserProviderId(String userProviderId);
     Optional<User> findByUserRefreshToken(String userRefreshToken);
+    Optional<User> findByUserId(Long userId);
 
     // exists
     boolean existsByUserProviderId(String userProviderId);
@@ -16,4 +17,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     // delete
     void deleteByUserProviderId(String userProviderId);
+
 }

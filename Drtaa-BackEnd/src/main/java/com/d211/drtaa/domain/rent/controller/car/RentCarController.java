@@ -1,5 +1,6 @@
 package com.d211.drtaa.domain.rent.controller.car;
 
+import com.d211.drtaa.domain.rent.dto.request.RentCarArriveStatusRequestDTO;
 import com.d211.drtaa.domain.rent.dto.request.RentCarCallRequestDTO;
 import com.d211.drtaa.domain.rent.dto.request.RentCarDriveStatusRequestDTO;
 import com.d211.drtaa.domain.rent.dto.request.RentCarUnassignedDispatchStatusRequestDTO;
@@ -148,6 +149,34 @@ public class RentCarController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
         } catch (WebSocketDisConnectedException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage()); // 500
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
+        }
+    }
+
+    @PostMapping("/alarm")
+    @Operation(summary = "렌트 차량 상태 변경 알림", description = "회원의 진행중인 렌트 차량의 상태가 변경되어 안드로이드로 알림 전송")
+    public ResponseEntity alarmToAndroid(@RequestBody RentCarDriveStatusRequestDTO rentCarDriveStatusRequestDTO) {
+        try {
+            rentCarService.alarmToAndroid(rentCarDriveStatusRequestDTO);
+
+            return ResponseEntity.ok("Success"); // 200
+        } catch (RentCarNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
+        }
+    }
+
+    @PostMapping("/arrival")
+    @Operation(summary = "렌트 차량 도착 상태 알림", description = "회원의 진행중인 렌트 차량의 도착 상태를 안드로이드로 알림 전송")
+    public ResponseEntity arrivalToAndroid(@RequestBody RentCarArriveStatusRequestDTO rentCarArriveStatusRequestDTO) {
+        try {
+            rentCarService.arrivalToAndroid(rentCarArriveStatusRequestDTO);
+
+            return ResponseEntity.ok("Success"); // 200
+        } catch (RentCarNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
         }

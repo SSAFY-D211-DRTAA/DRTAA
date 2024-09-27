@@ -12,6 +12,6 @@ import lombok.Getter;
 public class RentCarDriveStatusRequestDTO {
     @Schema(description = "렌트 차량 고유 번호", example = "1")
     private long rentCarId;
-    @Schema(description = "렌트 차량 주행 상태", example = "parked")
+    @Schema(description = "렌트 차량 주행 상태", example = "parking")
     private RentDrivingStatus rentCarDrivingStatus;
 }

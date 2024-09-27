@@ -21,6 +21,7 @@ before_script:
   - sdkmanager "platform-tools"
   - sdkmanager "build-tools;${ANDROID_BUILD_TOOLS}"
   - chmod +x ./gradlew
+  - echo "$GOOGLE_SERVICES" | base64 -d > app/google-services.json
   - echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
   - echo "NAVER_MAP_CLIENT_ID=\"$NAVER_MAP_CLIENT_ID\"" >> local.properties
   - echo "NAVER_MAP_CLIENT_ID_MANIFEST=$NAVER_MAP_CLIENT_ID_MANIFEST" >> local.properties

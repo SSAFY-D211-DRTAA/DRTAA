@@ -13,6 +13,8 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class TravelDetailResponseDTO {
+    @Schema(description = "여행 고유 번호", example = "1")
+    private Long travelId;
     @Schema(description = "여행 이름", example = "서울 여행")
     private String travelName;
     @Schema(description = "여행 시작 일정", example = "2024/01/01")

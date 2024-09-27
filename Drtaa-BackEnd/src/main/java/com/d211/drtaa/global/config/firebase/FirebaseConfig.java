@@ -31,6 +31,7 @@ public class FirebaseConfig {
         } catch (Exception e){
             e.printStackTrace();
         }
+
         return FirebaseMessaging.getInstance();
     }
 }
