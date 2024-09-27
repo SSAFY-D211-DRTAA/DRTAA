@@ -19,10 +19,10 @@ import javax.inject.Inject
 class PlanHistoryViewModel @Inject constructor(
     private val planRepository: PlanRepository
 ) : ViewModel() {
-    private val _planList = MutableStateFlow<List<PlanSimple>?>(arrayListOf())
+    private val _planList = MutableStateFlow<List<PlanSimple>?>(null)
     val planList: StateFlow<List<PlanSimple>?> = _planList
 
-    init{
+    init {
         getPlanList()
     }
 
@@ -32,7 +32,7 @@ class PlanHistoryViewModel @Inject constructor(
                 result.onSuccess { data ->
                     Timber.tag("search").d("success $data")
                     _planList.value = data
-                }.onSuccess {
+                }.onFailure {
                     Timber.tag("search").d("fail")
                     _planList.value = null
                 }

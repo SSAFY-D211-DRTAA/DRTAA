@@ -27,9 +27,9 @@ class PlanHistoryListAdapter :
             binding.planSimple = planSimple
             binding.executePendingBindings()
 
-//            binding.root.setOnClickListener {
-//                itemClickListener.onItemClicked(planSimple.travelId)
-//            }
+            binding.root.setOnClickListener {
+                itemClickListener.onItemClicked(planSimple.travelId)
+            }
         }
     }
 

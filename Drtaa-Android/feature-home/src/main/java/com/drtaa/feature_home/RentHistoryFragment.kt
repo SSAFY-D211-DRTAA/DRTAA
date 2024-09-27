@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.onEach
 
 @AndroidEntryPoint
 class RentHistoryFragment :
-    BaseFragment<FragmentRentHistoryBinding>(R.layout.fragment_plan_history) {
+    BaseFragment<FragmentRentHistoryBinding>(R.layout.fragment_rent_history) {
 
     private val rentHistoryViewModel: RentHistoryViewModel by viewModels()
 

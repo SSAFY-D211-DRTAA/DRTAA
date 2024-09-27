@@ -15,8 +15,7 @@ interface PlanAPI {
         @Body plan: Plan
     ): String
 
-    // 수정 필요
-    @GET("travel/")
+    @GET("travel")
     suspend fun getPlanList(): List<PlanSimple>
 
     @GET("travel/{travelId}")

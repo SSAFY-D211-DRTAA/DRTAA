@@ -33,6 +33,17 @@ class DayPlanFragment(
     override fun initView() {
         initObserve()
         initRVAdapter()
+        initEvent()
+    }
+
+    private fun initEvent() {
+        binding.llNoPlan.setOnClickListener {
+            navigateDestination(
+                PlanListFragmentDirections.actionPlanListFragmentToPlanSearchFragment(
+                    day = day
+                )
+            )
+        }
     }
 
     private fun initObserve() {

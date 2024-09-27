@@ -41,6 +41,10 @@ class PlanListFragment :
     override fun onResume() {
         super.onResume()
 
+        if (planViewModel.plan.value == null) {
+            return
+        }
+
         if (!planViewModel.isViewPagerLoaded) {
             initViewPager()
         }
@@ -65,7 +69,6 @@ class PlanListFragment :
 
         initEvent()
         initObserve()
-        initDatePickerDialog()
 
         planViewModel.plan.value?.let {
             binding.tvPlanTitle.text = it.travelName
@@ -120,12 +123,13 @@ class PlanListFragment :
 
         planViewModel.plan.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { plan ->
-                if(plan == null) return@onEach
+                if (plan == null) return@onEach
 
                 binding.tvPlanTitle.text = plan.travelName
 
                 if (planViewModel.isViewPagerLoaded) return@onEach
                 initViewPager()
+                initDatePickerDialog()
                 planViewModel.isViewPagerLoaded = true
                 Timber.d("plan: $plan")
             }.launchIn(viewLifecycleOwner.lifecycleScope)
@@ -191,12 +195,12 @@ class PlanListFragment :
     private fun initViewPager() {
         if (fragmentList.isEmpty()) {
             fragmentList = planViewModel.dayPlanList.value?.let {
-                it.map { dayPlan ->
+                List(it.size) { index ->
                     editPlanList.add(arrayListOf())
 
                     DayPlanFragment(
                         context = requireActivity(),
-                        day = dayPlan.travelDatesId,
+                        day = index + 1,
                         onPlanSelectListener = { planItem ->
                             if (planViewModel.isEditMode.value) {
                                 editPlan(planItem)

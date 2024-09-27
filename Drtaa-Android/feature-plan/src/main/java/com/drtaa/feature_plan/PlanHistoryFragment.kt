@@ -11,6 +11,7 @@ import com.drtaa.feature_plan.viewmodel.PlanHistoryViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import timber.log.Timber
 
 @AndroidEntryPoint
 class PlanHistoryFragment :
@@ -42,12 +43,17 @@ class PlanHistoryFragment :
     private fun initObserve() {
         planHistoryViewModel.planList.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { planList ->
-                if (planList == null) return@onEach
-
-                if (planList.isEmpty()) {
+                Timber.tag("search").d("success $planList")
+                if (planList == null) {
+                    binding.tvErrorPlanHistory.visibility = View.VISIBLE
+                    binding.tvNoPlanHistory.visibility = View.GONE
+                    binding.rvPlanHistory.visibility = View.GONE
+                } else if (planList.isEmpty()) {
+                    binding.tvErrorPlanHistory.visibility = View.GONE
                     binding.tvNoPlanHistory.visibility = View.VISIBLE
                     binding.rvPlanHistory.visibility = View.GONE
                 } else {
+                    binding.tvErrorPlanHistory.visibility = View.GONE
                     binding.tvNoPlanHistory.visibility = View.GONE
                     binding.rvPlanHistory.visibility = View.VISIBLE
 

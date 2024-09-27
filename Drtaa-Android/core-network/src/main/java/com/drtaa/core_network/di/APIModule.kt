@@ -72,7 +72,7 @@ object APIModule {
 
     @Singleton
     @Provides
-    fun provideTestAPI(
+    fun providePlanAPI(
         @AuthRetrofit
         retrofit: Retrofit
     ): PlanAPI = retrofit.create(PlanAPI::class.java)
