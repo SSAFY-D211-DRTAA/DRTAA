@@ -153,7 +153,9 @@ public class TravelServiceImpl implements TravelService {
             // 일정 장소 DTO 리스트 생성
             List<PlacesDetailResponseDTO> placesDtoList = placesList.stream().map(places ->
                     PlacesDetailResponseDTO.builder()
+                            .travelDatesId(places.getTravelDates().getTravelDatesId())
                             .datePlacesId(places.getDatePlacesId())
+                            .datePlacesOrder(places.getDatePlacesOrder())
                             .datePlacesName(places.getDatePlacesName())
                             .datePlacesCategory(places.getDatePlacesCategory())
                             .datePlacesAddress(places.getDatePlacesAddress())
@@ -165,6 +167,7 @@ public class TravelServiceImpl implements TravelService {
 
             // 일정 DTO 생성
             return DatesDetailResponseDTO.builder()
+                    .travelId(dates.getTravel().getTravelId())
                     .travelDatesId(dates.getTravelDatesId())
                     .travelDatesDate(dates.getTravelDatesDate())
                     .placesDetail(placesDtoList) // 일정 장소 리스트를 설정
@@ -173,6 +176,7 @@ public class TravelServiceImpl implements TravelService {
 
         // 최종 여행 DTO 생성
         TravelDetailResponseDTO dto = TravelDetailResponseDTO.builder()
+                .travelId(travel.getTravelId())
                 .travelName(travel.getTravelName())
                 .travelStartDate(travel.getTravelStartDate())
                 .travelEndDate(travel.getTravelEndDate())

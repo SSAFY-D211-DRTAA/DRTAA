@@ -25,6 +25,10 @@ public class DatePlaces {
     @Schema(description = "여행 일정 고유번호", example = "1")
     private TravelDates travelDates;
 
+    @Column(name = "date_places_order", nullable = false)
+    @Schema(description = "여행 일정 장소 순서", example = "1")
+    private int datePlacesOrder;
+
     @Column(name = "date_places_name", nullable = false)
     @Schema(description = "일정 장소 이름", example = "디지털미디어시티역")
     private String datePlacesName;
