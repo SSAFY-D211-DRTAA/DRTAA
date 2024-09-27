@@ -43,12 +43,10 @@ class PlanListFragment :
     override fun onResume() {
         super.onResume()
 
-        if (planViewModel.plan.value == null) {
-            return
-        }
-
-        if (!planViewModel.isViewPagerLoaded) {
-            initViewPager()
+        planViewModel.plan.value?.let {
+            if (!planViewModel.isViewPagerLoaded) {
+                initViewPager()
+            }
         }
     }
 
@@ -101,7 +99,6 @@ class PlanListFragment :
                     dayIdxTo = selectedDateIdx,
                     movePlanList = editPlanList[currentDayIdx]
                 )
-//                   //////////////////////////////////////////////// completeEdit(dayIdx)
             }
         }
     }
@@ -177,6 +174,11 @@ class PlanListFragment :
         }
 
         binding.btnDeletePlan.setOnClickListener {
+            if (editPlanList[binding.vpPlanDay.currentItem].isEmpty()) {
+                showSnackBar("삭제할 일정이 없습니다.")
+                return@setOnClickListener
+            }
+
             TwoButtonMessageDialog(
                 context = requireActivity(),
                 message = "일정을 삭제하시겠습니까?",
@@ -233,23 +235,11 @@ class PlanListFragment :
             updateDayPlanText(planViewModel.plan.value!!.datesDetail[0])
 
             ivPlanDayPrev.setOnClickListener {
-                binding.vpPlanDay.apply {
-                    if (currentItem > 0) {
-                        currentItem -= 1
-
-                        updateDayPlanText(planViewModel.plan.value!!.datesDetail[currentItem])
-                    }
-                }
+                changeDay(-1)
             }
 
             ivPlanDayNext.setOnClickListener {
-                binding.vpPlanDay.apply {
-                    if (currentItem < fragmentList.size - 1) {
-                        currentItem += 1
-
-                        updateDayPlanText(planViewModel.plan.value!!.datesDetail[currentItem])
-                    }
-                }
+                changeDay(1)
             }
         }
     }
@@ -260,14 +250,37 @@ class PlanListFragment :
     }
 
     private fun editPlan(planItem: Plan.DayPlan.PlanItem) {
-        binding.clEditBottomSheet.visibility = View.VISIBLE
-
         val dayIdx = binding.vpPlanDay.currentItem
+
+        binding.clEditBottomSheet.visibility = View.VISIBLE
 
         if (planItem.isSelected) {
             editPlanList[dayIdx].add(planItem)
         } else {
             editPlanList[dayIdx].remove(planItem)
+            if (editPlanList[dayIdx].isEmpty()) {
+                binding.clEditBottomSheet.visibility = View.GONE
+            }
+        }
+    }
+
+    private fun changeDay(direction: Int) {
+        binding.vpPlanDay.apply {
+            val newIndex = currentItem + direction
+            if (newIndex in fragmentList.indices) {
+                currentItem = newIndex
+                updateDayPlanText(planViewModel.plan.value!!.datesDetail[newIndex])
+                updateBottomSheetVisibility(newIndex)
+            }
+        }
+    }
+
+    private fun updateBottomSheetVisibility(dayIdx: Int) {
+        if (planViewModel.isEditMode.value) {
+            binding.clEditBottomSheet.visibility =
+                if (editPlanList[dayIdx].isEmpty()) View.GONE else View.VISIBLE
+        } else {
+            binding.clEditBottomSheet.visibility = View.GONE
         }
     }
 

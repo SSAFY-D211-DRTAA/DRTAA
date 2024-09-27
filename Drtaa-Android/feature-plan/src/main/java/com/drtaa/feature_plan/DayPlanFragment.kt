@@ -26,8 +26,13 @@ class DayPlanFragment(
 
     private val planViewModel: PlanViewModel by hiltNavGraphViewModels(R.id.nav_graph_plan)
 
+    private var visitedIdxRange: IntRange? = null
+
     val planListAdapter = PlanListAdapter(context, onPlanSelectListener)
-    private val itemTouchHelperCallback = ItemTouchHelperCallback(planListAdapter)
+    private val itemTouchHelperCallback = ItemTouchHelperCallback(
+        listener = planListAdapter,
+        disabledRange = null
+    )
     private val helper = ItemTouchHelper(itemTouchHelperCallback)
 
     override fun initView() {
@@ -62,6 +67,9 @@ class DayPlanFragment(
                 if (dayPlanList == null) return@onEach
 
                 val dayPlan = dayPlanList[day - 1]
+                getVisitedIdxRange(dayPlan)
+                itemTouchHelperCallback.setDisabledRange(visitedIdxRange)
+
                 if (dayPlan.placesDetail.isEmpty()) {
                     binding.llNoPlan.visibility = View.VISIBLE
                     binding.clDayPlan.visibility = View.GONE
@@ -72,6 +80,19 @@ class DayPlanFragment(
                     binding.llNoPlan.visibility = View.GONE
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
+    }
+
+    private fun getVisitedIdxRange(dayPlan: Plan.DayPlan) {
+        val firstVisitedIndex = dayPlan.placesDetail.indexOfFirst { it.datePlacesIsVisited }
+        val lastVisitedIndex = dayPlan.placesDetail.indexOfLast { it.datePlacesIsVisited }
+
+        visitedIdxRange = if (firstVisitedIndex != -1 && lastVisitedIndex != -1) {
+            IntRange(firstVisitedIndex, lastVisitedIndex) // IntRange 반환
+        } else {
+            null
+        }
+
+        Timber.d("visitedIdxRange : $visitedIdxRange")
     }
 
     private fun initRVAdapter() {
