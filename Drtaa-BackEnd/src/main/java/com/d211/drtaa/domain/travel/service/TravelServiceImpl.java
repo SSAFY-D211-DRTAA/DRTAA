@@ -237,33 +237,37 @@ public class TravelServiceImpl implements TravelService {
             // 일정 찾기
             TravelDates dates = travelDatesRepository.findByTravelDatesId(date.getTravelDatesId())
                     .orElseThrow(() -> new TravelNotFoundException("TravelDatesId에 해당하는 일정이 없습니다."));
+            log.info("dates: {}", dates);
 
-            // 여행 일정 별 장소 테이블 비우기
-            datePlacesRepository.deleteAllByTravelDates(dates);
+            // travelId와 travelDatesId에 해당하는 일정들 삭제
+            datePlacesRepository.deleteAllByTravelAndTravelDates(travel, dates);
+            log.info("일정 삭제 완료");
 
             // 입력받은 여행 일정 별 장소
             List<PlacesDetailRequestDTO> placesDetail = date.getPlacesDetail();
 
             if (placesDetail != null && !placesDetail.isEmpty()) {
-                // 일정 장소 저장할 리스트
-                List<DatePlaces> datePlacesList = new ArrayList<>();
-
                 // 일정 장소 별 반복해 리스트에 추가
-                for (PlacesDetailRequestDTO places : placesDetail) {
-                    DatePlaces datePlaces = DatePlaces.builder()
-                            .travelDates(dates)
-                            .datePlacesName(places.getDatePlacesName())
-                            .datePlacesCategory(places.getDatePlacesCategory())
-                            .datePlacesAddress(places.getDatePlacesAddress())
-                            .datePlacesLat(places.getDatePlacesLat())
-                            .datePlacesLon(places.getDatePlacesLon())
-                            .datePlacesIsVisited(places.getDatePlacesIsVisited())
-                            .build();
-                    datePlacesList.add(datePlaces);
-                }
+                for (int i = 1; i <= placesDetail.size(); i++) {
+                    PlacesDetailRequestDTO placeDetail = placesDetail.get(i - 1);
 
-                // DB에 한 번에 저장
-                datePlacesRepository.saveAll(datePlacesList);
+                    DatePlaces datePlaces = DatePlaces.builder()
+                            .travel(travel)
+                            .travelDates(dates)
+                            .datePlacesOrder(i)
+                            .datePlacesName(placeDetail.getDatePlacesName())
+                            .datePlacesCategory(placeDetail.getDatePlacesCategory())
+                            .datePlacesAddress(placeDetail.getDatePlacesAddress())
+                            .datePlacesLat(placeDetail.getDatePlacesLat())
+                            .datePlacesLon(placeDetail.getDatePlacesLon())
+                            .datePlacesIsVisited(placeDetail.getDatePlacesIsVisited())
+                            .build();
+
+                    log.info("{} 일정 추가", placeDetail.getDatePlacesName());
+                    datePlacesRepository.saveAndFlush(datePlaces);
+
+                    log.info("저장 완료");
+                }
             }
         }
     }

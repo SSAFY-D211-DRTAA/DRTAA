@@ -20,6 +20,11 @@ public class DatePlaces {
     @Schema(description = "일정 장소 고유번호", example = "1")
     private long datePlacesId;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "travel_id", nullable = false)
+    @Schema(description = "여행 고유번호", example = "1")
+    private Travel travel;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "travel_dates_id", nullable = false)
     @Schema(description = "여행 일정 고유번호", example = "1")

@@ -1,6 +1,7 @@
 package com.d211.drtaa.domain.travel.repository;
 
 import com.d211.drtaa.domain.travel.entity.DatePlaces;
+import com.d211.drtaa.domain.travel.entity.Travel;
 import com.d211.drtaa.domain.travel.entity.TravelDates;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,4 +16,5 @@ public interface DatePlacesRepository extends JpaRepository<DatePlaces, Long> {
 
     // delete
     void deleteAllByTravelDates(TravelDates dates);
+    void deleteAllByTravelAndTravelDates(Travel travel, TravelDates dates);
 }
