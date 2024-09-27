@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.drtaa.core_map.base.BaseMapFragment
 import com.drtaa.core_model.plan.Plan
 import com.drtaa.core_model.util.toDate
+import com.drtaa.core_ui.component.TwoButtonMessageDialog
 import com.drtaa.core_ui.component.TwoButtonTypingDialog
 import com.drtaa.core_ui.showSnackBar
 import com.drtaa.feature_plan.adapter.PlanViewPagerAdapter
@@ -53,6 +54,7 @@ class PlanListFragment :
 
     override fun onDestroyView() {
         super.onDestroyView()
+        planViewModel.setEditMode(false)
         planViewModel.isViewPagerLoaded = false
     }
 
@@ -175,9 +177,15 @@ class PlanListFragment :
         }
 
         binding.btnDeletePlan.setOnClickListener {
-            val dayIdx = binding.vpPlanDay.currentItem
-            Timber.d("dayIdx: $dayIdx, ${editPlanList[dayIdx]}")
-            planViewModel.deletePlan(dayIdx, editPlanList[dayIdx])
+            TwoButtonMessageDialog(
+                context = requireActivity(),
+                message = "일정을 삭제하시겠습니까?",
+                onCheckClick = {
+                    val dayIdx = binding.vpPlanDay.currentItem
+                    Timber.d("dayIdx: $dayIdx, ${editPlanList[dayIdx]}")
+                    planViewModel.deletePlan(dayIdx, editPlanList[dayIdx])
+                }
+            ).show()
         }
 
         binding.btnChangeDate.setOnClickListener {
