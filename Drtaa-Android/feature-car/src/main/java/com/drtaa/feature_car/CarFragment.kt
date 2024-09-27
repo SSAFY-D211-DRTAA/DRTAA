@@ -171,16 +171,6 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
     }
 
     private fun observeStatus() {
-        carViewModel.isSuccessComplete.flowWithLifecycle(viewLifecycleOwner.lifecycle)
-            .onEach { isSuccess ->
-                if (isSuccess) {
-                    showSnackBar("반납 성공")
-                    navigatePopBackStack()
-                } else {
-                    showSnackBar("반납 실패")
-                }
-            }.launchIn(viewLifecycleOwner.lifecycleScope)
-
         carViewModel.drivingStatus.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { drivingStatus ->
                 when (drivingStatus) {
