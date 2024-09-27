@@ -12,7 +12,6 @@ import com.drtaa.core_map.base.BaseMapFragment
 import com.drtaa.core_map.moveCameraTo
 import com.drtaa.core_map.setCustomLocationButton
 import com.drtaa.core_model.map.Search
-import com.drtaa.core_model.util.toPlanItem
 import com.drtaa.core_ui.hideKeyboard
 import com.drtaa.core_ui.showSnackBar
 import com.drtaa.feature_plan.adapter.SearchListAdapter
@@ -135,7 +134,7 @@ class PlanSearchFragment :
                     if (this != null) {
                         planViewModel.addPlan(
                             dayIdx = args.day - 1,
-                            addPlanList = arrayListOf(this.toPlanItem())
+                            newLocation = this
                         )
                         navigatePopBackStack()
                     } else {

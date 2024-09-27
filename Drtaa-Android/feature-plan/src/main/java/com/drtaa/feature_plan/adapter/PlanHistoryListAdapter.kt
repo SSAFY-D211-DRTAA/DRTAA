@@ -12,18 +12,18 @@ class PlanHistoryListAdapter :
     ListAdapter<PlanSimple, PlanHistoryListAdapter.PlanHistoryViewHolder>(BaseDiffUtil<PlanSimple>()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlanHistoryViewHolder {
-        val binding = ItemPlanHistoryBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding =
+            ItemPlanHistoryBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return PlanHistoryViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: PlanHistoryViewHolder, position: Int) {
-        val isLastItem = position == itemCount - 1
-        holder.bind(getItem(position), isLastItem)
+        holder.bind(getItem(position))
     }
 
     inner class PlanHistoryViewHolder(private val binding: ItemPlanHistoryBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(planSimple: PlanSimple, isLastItem: Boolean) {
+        fun bind(planSimple: PlanSimple) {
             binding.planSimple = planSimple
             binding.executePendingBindings()
 

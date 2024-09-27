@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.drtaa.core_map.base.BaseMapFragment
 import com.drtaa.core_model.plan.Plan
 import com.drtaa.core_model.util.toDate
+import com.drtaa.core_ui.component.TwoButtonTypingDialog
 import com.drtaa.core_ui.showSnackBar
 import com.drtaa.feature_plan.adapter.PlanViewPagerAdapter
 import com.drtaa.feature_plan.databinding.FragmentPlanListBinding
@@ -105,7 +106,7 @@ class PlanListFragment :
 
     private fun completeEdit() {
         editPlanList.forEachIndexed { index, _ ->
-            editPlanList[index] = arrayListOf()  // 각 내부 리스트를 빈 배열로 대체
+            editPlanList[index] = arrayListOf()
         }
         planViewModel.setEditMode(false)
     }
@@ -149,7 +150,14 @@ class PlanListFragment :
 
     private fun initEvent() {
         binding.ivEditTitle.setOnClickListener {
-            // 여행 이름 변경 다이얼로그 띄우기
+            TwoButtonTypingDialog(
+                context = requireActivity(),
+                defaultText = binding.tvPlanTitle.text.toString(),
+                onCheckClick = { newText ->
+                    binding.tvPlanTitle.text = newText
+                    planViewModel.updatePlanName(newText)
+                }
+            ).show()
         }
 
         binding.tvEditPlan.setOnClickListener {
@@ -170,9 +178,6 @@ class PlanListFragment :
             val dayIdx = binding.vpPlanDay.currentItem
             Timber.d("dayIdx: $dayIdx, ${editPlanList[dayIdx]}")
             planViewModel.deletePlan(dayIdx, editPlanList[dayIdx])
-
-//                //////////////////////////////////////////////////////////////////////////////////////
-
         }
 
         binding.btnChangeDate.setOnClickListener {
@@ -260,6 +265,6 @@ class PlanListFragment :
 
     private fun updateDayPlanText(dayPlan: Plan.DayPlan) {
         binding.tvPlanDay.text =
-            "Day ${dayPlan.travelDatesId} ${dayPlan.travelDatesDate.toDate()}"
+            "Day ${binding.vpPlanDay.currentItem + 1} ${dayPlan.travelDatesDate.toDate()}"
     }
 }

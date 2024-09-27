@@ -8,11 +8,13 @@ data class Plan(
     val travelStartDate: String
 ) {
     data class DayPlan(
+        val travelId: Int,
         val placesDetail: List<PlanItem>,
         val travelDatesDate: String,
         val travelDatesId: Int
     ) {
         data class PlanItem(
+            val travelDatesId: Int,
             val datePlacesAddress: String,
             val datePlacesCategory: String,
             val datePlacesIsVisited: Boolean,
@@ -20,6 +22,7 @@ data class Plan(
             val datePlacesLon: Double,
             val datePlacesName: String,
             val datePlacesId: Int = 0,
+            val datePlacesOrder: Int,
             var isSelected: Boolean = false
         )
     }

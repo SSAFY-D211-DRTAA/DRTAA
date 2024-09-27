@@ -14,14 +14,17 @@ fun SearchItem.toSearch(): Search {
     )
 }
 
-fun Search.toPlanItem(): PlanItem {
+fun Search.toPlanItem(travelDatesId: Int): PlanItem {
     return PlanItem(
         datePlacesAddress = this.roadAddress,
         datePlacesCategory = this.category,
         datePlacesIsVisited = false,
         datePlacesLat = this.lat,
         datePlacesLon = this.lng,
-        datePlacesName = this.title
+        datePlacesName = this.title,
+        datePlacesOrder = 0,
+        datePlacesId = 0,
+        travelDatesId = travelDatesId,
     )
 }
 

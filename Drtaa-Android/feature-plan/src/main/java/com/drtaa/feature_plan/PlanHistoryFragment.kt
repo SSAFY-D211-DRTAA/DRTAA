@@ -21,6 +21,11 @@ class PlanHistoryFragment :
 
     private val planHistoryListAdapter = PlanHistoryListAdapter()
 
+    override fun onResume() {
+        super.onResume()
+        planHistoryViewModel.getPlanList()
+    }
+
     override fun initView() {
         initObserve()
         initRVAdapter()
@@ -38,6 +43,7 @@ class PlanHistoryFragment :
             }
         })
         binding.rvPlanHistory.adapter = planHistoryListAdapter
+        binding.rvPlanHistory.itemAnimator = null
     }
 
     private fun initObserve() {

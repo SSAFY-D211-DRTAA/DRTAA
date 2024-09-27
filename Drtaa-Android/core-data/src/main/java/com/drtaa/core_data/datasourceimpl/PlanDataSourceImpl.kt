@@ -9,7 +9,7 @@ import javax.inject.Inject
 
 class PlanDataSourceImpl @Inject constructor(
     private val planAPI: PlanAPI
-): PlanDataSource {
+) : PlanDataSource {
     override suspend fun putPlan(plan: Plan): String {
         return planAPI.putPlan(plan)
     }

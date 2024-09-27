@@ -3,13 +3,15 @@ package com.drtaa.feature_plan.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.drtaa.core_data.repository.PlanRepository
+import com.drtaa.core_model.map.Search
 import com.drtaa.core_model.plan.Plan
+import com.drtaa.core_model.plan.RequestPlanName
+import com.drtaa.core_model.util.toPlanItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.util.Collections.addAll
 import javax.inject.Inject
 
 @HiltViewModel
@@ -75,18 +77,16 @@ class PlanViewModel @Inject constructor(
         }
     }
 
-    fun addPlan(dayIdx: Int, addPlanList: List<Plan.DayPlan.PlanItem>) {
-        Timber.d("addPlan $dayIdx $addPlanList")
-        val currentPlan = _plan.value
-        if (currentPlan == null) {
-//            _isEditSuccess.value = false
-            return
-        }
+    fun addPlan(dayIdx: Int, newLocation: Search) {
+        val newPlan = newLocation.toPlanItem(travelId)
+        Timber.d("addPlan $dayIdx $newPlan")
+
+        val currentPlan = _plan.value ?: return
 
         val updatedDatesDetail = currentPlan.datesDetail.mapIndexed { index, dayPlan ->
             if (index == dayIdx) {
                 val newPlanList = dayPlan.placesDetail.toMutableList().apply {
-                    addAll(addPlanList)
+                    add(newPlan)
                 }
 
                 dayPlan.copy(placesDetail = newPlanList)
@@ -98,7 +98,6 @@ class PlanViewModel @Inject constructor(
         Timber.d("updatedDatesDetail $updatedDatesDetail")
 
         if (updatedDatesDetail == currentPlan.datesDetail) {
-            _isEditSuccess.value = false
             return
         }
 
@@ -111,15 +110,11 @@ class PlanViewModel @Inject constructor(
         dayIdxTo: Int,
         movePlanList: List<Plan.DayPlan.PlanItem>
     ) {
-        val currentPlan = _plan.value
-        if (currentPlan == null) {
-//            _isEditSuccess.value = false
-            return
-        }
+        val currentPlan = _plan.value ?: return
 
-        val updatedDatesDetail = currentPlan.datesDetail.map { dayPlan ->
-            when (dayPlan.travelDatesId) {
-                dayIdxFrom + 1 -> {
+        val updatedDatesDetail = currentPlan.datesDetail.mapIndexed { index, dayPlan ->
+            when (index) {
+                dayIdxFrom -> {
                     val newPlanList = dayPlan.placesDetail.toMutableList().apply {
                         removeAll(movePlanList)
                     }
@@ -127,7 +122,7 @@ class PlanViewModel @Inject constructor(
                     dayPlan.copy(placesDetail = newPlanList)
                 }
 
-                dayIdxTo + 1 -> {
+                dayIdxTo -> {
                     val newPlanList = dayPlan.placesDetail.toMutableList().apply {
                         addAll(movePlanList)
                     }
@@ -142,7 +137,6 @@ class PlanViewModel @Inject constructor(
         }
 
         if (updatedDatesDetail == currentPlan.datesDetail) {
-            _isEditSuccess.value = false
             return
         }
 
@@ -151,14 +145,10 @@ class PlanViewModel @Inject constructor(
     }
 
     fun updatePlan(dayIdx: Int, newPlanList: List<Plan.DayPlan.PlanItem>) {
-        val currentPlan = _plan.value
-        if (currentPlan == null) {
-//            _isEditSuccess.value = false
-            return
-        }
+        val currentPlan = _plan.value ?: return
 
-        val updatedDatesDetail = currentPlan.datesDetail.map { dayPlan ->
-            if (dayPlan.travelDatesId == dayIdx + 1) {
+        val updatedDatesDetail = currentPlan.datesDetail.mapIndexed { index, dayPlan ->
+            if (index == dayIdx) {
                 dayPlan.copy(placesDetail = newPlanList)
             } else {
                 dayPlan
@@ -166,7 +156,6 @@ class PlanViewModel @Inject constructor(
         }
 
         if (updatedDatesDetail == currentPlan.datesDetail) {
-            _isEditSuccess.value = false
             return
         }
 
@@ -175,14 +164,10 @@ class PlanViewModel @Inject constructor(
     }
 
     fun deletePlan(dayIdx: Int, deletedPlanList: List<Plan.DayPlan.PlanItem>) {
-        val currentPlan = _plan.value
-        if (currentPlan == null) {
-//            _isEditSuccess.value = false
-            return
-        }
+        val currentPlan = _plan.value ?: return
 
-        val updatedDatesDetail = currentPlan.datesDetail.map { dayPlan ->
-            if (dayPlan.travelDatesId == dayIdx + 1) {
+        val updatedDatesDetail = currentPlan.datesDetail.mapIndexed { index, dayPlan ->
+            if (index == dayIdx) {
                 val newPlanList = dayPlan.placesDetail.toMutableList().apply {
                     removeAll(deletedPlanList)
                 }
@@ -194,7 +179,6 @@ class PlanViewModel @Inject constructor(
         }
 
         if (updatedDatesDetail == currentPlan.datesDetail) {
-            _isEditSuccess.value = false
             return
         }
 
@@ -210,6 +194,24 @@ class PlanViewModel @Inject constructor(
                     _plan.value = plan
                     _isEditSuccess.value = true
                     Timber.tag("NEW_PLAN").d("${_plan.value}")
+                }.onFailure {
+                    _isEditSuccess.value = false
+                }
+            }
+        }
+    }
+
+    fun updatePlanName(newName: String) {
+        viewModelScope.launch {
+            Timber.d("updatePlanName $newName")
+            planRepository.updatePlanName(
+                RequestPlanName(
+                    travelId = travelId,
+                    travelName = newName
+                )
+            ).collect { result ->
+                result.onSuccess {
+                    _isEditSuccess.value = true
                 }.onFailure {
                     _isEditSuccess.value = false
                 }
