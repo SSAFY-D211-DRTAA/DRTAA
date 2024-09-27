@@ -44,10 +44,9 @@ detektAnalysis:
     expire_in: 8h
   allow_failure: false 
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_REF_NAME =~ /.*android.*/
       changes:    
         - Drtaa-Android/**/*
-
 
 
 assembleDebug:
