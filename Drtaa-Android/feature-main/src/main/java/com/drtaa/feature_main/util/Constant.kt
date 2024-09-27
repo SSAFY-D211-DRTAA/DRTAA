@@ -13,6 +13,7 @@ enum class Page(val hideBottomNav: Boolean) {
     RENT_SUMMARY(true),
     TAXI(true),
     TAXI_SEARCH(true),
+    TAXI_SUMMARY(true)
     ;
 
     companion object {
@@ -31,5 +32,6 @@ enum class Page(val hideBottomNav: Boolean) {
             RENT_SUMMARY -> com.drtaa.feature_rent.R.id.rentSummaryFragment
             TAXI -> com.drtaa.feature_taxi.R.id.taxiFragment
             TAXI_SEARCH -> com.drtaa.feature_taxi.R.id.taxiSearchFragment
+            TAXI_SUMMARY -> com.drtaa.feature_taxi.R.id.taxiSummaryFragment
         }
 }

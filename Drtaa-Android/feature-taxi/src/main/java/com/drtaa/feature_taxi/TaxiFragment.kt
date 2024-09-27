@@ -52,7 +52,7 @@ class TaxiFragment : BaseFragment<FragmentTaxiBinding>(R.layout.fragment_taxi) {
         }
 
         binding.btnTaxiNext.setOnClickListener {
-
+            navigateDestination(R.id.action_taxiFragment_to_taxiSummaryFragment)
         }
 
     }

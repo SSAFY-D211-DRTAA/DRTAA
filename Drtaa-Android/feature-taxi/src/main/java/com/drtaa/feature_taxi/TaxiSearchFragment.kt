@@ -189,7 +189,7 @@ class TaxiSearchFragment :
         behavior.isHideable = false
 
         behavior.peekHeight = BOTTOM_SHEET_PEEK_HEIGHT
-        behavior.maxHeight = BOTTOM_SHEET_PEEK_HEIGHT * 2
+        behavior.maxHeight = BOTTOM_SHEET_PEEK_HEIGHT * 4
 
         behavior.addBottomSheetCallback(object : BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {

@@ -8,6 +8,7 @@ import com.drtaa.core_network.api.RentCarAPI
 import com.drtaa.core_network.api.SignAPI
 import com.drtaa.core_network.api.TaxiAPI
 import com.drtaa.core_network.api.TestAPI
+import com.drtaa.core_network.api.TmapAPI
 import com.drtaa.core_network.api.TourAPI
 import dagger.Module
 import dagger.Provides
@@ -22,6 +23,7 @@ object APIModule {
     const val MAP_SEARCH_URL = "https://openapi.naver.com/v1/search/"
     const val MAP_GEOCODE_URL = "https://naveropenapi.apigw.ntruss.com/"
     const val TOUR_URL = "http://apis.data.go.kr/B551011/KorService1/"
+    const val TMAP_URL = "https://apis.openapi.sk.com/"
 
     @Singleton
     @Provides
@@ -105,5 +107,14 @@ object APIModule {
         retrofit: Retrofit
     ): TaxiAPI {
         return retrofit.create(TaxiAPI::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideTmapAPI(
+        retrofitFactory: RetrofitFactory
+    ): TmapAPI {
+        return retrofitFactory.create(TMAP_URL)
+            .create(TmapAPI::class.java)
     }
 }

@@ -13,6 +13,11 @@
         <action
             android:id="@+id/action_taxiFragment_to_taxiSearchFragment"
             app:destination="@id/taxiSearchFragment"></action>
+
+        <action
+            android:id="@+id/action_taxiFragment_to_taxiSummaryFragment"
+            app:destination="@id/taxiSummaryFragment">
+        </action>
     </fragment>
 
     <fragment
@@ -23,5 +28,13 @@
         <argument
             android:name="isStartLocation"
             app:argType="boolean" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/taxiSummaryFragment"
+        android:name="com.drtaa.feature_taxi.TaxiSummaryFragment"
+        android:label="TaxiSummaryFragment"
+        tools:layout="@layout/fragment_taxi_summary">
     </fragment>
 </navigation>
