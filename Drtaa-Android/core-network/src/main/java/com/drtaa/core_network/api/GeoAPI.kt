@@ -9,8 +9,8 @@ import retrofit2.http.Query
 interface GeoAPI {
     @GET("map-reversegeocode/v2/gc")
     suspend fun getReverseGeocode(
-        @Header("X-NCP-APIGW-API-KEY-ID") clientId: String = BuildConfig.NAVER_CLIENT_ID,
-        @Header("X-NCP-APIGW-API-KEY") clientSecret: String = BuildConfig.NAVER_CLIENT_SECRET,
+        @Header("X-NCP-APIGW-API-KEY-ID") clientId: String = BuildConfig.NAVER_MAP_CLIENT_ID,
+        @Header("X-NCP-APIGW-API-KEY") clientSecret: String = BuildConfig.NAVER_MAP_CLIENT_SECRET,
         @Query("coords") coords: String,
         @Query("output") output: String = "json",
         @Query("orders") orders: String = "roadaddr"

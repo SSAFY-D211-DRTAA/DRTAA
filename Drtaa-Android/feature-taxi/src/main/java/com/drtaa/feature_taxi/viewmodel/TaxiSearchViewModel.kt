@@ -64,7 +64,8 @@ class TaxiSearchViewModel @Inject constructor(
         val result = response.results.firstOrNull()
         return if (result !=null) {
             val region = result.region
-            "${region.area1.name} ${region.area2.name} ${region.area3.name}"
+            val land = result.land
+            "${region.area1.name} ${region.area2.name} ${region.area3.name} ${land?.addition0?.value}"
         } else {
             "주소를 찾을 수 없습니다."
         }

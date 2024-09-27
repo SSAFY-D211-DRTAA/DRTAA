@@ -113,61 +113,53 @@ class TaxiSearchFragment :
 
             btnSearchSelect.setOnClickListener {
                 var center = naverMap.cameraPosition.target
-                taxiSearchViewModel.getReverseGeocode(center.latitude, center.longitude)
-                taxiSearchViewModel.setSelectedSearchItem(Search(taxiSearchViewModel.reverseGeocode.toString(), "", "", center.longitude, center.latitude))
-                if (taxiSearchViewModel.selectedSearchItem.value != null) {
-                    if (args.isStartLocation) {
-                        taxiViewModel.setTaxiStartLocation(taxiSearchViewModel.selectedSearchItem.value!!)
-                    } else {
-                        taxiViewModel.setTaxiEndLocation(taxiSearchViewModel.selectedSearchItem.value!!)
+                viewLifecycleOwner.lifecycleScope.launch {
+                    taxiSearchViewModel.getReverseGeocode(center.latitude, center.longitude)
+                    taxiSearchViewModel.reverseGeocode.collect { result ->
+                        result?.let {
+                            if (it.isSuccess) {
+                                taxiSearchViewModel.setSelectedSearchItem(
+                                    Search(
+                                        "${result}",
+                                        "",
+                                        "",
+                                        center.longitude,
+                                        center.latitude
+                                    )
+                                )
+                                Timber.d("선택된 주소 : ${result}")
+                            } else {
+                                showSnackBar("주소를 가져오는데 실패 했습니다.")
+                            }
+                        }
                     }
-                    navigatePopBackStack()
-                } else {
-                    showSnackBar("장소를 선택해주세요")
                 }
+
+                //위에서 getReverseGeocode로 응답 받은 정보를 확인해서 성공이면
+                //밑에 setSelectedSearchItem에 값을 넣고 싶어
+//                taxiSearchViewModel.setSelectedSearchItem(
+//                    Search(
+//                        taxiSearchViewModel.reverseGeocode.toString(),
+//                        "",
+//                        "",
+//                        center.longitude,
+//                        center.latitude
+//                    )
+//                )
+//                Timber.d("${taxiSearchViewModel.selectedSearchItem}")
+//                if (taxiSearchViewModel.selectedSearchItem.value != null) {
+//                    if (args.isStartLocation) {
+//                        taxiViewModel.setTaxiStartLocation(taxiSearchViewModel.selectedSearchItem.value!!)
+//                    } else {
+//                        taxiViewModel.setTaxiEndLocation(taxiSearchViewModel.selectedSearchItem.value!!)
+//                    }
+//                    navigatePopBackStack()
+//                } else {
+//                    showSnackBar("장소를 선택해주세요")
+//                }
             }
         }
     }
-
-    private fun getAddress(center: LatLng) {
-
-        showLoading()
-
-        val geocoder = Geocoder(requireContext(), Locale.KOREA)
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            geocoder.getFromLocation(center.latitude, center.longitude, 1) { address ->
-                if (address.isNotEmpty()) {
-                    taxiSearchViewModel.setSelectedSearchItem(
-                        Search(
-                            address[0].getAddressLine(0).toString(),
-                            address[0].thoroughfare.toString(),
-                            address[0].subThoroughfare.toString(),
-                            center.longitude,
-                            center.latitude
-                        )
-                    )
-                }
-            }
-        } else {
-            val address = geocoder.getFromLocation(center.latitude, center.longitude, 1)
-            if (address != null) {
-                taxiSearchViewModel.setSelectedSearchItem(
-                    Search(
-                        address[0].getAddressLine(0).toString(),
-                        address[0].thoroughfare.toString(),
-                        address[0].subThoroughfare.toString(),
-                        center.longitude,
-                        center.latitude
-                    )
-                )
-            }
-        }
-
-        dismissLoading()
-
-    }
-
 
     private fun initObserve(naverMap: NaverMap) {
         taxiSearchViewModel.selectedSearchItem.flowWithLifecycle(viewLifecycleOwner.lifecycle)
@@ -181,8 +173,10 @@ class TaxiSearchFragment :
 
         taxiSearchViewModel.reverseGeocode.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { result ->
-                result?.let {
-                    Timber.d("주소는?? ${result}")
+                result?.onSuccess { data ->
+                    Timber.d("주소는?? ${data}")
+                }?.onFailure {
+                    Timber.d("주소를 가져오지 못했습니다.")
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
     }

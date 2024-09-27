@@ -17,6 +17,8 @@ android {
     defaultConfig {
         minSdk = 28
 
+        buildConfigField("String", "NAVER_MAP_CLIENT_ID", getApiKey("NAVER_MAP_CLIENT_ID"))
+        buildConfigField("String", "NAVER_MAP_CLIENT_SECRET", getApiKey("NAVER_MAP_CLIENT_SECRET"))
         buildConfigField("String", "NAVER_CLIENT_ID", getApiKey("NAVER_CLIENT_ID"))
         buildConfigField("String", "NAVER_CLIENT_SECRET", getApiKey("NAVER_CLIENT_SECRET"))
         buildConfigField("String", "BASE_URL", getApiKey("BASE_URL"))
