@@ -1,11 +1,13 @@
 package com.drtaa.core_mqtt
 
+import com.drtaa.core_model.map.ResponseCarRoute
 import com.drtaa.core_model.map.ResponseGPS
 import com.google.gson.Gson
 import com.hivemq.client.mqtt.MqttClient
 import com.hivemq.client.mqtt.datatypes.MqttQos
 import com.hivemq.client.mqtt.mqtt5.Mqtt5AsyncClient
 import com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5Publish
+import com.hivemq.client.mqtt.mqtt5.message.subscribe.Mqtt5Subscription
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -25,8 +27,10 @@ private const val TAG = "MQTT"
 class MqttManager @Inject constructor() {
     private lateinit var client: Mqtt5AsyncClient
     private val gson = Gson()
-    private val _receivedMessages = MutableSharedFlow<ResponseGPS>()
-    val receivedMessages: SharedFlow<ResponseGPS> = _receivedMessages.asSharedFlow()
+    private val _receivedGPSMessages = MutableSharedFlow<ResponseGPS>()
+    val receivedGPSMessages: SharedFlow<ResponseGPS> = _receivedGPSMessages.asSharedFlow()
+    private val _receivedPathMessages = MutableSharedFlow<ResponseCarRoute>()
+    val receivedPathMessages: SharedFlow<ResponseCarRoute> = _receivedPathMessages.asSharedFlow()
     private var reconnectAttempts = 0
     private var isConnected = false
     private val _connectionStatus = MutableSharedFlow<Int>()
@@ -87,25 +91,53 @@ class MqttManager @Inject constructor() {
 
     private fun subscribeToTopic() {
         client.subscribeWith()
-            .topicFilter(GPS_PUB)
+            .addSubscription(mqtt5Subscription(GPS_PUB))
+            .addSubscription(mqtt5Subscription(PATH_PUB))
             .callback { publish: Mqtt5Publish ->
+                Timber.tag(TAG).d("$publish")
+                val topic = publish.topic.toString()
                 val message = String(publish.payloadAsBytes)
                 CoroutineScope(Dispatchers.IO).launch {
                     _connectionStatus.emit(1)
-                    val parsedMessage = gson.fromJson(message, ResponseGPS::class.java)
-                    _receivedMessages.emit(parsedMessage)
-                    Timber.tag(TAG).d("MQTT 응답: $parsedMessage")
+                    when (topic) {
+                        GPS_PUB -> {
+                            kotlin.runCatching {
+                                gson.fromJson(message, ResponseGPS::class.java)
+                            }.onSuccess { parsedMessage ->
+                                _receivedGPSMessages.emit(parsedMessage)
+                                Timber.tag(TAG).d("GPS 데이터 수신: $parsedMessage")
+                            }.onFailure { e ->
+                                Timber.tag(TAG).e(e, "GPS 메시지 파싱 실패")
+                            }
+                        }
+
+                        PATH_PUB -> {
+                            kotlin.runCatching {
+                                gson.fromJson(message, ResponseCarRoute::class.java)
+                            }.onSuccess { parsedMessage ->
+                                _receivedPathMessages.emit(parsedMessage)
+                                Timber.tag(TAG).d("경로 데이터 수신: $parsedMessage")
+                            }.onFailure { e ->
+                                Timber.tag(TAG).e(e, "경로 메시지 파싱 실패")
+                            }
+                        }
+                    }
                 }
             }
             .send()
-            .whenComplete { connAck, throwable ->
+            .whenComplete { subAck, throwable ->
                 if (throwable != null) {
                     Timber.tag(TAG).e(throwable, "구독 실패")
                 } else {
-                    Timber.tag(TAG).d("구독 성공 $connAck")
+                    Timber.tag(TAG).d("구독 성공: $subAck")
                 }
             }
     }
+
+    private fun mqtt5Subscription(topic: String) = Mqtt5Subscription.builder()
+        .topicFilter(topic)
+        .qos(MqttQos.AT_LEAST_ONCE)
+        .build()
 
     fun publishMessage(message: String) {
         if (!isConnected) {
@@ -143,5 +175,7 @@ class MqttManager @Inject constructor() {
         private const val INITIAL_RECONNECT_DELAY = 1000L // 초기 1초
         private const val GPS_SUB = "gps/data/v1/subscribe"
         private const val GPS_PUB = "gps/data/v1/publish"
+//        private const val PATH_SUB = "path/data/v1/subscribe"
+        private const val PATH_PUB = "path/data/v1/publish"
     }
 }

@@ -34,6 +34,20 @@ before_script:
   - echo "MQTT_URL=\"$MQTT_URL\"" >> local.properties
   - echo "BOOTPAY_APP_ID=\"$BOOTPAY_APP_ID\"" >> local.properties
 
+detektAnalysis:
+  stage: test
+  script:
+    - ./gradlew detekt
+  artifacts:
+    paths:
+      - Drtaa-Android/build/reports/detekt/
+    expire_in: 8h
+  allow_failure: false 
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_REF_NAME =~ /.*android.*/
+      changes:    
+        - Drtaa-Android/**/*
+
 
 assembleDebug:
   interruptible: true

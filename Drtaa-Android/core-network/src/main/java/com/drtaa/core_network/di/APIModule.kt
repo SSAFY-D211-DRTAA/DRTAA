@@ -7,8 +7,8 @@ import com.drtaa.core_network.api.RentAPI
 import com.drtaa.core_network.api.RentCarAPI
 import com.drtaa.core_network.api.SignAPI
 import com.drtaa.core_network.api.TaxiAPI
-import com.drtaa.core_network.api.TestAPI
 import com.drtaa.core_network.api.TmapAPI
+import com.drtaa.core_network.api.PlanAPI
 import com.drtaa.core_network.api.TourAPI
 import dagger.Module
 import dagger.Provides
@@ -24,13 +24,6 @@ object APIModule {
     const val MAP_GEOCODE_URL = "https://naveropenapi.apigw.ntruss.com/"
     const val TOUR_URL = "http://apis.data.go.kr/B551011/KorService1/"
     const val TMAP_URL = "https://apis.openapi.sk.com/"
-
-    @Singleton
-    @Provides
-    fun provideTestAPI(
-        @DefaultRetrofit
-        retrofit: Retrofit
-    ): TestAPI = retrofit.create(TestAPI::class.java)
 
     @Singleton
     @NoAuth
@@ -99,6 +92,13 @@ object APIModule {
     ): RentCarAPI {
         return retrofit.create(RentCarAPI::class.java)
     }
+
+    @Singleton
+    @Provides
+    fun providePlanAPI(
+        @AuthRetrofit
+        retrofit: Retrofit
+    ): PlanAPI = retrofit.create(PlanAPI::class.java)
 
     @Singleton
     @Provides

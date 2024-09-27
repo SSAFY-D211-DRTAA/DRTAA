@@ -1,6 +1,7 @@
 package com.drtaa.core_data.di
 
 import com.drtaa.core_data.datasource.NaverDataSource
+import com.drtaa.core_data.datasource.PlanDataSource
 import com.drtaa.core_data.datasource.RentCarDataSource
 import com.drtaa.core_data.datasource.RentDataSource
 import com.drtaa.core_data.datasource.SignDataSource
@@ -8,6 +9,7 @@ import com.drtaa.core_data.datasource.TaxiDataSource
 import com.drtaa.core_data.datasource.TokenDataSource
 import com.drtaa.core_data.datasource.TourDataSource
 import com.drtaa.core_data.datasourceimpl.NaverDataSourceImpl
+import com.drtaa.core_data.datasourceimpl.PlanDataSourceImpl
 import com.drtaa.core_data.datasourceimpl.RentCarDataSourceImpl
 import com.drtaa.core_data.datasourceimpl.RentDataSourceImpl
 import com.drtaa.core_data.datasourceimpl.SignDataSourceImpl
@@ -50,4 +52,8 @@ interface DataSourceModule {
     @Singleton
     @Binds
     fun bindTaxiDataSource(taxiDataSourceImpl: TaxiDataSourceImpl): TaxiDataSource
+
+    @Singleton
+    @Binds
+    fun bindPlanDataSource(planDataSourceImpl: PlanDataSourceImpl): PlanDataSource
 }

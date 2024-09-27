@@ -45,5 +45,6 @@ dependencies {
 
     implementation(project(":core-map"))
     implementation(project(":feature-rent"))
+    implementation(project(":feature-plan"))
     implementation(project(":feature-taxi"))
 }

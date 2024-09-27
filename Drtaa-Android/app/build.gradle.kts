@@ -63,7 +63,6 @@ android {
 dependencies {
     implementation(project(":feature-main"))
     implementation(project(":feature-sign"))
-    implementation(project(":core-data"))
 
     // Datastore
     implementation(libs.datastore.preferences)

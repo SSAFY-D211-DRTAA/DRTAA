@@ -7,5 +7,8 @@ data class RequestCallRent(
     val rentStartTime: String,
     val rentEndTime: String,
     val rentDptLat: Double,
-    val rentDptLon: Double
+    val rentDptLon: Double,
+    val datePlacesName: String,
+    val datePlacesCategory: String,
+    val datePlacesAddress: String,
 )

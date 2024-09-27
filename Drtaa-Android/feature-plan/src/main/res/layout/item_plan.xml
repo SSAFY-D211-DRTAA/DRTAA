@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="plan"
+            type="com.drtaa.core_model.plan.Plan.DayPlan.PlanItem" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <View
+            android:id="@+id/view_line"
+            android:layout_width="1dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="30dp"
+            android:background="@color/gray_d9d9"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/cv_plan"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_plan_view_mode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="@+id/view_line"
+            app:layout_constraintStart_toStartOf="@+id/view_line"
+            app:layout_constraintTop_toTopOf="@+id/view_line">
+
+            <View
+                android:id="@+id/view_circle_blue"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/circle_call"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_plan_order"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1"
+                android:textColor="@color/white"
+                app:layout_constraintBottom_toBottomOf="@+id/view_circle_blue"
+                app:layout_constraintEnd_toEndOf="@+id/view_circle_blue"
+                app:layout_constraintStart_toStartOf="@+id/view_circle_blue"
+                app:layout_constraintTop_toTopOf="@+id/view_circle_blue" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_plan_edit_mode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="visible"
+            app:layout_constraintEnd_toEndOf="@+id/view_line"
+            app:layout_constraintStart_toStartOf="@+id/view_line"
+            app:layout_constraintTop_toTopOf="@+id/view_line">
+
+            <View
+                android:id="@+id/view_circle_edit"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/circle_gray_d9d9"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/tv_plan_select"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:src="@drawable/ic_check"
+                android:textColor="@color/white"
+                android:padding="3dp"
+                app:layout_constraintBottom_toBottomOf="@+id/view_circle_edit"
+                app:layout_constraintEnd_toEndOf="@+id/view_circle_edit"
+                app:layout_constraintStart_toStartOf="@+id/view_circle_edit"
+                app:layout_constraintTop_toTopOf="@+id/view_circle_edit" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cv_plan"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="30dp"
+            android:layout_marginVertical="10dp"
+            app:cardCornerRadius="5dp"
+            app:cardElevation="3dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/view_line"
+            app:layout_constraintTop_toTopOf="parent"
+            app:strokeColor="@color/white">
+
+            <LinearLayout
+                android:id="@+id/ll_plan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="15dp"
+                android:paddingVertical="10dp">
+
+                <TextView
+                    android:id="@+id/tv_plan_title"
+                    style="@style/ptd_medium"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{plan.datePlacesName}"
+                    android:textSize="18sp"
+                    tools:text="경복궁" />
+
+                <TextView
+                    android:id="@+id/tv_plan_category"
+                    style="@style/ptd_medium"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{plan.datePlacesCategory}"
+                    android:textColor="@color/gray_5858"
+                    android:textSize="16sp"
+                    tools:text="관광명소" />
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

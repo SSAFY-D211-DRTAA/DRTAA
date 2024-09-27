@@ -10,5 +10,6 @@
     <include app:graph="@navigation/nav_graph_car" />
     <include app:graph="@navigation/nav_graph_rent" />
     <include app:graph="@navigation/nav_graph_payment"/>
+    <include app:graph="@navigation/nav_graph_plan"/>
 
 </navigation>

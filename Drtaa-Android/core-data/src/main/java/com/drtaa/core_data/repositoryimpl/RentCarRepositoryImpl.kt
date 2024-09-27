@@ -98,7 +98,7 @@ class RentCarRepositoryImpl @Inject constructor(
             ) {
                 is ResultWrapper.Success -> {
                     emit(Result.success(response.data.toCarPosition()))
-                    Timber.d("현재 렌트카 호출 성공")
+                    Timber.d("현재 렌트카 호출 성공 ${response.data}")
                 }
 
                 is ResultWrapper.GenericError -> {
