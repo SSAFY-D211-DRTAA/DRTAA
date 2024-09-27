@@ -368,6 +368,7 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
 
             if (qrRentId != null) {
                 showSnackBar("차량 ID: $qrCarId, 렌트 ID: $qrRentId")
+                Timber.tag("qr").d("차량 ID: $qrCarId, 렌트 ID: $qrRentId")
                 checkRentReservation(qrRentId, qrCarId)
             } else {
                 showSnackBar("잘못된 QR 코드 형식입니다.")
@@ -378,10 +379,15 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
     }
 
     private fun checkRentReservation(qrRentId: Long, qrCarId: Int) {
+        Timber.tag("qr").d("qrRentId: $qrRentId, qrCarId: $qrCarId")
         val currentRentDetail = carViewModel.currentRentDetail.value
+        Timber.tag("qr").d("$currentRentDetail")
         if (currentRentDetail != null) {
-            if (currentRentDetail.rentId == qrRentId && currentRentDetail.rentCarId == qrCarId) {
-                carViewModel.getOnCar(rentId = carViewModel.latestReservedId.value)
+//            if (currentRentDetail.rentId == qrRentId && currentRentDetail.rentCarId == qrCarId) {
+//                carViewModel.getOnCar(rentId = currentRentDetail.rentId!!)
+//            }
+            if (true) {
+                carViewModel.getOnCar(rentId = currentRentDetail.rentId!!)
             } else {
                 showSnackBar("배정된 차량이 아닙니다!")
             }

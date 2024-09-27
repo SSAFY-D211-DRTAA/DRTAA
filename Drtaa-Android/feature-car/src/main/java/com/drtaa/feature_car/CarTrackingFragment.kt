@@ -1,6 +1,6 @@
 package com.drtaa.feature_car
 
-import android.view.View
+import android.graphics.Color
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.flowWithLifecycle
@@ -36,9 +36,8 @@ class CarTrackingFragment :
 
     private val pathOverlay by lazy {
         PathOverlay().apply {
-            color = ContextCompat.getColor(requireContext(), com.drtaa.core_ui.R.color.blue_a0ba)
-            outlineColor =
-                ContextCompat.getColor(requireContext(), com.drtaa.core_ui.R.color.blue_a0ba_80)
+            color = Color.RED
+            outlineColor = Color.RED
             passedColor = ContextCompat.getColor(requireContext(), android.R.color.transparent)
             passedOutlineColor =
                 ContextCompat.getColor(requireContext(), android.R.color.transparent)
@@ -55,7 +54,6 @@ class CarTrackingFragment :
     override fun initOnMapReady(naverMap: NaverMap) {
         observeViewModelOnMap(naverMap)
         observeState()
-        viewModel.getRoute()
         binding.btnCall.setOnClickListener {
             showLoading()
             if (viewModel.currentRentDetail.value?.rentStatus == "reserved") {
@@ -83,6 +81,7 @@ class CarTrackingFragment :
                     dismissLoading()
                     viewModel.startPublish()
                     showSnackBar("MQTT 연결 성공")
+                    viewModel.getRoute()
                 } else if (status == -1) {
                     Timber.tag("mqtt").d("mqtt 연결 실패")
                 } else {
@@ -134,7 +133,7 @@ class CarTrackingFragment :
         }.launchIn(viewLifecycleOwner.lifecycleScope)
 
         viewModel.routeData.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach { routeData ->
-            if(routeData.isEmpty()) return@onEach
+            if (routeData.isEmpty()) return@onEach
             Timber.tag("pathFrag").d("$routeData")
             pathOverlay.apply {
                 coords = routeData.map { LatLng(it.lat, it.lon) }
@@ -145,17 +144,32 @@ class CarTrackingFragment :
 
     private fun pathOverlayProgress(gps: LatLng) {
         val path = viewModel.routeData.value
-        val end = path.last().index
-        Timber.tag("gps progress").d("$path || $end")
-        runCatching {
-            path.first {
-                it.lat == gps.latitude && it.lon == gps.longitude
-            }.index
-        }.onSuccess { progress ->
-            Timber.tag("gps progress").d("path and end: $path || $end -- ${(progress.toFloat() / end.toFloat()).toDouble()}")
-            pathOverlay.progress = (progress.toFloat() / end.toFloat()).toDouble()
-        }.onFailure {
-            Timber.tag("gps progress").d("매칭 안됨")
+        if (path.isNotEmpty()) {
+            val end = path.last().idx
+            Timber.tag("gps path").d("$path || $end")
+
+            // 허용 가능한 오차 범위 설정
+            val tolerance = 10.0 // meters
+
+            // 현재 GPS와 경로의 점들 간의 거리를 계산하여 tolerance 범위 내에서 가장 가까운 지점을 찾음
+            val closestPoint = path.minByOrNull { point ->
+                gps.distanceTo(LatLng(point.lat, point.lon))
+            }
+
+            // 가장 가까운 지점과의 거리가 tolerance 범위 이내일 경우에만 진행 상황 계산
+            closestPoint?.let { matchedPoint ->
+                val distanceToClosestPoint = gps.distanceTo(LatLng(matchedPoint.lat, matchedPoint.lon))
+                if (distanceToClosestPoint <= tolerance) {
+                    val progress = matchedPoint.idx
+                    Timber.tag("gps progress")
+                        .d("path and end: $path || $end -- ${(progress.toFloat() / end.toFloat()).toDouble()}")
+                    pathOverlay.progress = (progress.toFloat() / end.toFloat()).toDouble()
+                } else {
+                    Timber.tag("gps progress").d("매칭 안됨: 가장 가까운 지점이 허용 범위 밖입니다. $distanceToClosestPoint")
+                }
+            } ?: run {
+                Timber.tag("gps progress").d("매칭 안됨: 경로가 존재하지 않음.")
+            }
         }
     }
 

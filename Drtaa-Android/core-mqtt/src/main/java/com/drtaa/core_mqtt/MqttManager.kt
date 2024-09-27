@@ -94,6 +94,7 @@ class MqttManager @Inject constructor() {
             .addSubscription(mqtt5Subscription(GPS_PUB))
             .addSubscription(mqtt5Subscription(PATH_PUB))
             .callback { publish: Mqtt5Publish ->
+                Timber.tag(TAG).d("$publish")
                 val topic = publish.topic.toString()
                 val message = String(publish.payloadAsBytes)
                 CoroutineScope(Dispatchers.IO).launch {
