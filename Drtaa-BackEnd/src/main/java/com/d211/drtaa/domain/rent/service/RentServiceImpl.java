@@ -13,8 +13,10 @@ import com.d211.drtaa.domain.rent.repository.RentRepository;
 import com.d211.drtaa.domain.rent.repository.car.RentCarRepository;
 import com.d211.drtaa.domain.rent.repository.car.RentCarScheduleRepository;
 import com.d211.drtaa.domain.rent.repository.history.RentHistoryRepository;
+import com.d211.drtaa.domain.travel.entity.DatePlaces;
 import com.d211.drtaa.domain.travel.entity.Travel;
 import com.d211.drtaa.domain.travel.entity.TravelDates;
+import com.d211.drtaa.domain.travel.repository.DatePlacesRepository;
 import com.d211.drtaa.domain.travel.repository.TravelDatesRepository;
 import com.d211.drtaa.domain.travel.repository.TravelRepository;
 import com.d211.drtaa.domain.user.entity.User;
@@ -63,6 +65,7 @@ public class RentServiceImpl implements RentService{
     private final FcmUtil fcmUtil;
     private final WebSocketConfig webSocketConfig;
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final DatePlacesRepository datePlacesRepository;
 
     @Override
     public List<RentResponseDTO> getAllRent(String userProviderId) {
@@ -304,6 +307,26 @@ public class RentServiceImpl implements RentService{
             // 다음날로 이동
             startDate = startDate.plusDays(1);
         }
+
+        // 첫 번째 일정 찾기
+        TravelDates firstTravelDate = travelDatesRepository.findFirstByTravelOrderByTravelDatesDateAsc(travel)
+                .orElseThrow(() -> new RuntimeException("여행 일정이 존재하지 않습니다."));
+
+        // 여행 별 일정의 첫번째 일정에 탑승 장소 추가하기
+        DatePlaces dptPlace = DatePlaces.builder()
+                .travel(travel)
+                .travelDates(firstTravelDate)
+                .datePlacesOrder(1)
+                .datePlacesName(rentCreateRequestDTO.getDatePlacesName())
+                .datePlacesCategory(rentCreateRequestDTO.getDatePlacesCategory())
+                .datePlacesAddress(rentCreateRequestDTO.getDatePlacesAddress())
+                .datePlacesLat(rentCreateRequestDTO.getRentDptLat())
+                .datePlacesLon(rentCreateRequestDTO.getRentDptLon())
+                .datePlacesIsVisited(false)
+                .build();
+
+        // 추가한 장소 저장
+        datePlacesRepository.save(dptPlace);
 
         // 렌트 생성
         Rent rent = Rent.builder()

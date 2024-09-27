@@ -51,4 +51,5 @@ public class RentDetailResponseDTO {
     // travel
     @Schema(description = "여행 고유 번호", example = "1")
     private Long travelId;
+
 }
