@@ -27,7 +27,7 @@ class AStarPathPublisher:
         # rospy.Subscriber('/initialpose', PoseWithCovarianceStamped, self.init_callback) 
         rospy.Subscriber('/odom', Odometry, self.odom_callback)
         self.global_path_pub = rospy.Publisher('/global_path', Path, queue_size=1)
-        self.global_path_once_pub = rospy.Publisher('/global_path_once', Path, queue_size=1)
+        # self.global_path_once_pub = rospy.Publisher('/global_path_once', Path, queue_size=1)
         self.destination_reached_pub = rospy.Publisher('/complete_drive', PoseStamped, queue_size=1)
 
         self.event_cmd_client = rospy.ServiceProxy('/Service_MoraiEventCmd', MoraiEventCmdSrv)
@@ -62,25 +62,18 @@ class AStarPathPublisher:
         rate = rospy.Rate(1) # 1Hz
         while not rospy.is_shutdown():
             if self.global_path_msg is not None:
-                self.global_path_pub.publish(self.global_path_msg)
+                # self.global_path_pub.publish(self.global_path_msg)
 
                 if self.is_global_path_once_pub is not True:
-                    self.global_path_once_pub.publish(self.global_path_msg)
+                    self.global_path_pub.publish(self.global_path_msg)
                     self.is_global_path_once_pub = True
 
                     # Change ctrl_mode to automode
                     event_info = EventInfo()
                     event_info.option = 1  # ctrl_mode option
                     event_info.ctrl_mode = 3  # automode
+                    self.event_cmd_client(event_info)
                     
-                    try:
-                        response = self.event_cmd_client(event_info)
-                        if response.success:
-                            rospy.loginfo("Control mode changed to automode.")
-                        else:
-                            rospy.logwarn("Failed to change control mode.")
-                    except rospy.ServiceException as e:
-                        rospy.logerr(f"Service call failed: {e}")
             # else:
             #     rospy.loginfo('Waiting for goal and current position data')
             rate.sleep()
@@ -169,6 +162,7 @@ class AStarPathPublisher:
             if self.global_path_msg is not None:
                 rospy.loginfo("Global path calculated and fixed")
                 self.is_goal_pose = False
+                self.is_global_path_once_pub = False
                 return
 
     def calc_astar_path_node(self, start_node, end_node):

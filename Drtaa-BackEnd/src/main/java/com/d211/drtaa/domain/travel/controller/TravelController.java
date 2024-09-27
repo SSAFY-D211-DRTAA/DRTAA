@@ -1,9 +1,10 @@
 package com.d211.drtaa.domain.travel.controller;
 
 import com.d211.drtaa.domain.travel.dto.request.PlacesAddRequestDTO;
-import com.d211.drtaa.domain.travel.dto.request.PlacesUpdateRequestDTO;
+import com.d211.drtaa.domain.travel.dto.request.TravelDetailRequestDTO;
 import com.d211.drtaa.domain.travel.dto.request.TravelNameRequestDTO;
 import com.d211.drtaa.domain.travel.dto.response.TravelDetailResponseDTO;
+import com.d211.drtaa.domain.travel.dto.response.TravelResponseDTO;
 import com.d211.drtaa.domain.travel.service.TravelService;
 import com.d211.drtaa.global.exception.travel.TravelNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,7 +13,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.parameters.P;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/travel")
@@ -22,6 +29,54 @@ import org.springframework.web.bind.annotation.*;
 public class TravelController {
 
     private final TravelService travelService;
+
+    @GetMapping
+    @Operation(summary = "여행 전체 조회", description = "사용자의 모든 여행 일정 조회")
+    public ResponseEntity getAllTravels(Authentication authentication) {
+        try {
+            List<TravelResponseDTO> response = travelService.getAllTravels(authentication.getName());
+
+            return ResponseEntity.ok(response);
+        } catch (UsernameNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
+        } catch (AuthenticationException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("권한 인증에 실패하였습니다."); // 401
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
+        }
+    }
+
+    @GetMapping("/status/completed")
+    @Operation(summary = "완료된 여행 조회", description = "해당 회원의 완료된 렌트의 여행 조회")
+    public ResponseEntity getAllTravelsCompleted(Authentication authentication) {
+        try {
+            List<TravelResponseDTO> response = travelService.getAllTravelsCompleted(authentication.getName());
+
+            return ResponseEntity.ok(response);
+        } catch (UsernameNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
+        } catch (AuthenticationException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("권한 인증에 실패하였습니다."); // 401
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
+        }
+    }
+
+    @GetMapping("/status/active")
+    @Operation(summary = "진행중 & 예약된 여행 조회", description = "해당 회원의 진행중인 렌트의 여행 한개와 예약된 렌트의 여행 전체 조회")
+    public ResponseEntity getAllTravelsActive(Authentication authentication) {
+        try {
+            List<TravelResponseDTO> response = travelService.getAllTravelsActive(authentication.getName());
+
+            return ResponseEntity.ok(response);
+        } catch (UsernameNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
+        } catch (AuthenticationException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("권한 인증에 실패하였습니다."); // 401
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
+        }
+    }
 
     @GetMapping("/{travelId}")
     @Operation(summary = "여행 상세 조회", description = "travelId의 해당하는 여행 일정 전체를 조회")
@@ -67,9 +122,9 @@ public class TravelController {
 
     @PutMapping
     @Operation(summary = "여행 일정 장소 변경", description = "travelId의 해당하고 travelDatesId의 해당하는 여행 장소들 변경")
-    public ResponseEntity updateTravelDatesPlaces(@RequestBody PlacesUpdateRequestDTO placesUpdateRequestDTO) {
+    public ResponseEntity updateTravelDatesPlaces(@RequestBody TravelDetailRequestDTO travelDetailRequestDTO) {
         try {
-            travelService.updateTravelDatesPlaces(placesUpdateRequestDTO);
+            travelService.updateTravelDatesPlaces(travelDetailRequestDTO);
 
             return ResponseEntity.ok("Success"); // 200
         } catch(TravelNotFoundException e) {

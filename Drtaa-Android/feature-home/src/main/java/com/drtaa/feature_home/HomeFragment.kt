@@ -46,5 +46,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         binding.btnHomeRentHistory.setOnClickListener {
             navigateDestination(R.id.action_homeFragment_to_rentHistoryFragment)
         }
+
+        binding.btnHomePlan.setOnClickListener {
+            navigateDestination(R.id.action_homeFragment_to_nav_graph_plan)
+        }
     }
 }

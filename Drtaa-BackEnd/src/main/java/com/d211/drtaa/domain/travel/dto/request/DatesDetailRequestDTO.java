@@ -6,17 +6,20 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 @Data
 @AllArgsConstructor
 @Getter
-public class PlacesUpdateRequestDTO {
-    @Schema(description = "여행 고유 번호", example = "1")
-    private Long travelId;
+public class DatesDetailRequestDTO {
+    @Schema(description = "여행 고유번호", example = "1")
+    private long travelId;
     @Schema(description = "여행 일정 고유번호", example = "1")
     private Long travelDatesId;
+    @Schema(description = "여행 일정 날짜", example = "2024/01/01")
+    private LocalDate travelDatesDate;
 
-    List<PlacesDetailResponseDTO> places = new ArrayList<>();
+    private List<PlacesDetailRequestDTO> placesDetail = new ArrayList<>();
 }

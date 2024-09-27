@@ -1,18 +1,18 @@
 package com.d211.drtaa.domain.travel.service;
 
-import com.d211.drtaa.domain.travel.dto.request.PlacesAddRequestDTO;
-import com.d211.drtaa.domain.travel.dto.request.PlacesUpdateRequestDTO;
-import com.d211.drtaa.domain.travel.dto.request.TravelNameRequestDTO;
-import com.d211.drtaa.domain.travel.dto.response.DatesDetailResponseDTO;
-import com.d211.drtaa.domain.travel.dto.response.PlacesDetailResponseDTO;
-import com.d211.drtaa.domain.travel.dto.response.TravelDetailResponseDTO;
-import com.d211.drtaa.domain.travel.dto.response.WeatherResponseDTO;
+import com.d211.drtaa.domain.rent.entity.Rent;
+import com.d211.drtaa.domain.rent.entity.RentStatus;
+import com.d211.drtaa.domain.rent.repository.RentRepository;
+import com.d211.drtaa.domain.travel.dto.request.*;
+import com.d211.drtaa.domain.travel.dto.response.*;
 import com.d211.drtaa.domain.travel.entity.DatePlaces;
 import com.d211.drtaa.domain.travel.entity.Travel;
 import com.d211.drtaa.domain.travel.entity.TravelDates;
 import com.d211.drtaa.domain.travel.repository.DatePlacesRepository;
 import com.d211.drtaa.domain.travel.repository.TravelDatesRepository;
 import com.d211.drtaa.domain.travel.repository.TravelRepository;
+import com.d211.drtaa.domain.user.entity.User;
+import com.d211.drtaa.domain.user.repository.UserRepository;
 import com.d211.drtaa.global.exception.travel.TravelNotFoundException;
 import com.d211.drtaa.global.service.weather.WeatherService;
 import jakarta.persistence.EntityManager;
@@ -20,10 +20,12 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -41,6 +43,99 @@ public class TravelServiceImpl implements TravelService {
     private final TravelRepository travelRepository;
     private final TravelDatesRepository travelDatesRepository;
     private final DatePlacesRepository datePlacesRepository;
+    private final UserRepository userRepository;
+    private final RentRepository rentRepository;
+
+    @Override
+    public List<TravelResponseDTO> getAllTravels(String userProviderId) {
+        // 사용자 찾기
+        User user = userRepository.findByUserProviderId(userProviderId)
+                .orElseThrow(() -> new UsernameNotFoundException("해당 userProviderId의 맞는 회원을 찾을 수 없습니다."));
+
+        // 사용자의 렌트 찾기
+        List<Rent> rents = rentRepository.findByUser(user);
+
+        // 사용자의 여행 찾기
+        List<TravelResponseDTO> travels = new ArrayList<>();
+        for(Rent rent : rents) {
+            // 여행 찾기
+            Travel travel = rent.getTravel();
+
+            TravelResponseDTO dto = TravelResponseDTO.builder()
+                    .rentId(rent.getRentId())
+                    .rentStatus(rent.getRentStatus())
+                    .travelId(travel.getTravelId())
+                    .travelName(travel.getTravelName())
+                    .travelStartDate(travel.getTravelStartDate())
+                    .travelEndDate(travel.getTravelEndDate())
+                    .build();
+
+            travels.add(dto);
+        }
+
+        return travels;
+    }
+
+    @Override
+    public List<TravelResponseDTO> getAllTravelsCompleted(String userProviderId) {
+        // 사용자 찾기
+        User user = userRepository.findByUserProviderId(userProviderId)
+                .orElseThrow(() -> new UsernameNotFoundException("해당 userProviderId의 맞는 회원을 찾을 수 없습니다."));
+
+        // 사용자의 완료된 렌트 찾기
+        List<Rent> rents = rentRepository.findByUserAndRentStatusCompleted(user);
+
+        // 사용자의 여행 찾기
+        List<TravelResponseDTO> travels = new ArrayList<>();
+        for(Rent rent : rents) {
+            // 여행 찾기
+            Travel travel = rent.getTravel();
+
+            TravelResponseDTO dto = TravelResponseDTO.builder()
+                    .rentId(rent.getRentId())
+                    .rentStatus(rent.getRentStatus())
+                    .travelId(travel.getTravelId())
+                    .travelName(travel.getTravelName())
+                    .travelStartDate(travel.getTravelStartDate())
+                    .travelEndDate(travel.getTravelEndDate())
+                    .build();
+
+            travels.add(dto);
+        }
+
+        return travels;
+    }
+
+    @Override
+    public List<TravelResponseDTO> getAllTravelsActive(String userProviderId) {
+        // 사용자 찾기
+        User user = userRepository.findByUserProviderId(userProviderId)
+                .orElseThrow(() -> new UsernameNotFoundException("해당 userProviderId의 맞는 회원을 찾을 수 없습니다."));
+
+        // 사용자의 진행중 & 예약된 렌트 찾기
+        List<Rent> rents = rentRepository.findByUserAndRentStatusInOrderByRentStatusDesc(
+                user, Arrays.asList(RentStatus.in_progress, RentStatus.reserved));
+
+        // 사용자의 여행 찾기
+        List<TravelResponseDTO> travels = new ArrayList<>();
+        for(Rent rent : rents) {
+            // 여행 찾기
+            Travel travel = rent.getTravel();
+
+            TravelResponseDTO dto = TravelResponseDTO.builder()
+                    .rentId(rent.getRentId())
+                    .rentStatus(rent.getRentStatus())
+                    .travelId(travel.getTravelId())
+                    .travelName(travel.getTravelName())
+                    .travelStartDate(travel.getTravelStartDate())
+                    .travelEndDate(travel.getTravelEndDate())
+                    .build();
+
+            travels.add(dto);
+        }
+
+        return travels;
+    }
 
     @Override
     public TravelDetailResponseDTO getTravel(Long travelId) {
@@ -58,7 +153,9 @@ public class TravelServiceImpl implements TravelService {
             // 일정 장소 DTO 리스트 생성
             List<PlacesDetailResponseDTO> placesDtoList = placesList.stream().map(places ->
                     PlacesDetailResponseDTO.builder()
+                            .travelDatesId(places.getTravelDates().getTravelDatesId())
                             .datePlacesId(places.getDatePlacesId())
+                            .datePlacesOrder(places.getDatePlacesOrder())
                             .datePlacesName(places.getDatePlacesName())
                             .datePlacesCategory(places.getDatePlacesCategory())
                             .datePlacesAddress(places.getDatePlacesAddress())
@@ -70,6 +167,7 @@ public class TravelServiceImpl implements TravelService {
 
             // 일정 DTO 생성
             return DatesDetailResponseDTO.builder()
+                    .travelId(dates.getTravel().getTravelId())
                     .travelDatesId(dates.getTravelDatesId())
                     .travelDatesDate(dates.getTravelDatesDate())
                     .placesDetail(placesDtoList) // 일정 장소 리스트를 설정
@@ -78,6 +176,7 @@ public class TravelServiceImpl implements TravelService {
 
         // 최종 여행 DTO 생성
         TravelDetailResponseDTO dto = TravelDetailResponseDTO.builder()
+                .travelId(travel.getTravelId())
                 .travelName(travel.getTravelName())
                 .travelStartDate(travel.getTravelStartDate())
                 .travelEndDate(travel.getTravelEndDate())
@@ -125,36 +224,51 @@ public class TravelServiceImpl implements TravelService {
 
     @Override
     @Transactional
-    public void updateTravelDatesPlaces(PlacesUpdateRequestDTO placesUpdateRequestDTO) {
+    public void updateTravelDatesPlaces(TravelDetailRequestDTO travelDetailRequestDTO) {
         // 여행 찾기
-        Travel travel = travelRepository.findByTravelId(placesUpdateRequestDTO.getTravelId())
+        Travel travel = travelRepository.findByTravelId(travelDetailRequestDTO.getTravelId())
                 .orElseThrow(() -> new TravelNotFoundException("해당 travelId의 맞는 여행을 찾을 수 없습니다."));
 
-        // 여행 일정 찾기
-        TravelDates dates = travelDatesRepository.findByTravelDatesId(placesUpdateRequestDTO.getTravelDatesId())
-                .orElseThrow(() -> new TravelNotFoundException("해당 travelDatesId의 맞는 일정을 찾을 수 없습니다."));
+        // 여행 일정 리스트 찾기
+        List<DatesDetailRequestDTO> datesList = travelDetailRequestDTO.getDatesDetail();
 
-        // 이전 일정 모두 지우기
-        datePlacesRepository.deleteAllByTravelDates(dates);
+        // 여행 일정 별 반복
+        for(DatesDetailRequestDTO date : datesList) {
+            // 일정 찾기
+            TravelDates dates = travelDatesRepository.findByTravelDatesId(date.getTravelDatesId())
+                    .orElseThrow(() -> new TravelNotFoundException("TravelDatesId에 해당하는 일정이 없습니다."));
+            log.info("dates: {}", dates);
 
-        // 기본값 auto_increment를 1로 설정해야 하는 쿼리문 수행
-        entityManager.createNativeQuery("ALTER TABLE date_places AUTO_INCREMENT = 1").executeUpdate();
+            // travelId와 travelDatesId에 해당하는 일정들 삭제
+            datePlacesRepository.deleteAllByTravelAndTravelDates(travel, dates);
+            log.info("일정 삭제 완료");
 
-        // 전달 받은 placesUpdateRequestDTO내 places리스트 자료들 저장
-        for(PlacesDetailResponseDTO places: placesUpdateRequestDTO.getPlaces()) {
-            // 생성
-            DatePlaces place = DatePlaces.builder()
-                    .travelDates(dates)
-                    .datePlacesName(places.getDatePlacesName())
-                    .datePlacesCategory(places.getDatePlacesCategory())
-                    .datePlacesAddress(places.getDatePlacesAddress())
-                    .datePlacesLat(places.getDatePlacesLat())
-                    .datePlacesLon(places.getDatePlacesLon())
-                    .datePlacesIsVisited(places.getDatePlacesIsVisited())
-                    .build();
+            // 입력받은 여행 일정 별 장소
+            List<PlacesDetailRequestDTO> placesDetail = date.getPlacesDetail();
 
-            // 저장
-            datePlacesRepository.save(place);
+            if (placesDetail != null && !placesDetail.isEmpty()) {
+                // 일정 장소 별 반복해 리스트에 추가
+                for (int i = 1; i <= placesDetail.size(); i++) {
+                    PlacesDetailRequestDTO placeDetail = placesDetail.get(i - 1);
+
+                    DatePlaces datePlaces = DatePlaces.builder()
+                            .travel(travel)
+                            .travelDates(dates)
+                            .datePlacesOrder(i)
+                            .datePlacesName(placeDetail.getDatePlacesName())
+                            .datePlacesCategory(placeDetail.getDatePlacesCategory())
+                            .datePlacesAddress(placeDetail.getDatePlacesAddress())
+                            .datePlacesLat(placeDetail.getDatePlacesLat())
+                            .datePlacesLon(placeDetail.getDatePlacesLon())
+                            .datePlacesIsVisited(placeDetail.getDatePlacesIsVisited())
+                            .build();
+
+                    log.info("{} 일정 추가", placeDetail.getDatePlacesName());
+                    datePlacesRepository.saveAndFlush(datePlaces);
+
+                    log.info("저장 완료");
+                }
+            }
         }
     }
 

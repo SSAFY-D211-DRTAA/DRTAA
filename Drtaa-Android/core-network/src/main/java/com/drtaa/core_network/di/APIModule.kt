@@ -5,7 +5,7 @@ import com.drtaa.core_network.api.PaymentAPI
 import com.drtaa.core_network.api.RentAPI
 import com.drtaa.core_network.api.RentCarAPI
 import com.drtaa.core_network.api.SignAPI
-import com.drtaa.core_network.api.TestAPI
+import com.drtaa.core_network.api.PlanAPI
 import com.drtaa.core_network.api.TourAPI
 import dagger.Module
 import dagger.Provides
@@ -19,13 +19,6 @@ import javax.inject.Singleton
 object APIModule {
     const val MAP_SEARCH_URL = "https://openapi.naver.com/v1/search/"
     const val TOUR_URL = "http://apis.data.go.kr/B551011/KorService1/"
-
-    @Singleton
-    @Provides
-    fun provideTestAPI(
-        @DefaultRetrofit
-        retrofit: Retrofit
-    ): TestAPI = retrofit.create(TestAPI::class.java)
 
     @Singleton
     @NoAuth
@@ -85,4 +78,11 @@ object APIModule {
     ): RentCarAPI {
         return retrofit.create(RentCarAPI::class.java)
     }
+
+    @Singleton
+    @Provides
+    fun providePlanAPI(
+        @AuthRetrofit
+        retrofit: Retrofit
+    ): PlanAPI = retrofit.create(PlanAPI::class.java)
 }

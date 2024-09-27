@@ -57,7 +57,6 @@ class RentViewModel @Inject constructor(
                 lng = default_position.longitude,
                 lat = default_position.latitude
             )
-//            _rentStartLocation.value = search
             _rentStartLocation.value = jungryujang
         }
     }
