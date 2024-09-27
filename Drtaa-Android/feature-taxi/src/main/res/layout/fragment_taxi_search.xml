@@ -7,6 +7,7 @@
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/cl_taxi_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -15,17 +16,16 @@
             android:id="@+id/mv_taximap"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:layout_marginBottom="20dp"
+                app:srcCompat="@drawable/ic_center_marker" />
         </com.naver.maps.map.MapView>
 
-
-        <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            app:layout_anchor="@+id/mv_taximap"
-            app:layout_anchorGravity="center"
-            android:layout_marginBottom="40dp"
-            app:srcCompat="@drawable/ic_center_marker" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/cl_taxi_search_bottom_sheet"

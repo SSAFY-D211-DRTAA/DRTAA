@@ -5,15 +5,19 @@ import android.os.Build
 import android.view.KeyEvent
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.viewModels
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import com.drtaa.core_map.LOCATION_PERMISSION_REQUEST_CODE
+import com.drtaa.core_map.MAX_ZOOM
+import com.drtaa.core_map.MIN_ZOOM
 import com.drtaa.core_map.base.BaseMapFragment
 import com.drtaa.core_map.moveCameraTo
 import com.drtaa.core_map.setCustomLocationButton
+import com.drtaa.core_map.setup
 import com.drtaa.core_model.map.Search
 import com.drtaa.core_ui.hideKeyboard
 import com.drtaa.core_ui.showSnackBar
@@ -24,6 +28,7 @@ import com.drtaa.feature_taxi.viewmodel.TaxiViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
 import com.naver.maps.geometry.LatLng
+import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.LocationTrackingMode
 import com.naver.maps.map.MapView
 import com.naver.maps.map.NaverMap
@@ -67,6 +72,7 @@ class TaxiSearchFragment :
         locationSource = FusedLocationSource(this, LOCATION_PERMISSION_REQUEST_CODE)
         naverMap.locationTrackingMode = LocationTrackingMode.Follow
 
+        naverMap.moveCamera(CameraUpdate.zoomTo(DEFAULT_ZOOM))
         initObserve(naverMap)
     }
 
@@ -81,7 +87,6 @@ class TaxiSearchFragment :
         taxiSearchListAdapter.setItemClickListener(object :
             TaxiSearchListAdapter.ItemClickListener {
             override fun onItemClicked(search: Search) {
-//                taxiSearchViewModel.setSelectedSearchItem(search)
                 naverMap.moveCameraTo(search.lat, search.lng)
                 naverMap.setContentPadding(0, 0, 0, MAP_BOTTOM_CONTENT_PADDING)
             }
@@ -120,57 +125,33 @@ class TaxiSearchFragment :
                             if (it.isSuccess) {
                                 taxiSearchViewModel.setSelectedSearchItem(
                                     Search(
-                                        "${result}",
+                                        "${result.getOrNull()}",
                                         "",
                                         "",
                                         center.longitude,
                                         center.latitude
                                     )
                                 )
-                                Timber.d("선택된 주소 : ${result}")
+                                Timber.d("선택된 주소 : ${result.getOrNull()}")
+                                delay(100)
+                                Timber.d("주소 선택 ${taxiSearchViewModel.selectedSearchItem.value}")
+                                if (args.isStartLocation) {
+                                    taxiViewModel.setTaxiStartLocation(taxiSearchViewModel.selectedSearchItem.value!!)
+                                } else {
+                                    taxiViewModel.setTaxiEndLocation(taxiSearchViewModel.selectedSearchItem.value!!)
+                                }
+                                navigatePopBackStack()
                             } else {
                                 showSnackBar("주소를 가져오는데 실패 했습니다.")
                             }
                         }
                     }
                 }
-
-                //위에서 getReverseGeocode로 응답 받은 정보를 확인해서 성공이면
-                //밑에 setSelectedSearchItem에 값을 넣고 싶어
-//                taxiSearchViewModel.setSelectedSearchItem(
-//                    Search(
-//                        taxiSearchViewModel.reverseGeocode.toString(),
-//                        "",
-//                        "",
-//                        center.longitude,
-//                        center.latitude
-//                    )
-//                )
-//                Timber.d("${taxiSearchViewModel.selectedSearchItem}")
-//                if (taxiSearchViewModel.selectedSearchItem.value != null) {
-//                    if (args.isStartLocation) {
-//                        taxiViewModel.setTaxiStartLocation(taxiSearchViewModel.selectedSearchItem.value!!)
-//                    } else {
-//                        taxiViewModel.setTaxiEndLocation(taxiSearchViewModel.selectedSearchItem.value!!)
-//                    }
-//                    navigatePopBackStack()
-//                } else {
-//                    showSnackBar("장소를 선택해주세요")
-//                }
             }
         }
     }
 
     private fun initObserve(naverMap: NaverMap) {
-        taxiSearchViewModel.selectedSearchItem.flowWithLifecycle(viewLifecycleOwner.lifecycle)
-            .onEach { seleted ->
-                seleted?.let {
-//                    naverMap.setMarker(seleted.lat, seleted.lng)
-//                    naverMap.moveCameraTo(seleted.lat, seleted.lng)
-//                    naverMap.setContentPadding(0, 0, 0, MAP_BOTTOM_CONTENT_PADDING)
-                }
-            }.launchIn(viewLifecycleOwner.lifecycleScope)
-
         taxiSearchViewModel.reverseGeocode.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { result ->
                 result?.onSuccess { data ->
@@ -185,17 +166,13 @@ class TaxiSearchFragment :
         taxiSearchViewModel.searchList.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { result ->
                 result.onSuccess { data ->
-                    binding.layoutTaxiSearchBottomSheet.tvSearchBefore.visibility = View.GONE
                     taxiSearchListAdapter.submitList(data)
                     binding.apply {
                         if (data.isEmpty()) {
                             layoutTaxiSearchBottomSheet.tvSearchNothing.visibility =
                                 View.VISIBLE
-                            layoutTaxiSearchBottomSheet.btnSearchSelect.visibility = View.GONE
                         } else {
                             layoutTaxiSearchBottomSheet.tvSearchNothing.visibility = View.GONE
-                            layoutTaxiSearchBottomSheet.btnSearchSelect.visibility =
-                                View.VISIBLE
                         }
                     }
                 }.onFailure {
@@ -206,10 +183,9 @@ class TaxiSearchFragment :
 
     private fun initBottomSheet() {
         binding.layoutTaxiSearchBottomSheet.tvSearchNothing.visibility = View.GONE
-        binding.layoutTaxiSearchBottomSheet.btnSearchSelect.visibility = View.GONE
 
         behavior = BottomSheetBehavior.from(binding.clTaxiSearchBottomSheet)
-        behavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        behavior.state = BottomSheetBehavior.STATE_EXPANDED
         behavior.isHideable = false
 
         behavior.peekHeight = BOTTOM_SHEET_PEEK_HEIGHT
@@ -246,8 +222,9 @@ class TaxiSearchFragment :
     }
 
     companion object {
-        const val BOTTOM_SHEET_PEEK_HEIGHT = 500
+        const val BOTTOM_SHEET_PEEK_HEIGHT = 300
         const val MAP_BOTTOM_CONTENT_PADDING = 100
+        const val DEFAULT_ZOOM = 17.4
     }
 }
 

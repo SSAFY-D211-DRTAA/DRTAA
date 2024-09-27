@@ -29,9 +29,8 @@ class TaxiSearchViewModel @Inject constructor(
     val reverseGeocode: StateFlow<Result<String>?> = _reverseGeocode
 
     fun setSelectedSearchItem(search: Search) {
-        viewModelScope.launch {
-            _selectedSearchItem.emit(search)
-        }
+        _selectedSearchItem.value = search
+        Timber.d("뷰모델 선택된 주소 : ${search}")
     }
 
     fun getSearchList(keyword: String) {
