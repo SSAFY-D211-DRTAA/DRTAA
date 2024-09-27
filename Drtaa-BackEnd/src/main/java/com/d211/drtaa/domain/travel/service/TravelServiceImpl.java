@@ -13,6 +13,7 @@ import com.d211.drtaa.domain.travel.repository.TravelDatesRepository;
 import com.d211.drtaa.domain.travel.repository.TravelRepository;
 import com.d211.drtaa.domain.user.entity.User;
 import com.d211.drtaa.domain.user.repository.UserRepository;
+import com.d211.drtaa.global.exception.rent.RentNotFoundException;
 import com.d211.drtaa.global.exception.travel.TravelNotFoundException;
 import com.d211.drtaa.global.service.weather.WeatherService;
 import jakarta.persistence.EntityManager;
@@ -270,6 +271,23 @@ public class TravelServiceImpl implements TravelService {
                 }
             }
         }
+
+        // 첫번째 날 첫번째 장소는 탑승장소이므로 렌트의 탑승 장소 변경하기
+        DatesDetailRequestDTO date = datesList.get(0);
+        PlacesDetailRequestDTO placeDetail = date.getPlacesDetail().get(0);
+        double rentDptLat = placeDetail.getDatePlacesLat();
+        double rentDptLon = placeDetail.getDatePlacesLon();
+
+        // 렌트 찾기
+        Rent rent = rentRepository.findByTravel(travel)
+                .orElseThrow(() -> new RentNotFoundException("해당 travelId의 맞는 렌트를 찾을 수 없습니다."));
+
+        // 렌트 탑승 장소 위도, 경도 변경
+        rent.setRentDptLat(rentDptLat);
+        rent.setRentDptLon(rentDptLon);
+
+        // 렌트 변경 상태 저장
+        rentRepository.save(rent);
     }
 
     @Override

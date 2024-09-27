@@ -2,6 +2,7 @@ package com.d211.drtaa.domain.rent.repository;
 
 import com.d211.drtaa.domain.rent.entity.Rent;
 import com.d211.drtaa.domain.rent.entity.RentStatus;
+import com.d211.drtaa.domain.travel.entity.Travel;
 import com.d211.drtaa.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -12,8 +13,8 @@ import java.util.Optional;
 
 public interface RentRepository extends JpaRepository<Rent, Long> {
     // find
-    List<Rent> findByUser(User user);
     Optional<Rent> findByRentId(Long rentId);
+    Optional<Rent> findByTravel(Travel travel);
     @Query("SELECT r FROM Rent r " +
             "JOIN FETCH r.rentCar rc " +
             "WHERE r.rentStatus = 'in_progress' " +
@@ -21,11 +22,6 @@ public interface RentRepository extends JpaRepository<Rent, Long> {
             "AND r.rentStartTime <= CURRENT_TIMESTAMP " +
             "AND r.rentEndTime > CURRENT_TIMESTAMP")
     Optional<Rent> findCurrentRentByUserProviderId(String userProviderId);
-    @Query("SELECT r FROM Rent r " +
-            "WHERE r.user = :user AND r.rentStatus = 'completed'")
-    List<Rent> findByUserAndRentStatusCompleted(User user);
-    List<Rent> findByUserAndRentStatusInOrderByRentStatusDesc(User user, List<RentStatus> rentStatuses);
-    List<Rent> findByRentStartTimeBetween(LocalDateTime startDate, LocalDateTime endDate);
     Optional<Rent> findFirstByRentCar_RentCarIdAndRentStatusAndRentStartTimeLessThanEqualAndRentEndTimeGreaterThanEqual(
             Long rentCarId,
             RentStatus rentStatus,
@@ -33,9 +29,21 @@ public interface RentRepository extends JpaRepository<Rent, Long> {
             LocalDateTime rentEndTime
     );
 
-
+    List<Rent> findByUser(User user);
+    List<Rent> findByUserAndRentStatusInOrderByRentStatusDesc(User user, List<RentStatus> rentStatuses);
+    List<Rent> findByRentStartTimeBetween(LocalDateTime startDate, LocalDateTime endDate);
+    @Query("SELECT r FROM Rent r " +
+            "WHERE r.user = :user AND r.rentStatus = 'completed'")
+    List<Rent> findByUserAndRentStatusCompleted(User user);
 
     // exists
-    boolean existsByUserAndRentStatusAndRentStartTimeBetweenOrRentEndTimeBetween(User user, RentStatus rentStatus, LocalDateTime localDateTime, LocalDateTime localDateTime1, LocalDateTime localDateTime2, LocalDateTime localDateTime3);
+    boolean existsByUserAndRentStatusAndRentStartTimeBetweenAndRentEndTimeBetween(
+            User user,
+            RentStatus rentStatus,
+            LocalDateTime rentStartTimeStart,
+            LocalDateTime rentStartTimeEnd,
+            LocalDateTime rentEndTimeStart,
+            LocalDateTime rentEndTimeEnd
+    );
 
 }
