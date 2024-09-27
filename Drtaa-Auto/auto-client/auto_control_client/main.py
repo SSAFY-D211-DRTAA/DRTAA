@@ -269,8 +269,9 @@ def on_ros_bridge_message(ws: WebSocketApp, message: str) -> None:
                         json.dump(complete_data, f)
                 except IOError as e:
                     logger.error(f"완료 데이터를 파일에 저장하는 중 오류 발생: {e}")
-                
-                send_to_ec2(data)
+
+                send_to_ec2(complete_data)
+                rent_car_api_client.send_arrival_info(rent_car_id=1, expected_minutes=0, arrived=True)
 
             elif data['topic'] == GLOBAL_PATH_TOPIC:
                 path_data = data['msg']

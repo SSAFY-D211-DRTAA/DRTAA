@@ -9,7 +9,7 @@ main_logger = setup_logger(__name__)
 # MQTT 메시지 처리 관련 로거
 message_logger = setup_logger('message_logger', 'mqtt_messages.log', logging.INFO)
 
-class MQTTClient:
+class MQTTClient():
     def __init__(self, broker='mqtt-broker', port=1883, topic="vehicle_control"):
         self.broker = broker
         self.port = port

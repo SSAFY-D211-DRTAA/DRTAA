@@ -20,7 +20,7 @@ class MessageHandler:
         
         action = data.get('action')
         response = self.process_action(action, data)
-        logger.info(f"Processed message from {source}: {action}")
+        logger.info(f"Received from {source}: {action}")
         return response
     
     def process_action(self, action, data):

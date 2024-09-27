@@ -46,7 +46,7 @@ class CommandDistributorWebSocketServer:
                         except IOError as e:
                             logger.error(f"Global Path file save error: {e}")
                         
-                        self.mqtt_client.publish_global_path(data)
+                        self.mqtt_client.publish_global_path(json.dumps(data))
                     elif tag == "complete_drive":
                         logger.info(f"ack complete drive")
                         response = "complete drive"
@@ -54,7 +54,7 @@ class CommandDistributorWebSocketServer:
                         logger.info(f"Local client connected")
                         response = data
                     else:
-                        logger.warning(f"unknown tag: {tag}")
+                        logger.warning(f"unknown tag: {data}")
                     
                     await websocket.send(json.dumps({f"success": response}))
                 except json.JSONDecodeError:
