@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="planSimple"
+            type="com.drtaa.core_model.plan.PlanSimple" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/rect_white_rad30"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="30dp">
+
+        <TextView
+            android:id="@+id/tv_plan_title"
+            style="@style/ptd_regular"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{planSimple.travelName}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="여행 제목이 들어가요" />
+
+        <TextView
+            android:id="@+id/tv_plan_start_date_title"
+            style="@style/ptd_regular"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="렌트 시작일: "
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_plan_title" />
+
+        <TextView
+            android:id="@+id/tv_plan_start_date"
+            style="@style/ptd_regular"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:text="@{planSimple.travelStartDate}"
+            app:layout_constraintBottom_toBottomOf="@id/tv_plan_start_date_title"
+            app:layout_constraintStart_toEndOf="@+id/tv_plan_start_date_title"
+            app:layout_constraintTop_toTopOf="@id/tv_plan_start_date_title"
+            tools:text="날짜 들어가용" />
+
+        <TextView
+            android:id="@+id/tv_plan_end_date_title"
+            style="@style/ptd_regular"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="렌트 종료일: "
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_plan_start_date_title" />
+
+        <TextView
+            android:id="@+id/tv_plan_end_date"
+            style="@style/ptd_regular"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:text="@{planSimple.travelEndDate}"
+            app:layout_constraintBottom_toBottomOf="@id/tv_plan_end_date_title"
+            app:layout_constraintStart_toEndOf="@+id/tv_plan_end_date_title"
+            app:layout_constraintTop_toTopOf="@id/tv_plan_end_date_title"
+            tools:text="날짜 들어가용" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
