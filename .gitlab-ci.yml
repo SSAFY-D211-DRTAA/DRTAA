@@ -36,8 +36,6 @@ before_script:
 
 detektAnalysis:
   stage: test
-  before_script:
-    - chmod +x ./gradlew
   script:
     - ./gradlew detekt
   artifacts:
