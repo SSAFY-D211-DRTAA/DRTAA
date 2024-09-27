@@ -323,22 +323,23 @@ def on_ec2_message(ws: WebSocketApp, message: str) -> None:
         data: Dict[str, Any] = json.loads(message)
 
         action = data.get('action', 'default')
+        car_id = data.get('rentCarId', 1)
 
         if action == 'vehicle_dispatch':
             publish_command_status(ros_bridge_ws, 'dispatch')
-            db_api_client.update_rent_car_status(car_id=1, status=VehicleStatus.CALLING)
+            db_api_client.update_rent_car_status(car_id=car_id, status=VehicleStatus.CALLING)
             publish_pose_from_gps(ros_bridge_ws, data['latitude'], data['longitude'])
         elif action == 'vehicle_return':
             publish_command_status(ros_bridge_ws, 'return')
-            db_api_client.update_rent_car_status(car_id=1, status=VehicleStatus.IDLING)
+            db_api_client.update_rent_car_status(car_id=car_id, status=VehicleStatus.IDLING)
             publish_pose_from_gps(ros_bridge_ws, config['lat_return'], config['lon_return'])
         elif action == 'vehicle_drive':
             publish_command_status(ros_bridge_ws, 'drive')
-            db_api_client.update_rent_car_status(car_id=1, status=VehicleStatus.DRIVING)
+            db_api_client.update_rent_car_status(car_id=car_id, status=VehicleStatus.DRIVING)
             publish_pose_from_gps(ros_bridge_ws, data['latitude'], data['longitude'])
         elif action == 'vehicle_wait':
             publish_command_status(ros_bridge_ws, 'wait')
-            db_api_client.update_rent_car_status(car_id=1, status=VehicleStatus.WAITING)
+            db_api_client.update_rent_car_status(car_id=car_id, status=VehicleStatus.WAITING)
             publish_next_goal(ros_bridge_ws)
         elif action == 'default':
             logger.info(f"recv from ec2: {data}")
