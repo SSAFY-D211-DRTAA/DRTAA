@@ -45,6 +45,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -217,6 +218,16 @@ public class RentCarServiceImpl implements RentCarService {
             FcmMessage.FcmDTO fcmDTO = fcmUtil.makeFcmDTO("렌트 차량 위치", content);
             log.info("Message: {}", content);
             fcmUtil.singleFcmSend(rent.getUser(), fcmDTO);
+
+            // 현재 렌트에 해당하는 여행 id
+            response[0].setTravelId(rent.getTravel().getTravelId());
+            // 현재 렌트에 해당하는 첫째날 id
+            List<TravelDates> travelDates = travelDatesRepository.findByTravel(rent.getTravel());
+            response[0].setTravelDatesId(travelDates.get(0).getTravelDatesId());
+            // 첫째날의 첫 장소(탑승 장소) id
+            List<DatePlaces> datePlaces = datePlacesRepository.findByTravelDatesId(travelDates.get(0).getTravelDatesId());
+            response[0].setDatePlacesId(datePlaces.get(0).getDatePlacesId());
+
             // 응답 반환
             return response[0];
         } else {
@@ -238,7 +249,7 @@ public class RentCarServiceImpl implements RentCarService {
 
         // 응답 DTO 초기화
         final RentCarLocationResponseDTO[] response = {null};
-
+        // 자율주행 서버로 메시지 전송
         try {
             StandardWebSocketClient client = new StandardWebSocketClient();
             WebSocketSession session = client.execute(new TextWebSocketHandler() {
@@ -251,12 +262,12 @@ public class RentCarServiceImpl implements RentCarService {
                         log.info("Received message: {}", jsonNode);
 
                         // null 체크 추가
+                        JsonNode rentCarId = jsonNode.get("rentCarId");
                         JsonNode latNode = jsonNode.get("latitude");
                         JsonNode lonNode = jsonNode.get("longitude");
-                        JsonNode rentCarId = jsonNode.get("rentCarId");
+                        log.info("rentCarId: {}", rentCarId);
                         log.info("latitude: {}", latNode);
                         log.info("longitude: {}", lonNode);
-                        log.info("rentCarId: {}", rentCarId);
 
                         if (latNode != null && lonNode != null && !latNode.isNull() && !lonNode.isNull()) {
                             // DTO 생성
@@ -293,8 +304,20 @@ public class RentCarServiceImpl implements RentCarService {
         // 렌트 차량 변경 상태 저장
         rentCarRepository.save(car);
 
-        // 응답이 없으면 빈 DTO 반환
-        return response[0] != null ? response[0] : RentCarLocationResponseDTO.builder().build();
+        if(response[0] != null) {
+            // 알림 보낼 내용
+            String content = "차량이 사용자의 위치로 이동중입니다.\n 조금만 기다려주세요 !!";
+
+            // 사용자에게 알림 전송
+            FcmMessage.FcmDTO fcmDTO = fcmUtil.makeFcmDTO("렌트 차량 위치", content);
+            log.info("Message: {}", content);
+            fcmUtil.singleFcmSend(rent.getUser(), fcmDTO);
+            // 응답 반환
+            return response[0];
+        } else {
+            // 응답이 없으면 빈 DTO 반환
+            return RentCarLocationResponseDTO.builder().build();
+        }
     }
 
     @Override

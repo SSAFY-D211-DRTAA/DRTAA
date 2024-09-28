@@ -1,9 +1,6 @@
 package com.d211.drtaa.domain.rent.controller.car;
 
-import com.d211.drtaa.domain.rent.dto.request.RentCarArriveStatusRequestDTO;
-import com.d211.drtaa.domain.rent.dto.request.RentCarCallRequestDTO;
-import com.d211.drtaa.domain.rent.dto.request.RentCarDriveStatusRequestDTO;
-import com.d211.drtaa.domain.rent.dto.request.RentCarUnassignedDispatchStatusRequestDTO;
+import com.d211.drtaa.domain.rent.dto.request.*;
 import com.d211.drtaa.domain.rent.dto.response.RentCarDriveStatusResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentCarLocationResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentCarResponseDTO;
@@ -19,9 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -181,4 +176,20 @@ public class RentCarController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
         }
     }
+
+//    @PostMapping("/driving")
+//    @Operation(summary = "렌트 차량 탑승", description = "회원의 진행중인 렌트 차량 탑승")
+//    public ResponseEntity driveToRentCar(@RequestBody RentCarDrivingRequestDTO rentCarDrivingRequestDTO) {
+//        try{
+//            rentCarService.driveToRentCar(rentCarDrivingRequestDTO);
+//
+//            return ResponseEntity.ok("Success"); //200
+//        } catch (RentNotFoundException | RentCarNotFoundException e) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
+//        } catch (WebSocketDisConnectedException e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage()); // 500
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
+//        }
+//    }
 }
