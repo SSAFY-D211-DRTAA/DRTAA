@@ -1,4 +1,4 @@
-package com.d211.drtaa.domain.rent.service;
+package com.d211.drtaa.domain.rent.job;
 
 import com.d211.drtaa.domain.rent.entity.Rent;
 import com.d211.drtaa.domain.rent.repository.RentRepository;
