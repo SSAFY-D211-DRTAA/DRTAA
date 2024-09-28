@@ -1,5 +1,6 @@
 package com.drtaa.feature_plan
 
+import android.view.Gravity
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
@@ -8,6 +9,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView
 import com.drtaa.core_map.base.BaseMapFragment
+import com.drtaa.core_map.setCustomLocationButton
 import com.drtaa.core_model.plan.Plan
 import com.drtaa.core_model.util.toDate
 import com.drtaa.core_ui.component.TwoButtonMessageDialog
@@ -62,7 +64,15 @@ class PlanListFragment :
     }
 
     override fun initOnMapReady(naverMap: NaverMap) {
-        naverMap.uiSettings.isLocationButtonEnabled = false
+        naverMap.apply {
+            minZoom = MIN_ZOOM
+            uiSettings.isLocationButtonEnabled = false
+            setCustomLocationButton(binding.ivPlanCurrentLocation)
+            uiSettings.logoGravity = Gravity.END
+            uiSettings.setLogoMargin(0, NAVER_LOGO_MARGIN, NAVER_LOGO_MARGIN, 0)
+        }
+
+        setMapMarkers(naverMap)
     }
 
     override fun iniView() {
@@ -80,7 +90,9 @@ class PlanListFragment :
 
     private fun initData() {
         planViewModel.setTravelId(args.travelId)
-        planViewModel.getPlan()
+        if (planViewModel.plan.value == null) {
+            planViewModel.getPlan()
+        }
     }
 
     private fun initDatePickerDialog() {
@@ -207,6 +219,19 @@ class PlanListFragment :
         }
     }
 
+    private fun setMapMarkers(naverMap: NaverMap) {
+        planViewModel.dayPlan.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach { dayPlan ->
+                if (dayPlan == null) return@onEach
+
+                naverMap.clearMarkerList()
+                dayPlan.placesDetail.forEach { place ->
+                    naverMap.addMarker(place.datePlacesLat, place.datePlacesLon)
+                }
+                naverMap.adjustCamera()
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
+    }
+
     private fun initViewPager() {
         if (fragmentList.isEmpty()) {
             fragmentList = planViewModel.dayPlanList.value?.let {
@@ -272,6 +297,7 @@ class PlanListFragment :
                 updateDayPlanText(planViewModel.plan.value!!.datesDetail[newIndex])
                 updateBottomSheetVisibility(newIndex)
             }
+            planViewModel.setDayIdx(currentItem)
         }
     }
 
@@ -287,5 +313,10 @@ class PlanListFragment :
     private fun updateDayPlanText(dayPlan: Plan.DayPlan) {
         binding.tvPlanDay.text =
             "Day ${binding.vpPlanDay.currentItem + 1} ${dayPlan.travelDatesDate.toDate()}"
+    }
+
+    companion object {
+        const val MIN_ZOOM = 5.0
+        const val NAVER_LOGO_MARGIN = 10
     }
 }
