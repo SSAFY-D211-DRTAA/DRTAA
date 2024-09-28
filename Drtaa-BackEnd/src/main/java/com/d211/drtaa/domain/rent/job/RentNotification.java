@@ -81,6 +81,7 @@ public class RentNotification {
                 FcmMessage.FcmDTO fcmDTO = fcmUtil.makeFcmDTO("렌트 알림", rent.getTravel().getTravelName() + "의 렌트 시작이 " + (rent.getRentStartTime().isBefore(LocalDateTime.now().plusDays(3)) ? "하루" : "3일") + " 남았습니다.");
                 // FCM 알림 전송
                 fcmUtil.singleFcmSend(user, fcmDTO);
+                log.info("사용자명: {}에게 알림 전송 완료", rent.getUser().getUsername());
             }
 
             // 태스크렛 실행 완료 상태 반환
