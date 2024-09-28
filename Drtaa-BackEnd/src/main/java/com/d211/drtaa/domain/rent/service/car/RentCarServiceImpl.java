@@ -148,6 +148,7 @@ public class RentCarServiceImpl implements RentCarService {
 
         // 응답 DTO 초기화
         final RentCarLocationResponseDTO[] response = {null};
+        // 자율주행 서버로 메시지 전송
         try {
             StandardWebSocketClient client = new StandardWebSocketClient();
             WebSocketSession session = client.execute(new TextWebSocketHandler() {
@@ -160,9 +161,9 @@ public class RentCarServiceImpl implements RentCarService {
                         log.info("Received message: {}", jsonNode);
 
                         // null 체크 추가
+                        JsonNode rentCarId = jsonNode.get("rentCarId");
                         JsonNode latNode = jsonNode.get("latitude");
                         JsonNode lonNode = jsonNode.get("longitude");
-                        JsonNode rentCarId = jsonNode.get("rentCarId");
                         log.info("latitude: {}", latNode);
                         log.info("longitude: {}", lonNode);
                         log.info("rentCarId: {}", rentCarId);
@@ -208,8 +209,20 @@ public class RentCarServiceImpl implements RentCarService {
         // 렌트 변경 상태 저장
         rentRepository.save(rent);
 
-        // 응답이 없으면 빈 DTO 반환
-        return response[0] != null ? response[0] : RentCarLocationResponseDTO.builder().build();
+        if(response[0] != null) {
+            // 알림 보낼 내용
+            String content = "차량이 여행 첫번째 탑승 위치(" + rent.getTravel().getTravelName() + ")로 이동중입니다.\n 위치를 확인해 주세요 !!";
+
+            // 사용자에게 알림 전송
+            FcmMessage.FcmDTO fcmDTO = fcmUtil.makeFcmDTO("렌트 차량 위치", content);
+            log.info("Message: {}", content);
+            fcmUtil.singleFcmSend(rent.getUser(), fcmDTO);
+            // 응답 반환
+            return response[0];
+        } else {
+            // 응답이 없으면 빈 DTO 반환
+            return RentCarLocationResponseDTO.builder().build();
+        }
     }
 
     @Override
@@ -296,39 +309,44 @@ public class RentCarServiceImpl implements RentCarService {
                 .orElseThrow(() -> new RentCarNotFoundException("해당 rentCarId의 맞는 차량을 찾을 수 없습니다."));
 
         // ** 방문하지 않은 여행 일정 장소 찾기 로직 **
+        // 자율주행 서버로 보낼 위도, 경도
         double lattitude = 37.576636819990284;
         double longitude = 126.89879021208397;
-//        Travel travel = rent.getTravel(); // 해당 렌트의 여행
-//        LocalDate now = LocalDate.now(); // 현재 날짜
-//        boolean chk = true;
-//        log.info("현재 날짜: {}", now);
-//
-//        // 현재 날짜 기준 여행 일정 찾기
-//        TravelDates dates = travelDatesRepository.findByTravelAndTravelDatesDate(travel, now)
-//                .orElseThrow(() -> new TravelNotFoundException("현재 날짜에 진행중인 여행을 찾을 수 없습니다."));
-//
-//        // 현재 날짜 기준 여행 일정의 여행 장소 찾기
-//        List<DatePlaces> placesList = datePlacesRepository.findByTravelDatesId(dates.getTravelDatesId());
-//        for(DatePlaces places : placesList) {
-//            // 방문하지 않은 여행 일정 찾기
-//            if(!places.getDatePlacesIsVisited()) {
-//                lattitude = places.getDatePlacesLat();
-//                longitude = places.getDatePlacesLon();
-//                chk = false;
-//
-//                break; // 반복 종료
-//            }
-//        }
+
+        // 해당 렌트의 여행
+        Travel travel = rent.getTravel();
+        // 현재 날짜
+        LocalDate now = LocalDate.now();
+        log.info("현재 날짜: {}", now);
+        //
+        boolean chk = true;
+
+        // 현재 날짜 기준 여행 일정 찾기
+        TravelDates dates = travelDatesRepository.findByTravelAndTravelDatesDate(travel, now)
+                .orElseThrow(() -> new TravelNotFoundException("현재 날짜에 진행중인 여행을 찾을 수 없습니다."));
+
+        // 현재 날짜 기준 여행 일정의 여행 장소 찾기
+        List<DatePlaces> placesList = datePlacesRepository.findByTravelDatesId(dates.getTravelDatesId());
+        for(DatePlaces places : placesList) {
+            // 방문하지 않은 여행 일정 찾기
+            if(!places.getDatePlacesIsVisited()) {
+                lattitude = places.getDatePlacesLat();
+                longitude = places.getDatePlacesLon();
+                chk = false;
+
+                break; // 반복 종료
+            }
+        }
 
         // ** 방문하지 않은 여행 일정 장소가 없는 경우 로직 **
-//        if(chk) {
-//            FcmMessage.FcmDTO fcmDTO = fcmUtil.makeFcmDTO("렌트 일정", "렌트 일정의 모든 여행지를 방문했습니다.\n 반납 예정이 아니라면 여행지를 추가해주세요.");
-//            log.info("Message: {}", fcmDTO.getBody());
-//            fcmUtil.singleFcmSend(rent.getUser(), fcmDTO); // 비동기로 전송
-//
-//            new TravelAllPlacesVisitedException("렌트 일정의 모든 여행지를 방문했습니다. 반납 예정이 아니라면 여행지를 추가해주세요.");
-//            return;
-//        }
+        if(chk) {
+            FcmMessage.FcmDTO fcmDTO = fcmUtil.makeFcmDTO("렌트 일정", "렌트 일정의 모든 여행지를 방문했습니다.\n 반납 예정이 아니라면 여행지를 추가해주세요.");
+            log.info("Message: {}", fcmDTO.getBody());
+            fcmUtil.singleFcmSend(rent.getUser(), fcmDTO); // 비동기로 전송
+
+            new TravelAllPlacesVisitedException("렌트 일정의 모든 여행지를 방문했습니다. 반납 예정이 아니라면 여행지를 추가해주세요.");
+            return;
+        }
 
         try {
             StandardWebSocketClient client = new StandardWebSocketClient();
