@@ -9,6 +9,7 @@ import com.d211.drtaa.domain.rent.service.car.RentCarService;
 import com.d211.drtaa.global.exception.rent.NoAvailableRentCarException;
 import com.d211.drtaa.global.exception.rent.RentCarNotFoundException;
 import com.d211.drtaa.global.exception.rent.RentNotFoundException;
+import com.d211.drtaa.global.exception.travel.TravelDateNotMatchException;
 import com.d211.drtaa.global.exception.websocket.WebSocketDisConnectedException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -117,21 +118,21 @@ public class RentCarController {
         }
     }
 
-    @PatchMapping("/{rentId}/driving")
-    @Operation(summary = "렌트 차량 탑승", description = "회원이 진행중인 렌트 차량을 탑승한 경우 탑승(driving) 상태로 수정")
-    public ResponseEntity updateRentCarDriveStatustoDriving (@PathVariable("rentId") long rentId) {
-        try{
-            rentCarService.updateRentCarDriveStatustoDriving(rentId);
-
-            return ResponseEntity.ok("Success"); //200
-        } catch (RentNotFoundException | RentCarNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
-        } catch (WebSocketDisConnectedException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage()); // 500
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
-        }
-    }
+//    @PatchMapping("/{rentId}/driving")
+//    @Operation(summary = "렌트 차량 탑승", description = "회원이 진행중인 렌트 차량을 탑승한 경우 탑승(driving) 상태로 수정")
+//    public ResponseEntity updateRentCarDriveStatustoDriving (@PathVariable("rentId") long rentId) {
+//        try{
+//            rentCarService.updateRentCarDriveStatustoDriving(rentId);
+//
+//            return ResponseEntity.ok("Success"); //200
+//        } catch (RentNotFoundException | RentCarNotFoundException e) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
+//        } catch (WebSocketDisConnectedException e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage()); // 500
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
+//        }
+//    }
 
     @PatchMapping("/{rentId}/parking")
     @Operation(summary = "렌트 차량 하차", description = "회원이 진행중인 렌트 차량을 탑승한 경우 하차(parking) 상태로 수정")
@@ -177,19 +178,21 @@ public class RentCarController {
         }
     }
 
-//    @PostMapping("/driving")
-//    @Operation(summary = "렌트 차량 탑승", description = "회원의 진행중인 렌트 차량 탑승")
-//    public ResponseEntity driveToRentCar(@RequestBody RentCarDrivingRequestDTO rentCarDrivingRequestDTO) {
-//        try{
-//            rentCarService.driveToRentCar(rentCarDrivingRequestDTO);
-//
-//            return ResponseEntity.ok("Success"); //200
-//        } catch (RentNotFoundException | RentCarNotFoundException e) {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
-//        } catch (WebSocketDisConnectedException e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage()); // 500
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
-//        }
-//    }
+    @PatchMapping("/driving")
+    @Operation(summary = "렌트 차량 탑승", description = "회원이 진행중인 렌트 차량을 탑승한 경우 탑승(driving) 상태로 수정")
+    public ResponseEntity updateRentCarDriveStatustoDriving (@RequestBody RentCarDrivingRequestDTO rentCarDrivingRequestDTO) {
+        try{
+            RentCarLocationResponseDTO response = rentCarService.updateRentCarDriveStatustoDriving(rentCarDrivingRequestDTO);
+
+            return ResponseEntity.ok(response); //200
+        } catch(TravelDateNotMatchException e) {
+          return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage()); // 409
+        } catch (RentNotFoundException | RentCarNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
+        } catch (WebSocketDisConnectedException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage()); // 500
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
+        }
+    }
 }
