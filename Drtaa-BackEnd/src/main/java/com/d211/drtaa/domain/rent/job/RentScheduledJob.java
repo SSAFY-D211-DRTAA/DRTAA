@@ -27,9 +27,9 @@ public class RentScheduledJob {
 //        log.info("30분마다 실행되는 메소드");
 //    }
 
-    @Scheduled(cron = "0 30 18 * * *") // 매일 오후 6시 30분에 실행
+    @Scheduled(cron = "0 0 9 * * *") // 매일 오전 9시에 실행
     public void runRentNotificationJob() {
-        log.info("매일 오후 6시 30분에 시작되는 Job");
+        log.info("매일 오전 9시에 시작되는 Job");
         try {
             log.info("Rent notification job started");
             JobParameters jobParameters = new JobParametersBuilder()
@@ -41,5 +41,4 @@ public class RentScheduledJob {
             log.error("Job execution failed", e);
         }
     }
-
 }
