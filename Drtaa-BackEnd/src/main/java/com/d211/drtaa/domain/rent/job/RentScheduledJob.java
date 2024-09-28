@@ -1,9 +1,10 @@
-package com.d211.drtaa.domain.rent.service;
+package com.d211.drtaa.domain.rent.job;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -26,12 +27,15 @@ public class RentScheduledJob {
 //        log.info("30분마다 실행되는 메소드");
 //    }
 
-    @Scheduled(cron = "0 0 10 * * *") // 매일 오전 10시에 실행
+    @Scheduled(cron = "0 30 12 * * *") // 매일 오후 12시 30분에 실행
     public void runRentNotificationJob() {
-        log.info("매일 오전 10시에 시작되는 Job");
+        log.info("매일 오후 12시 30분에 시작되는 Job");
         try {
             log.info("Rent notification job started");
-            jobLauncher.run(rentNotificationJob, new JobParameters());
+            JobParameters jobParameters = new JobParametersBuilder()
+                    .addLong("time", System.currentTimeMillis())
+                    .toJobParameters();
+            jobLauncher.run(rentNotificationJob, jobParameters);
         } catch (Exception e) {
             // 예외 처리
             log.error("Job execution failed", e);
