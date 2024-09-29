@@ -20,4 +20,5 @@ interface SignRepository {
     suspend fun clearUserData()
     suspend fun updateProfileImage(image: File?): Flow<Result<SocialUser>>
     suspend fun setFCMToken(fcmToken: String): Flow<Result<String>>
+    suspend fun getAndSetUserInfo(): Flow<Result<SocialUser>>
 }

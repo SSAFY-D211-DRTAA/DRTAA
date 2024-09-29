@@ -1,6 +1,7 @@
 package com.drtaa.core_data.datasource
 
 import com.drtaa.core_model.network.ResponseLogin
+import com.drtaa.core_model.sign.ResponseUserInfo
 import com.drtaa.core_model.sign.SocialUser
 import com.drtaa.core_model.sign.UserLoginInfo
 import okhttp3.MultipartBody
@@ -15,4 +16,5 @@ interface SignDataSource {
     suspend fun setUserData(user: SocialUser)
     suspend fun clearUserData()
     suspend fun updateUserProfileImage(image: MultipartBody.Part?): SocialUser
+    suspend fun getUserInfo(): ResponseUserInfo
 }

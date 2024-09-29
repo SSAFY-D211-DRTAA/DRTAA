@@ -4,6 +4,7 @@ import com.drtaa.core_model.network.RequestFormLogin
 import com.drtaa.core_model.network.RequestSocialLogin
 import com.drtaa.core_model.network.ResponseLogin
 import com.drtaa.core_model.sign.RequestFCMToken
+import com.drtaa.core_model.sign.ResponseUserInfo
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.http.Body
@@ -47,4 +48,7 @@ interface SignAPI {
     suspend fun setFCMToken(
         @Body request: RequestFCMToken
     ): String
+
+    @GET("user/info")
+    suspend fun getUserInfo(): ResponseUserInfo
 }
