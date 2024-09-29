@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.drtaa.core_data.repository.GPSRepository
 import com.drtaa.core_data.repository.RentCarRepository
 import com.drtaa.core_data.repository.RentRepository
+import com.drtaa.core_model.map.CarRoute
 import com.drtaa.core_model.network.RequestCompleteRent
 import com.drtaa.core_model.rent.CarPosition
 import com.drtaa.core_model.rent.RentDetail
@@ -70,6 +71,9 @@ class CarViewModel @Inject constructor(
 
     private val _mqttConnectionStatus = MutableStateFlow<Int>(-1)
     val mqttConnectionStatus: StateFlow<Int> = _mqttConnectionStatus
+
+    private val _routeData = MutableStateFlow<List<CarRoute>>(emptyList())
+    val routeData: StateFlow<List<CarRoute>> = _routeData
 
     init {
         initMQTT()
@@ -162,9 +166,10 @@ class CarViewModel @Inject constructor(
         viewModelScope.launch {
             rentRepository.getRentDetail(_latestReservedId.value).collect { result ->
                 result.onSuccess { data ->
-                    Timber.d("성공")
-                    if (data.rentStatus == "in_progress") {
-                        _currentRentDetail.value = data
+                    Timber.tag("getCR").d("성공 $data")
+                    when (data.rentStatus) {
+                        "reserved" -> _currentRentDetail.value = data
+                        "in_progress" -> _currentRentDetail.value = data
                     }
                 }.onFailure {
                     Timber.d("현재 진행 중인 렌트가 없습니다.")
@@ -213,9 +218,9 @@ class CarViewModel @Inject constructor(
 
     private fun observeMqttMessages() {
         viewModelScope.launch {
-            gpsRepository.observeMqttMessages().collectLatest {
+            gpsRepository.observeMqttGPSMessages().collectLatest {
                 Timber.tag("mqtt_viewmodel").d("observeMqttMessages: $it")
-                _gpsData.emit(LatLng(it.latitude, it.longitude))
+                _gpsData.emit(LatLng(it.msg.latitude, it.msg.longitude))
             }
         }
     }
@@ -232,6 +237,8 @@ class CarViewModel @Inject constructor(
             rentRepository.completeRent(requestCompleteRent).collect { result ->
                 result.onSuccess {
                     Timber.tag("complete").d("성공")
+                    _currentRentDetail.value = null
+                    _rentState.value = false
                     _isSuccessComplete.emit(true)
                 }.onFailure {
                     Timber.tag("complete").d("실패")
@@ -257,10 +264,10 @@ class CarViewModel @Inject constructor(
                 userPosition.longitude
             ).collect { result ->
                 result.onSuccess {
-                    Timber.tag("call car").d("성공")
+                    Timber.tag("call car").d("성공 $it")
                     _carPosition.emit(it)
                 }.onFailure {
-                    Timber.tag("call car").d("실패")
+                    Timber.tag("call car").d("실패 $it")
                     _carPosition.emit(CarPosition(0.0, 0.0))
                 }
             }
@@ -278,6 +285,15 @@ class CarViewModel @Inject constructor(
                     _firstCall.emit(false)
                     Timber.tag("첫 호출").d("실패")
                 }
+            }
+        }
+    }
+
+    fun getRoute() {
+        viewModelScope.launch {
+            gpsRepository.observeMqttPathMessages().collect { path ->
+                Timber.tag("path").d("$path")
+                _routeData.value = path
             }
         }
     }
