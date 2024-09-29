@@ -113,39 +113,6 @@ public class RentNotification {
     }
 
     @Bean
-    public Tasklet rentEndNotificationTasklet() {
-        return ((contribution, chunkContext) -> {
-            log.info(">>>>> Tasklet(렌트 종료 1시간, 30분 전 알림)");
-
-            // 렌트 종료 1시간 전 알림
-            log.info("렌트 종료 1시간 전 예약된 렌트 정보를 조회");
-            LocalDateTime startDate = LocalDateTime.now().plusHours(1).withMinute(0).withSecond(0);
-            LocalDateTime endDate = LocalDateTime.now().plusHours(1).withMinute(59).withSecond(59);
-            List<Rent> oneHourBeforeRents = rentRepository.findByRentEndTimeBetween(startDate, endDate);
-
-            // 렌트 종료 30분 전 알림
-            log.info("렌트 종료 30분 전 예약된 렌트 정보를 조회");
-            startDate = LocalDateTime.now().plusMinutes(30).withSecond(0);
-            endDate = LocalDateTime.now().plusMinutes(30).withSecond(59);
-            List<Rent> thirtyMinutesBeforeRents = rentRepository.findByRentEndTimeBetween(startDate, endDate);
-
-            // 추가된 렌트 목록에 대한 FCM 알림
-            List<Rent> allRents = new ArrayList<>();
-            allRents.addAll(oneHourBeforeRents);
-            allRents.addAll(thirtyMinutesBeforeRents);
-
-            for (Rent rent : allRents) {
-                User user = rent.getUser();
-                FcmMessage.FcmDTO fcmDTO = fcmUtil.makeFcmDTO("렌트 종료", rent.getTravel().getTravelName() + "의 렌트 종료가 " + (rent.getRentEndTime().isBefore(LocalDateTime.now().plusMinutes(30)) ? "30분" : "1시간") + " 남았습니다.");
-                fcmUtil.singleFcmSend(user, fcmDTO);
-                log.info("사용자명: {}에게 종료 알림 전송 완료", rent.getUser().getUserNickname());
-            }
-
-            return RepeatStatus.FINISHED;
-        });
-    }
-
-    @Bean
     public Tasklet rentStartNotificationTasklet() {
         return ((contribution, chunkContext) -> {
             log.info(">>>>> Tasklet(렌트 시작 1시간, 30분 전 알림)");
@@ -155,12 +122,14 @@ public class RentNotification {
             LocalDateTime startDate = LocalDateTime.now().plusHours(1).withMinute(0).withSecond(0);
             LocalDateTime endDate = LocalDateTime.now().plusHours(1).withMinute(59).withSecond(59);
             List<Rent> oneHourBeforeRents = rentRepository.findByRentStartTimeBetween(startDate, endDate);
+            log.info("시작 1시간 전 알림 줄 rent 개수: {}", oneHourBeforeRents.size());
 
             // 렌트 시작 30분 전 알림
             log.info("렌트 시작 30분 전 예약된 렌트 정보를 조회");
             startDate = LocalDateTime.now().plusMinutes(30).withSecond(0);
             endDate = LocalDateTime.now().plusMinutes(30).withSecond(59);
             List<Rent> thirtyMinutesBeforeRents = rentRepository.findByRentStartTimeBetween(startDate, endDate);
+            log.info("시작 30분 전 알림 줄 rent 개수: {}", thirtyMinutesBeforeRents.size());
 
             // 추가된 렌트 목록에 대한 FCM 알림
             List<Rent> allRents = new ArrayList<>();
@@ -172,6 +141,41 @@ public class RentNotification {
                 FcmMessage.FcmDTO fcmDTO = fcmUtil.makeFcmDTO("렌트 시작", rent.getTravel().getTravelName() + "의 렌트 시작이 " + (rent.getRentStartTime().isBefore(LocalDateTime.now().plusMinutes(30)) ? "30분" : "1시간") + " 남았습니다.");
                 fcmUtil.singleFcmSend(user, fcmDTO);
                 log.info("사용자명: {}에게 시작 알림 전송 완료", rent.getUser().getUserNickname());
+            }
+
+            return RepeatStatus.FINISHED;
+        });
+    }
+
+    @Bean
+    public Tasklet rentEndNotificationTasklet() {
+        return ((contribution, chunkContext) -> {
+            log.info(">>>>> Tasklet(렌트 종료 1시간, 30분 전 알림)");
+
+            // 렌트 종료 1시간 전 알림
+            log.info("렌트 종료 1시간 전 예약된 렌트 정보를 조회");
+            LocalDateTime startDate = LocalDateTime.now().plusHours(1).withMinute(0).withSecond(0);
+            LocalDateTime endDate = LocalDateTime.now().plusHours(1).withMinute(59).withSecond(59);
+            List<Rent> oneHourBeforeRents = rentRepository.findByRentEndTimeBetween(startDate, endDate);
+            log.info("종료 1시간 전 알림 줄 rent 개수: {}", oneHourBeforeRents.size());
+
+            // 렌트 종료 30분 전 알림
+            log.info("렌트 종료 30분 전 예약된 렌트 정보를 조회");
+            startDate = LocalDateTime.now().plusMinutes(30).withSecond(0);
+            endDate = LocalDateTime.now().plusMinutes(30).withSecond(59);
+            List<Rent> thirtyMinutesBeforeRents = rentRepository.findByRentEndTimeBetween(startDate, endDate);
+            log.info("종료 30분 전 알림 줄 rent 개수: {}", thirtyMinutesBeforeRents.size());
+
+            // 추가된 렌트 목록에 대한 FCM 알림
+            List<Rent> allRents = new ArrayList<>();
+            allRents.addAll(oneHourBeforeRents);
+            allRents.addAll(thirtyMinutesBeforeRents);
+
+            for (Rent rent : allRents) {
+                User user = rent.getUser();
+                FcmMessage.FcmDTO fcmDTO = fcmUtil.makeFcmDTO("렌트 종료", rent.getTravel().getTravelName() + "의 렌트 종료가 " + (rent.getRentEndTime().isBefore(LocalDateTime.now().plusMinutes(30)) ? "30분" : "1시간") + " 남았습니다.");
+                fcmUtil.singleFcmSend(user, fcmDTO);
+                log.info("사용자명: {}에게 종료 알림 전송 완료", rent.getUser().getUserNickname());
             }
 
             return RepeatStatus.FINISHED;

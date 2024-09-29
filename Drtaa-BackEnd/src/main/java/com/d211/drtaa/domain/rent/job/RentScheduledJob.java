@@ -29,7 +29,7 @@ public class RentScheduledJob {
 //    }
 
     @Scheduled(cron = "0 0 9 * * *") // 매일 오전 9시에 실행
-    public void runRentReservationNotificationJob() {
+    public void rentReservationNotificationJob() {
         log.info("매일 오전 9시에 시작되는 Job");
         try {
             log.info("Rent Reservation Notification Job Started");
@@ -44,7 +44,7 @@ public class RentScheduledJob {
     }
 
     @Scheduled(cron =  "0 0,30 * * * *") // 30분마다 실행
-    public void runRentEndNotificationJob() {
+    public void rentStartOrEndNotificationJob() {
         log.info("30분마다 실행되는 Job");
         try {
             log.info("Rent Start or End Notification Job Started");
