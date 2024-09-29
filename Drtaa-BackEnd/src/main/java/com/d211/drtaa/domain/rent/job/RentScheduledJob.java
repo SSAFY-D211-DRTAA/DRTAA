@@ -15,7 +15,8 @@ import org.springframework.stereotype.Component;
 public class RentScheduledJob {
 
     private final JobLauncher jobLauncher;
-    private final Job rentNotificationJob;
+    private final Job rentReservationNotificationJob;
+    private final Job rentStartOrEndNotificationJob;
 
 //    @Scheduled(cron = "0 0/10 * * * *") // 매 10분마다 실행
 //    public void checkEvery10Minutes() throws Exception {
@@ -28,17 +29,32 @@ public class RentScheduledJob {
 //    }
 
     @Scheduled(cron = "0 0 9 * * *") // 매일 오전 9시에 실행
-    public void runRentNotificationJob() {
+    public void runRentReservationNotificationJob() {
         log.info("매일 오전 9시에 시작되는 Job");
         try {
-            log.info("Rent notification job started");
+            log.info("Rent Reservation Notification Job Started");
             JobParameters jobParameters = new JobParametersBuilder()
                     .addLong("time", System.currentTimeMillis())
                     .toJobParameters();
-            jobLauncher.run(rentNotificationJob, jobParameters);
+            jobLauncher.run(rentReservationNotificationJob, jobParameters);
         } catch (Exception e) {
             // 예외 처리
-            log.error("Job execution failed", e);
+            log.error("Rent Reservation Notification Job execution failed", e);
+        }
+    }
+
+    @Scheduled(cron =  "0 0,30 * * * *") // 30분마다 실행
+    public void runRentEndNotificationJob() {
+        log.info("30분마다 실행되는 Job");
+        try {
+            log.info("Rent Start or End Notification Job Started");
+            JobParameters jobParameters = new JobParametersBuilder()
+                    .addLong("time", System.currentTimeMillis())
+                    .toJobParameters();
+            jobLauncher.run(rentStartOrEndNotificationJob, jobParameters);
+        } catch (Exception e) {
+            // 예외 처리
+            log.error("Rent Start or End Notification Job execution failed", e);
         }
     }
 }
