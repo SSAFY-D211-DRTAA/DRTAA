@@ -12,10 +12,14 @@ import java.util.Optional;
 
 public interface DatePlacesRepository extends JpaRepository<DatePlaces, Long> {
     // find
-    Optional<DatePlaces> findByDatePlacesId(long datePlacesId);
-    @Query(value = "SELECT * FROM date_places WHERE travel_dates_id = :travelDatesId", nativeQuery = true)
+    Optional<DatePlaces> findByDatePlacesId(Long datePlacesId);
+    @Query(value = "SELECT * FROM date_places WHERE travelDatesId = :travelDatesId", nativeQuery = true)
     List<DatePlaces> findByTravelDatesId(@Param("travelDatesId") Long travelDatesId);
+    @Query("SELECT dp FROM DatePlaces dp WHERE dp.travelDates.travelDatesId = :travelDatesId ORDER BY dp.datePlacesOrder DESC")
+    Optional<DatePlaces> findLastPlaceByTravelDatesId(@Param("travelDatesId") Long travelDatesId);
+
 
     // delete
     void deleteAllByTravelAndTravelDates(Travel travel, TravelDates dates);
+
 }

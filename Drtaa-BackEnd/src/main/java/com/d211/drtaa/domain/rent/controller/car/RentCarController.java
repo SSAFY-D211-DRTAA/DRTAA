@@ -2,6 +2,7 @@ package com.d211.drtaa.domain.rent.controller.car;
 
 import com.d211.drtaa.domain.rent.dto.request.*;
 import com.d211.drtaa.domain.rent.dto.response.RentCarDriveStatusResponseDTO;
+import com.d211.drtaa.domain.rent.dto.response.RentCarDrivingResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentCarLocationResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentCarResponseDTO;
 import com.d211.drtaa.domain.rent.entity.car.RentDrivingStatus;
@@ -9,6 +10,7 @@ import com.d211.drtaa.domain.rent.service.car.RentCarService;
 import com.d211.drtaa.global.exception.rent.NoAvailableRentCarException;
 import com.d211.drtaa.global.exception.rent.RentCarNotFoundException;
 import com.d211.drtaa.global.exception.rent.RentNotFoundException;
+import com.d211.drtaa.global.exception.travel.TravelAllPlacesVisitedException;
 import com.d211.drtaa.global.exception.travel.TravelDateNotMatchException;
 import com.d211.drtaa.global.exception.websocket.WebSocketDisConnectedException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -85,13 +87,15 @@ public class RentCarController {
     @PatchMapping("/call/{rentId}")
     @Operation(summary = "렌트 차량 첫호출", description = "회원의 진행할 렌트 차량 첫호출(렌트 요청 시 입력했던 탑승 위치 전송), 렌트 상태 진행중으로 변경")
     public ResponseEntity callRentCar(@PathVariable("rentId") long rentId) {
-        try{
+        try {
             RentCarLocationResponseDTO response = rentCarService.callRentCar(rentId);
 
             return ResponseEntity.ok(response); //200
         } catch (RentNotFoundException | RentCarNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
-        } catch (AuthenticationException e) {
+        } catch(TravelAllPlacesVisitedException e) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(e.getMessage()); // 204
+        }catch (AuthenticationException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("권한 인증에 실패하였습니다."); // 401
         } catch (WebSocketDisConnectedException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage()); // 500
@@ -118,27 +122,27 @@ public class RentCarController {
         }
     }
 
-//    @PatchMapping("/{rentId}/driving")
-//    @Operation(summary = "렌트 차량 탑승", description = "회원이 진행중인 렌트 차량을 탑승한 경우 탑승(driving) 상태로 수정")
-//    public ResponseEntity updateRentCarDriveStatustoDriving (@PathVariable("rentId") long rentId) {
-//        try{
-//            rentCarService.updateRentCarDriveStatustoDriving(rentId);
-//
-//            return ResponseEntity.ok("Success"); //200
-//        } catch (RentNotFoundException | RentCarNotFoundException e) {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
-//        } catch (WebSocketDisConnectedException e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage()); // 500
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
-//        }
-//    }
-
-    @PatchMapping("/{rentId}/parking")
-    @Operation(summary = "렌트 차량 하차", description = "회원이 진행중인 렌트 차량을 탑승한 경우 하차(parking) 상태로 수정")
-    public ResponseEntity updateRentCarDriveStatustoParking (@PathVariable("rentId") long rentId) {
+    @PatchMapping("/driving")
+    @Operation(summary = "렌트 차량 탑승", description = "회원이 진행중인 렌트 차량을 탑승한 경우 탑승(driving) 상태로 수정")
+    public ResponseEntity updateRentCarDriveStatustoDriving (@RequestParam long rentId) {
         try{
-            rentCarService.updateRentCarDriveStatustoParking(rentId);
+            RentCarDrivingResponseDTO response = rentCarService.updateRentCarDriveStatustoDriving(rentId);
+
+            return ResponseEntity.ok(response); //200
+        } catch (RentNotFoundException | RentCarNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
+        } catch (WebSocketDisConnectedException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage()); // 500
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
+        }
+    }
+
+    @PatchMapping("/parking")
+    @Operation(summary = "렌트 차량 하차", description = "회원이 진행중인 렌트 차량을 탑승한 경우 하차(parking) 상태로 수정")
+    public ResponseEntity updateRentCarDriveStatustoParking (@RequestBody RentCarParkingRequestDTO rentCarParkingRequestDTO) {
+        try{
+            rentCarService.updateRentCarDriveStatustoParking(rentCarParkingRequestDTO);
 
             return ResponseEntity.ok("Success"); //200
         } catch (RentNotFoundException | RentCarNotFoundException e) {
@@ -173,24 +177,6 @@ public class RentCarController {
             return ResponseEntity.ok("Success"); // 200
         } catch (RentCarNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
-        }
-    }
-
-    @PatchMapping("/driving")
-    @Operation(summary = "렌트 차량 탑승", description = "회원이 진행중인 렌트 차량을 탑승한 경우 탑승(driving) 상태로 수정")
-    public ResponseEntity updateRentCarDriveStatustoDriving (@RequestBody RentCarDrivingRequestDTO rentCarDrivingRequestDTO) {
-        try{
-            RentCarLocationResponseDTO response = rentCarService.updateRentCarDriveStatustoDriving(rentCarDrivingRequestDTO);
-
-            return ResponseEntity.ok(response); //200
-        } catch(TravelDateNotMatchException e) {
-          return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage()); // 409
-        } catch (RentNotFoundException | RentCarNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
-        } catch (WebSocketDisConnectedException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage()); // 500
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
         }
