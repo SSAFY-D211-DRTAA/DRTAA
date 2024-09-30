@@ -5,6 +5,7 @@ import os
 
 from dotenv import load_dotenv
 from flask import Flask
+from flask_cors import CORS
 from flask_restx import Api, Resource, fields
 from langchain_openai import ChatOpenAI
 from langchain.prompts import PromptTemplate
@@ -29,7 +30,8 @@ if not all([OPENAI_API_KEY]):
     raise ValueError("필요한 환경 변수가 설정되지 않았습니다.")
 
 app = Flask(__name__)
-api = Api(app, version='1.0', title='AI API 문서', description='Swagger 문서', doc="/api-docs")
+CORS(app)
+api = Api(app, version='1.0', title='AI API 문서', description='Swagger 문서', doc="/ai-api-server/api-docs")
 llm = ChatOpenAI(api_key=OPENAI_API_KEY, model="gpt-4o-mini")
 
 try:
@@ -71,13 +73,13 @@ response_model = api.model('Response', {
     'response': fields.String(description='AI의 응답')
 })
 
-@api.route('/')
+@api.route('/ai-api-server/')
 class Home(Resource):
     def get(self):
         """Welcome message"""
         return "Welcome to the API server!"
 
-@api.route('/process_request')
+@api.route('/ai-api-server/process_request')
 class ProcessRequest(Resource):
     @api.expect(request_model)
     @api.marshal_with(response_model, code=200)
