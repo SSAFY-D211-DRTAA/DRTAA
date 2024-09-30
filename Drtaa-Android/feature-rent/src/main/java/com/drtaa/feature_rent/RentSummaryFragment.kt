@@ -131,7 +131,7 @@ class RentSummaryFragment :
                 findNavController()
                     .currentBackStackEntry
                     ?.savedStateHandle
-                    ?.getStateFlow<Pair<Boolean, String>>(Pay.SUCCESS.type, Pair(false, ""))
+                    ?.getStateFlow(Pay.SUCCESS.type, Pair(false, ""))
                     ?.collectLatest { (success, paymentData) ->
                         if (success) {
                             showSnackBar("결제에 성공했습니다")
@@ -147,7 +147,7 @@ class RentSummaryFragment :
                 findNavController()
                     .currentBackStackEntry
                     ?.savedStateHandle
-                    ?.getStateFlow<Boolean>(Pay.CLOSED.type, false)
+                    ?.getStateFlow(Pay.CLOSED.type, false)
                     ?.collectLatest { closed ->
                         if (closed) {
                             showSnackBar("결제가 취소되었습니다")
@@ -159,7 +159,7 @@ class RentSummaryFragment :
                 findNavController()
                     .currentBackStackEntry
                     ?.savedStateHandle
-                    ?.getStateFlow<Boolean>(Pay.CANCELED.type, false)
+                    ?.getStateFlow(Pay.CANCELED.type, false)
                     ?.collectLatest { canceled ->
                         if (canceled) {
                             showSnackBar("결제에 실패하였습니다")

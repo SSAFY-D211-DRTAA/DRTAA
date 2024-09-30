@@ -2,22 +2,33 @@ package com.drtaa.feature_taxi.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.drtaa.core_data.repository.RentRepository
 import com.drtaa.core_data.repository.TaxiRepository
 import com.drtaa.core_model.map.Search
+import com.drtaa.core_model.network.RequestDuplicatedSchedule
+import com.drtaa.core_model.rent.RentInfo
+import com.drtaa.core_model.rent.RentSchedule
 import com.drtaa.core_model.route.ResponseGeoJson
 import com.drtaa.core_model.route.RouteInfo
 import com.naver.maps.geometry.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.time.format.TextStyle
+import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
 class TaxiViewModel @Inject constructor(
-    private val taxiRepository: TaxiRepository
+    private val taxiRepository: TaxiRepository,
+    private val rentRepository: RentRepository
 ) : ViewModel() {
 
     private val _taxiStartLocation = MutableStateFlow<Search?>(null)
@@ -31,6 +42,12 @@ class TaxiViewModel @Inject constructor(
 
     private val _routeInfo = MutableStateFlow<RouteInfo?>(null)
     val routeInfo: StateFlow<RouteInfo?> = _routeInfo.asStateFlow()
+
+    private val _isDuplicatedSchedule = MutableSharedFlow<Boolean?>()
+    val isDuplicatedSchedule: SharedFlow<Boolean?> = _isDuplicatedSchedule
+
+    private val _taxiInfo = MutableStateFlow<RentInfo?>(null)
+    val taxiInfo: StateFlow<RentInfo?> = _taxiInfo
 
     fun setTaxiStartLocation(search: Search) {
         viewModelScope.launch {
@@ -58,7 +75,7 @@ class TaxiViewModel @Inject constructor(
             _taxiEndLocation.value = taxiEnd
         }
     }
-    
+
     fun getRoute(start: Search, end: Search) {
         viewModelScope.launch {
             taxiRepository.getRoute(start, end).collect { result ->
@@ -89,6 +106,59 @@ class TaxiViewModel @Inject constructor(
         }.flatMap { feature ->
             (feature.geometry.coordinates as List<List<Double>>).map { coordinate ->
                 LatLng(coordinate[1], coordinate[0])
+            }
+        }
+    }
+
+    fun getTaxiInfo() {
+        viewModelScope.launch {
+            val price = routeInfo.value?.taxiFare
+            val now = LocalDateTime.now()
+            val dayOfWeek = now.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault())
+            _taxiInfo.emit(
+                RentInfo(
+                    carInfo = null,
+                    hours = 1.0,
+                    price = 100,
+                    discount = 0,
+                    finalPrice = 100,
+                    people = 1,
+                    startLocation = _taxiStartLocation.value!!,
+                    startSchedule = RentSchedule(
+                        year = now.year,
+                        month = now.monthValue,
+                        date = now.dayOfMonth,
+                        day = dayOfWeek,
+                        hour = now.hour,
+                        minute = now.minute
+                    ),
+                    endSchedule = RentSchedule(
+                        year = now.year,
+                        month = now.monthValue,
+                        date = now.dayOfMonth,
+                        day = dayOfWeek,
+                        hour = now.hour,
+                        minute = now.minute
+                    )
+                )
+            )
+        }
+    }
+
+    fun checkDuplicatedSchedule() {
+        viewModelScope.launch {
+            rentRepository.checkDuplicatedRent(
+                RequestDuplicatedSchedule(
+                    rentStartTime = LocalDateTime.now()
+                        .format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+                    rentEndTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                )
+            ).collect { result ->
+                result.onSuccess { data ->
+                    _isDuplicatedSchedule.emit(data)
+                }.onFailure {
+                    _isDuplicatedSchedule.emit(null)
+                }
             }
         }
     }

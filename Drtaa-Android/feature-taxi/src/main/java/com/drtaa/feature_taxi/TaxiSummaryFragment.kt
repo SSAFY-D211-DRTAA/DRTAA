@@ -7,8 +7,10 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.drtaa.core_map.base.BaseMapFragment
+import com.drtaa.core_model.network.RequestUnassignedCar
 import com.drtaa.core_model.rent.Payment
 import com.drtaa.core_model.util.Pay
+import com.drtaa.core_ui.showSnackBar
 import com.drtaa.feature_taxi.databinding.FragmentTaxiSummaryBinding
 import com.drtaa.feature_taxi.viewmodel.TaxiSummaryViewModel
 import com.drtaa.feature_taxi.viewmodel.TaxiViewModel
@@ -19,9 +21,13 @@ import com.naver.maps.map.MapView
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.overlay.ArrowheadPathOverlay
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @AndroidEntryPoint
 class TaxiSummaryFragment :
@@ -46,11 +52,27 @@ class TaxiSummaryFragment :
         naverMap.uiSettings.isLocationButtonEnabled = false
 
         initObserve()
+        observeDialog()
         requestRoute()
     }
 
     override fun iniView() {
         initEvent()
+        initData()
+    }
+
+    private fun initData() {
+        val taxiStartLocation = taxiViewModel.taxiStartLocation.value
+        if (taxiStartLocation !=null) {
+            taxiSummaryViewModel.setTaxiStartLocation(taxiStartLocation)
+        }
+
+        val taxiSchedule = RequestUnassignedCar(
+            rentCarScheduleStartDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+            rentCarScheduleEndDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+        )
+        taxiSummaryViewModel.getUnAssignedCar(taxiSchedule)
+        taxiViewModel.getTaxiInfo()
     }
 
     private fun initObserve() {
@@ -70,6 +92,8 @@ class TaxiSummaryFragment :
                     }
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+
     }
 
     private fun drawRoute(routePoints: List<LatLng>) {
@@ -102,22 +126,71 @@ class TaxiSummaryFragment :
         }
 
         binding.btnTaxiSummaryPayment.setOnClickListener {
-            val action = TaxiSummaryFragmentDirections.actionTaxiSummaryFragmentToPaymentFragment(
-                Payment(
-                    "DRTAA 택시 이용",
-                    "1",
-                    listOf(
-                        Payment.Product(
-                            "DRTAA 택시",
-                            "TAXI_CODE",
-                            taxiViewModel.routeInfo.value?.taxiFare ?: 0,
-                            1
-                        )
+            navigationToPayment()
+        }
+    }
+
+    private fun navigationToPayment() {
+        val action = TaxiSummaryFragmentDirections.actionTaxiSummaryFragmentToPaymentFragment(
+            Payment(
+                "DRTAA 택시 이용",
+                "1",
+                listOf(
+                    Payment.Product(
+                        "DRTAA 택시",
+                        "TAXI_CODE",
+                        taxiViewModel.routeInfo.value?.taxiFare ?: 0,
+                        1
                     )
                 )
             )
-            clearBackStackEntryState()
-            navigateDestination(action)
+        )
+        clearBackStackEntryState()
+        navigateDestination(action)
+    }
+
+    private fun observeDialog() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            launch {
+                findNavController()
+                    .currentBackStackEntry
+                    ?.savedStateHandle
+                    ?.getStateFlow(Pay.SUCCESS.type, Pair(false,""))
+                    ?.collectLatest { (success, paymentData) ->
+                        if(success) {
+                            showSnackBar("결제에 성공했습니다.")
+                            Timber.tag("bootpay").d("택시용 ${Pay.SUCCESS.type} : $paymentData")
+                            taxiSummaryViewModel.processBootpayPayment(
+                                paymentData,
+                                taxiViewModel.taxiInfo.value!!
+                            )
+                        }
+                    }
+            }
+            launch {
+                findNavController()
+                    .currentBackStackEntry
+                    ?.savedStateHandle
+                    ?.getStateFlow(Pay.CLOSED.type,false)
+                    ?.collectLatest { closed ->
+                        if(closed) {
+                            showSnackBar("결제가 취소되었습니다.")
+                            Timber.tag("bootpay").d("택시용 ${Pay.CLOSED.type} : $closed")
+                        }
+                    }
+            }
+            launch {
+                findNavController()
+                    .currentBackStackEntry
+                    ?.savedStateHandle
+                    ?.getStateFlow(Pay.CANCELED.type, false)
+                    ?.collectLatest { canceled ->
+                        if(canceled) {
+                            showSnackBar("결제가 취소되었습니다.")
+                            Timber.tag("bootpay").d("택시용 ${Pay.CANCELED.type} : $canceled")
+                        }
+                    }
+            }
         }
     }
 

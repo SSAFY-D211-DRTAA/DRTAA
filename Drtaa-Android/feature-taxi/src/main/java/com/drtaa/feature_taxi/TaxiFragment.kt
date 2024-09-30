@@ -5,11 +5,13 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.drtaa.core_ui.base.BaseFragment
+import com.drtaa.core_ui.component.OneButtonMessageDialog
 import com.drtaa.feature_taxi.databinding.FragmentTaxiBinding
 import com.drtaa.feature_taxi.viewmodel.TaxiViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import timber.log.Timber
 
 @AndroidEntryPoint
 class TaxiFragment : BaseFragment<FragmentTaxiBinding>(R.layout.fragment_taxi) {
@@ -39,6 +41,23 @@ class TaxiFragment : BaseFragment<FragmentTaxiBinding>(R.layout.fragment_taxi) {
                     binding.tvTaxiEndLocation.hint = "상암 월드컵 경기장"
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+        taxiViewModel.isDuplicatedSchedule.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach { isDuplicatedSchedule ->
+                Timber.d("중복 확인: $isDuplicatedSchedule")
+                if (isDuplicatedSchedule == null) {
+                    OneButtonMessageDialog(
+                        requireActivity(),
+                        "오류가 발생했습니다.\n" + "다시 시도해주세요."
+                    ).show()
+                } else if (isDuplicatedSchedule) {
+                    OneButtonMessageDialog(
+                        requireActivity(), "현재 배정 가능한 차가 없습니다"
+                    ).show()
+                } else {
+                    navigateDestination(R.id.action_taxiFragment_to_taxiSummaryFragment)
+                }
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
     private fun initEvent() {
@@ -51,7 +70,7 @@ class TaxiFragment : BaseFragment<FragmentTaxiBinding>(R.layout.fragment_taxi) {
         }
 
         binding.btnTaxiNext.setOnClickListener {
-            navigateDestination(R.id.action_taxiFragment_to_taxiSummaryFragment)
+            taxiViewModel.checkDuplicatedSchedule()
         }
     }
 
