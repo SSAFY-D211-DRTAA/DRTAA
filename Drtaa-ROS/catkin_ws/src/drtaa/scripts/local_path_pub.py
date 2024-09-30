@@ -4,13 +4,11 @@
 import rospy
 import rospkg
 from math import sqrt, atan2
-from geometry_msgs.msg import PoseStamped
 from nav_msgs.msg import Odometry, Path
 from std_msgs.msg import Bool
 from tf.transformations import euler_from_quaternion
 import numpy as np
 from scipy.interpolate import interp1d
-from scipy.spatial import KDTree
 
 class local_path_pub:
     def __init__(self):
@@ -31,7 +29,7 @@ class local_path_pub:
         self.y = 0
         self.local_path_size = 70
         self.prev_current_waypoint = 0
-        self.smoothing_factor = 0.8  # 경로 평활화 계수
+        self.smoothing_factor = 0.5  # 경로 평활화 계수
 
         rate = rospy.Rate(20)  # 20hz
         while not rospy.is_shutdown():
@@ -54,7 +52,7 @@ class local_path_pub:
         self.is_path = True
         self.global_path_msg = msg
         if self.is_odom:  # 현재 위치 정보가 있는 경우에만 초기화
-            self.prev_current_waypoint = self.find_closest_waypoint(self.x, self.y)
+            self.prev_current_waypoint = self.find_closest_waypoint(self.x, self.y, self.heading, start_index=0)
             rospy.loginfo(f"Global path updated and prev_current_waypoint set to {self.prev_current_waypoint}")
 
     def update_local_path(self):
@@ -62,7 +60,7 @@ class local_path_pub:
             local_path_msg = Path()
             local_path_msg.header.frame_id = 'map'
             
-            current_waypoint = self.find_closest_waypoint(self.x, self.y, start_index=self.prev_current_waypoint)
+            current_waypoint = self.find_closest_waypoint(self.x, self.y, self.heading, start_index=self.prev_current_waypoint)
 
             # 급격한 변화 방지를 위한 평활화
             smoothed_waypoint = int(self.smoothing_factor * self.prev_current_waypoint + 
@@ -80,25 +78,67 @@ class local_path_pub:
             self.left_turn_pub.publish(Bool(is_turning_left))
             self.local_path_pub.publish(local_path_msg)
 
-    def find_closest_waypoint(self, x, y, start_index=0):
-        min_dis = float('inf')
+    # def find_closest_waypoint(self, x, y, start_index=0):
+    #     min_dis = float('inf')
+    #     current_waypoint = start_index
+    #     for i in range(start_index, len(self.global_path_msg.poses)):
+    #         pose = self.global_path_msg.poses[i]
+    #         dis = sqrt((x - pose.pose.position.x)**2 + (y - pose.pose.position.y)**2)
+    #         if dis < min_dis:
+    #             min_dis = dis
+    #             current_waypoint = i
+    #         elif dis > min_dis + 5.0:  # 거리가 다시 증가하기 시작하면 검색 중단
+    #             break
+
+    #     # 방향 기준 추가: 차량의 진행 방향과 경로점의 방향 비교
+    #     angle_to_waypoint = atan2(pose.pose.position.y - y, pose.pose.position.x - x)
+    #     angle_difference = (angle_to_waypoint - self.heading + np.pi) % (2 * np.pi) - np.pi
+        
+    #     # 특정 임계값을 기준으로 진행 방향과 맞지 않는 경우 무시
+    #     if angle_difference < -0.1 or angle_difference > 0.1:
+    #         return self.prev_current_waypoint
+
+    #     return current_waypoint
+    def find_closest_waypoint(self, x, y, heading, start_index=0):
+        min_score = float('inf')
         current_waypoint = start_index
+        look_ahead_distance = 10.0  # 전방 주시 거리
+        direction_weight = 0.7  # 방향 가중치
+        distance_weight = 0.3  # 거리 가중치
+
         for i in range(start_index, len(self.global_path_msg.poses)):
             pose = self.global_path_msg.poses[i]
-            dis = sqrt((x - pose.pose.position.x)**2 + (y - pose.pose.position.y)**2)
-            if dis < min_dis:
-                min_dis = dis
-                current_waypoint = i
-            elif dis > min_dis + 5.0:  # 거리가 다시 증가하기 시작하면 검색 중단
-                break
+            dx = pose.pose.position.x - x
+            dy = pose.pose.position.y - y
+            distance = sqrt(dx**2 + dy**2)
 
-        # 방향 기준 추가: 차량의 진행 방향과 경로점의 방향 비교
-        angle_to_waypoint = atan2(pose.pose.position.y - y, pose.pose.position.x - x)
-        angle_difference = (angle_to_waypoint - self.heading + np.pi) % (2 * np.pi) - np.pi
-        
-        # 특정 임계값을 기준으로 진행 방향과 맞지 않는 경우 무시
-        if angle_difference < -0.1 or angle_difference > 0.1:
-            return self.prev_current_waypoint
+            # 전방 주시 거리 이내의 경로점만 고려
+            if distance > look_ahead_distance:
+                continue
+
+            # 경로점의 방향 계산
+            angle_to_waypoint = atan2(dy, dx)
+            angle_difference = (angle_to_waypoint - heading + np.pi) % (2 * np.pi) - np.pi
+
+            # 거리와 방향을 고려한 점수 계산
+            direction_score = abs(angle_difference)
+            distance_score = distance / look_ahead_distance
+            score = direction_weight * direction_score + distance_weight * distance_score
+
+            if score < min_score:
+                min_score = score
+                current_waypoint = i
+
+        # 전역 경로 연속성 확인
+        if current_waypoint > start_index:
+            prev_pose = self.global_path_msg.poses[current_waypoint - 1].pose.position
+            current_pose = self.global_path_msg.poses[current_waypoint].pose.position
+            path_direction = atan2(current_pose.y - prev_pose.y, current_pose.x - prev_pose.x)
+            path_angle_difference = (path_direction - heading + np.pi) % (2 * np.pi) - np.pi
+
+            # 경로 방향과 차량 방향이 크게 다르면 이전 웨이포인트 유지
+            if abs(path_angle_difference) > np.pi/4:  # 45도
+                return self.prev_current_waypoint
 
         return current_waypoint
 
