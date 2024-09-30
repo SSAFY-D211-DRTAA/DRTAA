@@ -9,7 +9,7 @@ main_logger = setup_logger(__name__)
 # MQTT 메시지 처리 관련 로거
 message_logger = setup_logger('message_logger', 'mqtt_messages.log', logging.INFO)
 
-class MQTTClient:
+class MQTTClient():
     def __init__(self, broker='mqtt-broker', port=1883, topic="vehicle_control"):
         self.broker = broker
         self.port = port
@@ -27,27 +27,33 @@ class MQTTClient:
         self.sub_gps_topic = "gps/data/v1/subscribe"
         self.pub_gps_topic = "gps/data/v1/publish"
 
+        self.sub_path_topic = "path/data/v1/subscribe"
+        self.pub_path_topic = "path/data/v1/publish"
+
         self.sub_cmd_topic = "cmd/data/v1/subscribe"
         self.pub_cmd_topic = "cmd/data/v1/publish"
 
         self.message_handler = MessageHandler()
 
     def on_connect(self, client, userdata, flags, rc, properties=None):
-        client.subscribe(self.topic)
+        client.subscribe(self.topic, qos=2)
 
         client.subscribe(self.sub_topic, qos=2)
         client.subscribe(self.sub_gps_topic, qos=2)
+        client.subscribe(self.sub_path_topic, qos=2)
         client.subscribe(self.sub_cmd_topic, qos=2)
 
         main_logger.info(f"Connected with result code {rc}")
 
     def on_message(self, client, userdata, msg):
         message_logger.debug(f"Received message on topic {msg.topic}: {msg.payload}")
-        response = self.message_handler.handle_message(msg.payload.decode(), "MQTT")
-        
-        # MQTT로 응답을 보내는 로직 (필요한 경우)
-        self.client.publish(f"{self.pub_gps_topic}", json.dumps(response))
 
+        response = self.message_handler.handle_message(msg.payload.decode(), "MQTT")
+
+        if msg.topic == self.sub_gps_topic:
+            self.client.publish(f"{self.pub_gps_topic}", json.dumps(response))
+        elif msg.topic == self.sub_path_topic:
+            self.client.publish(f"{self.pub_path_topic}", json.dumps(response))
 
     def on_subscribe(self, client, userdata, mid, granted_qos, properties=None):
         main_logger.info(f"Subscribed: {mid} {granted_qos}")
@@ -65,6 +71,10 @@ class MQTTClient:
         self.client.loop_stop()
         self.client.disconnect()
         main_logger.info("MQTT client stopped")
+    
+    def publish_global_path(self, msg):
+        self.client.publish(self.pub_path_topic, msg)
+
 
 def run_mqtt_client():
     client = MQTTClient()
