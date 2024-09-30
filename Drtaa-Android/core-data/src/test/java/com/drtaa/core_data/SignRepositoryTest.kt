@@ -2,7 +2,7 @@ package com.drtaa.core_data
 
 import com.drtaa.core_data.datasource.SignDataSource
 import com.drtaa.core_data.repository.SignRepository
-import com.drtaa.core_model.data.SocialUser
+import com.drtaa.core_model.sign.SocialUser
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
