@@ -4,7 +4,7 @@ import time
 import os
 
 from dotenv import load_dotenv
-from flask import Flask
+from flask import Flask, redirect
 from flask_cors import CORS
 from flask_restx import Api, Resource, fields
 from langchain_openai import ChatOpenAI
@@ -31,8 +31,15 @@ if not all([OPENAI_API_KEY]):
 
 app = Flask(__name__)
 CORS(app)
-api = Api(app, version='1.0', title='AI API 문서', description='Swagger 문서', doc="/ai-api-server/api-docs")
-llm = ChatOpenAI(api_key=OPENAI_API_KEY, model="gpt-4o-mini")
+
+api = Api(app, version='1.0', 
+          title='AI API 문서', 
+          description='Swagger 문서', 
+          doc="/ai-api-server/api-docs", 
+          prefix='/ai-api-server')
+
+llm = ChatOpenAI(api_key=OPENAI_API_KEY, 
+                 model="gpt-4o-mini")
 
 try:
     dynamodb = boto3.resource('dynamodb', 
@@ -73,13 +80,12 @@ response_model = api.model('Response', {
     'response': fields.String(description='AI의 응답')
 })
 
-@api.route('/ai-api-server/')
+@api.route('/')
 class Home(Resource):
     def get(self):
-        """Welcome message"""
-        return "Welcome to the API server!"
+        return redirect('/ai-api-server/api-docs')
 
-@api.route('/ai-api-server/process_request')
+@api.route('/process_request')
 class ProcessRequest(Resource):
     @api.expect(request_model)
     @api.marshal_with(response_model, code=200)
