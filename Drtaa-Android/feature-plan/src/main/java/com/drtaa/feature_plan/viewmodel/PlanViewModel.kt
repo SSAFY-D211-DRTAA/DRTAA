@@ -10,6 +10,8 @@ import com.drtaa.core_model.util.toPlanItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -25,6 +27,12 @@ class PlanViewModel @Inject constructor(
 
     private val _dayPlanList = MutableStateFlow<List<Plan.DayPlan>?>(null)
     val dayPlanList: StateFlow<List<Plan.DayPlan>?> = _dayPlanList
+
+    private val _dayPlan = MutableStateFlow<Plan.DayPlan?>(null)
+    val dayPlan: StateFlow<Plan.DayPlan?> = _dayPlan
+
+    private val _dayIdx = MutableStateFlow(0)
+    val dayIdx: StateFlow<Int> = _dayIdx
 
     private val _isEditMode = MutableStateFlow(false)
     val isEditMode: StateFlow<Boolean> = _isEditMode
@@ -53,6 +61,10 @@ class PlanViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun setDayIdx(dayIdx: Int) {
+        _dayIdx.value = dayIdx
     }
 
     fun setIsEditSuccess(isEditSuccess: Boolean?) {
@@ -223,6 +235,19 @@ class PlanViewModel @Inject constructor(
         viewModelScope.launch {
             plan.collect { plan ->
                 _dayPlanList.value = plan?.datesDetail
+            }
+        }
+
+        viewModelScope.launch {
+            merge(
+                dayIdx.map { dayIdx ->
+                    plan.value?.datesDetail?.getOrNull(dayIdx)
+                },
+                plan.map { plan ->
+                    plan?.datesDetail?.getOrNull(dayIdx.value)
+                }
+            ).collect { dayPlan ->
+                _dayPlan.value = dayPlan
             }
         }
     }
