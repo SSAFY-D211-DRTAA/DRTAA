@@ -13,4 +13,10 @@ class TokenRepositoryImpl @Inject constructor(
         tokenDataSource.setAccessToken(accessToken)
 
     override suspend fun clearToken() = tokenDataSource.clearToken()
+
+    override suspend fun setRefreshToken(refreshToken: String) {
+        tokenDataSource.setRefreshToken(refreshToken)
+    }
+
+    override suspend fun getRefreshToken(): String = tokenDataSource.getRefreshToken()
 }

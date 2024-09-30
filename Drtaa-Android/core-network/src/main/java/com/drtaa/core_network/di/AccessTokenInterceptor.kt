@@ -25,6 +25,47 @@ class AccessTokenInterceptor @Inject constructor(
         }
         Timber.tag("access_token").d(" $accessToken")
         val request = requestBuilder.addHeader("Authorization", "Bearer $accessToken").build()
-        return chain.proceed(request)
+        val originResponse = chain.proceed(request)
+
+        if (originResponse.code == TOKEN_ERROR_CODE) {
+            synchronized(this) {
+                originResponse.close()
+
+                val newAccessToken = runBlocking {
+                    tokenProvider.getNewAccessToken()
+                }
+
+                return if (newAccessToken != null) {
+                    val newRequest = requestBuilder
+                        .removeHeader("Authorization")
+                        .addHeader("Authorization", "Bearer $newAccessToken").build()
+                    chain.proceed(newRequest)
+                } else {
+                    chain.proceed(originRequest)
+                }
+            }
+        }
+
+        return originResponse
+    }
+
+//    private suspend fun getNewAccessToken(): String? {
+//        return try {
+//            val newAccessToken = tokenProvider.getNewAccessToken()
+//
+//            if (!newAccessToken.isNullOrBlank()) {
+//                tokenProvider.setAccessToken(newAccessToken)
+//            } else {
+//                return null
+//            }
+//            newAccessToken
+//        } catch (e: Exception) {
+//            Timber.d("토큰 갱신 실패: ${e.message}")
+//            null
+//        }
+//    }
+
+    companion object {
+        private const val TOKEN_ERROR_CODE = 401
     }
 }

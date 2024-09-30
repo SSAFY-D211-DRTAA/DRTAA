@@ -25,8 +25,14 @@ class SignInFragment : BaseFragment<FragmentSignInBinding>(R.layout.fragment_sig
     lateinit var socialLoginManager: SocialLoginManager
 
     override fun initView() {
+        autoSignIn()
+
         initEvent()
         initObserver()
+    }
+
+    private fun autoSignIn() {
+        signViewModel.getTokens()
     }
 
     private fun initEvent() {
