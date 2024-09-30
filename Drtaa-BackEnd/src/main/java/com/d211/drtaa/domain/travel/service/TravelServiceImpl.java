@@ -224,7 +224,7 @@ public class TravelServiceImpl implements TravelService {
 
     @Override
     @Transactional
-    public void addTravelDatesPlace(PlaceAddRequestDTO placeAddRequestDTO) {
+    public RentCarDrivingResponseDTO addTravelDatesPlace(PlaceAddRequestDTO placeAddRequestDTO) {
         // 여행 찾기
         Travel travel = travelRepository.findByTravelId(placeAddRequestDTO.getTravelId())
                 .orElseThrow(() -> new TravelNotFoundException("해당 travelId의 맞는 여행을 찾을 수 없습니다."));
@@ -252,6 +252,13 @@ public class TravelServiceImpl implements TravelService {
                 .datePlacesLon(placeAddRequestDTO.getDatePlacesLon())
                 .datePlacesIsVisited(false)
                 .build();
+
+        // 응답할 빌더 생성
+        RentCarDrivingResponseDTO response = RentCarDrivingResponseDTO.builder()
+                .travelId(travel.getTravelId())
+                .travelDatesId(date.getTravelDatesId())
+                // 현재 이동할 장소
+                .build();
         
         // 목적지 이전에 이동
         if(placeAddRequestDTO.getIsBefore()) {
@@ -261,12 +268,18 @@ public class TravelServiceImpl implements TravelService {
             // 입력받은 일정(원래 목적지) 순서 조정 -> 하나 뒤로 밀려남
             destinationPlace.setDatePlacesOrder(destinationPlace.getDatePlacesOrder() + 1);
             datePlacesRepository.save(destinationPlace); // 상태 변경 저장
+
+            // 추가한 장소로 응답
+            response.setDatePlacesId(newPlace.getDatePlacesId());
         }
 
         // 목적지 이후에 이동
         else {
             // 추가로 등록할 장소 순서 조정 -> 원래 목적지 순서 뒤로 들어감
             newPlace.setDatePlacesOrder(destinationPlace.getDatePlacesOrder() + 1);
+
+            // 원래 장소로 응답
+            response.setDatePlacesId(destinationPlace.getDatePlacesId());
         }
 
         // 추가된 장소 상태 변경 저장
@@ -277,6 +290,8 @@ public class TravelServiceImpl implements TravelService {
             afterPlace.setDatePlacesOrder(destinationPlace.getDatePlacesOrder() + 1);
             datePlacesRepository.save(afterPlace);  // 순서 저장
         }
+
+        return response;
     }
 
     @Override

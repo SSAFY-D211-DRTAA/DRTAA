@@ -112,9 +112,9 @@ public class TravelController {
     @Operation(summary = "검색 후 장소 추가", description = "travelId의 해당하는 여행 중 travelDatesId의 해당하는 일정에 이전 또는 이후에 추가")
     public ResponseEntity addTravelDatesPlace(@RequestBody PlaceAddRequestDTO placeAddRequestDTO) {
         try {
-            travelService.addTravelDatesPlace(placeAddRequestDTO);
+            RentCarDrivingResponseDTO response = travelService.addTravelDatesPlace(placeAddRequestDTO);
 
-            return ResponseEntity.ok("Success");
+            return ResponseEntity.ok(response);
         } catch (TravelNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
         } catch (Exception e) {
