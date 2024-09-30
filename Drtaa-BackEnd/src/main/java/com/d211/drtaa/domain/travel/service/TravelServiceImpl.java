@@ -1,5 +1,7 @@
 package com.d211.drtaa.domain.travel.service;
 
+import com.d211.drtaa.domain.rent.dto.response.RentCarDrivingResponseDTO;
+import com.d211.drtaa.domain.rent.dto.response.RentCarLocationResponseDTO;
 import com.d211.drtaa.domain.rent.entity.Rent;
 import com.d211.drtaa.domain.rent.entity.RentStatus;
 import com.d211.drtaa.domain.rent.repository.RentRepository;
@@ -13,9 +15,14 @@ import com.d211.drtaa.domain.travel.repository.TravelDatesRepository;
 import com.d211.drtaa.domain.travel.repository.TravelRepository;
 import com.d211.drtaa.domain.user.entity.User;
 import com.d211.drtaa.domain.user.repository.UserRepository;
+import com.d211.drtaa.global.config.websocket.MyMessage;
+import com.d211.drtaa.global.config.websocket.WebSocketConfig;
 import com.d211.drtaa.global.exception.rent.RentNotFoundException;
 import com.d211.drtaa.global.exception.travel.TravelNotFoundException;
+import com.d211.drtaa.global.exception.websocket.WebSocketDisConnectedException;
 import com.d211.drtaa.global.service.weather.WeatherService;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
@@ -23,6 +30,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketSession;
+import org.springframework.web.socket.client.standard.StandardWebSocketClient;
+import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -46,6 +57,8 @@ public class TravelServiceImpl implements TravelService {
     private final DatePlacesRepository datePlacesRepository;
     private final UserRepository userRepository;
     private final RentRepository rentRepository;
+    private final WebSocketConfig webSocketConfig;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public List<TravelResponseDTO> getAllTravels(String userProviderId) {
@@ -207,6 +220,63 @@ public class TravelServiceImpl implements TravelService {
 
         // 생성한 일정 장소 저장
         datePlacesRepository.save(places);
+    }
+
+    @Override
+    @Transactional
+    public void addTravelDatesPlace(PlaceAddRequestDTO placeAddRequestDTO) {
+        // 여행 찾기
+        Travel travel = travelRepository.findByTravelId(placeAddRequestDTO.getTravelId())
+                .orElseThrow(() -> new TravelNotFoundException("해당 travelId의 맞는 여행을 찾을 수 없습니다."));
+
+        // 여행 일정 찾기
+        TravelDates date = travelDatesRepository.findByTravelDatesId(placeAddRequestDTO.getTravelDatesId())
+                .orElseThrow(() -> new TravelNotFoundException("해당 travelDatesId의 맞는 여행 일정을 찾을 수 없습니다."));
+
+        // 일정의 원래 목적지 장소 찾기
+        DatePlaces destinationPlace = datePlacesRepository.findByDatePlacesId(placeAddRequestDTO.getDatePlacesId())
+                .orElseThrow(() -> new TravelNotFoundException("해당 datePlacesId의 맞는 일정 장소를 찾을 수 없습니다."));
+
+        // 입력받은 일정(원래 목적지) 이후 장소들 찾기
+        List<DatePlaces> afterPlaces = datePlacesRepository.findByTravelDatesAndDatePlacesOrderGreaterThan(date, destinationPlace.getDatePlacesOrder());
+
+        // 추가로 등록할 장소 만들기
+        DatePlaces newPlace = DatePlaces.builder()
+                .travel(travel)
+                .travelDates(date)
+                // 순서는 아래에서 저장
+                .datePlacesName(placeAddRequestDTO.getDatePlacesName())
+                .datePlacesCategory(placeAddRequestDTO.getDatePlacesCategory())
+                .datePlacesAddress(placeAddRequestDTO.getDatePlacesAddress())
+                .datePlacesLat(placeAddRequestDTO.getDatePlacesLat())
+                .datePlacesLon(placeAddRequestDTO.getDatePlacesLon())
+                .datePlacesIsVisited(false)
+                .build();
+        
+        // 목적지 이전에 이동
+        if(placeAddRequestDTO.getIsBefore()) {
+            // 추가로 등록할 장소 순서 조정 -> 원래 목적지 순서로 들어감
+            newPlace.setDatePlacesOrder(destinationPlace.getDatePlacesOrder());
+
+            // 입력받은 일정(원래 목적지) 순서 조정 -> 하나 뒤로 밀려남
+            destinationPlace.setDatePlacesOrder(destinationPlace.getDatePlacesOrder() + 1);
+            datePlacesRepository.save(destinationPlace); // 상태 변경 저장
+        }
+
+        // 목적지 이후에 이동
+        else {
+            // 추가로 등록할 장소 순서 조정 -> 원래 목적지 순서 뒤로 들어감
+            newPlace.setDatePlacesOrder(destinationPlace.getDatePlacesOrder() + 1);
+        }
+
+        // 추가된 장소 상태 변경 저장
+        datePlacesRepository.save(newPlace);
+
+        // 이후 일정 순서 조정 -> 순서 하나씩 뒤로 밀기
+        for(DatePlaces afterPlace: afterPlaces) {
+            afterPlace.setDatePlacesOrder(destinationPlace.getDatePlacesOrder() + 1);
+            datePlacesRepository.save(afterPlace);  // 순서 저장
+        }
     }
 
     @Override

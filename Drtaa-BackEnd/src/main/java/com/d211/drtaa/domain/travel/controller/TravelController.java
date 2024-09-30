@@ -1,5 +1,7 @@
 package com.d211.drtaa.domain.travel.controller;
 
+import com.d211.drtaa.domain.rent.dto.response.RentCarDrivingResponseDTO;
+import com.d211.drtaa.domain.travel.dto.request.PlaceAddRequestDTO;
 import com.d211.drtaa.domain.travel.dto.request.PlacesAddRequestDTO;
 import com.d211.drtaa.domain.travel.dto.request.TravelDetailRequestDTO;
 import com.d211.drtaa.domain.travel.dto.request.TravelNameRequestDTO;
@@ -97,6 +99,20 @@ public class TravelController {
     public ResponseEntity createTravelDatesPlaces(@RequestBody PlacesAddRequestDTO placesAddRequestDTO) {
         try {
             travelService.createTravelDatesPlaces(placesAddRequestDTO);
+
+            return ResponseEntity.ok("Success");
+        } catch (TravelNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage()); // 400
+        }
+    }
+
+    @PostMapping("/search")
+    @Operation(summary = "검색 후 장소 추가", description = "travelId의 해당하는 여행 중 travelDatesId의 해당하는 일정에 이전 또는 이후에 추가")
+    public ResponseEntity addTravelDatesPlace(@RequestBody PlaceAddRequestDTO placeAddRequestDTO) {
+        try {
+            travelService.addTravelDatesPlace(placeAddRequestDTO);
 
             return ResponseEntity.ok("Success");
         } catch (TravelNotFoundException e) {
