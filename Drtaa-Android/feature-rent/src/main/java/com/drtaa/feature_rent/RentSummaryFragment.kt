@@ -7,7 +7,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.drtaa.core_model.network.RequestUnassignedCar
-import com.drtaa.core_model.rent.RentPayment
+import com.drtaa.core_model.rent.Payment
 import com.drtaa.core_model.util.Pay
 import com.drtaa.core_ui.base.BaseFragment
 import com.drtaa.core_ui.showSnackBar
@@ -90,11 +90,11 @@ class RentSummaryFragment :
     private fun initEvent() {
         binding.btnSummaryPay.setOnClickListener {
             val action = RentSummaryFragmentDirections.actionFragmentRentToNavGraphPayment(
-                RentPayment(
+                Payment(
                     "DRTAA 렌트 이용",
                     "1",
                     listOf(
-                        RentPayment.Product(
+                        Payment.Product(
                             "DRTAA 렌트",
                             "RENT_CODE",
                             rentViewModel.rentInfo.value!!.finalPrice,

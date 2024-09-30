@@ -63,7 +63,6 @@ class TaxiSearchFragment :
         naverMap.locationTrackingMode = LocationTrackingMode.Follow
 
         naverMap.moveCamera(CameraUpdate.zoomTo(DEFAULT_ZOOM))
-        initObserve(naverMap)
     }
 
     override fun iniView() {
@@ -92,6 +91,11 @@ class TaxiSearchFragment :
                     showSnackBar("장소를 입력해주세요.")
                     return@setOnClickListener
                 }
+                behavior.apply {
+                    maxHeight = BOTTOM_SHEET_PEEK_HEIGHT*2
+                    peekHeight = BOTTOM_SHEET_PEEK_HEIGHT / 2
+                }
+                rvSearchResult.visibility = View.VISIBLE
                 taxiSearchViewModel.getSearchList(etSearchLocation.text.toString())
                 requireActivity().hideKeyboard(requireView())
                 behavior.state = BottomSheetBehavior.STATE_EXPANDED
@@ -170,18 +174,19 @@ class TaxiSearchFragment :
                 }?.onFailure {
                     Timber.d("주소를 가져오지 못했습니다.")
                 }
-            }.launchIn(viewLifecycleOwner.lifecycleScope
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
     private fun initBottomSheet() {
         binding.layoutTaxiSearchBottomSheet.tvSearchNothing.visibility = View.GONE
+        binding.layoutTaxiSearchBottomSheet.rvSearchResult.visibility = View.GONE
 
         behavior = BottomSheetBehavior.from(binding.clTaxiSearchBottomSheet)
-        behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        behavior.state = BottomSheetBehavior.STATE_COLLAPSED
         behavior.isHideable = false
 
         behavior.peekHeight = BOTTOM_SHEET_PEEK_HEIGHT
-        behavior.maxHeight = BOTTOM_SHEET_PEEK_HEIGHT * 4
+        behavior.maxHeight = BOTTOM_SHEET_PEEK_HEIGHT
 
         behavior.addBottomSheetCallback(object : BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
@@ -215,7 +220,7 @@ class TaxiSearchFragment :
     }
 
     companion object {
-        const val BOTTOM_SHEET_PEEK_HEIGHT = 300
+        const val BOTTOM_SHEET_PEEK_HEIGHT = 620
         const val MAP_BOTTOM_CONTENT_PADDING = 100
         const val DEFAULT_ZOOM = 17.4
     }

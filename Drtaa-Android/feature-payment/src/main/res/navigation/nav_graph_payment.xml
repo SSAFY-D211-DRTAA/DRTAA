@@ -7,7 +7,7 @@
 
     <argument
         android:name="payment"
-        app:argType="com.drtaa.core_model.rent.RentPayment" />
+        app:argType="com.drtaa.core_model.rent.Payment" />
 
     <dialog
         android:id="@+id/paymentFragment"
@@ -16,7 +16,7 @@
         tools:layout="@layout/fragment_payment">
         <argument
             android:name="payment"
-            app:argType="com.drtaa.core_model.rent.RentPayment" />
+            app:argType="com.drtaa.core_model.rent.Payment" />
     </dialog>
 
 </navigation>

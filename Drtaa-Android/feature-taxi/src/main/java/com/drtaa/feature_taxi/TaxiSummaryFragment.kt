@@ -5,7 +5,10 @@ import androidx.fragment.app.viewModels
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.drtaa.core_map.base.BaseMapFragment
+import com.drtaa.core_model.rent.Payment
+import com.drtaa.core_model.util.Pay
 import com.drtaa.feature_taxi.databinding.FragmentTaxiSummaryBinding
 import com.drtaa.feature_taxi.viewmodel.TaxiSummaryViewModel
 import com.drtaa.feature_taxi.viewmodel.TaxiViewModel
@@ -94,16 +97,48 @@ class TaxiSummaryFragment :
     }
 
     private fun initEvent() {
-        Timber.d("추후 넣기")
+        binding.btnTaxiSummaryBack.setOnClickListener {
+            navigatePopBackStack()
+        }
+
+        binding.btnTaxiSummaryPayment.setOnClickListener {
+            val action = TaxiSummaryFragmentDirections.actionTaxiSummaryFragmentToPaymentFragment(
+                Payment(
+                    "DRTAA 택시 이용",
+                    "1",
+                    listOf(
+                        Payment.Product(
+                            "DRTAA 택시",
+                            "TAXI_CODE",
+                            taxiViewModel.routeInfo.value?.taxiFare ?: 0,
+                            1
+                        )
+                    )
+                )
+            )
+            clearBackStackEntryState()
+            navigateDestination(action)
+        }
+    }
+
+    private fun clearBackStackEntryState() {
+        val savedStateHandle = findNavController().currentBackStackEntry?.savedStateHandle ?: return
+
+        val states = mapOf(
+            Pay.SUCCESS.type to Pair(false, ""),
+            Pay.CLOSED.type to false,
+            Pay.CANCELED.type to false
+        )
+
+        states.forEach { (key, value) ->
+            savedStateHandle[key] = value
+        }
     }
 
     companion object {
         const val Hour = 60
         const val PADDING = 100
         const val WIDTH = 20
-        const val COLOR = Color.BLUE
         const val OUTLINE_WIDTH = 2
-        const val OUTLINE_COLOR = Color.WHITE
-
     }
 }

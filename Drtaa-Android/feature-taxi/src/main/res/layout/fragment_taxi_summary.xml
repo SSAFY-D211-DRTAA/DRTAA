@@ -31,7 +31,7 @@
             android:layout_marginBottom="10dp"
             android:background="@drawable/rect_black_rad15"
             android:backgroundTint="@color/white"
-            app:layout_constraintBottom_toTopOf="@+id/button"
+            app:layout_constraintBottom_toTopOf="@+id/btn_taxi_summary_back"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
 
@@ -66,7 +66,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 android:layout_marginEnd="25dp"
-                android:text="22분"
+                android:text="계산중.."
                 android:textSize="16sp"
                 app:layout_constraintBottom_toTopOf="@+id/tv_taxi_price"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -79,7 +79,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="25dp"
                 android:layout_marginBottom="5dp"
-                android:text="13,300원"
+                android:text="계산중.."
                 android:textColor="#0574E2"
                 android:textSize="16sp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -100,7 +100,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <Button
-            android:id="@+id/butto1n"
+            android:id="@+id/btn_taxi_summary_payment"
             style="@style/btn_short_black"
             android:layout_width="280dp"
             android:layout_height="wrap_content"
@@ -108,12 +108,12 @@
             android:layout_marginBottom="20dp"
             android:background="@null"
             android:backgroundTint="#0358E4"
-            android:text="결제하기"
+            android:text="호출하기"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
         <Button
-            android:id="@+id/button"
+            android:id="@+id/btn_taxi_summary_back"
             style="@style/btn_short_black"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
@@ -121,8 +121,8 @@
             android:backgroundTint="@color/white"
             android:text="뒤로가기"
             android:textColor="@color/black"
-            app:layout_constraintBottom_toBottomOf="@+id/butto1n"
-            app:layout_constraintEnd_toStartOf="@+id/butto1n"
+            app:layout_constraintBottom_toBottomOf="@+id/btn_taxi_summary_payment"
+            app:layout_constraintEnd_toStartOf="@+id/btn_taxi_summary_payment"
             app:layout_constraintStart_toStartOf="parent" />
 
 

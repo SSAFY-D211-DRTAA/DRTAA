@@ -3,7 +3,7 @@ package com.drtaa.core_model.rent
 import android.os.Parcel
 import android.os.Parcelable
 
-data class RentPayment(
+data class Payment(
     val orderName: String,
     val orderId: String,
     val items: List<Product>
@@ -23,12 +23,12 @@ data class RentPayment(
         return 0
     }
 
-    companion object CREATOR : Parcelable.Creator<RentPayment> {
-        override fun createFromParcel(parcel: Parcel): RentPayment {
-            return RentPayment(parcel)
+    companion object CREATOR : Parcelable.Creator<Payment> {
+        override fun createFromParcel(parcel: Parcel): Payment {
+            return Payment(parcel)
         }
 
-        override fun newArray(size: Int): Array<RentPayment?> {
+        override fun newArray(size: Int): Array<Payment?> {
             return arrayOfNulls(size)
         }
     }
