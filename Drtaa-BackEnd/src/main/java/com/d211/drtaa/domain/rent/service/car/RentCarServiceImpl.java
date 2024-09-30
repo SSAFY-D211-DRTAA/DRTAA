@@ -246,6 +246,24 @@ public class RentCarServiceImpl implements RentCarService {
         RentCar car = rentCarRepository.findByRentCarId(rent.getRentCar().getRentCarId())
                 .orElseThrow(() -> new RentCarNotFoundException("해당 rentCarId의 맞는 차량을 찾을 수 없습니다."));
 
+        // travelDatesId 에 해당하는 일정 찾기
+        TravelDates date = travelDatesRepository.findByTravelDatesId(rentCarCallRequestDTO.getTravelDatesId())
+                .orElseThrow(() -> new TravelNotFoundException("해당 travelDatesId의 맞는 여행 일정을 찾을 수 없습니다."));
+
+        // datePlacesId 에 해당하는 장소(호출하기 전 방문한 장소) 찾기
+        DatePlaces beforePlace = datePlacesRepository.findByDatePlacesId(rentCarCallRequestDTO.getDatePlacesId())
+                .orElseThrow(() -> new TravelNotFoundException("해당 datePlacesId의 맞는 일정 장소를 찾을 수 없습니다."));
+
+        // 찾은 일정의 장소들 중 찾은 장소 순서 바로 뒤 하나 찾기
+        DatePlaces nextPlace = datePlacesRepository.findByTravelDatesAndDatePlaceOrder(date, beforePlace.getDatePlacesOrder() + 1)
+                .orElseThrow(() -> new TravelNotFoundException("해당 datePlacesId의 맞는 일정 장소 다음 장소를 찾을 수 없습니다."));
+        log.info("다음 장소 id: {}", nextPlace.getDatePlacesId());
+        log.info("다음 장소 이름: {}", nextPlace.getDatePlacesName());
+
+        // 서버로 보낼 위도, 경도
+        double lattitude = nextPlace.getDatePlacesLat();
+        double longitude = nextPlace.getDatePlacesLon();
+
         // 응답 DTO 초기화
         final RentCarLocationResponseDTO[] response = {null};
         // 자율주행 서버로 메시지 전송
@@ -286,7 +304,7 @@ public class RentCarServiceImpl implements RentCarService {
             }, webSocketConfig.getUrl()).get();
 
             // 상태와 사용자 탑승 호출 위치 전송
-            MyMessage message = new MyMessage("vehicle_dispatch", rentCarCallRequestDTO.getUserLat(), rentCarCallRequestDTO.getUserLon(), rent.getRentCar().getRentCarId());
+            MyMessage message = new MyMessage("vehicle_dispatch", lattitude, longitude, car.getRentCarId());
             String jsonMessage = objectMapper.writeValueAsString(message);
             session.sendMessage(new TextMessage(jsonMessage));
             log.info("Sent message: {}", jsonMessage);
@@ -311,6 +329,16 @@ public class RentCarServiceImpl implements RentCarService {
             FcmMessage.FcmDTO fcmDTO = fcmUtil.makeFcmDTO("렌트 차량 위치", content);
             log.info("Message: {}", content);
             fcmUtil.singleFcmSend(rent.getUser(), fcmDTO);
+
+            // 현재 렌트 id
+            response[0].setRentId(rent.getRentId());
+            // 현재 렌트에 해당하는 여행 id
+            response[0].setTravelId(rent.getTravel().getTravelId());
+            // 현재 여행 중 현재 날짜에 해당하는 일정 id
+            response[0].setTravelDatesId(date.getTravelDatesId());
+            // 현재 일정 중 다음으로 이동할 장소 id
+            response[0].setDatePlacesId(nextPlace.getDatePlacesId());
+
             // 응답 반환
             return response[0];
         } else {
