@@ -152,15 +152,13 @@ class SignRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getAndSetUserInfo(): Flow<Result<SocialUser>> = flow {
+    override suspend fun getUserInfo(): Flow<Result<SocialUser>> = flow {
         when (
             val response = safeApiCall { signDataSource.getUserInfo() }
         ) {
             is ResultWrapper.Success -> {
-                emit(Result.success(response.data.toSocialUser()))
                 Timber.d("서버에서 사용자 정보 불러오기 성공")
-
-                setUserData(response.data.toSocialUser())
+                emit(Result.success(response.data.toSocialUser()))
             }
 
             is ResultWrapper.GenericError -> {

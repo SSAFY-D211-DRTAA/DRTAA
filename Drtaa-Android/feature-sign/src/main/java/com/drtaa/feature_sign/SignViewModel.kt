@@ -26,7 +26,14 @@ class SignViewModel @Inject constructor(
     private fun setTokens(tokens: Tokens) {
         viewModelScope.launch {
             tokenRepository.setAccessToken(tokens.accessToken)
-            signRepository.getAndSetUserInfo()
+            signRepository.getUserInfo().collect { result ->
+                result.onSuccess { data ->
+                    signRepository.setUserData(data)
+                    Timber.tag("tokens").d("유저 정보 불러오기 및 저장 성공")
+                }.onFailure {
+                    Timber.tag("tokens").d("유저 정보 불러오기 및 저장 실패")
+                }
+            }
         }
     }
 
