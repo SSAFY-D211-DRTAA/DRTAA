@@ -9,6 +9,7 @@ import com.drtaa.core_model.data.Tokens
 import com.drtaa.core_model.network.RequestSignUp
 import com.drtaa.core_model.sign.SocialUser
 import com.drtaa.core_model.sign.UserLoginInfo
+import com.drtaa.core_model.util.toSocialUser
 import com.drtaa.core_model.util.toTokens
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -114,7 +115,7 @@ class SignRepositoryImpl @Inject constructor(
         return flow {
             val user = signDataSource.getUserData()
             Timber.d("유저 정보 조회: $user")
-            when (user.isVaild()) {
+            when (user.isValid()) {
                 true -> emit(Result.success(user))
                 false -> emit(Result.failure(Exception("유저 정보가 없습니다.")))
             }
@@ -147,6 +148,27 @@ class SignRepositoryImpl @Inject constructor(
 
             is ResultWrapper.NetworkError -> {
                 emit(Result.failure(Exception("네트워크 에러")))
+            }
+        }
+    }
+
+    override suspend fun getUserInfo(): Flow<Result<SocialUser>> = flow {
+        when (
+            val response = safeApiCall { signDataSource.getUserInfo() }
+        ) {
+            is ResultWrapper.Success -> {
+                Timber.d("서버에서 사용자 정보 불러오기 성공")
+                emit(Result.success(response.data.toSocialUser()))
+            }
+
+            is ResultWrapper.GenericError -> {
+                emit(Result.failure(Exception(response.message)))
+                Timber.d("서버에서 사용자 정보 불러오기 실패")
+            }
+
+            is ResultWrapper.NetworkError -> {
+                emit(Result.failure(Exception("네트워크 에러")))
+                Timber.d("네트워크 에러")
             }
         }
     }
