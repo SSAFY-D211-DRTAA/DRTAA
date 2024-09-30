@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.drtaa.core_data.repository.NaverRepository
 import com.drtaa.core_model.map.Search
-import com.drtaa.core_model.network.ResponseReverseGeocode
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,7 +22,6 @@ class RentSearchViewModel @Inject constructor(
 
     private val _selectedSearchItem = MutableStateFlow<Search?>(null)
     val selectedSearchItem: StateFlow<Search?> = _selectedSearchItem
-
 
     fun setSelectedSearchItem(search: Search) {
         viewModelScope.launch {
@@ -44,5 +42,4 @@ class RentSearchViewModel @Inject constructor(
             }
         }
     }
-
 }

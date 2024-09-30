@@ -14,7 +14,6 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
-
 @HiltViewModel
 class TaxiSearchViewModel @Inject constructor(
     private val naverRepository: NaverRepository
@@ -61,7 +60,7 @@ class TaxiSearchViewModel @Inject constructor(
 
     private fun formatAddress(response: ResponseReverseGeocode): String {
         val result = response.results.firstOrNull()
-        return if (result !=null) {
+        return if (result != null) {
             val region = result.region
             val land = result.land
             "${region.area1.name} ${region.area2.name} ${region.area3.name} ${land?.addition0?.value}"

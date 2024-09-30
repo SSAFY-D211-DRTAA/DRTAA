@@ -18,5 +18,4 @@ class NaverDataSourceImpl @Inject constructor(
     override suspend fun getReverseGeocode(latitude: Double, longitude: Double): ResponseReverseGeocode {
         return geoAPI.getReverseGeocode(coords = "$longitude,$latitude")
     }
-
 }

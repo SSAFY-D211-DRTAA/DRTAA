@@ -59,7 +59,6 @@ interface RepositoryModule {
     @Binds
     fun bindTaxiRepository(taxiRepositoryImpl: TaxiRepositoryImpl): TaxiRepository
 
-
     @Singleton
     @Binds
     fun bindPlanRepository(planRepositoryImpl: PlanRepositoryImpl): PlanRepository

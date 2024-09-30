@@ -18,7 +18,7 @@ import javax.inject.Inject
 @HiltViewModel
 class TaxiViewModel @Inject constructor(
     private val taxiRepository: TaxiRepository
-):ViewModel(){
+) : ViewModel() {
 
     private val _taxiStartLocation = MutableStateFlow<Search?>(null)
     val taxiStartLocation: StateFlow<Search?> = _taxiStartLocation
@@ -32,7 +32,7 @@ class TaxiViewModel @Inject constructor(
     private val _routeInfo = MutableStateFlow<RouteInfo?>(null)
     val routeInfo: StateFlow<RouteInfo?> = _routeInfo.asStateFlow()
 
-    fun setTaxiStartLocation(search: Search){
+    fun setTaxiStartLocation(search: Search) {
         viewModelScope.launch {
             val taxiStart = Search(
                 title = search.title,
@@ -46,7 +46,7 @@ class TaxiViewModel @Inject constructor(
         }
     }
 
-    fun setTaxiEndLocation(search: Search){
+    fun setTaxiEndLocation(search: Search) {
         viewModelScope.launch {
             val taxiEnd = Search(
                 title = search.title,
@@ -55,14 +55,13 @@ class TaxiViewModel @Inject constructor(
                 lng = search.lng,
                 lat = search.lat
             )
-
             _taxiEndLocation.value = taxiEnd
         }
     }
     
-    fun getRoute(start: Search, end: Search){
+    fun getRoute(start: Search, end: Search) {
         viewModelScope.launch {
-            taxiRepository.getRoute(start, end).collect{ result ->
+            taxiRepository.getRoute(start, end).collect { result ->
                 result.onSuccess { geoJson ->
 
                     val route = parseGeoJons(geoJson)
@@ -89,7 +88,7 @@ class TaxiViewModel @Inject constructor(
             it.geometry.type == "LineString"
         }.flatMap { feature ->
             (feature.geometry.coordinates as List<List<Double>>).map { coordinate ->
-                LatLng(coordinate[1],coordinate[0])
+                LatLng(coordinate[1], coordinate[0])
             }
         }
     }

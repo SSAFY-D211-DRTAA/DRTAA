@@ -1,23 +1,17 @@
 package com.drtaa.feature_taxi
 
-import android.location.Geocoder
-import android.os.Build
 import android.view.KeyEvent
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.viewModels
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import com.drtaa.core_map.LOCATION_PERMISSION_REQUEST_CODE
-import com.drtaa.core_map.MAX_ZOOM
-import com.drtaa.core_map.MIN_ZOOM
 import com.drtaa.core_map.base.BaseMapFragment
 import com.drtaa.core_map.moveCameraTo
 import com.drtaa.core_map.setCustomLocationButton
-import com.drtaa.core_map.setup
 import com.drtaa.core_model.map.Search
 import com.drtaa.core_ui.hideKeyboard
 import com.drtaa.core_ui.showSnackBar
@@ -32,16 +26,13 @@ import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.LocationTrackingMode
 import com.naver.maps.map.MapView
 import com.naver.maps.map.NaverMap
-import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.util.FusedLocationSource
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.util.Locale
 
 @AndroidEntryPoint
 class TaxiSearchFragment :
@@ -58,7 +49,6 @@ class TaxiSearchFragment :
 
     private lateinit var locationSource: FusedLocationSource
     private lateinit var behavior: BottomSheetBehavior<ConstraintLayout>
-
 
     override fun initMapView() {
         mapView = binding.mvTaximap
@@ -123,24 +113,7 @@ class TaxiSearchFragment :
                     taxiSearchViewModel.reverseGeocode.collect { result ->
                         result?.let {
                             if (it.isSuccess) {
-                                taxiSearchViewModel.setSelectedSearchItem(
-                                    Search(
-                                        "${result.getOrNull()}",
-                                        "",
-                                        "",
-                                        center.longitude,
-                                        center.latitude
-                                    )
-                                )
-                                Timber.d("선택된 주소 : ${result.getOrNull()}")
-                                delay(100)
-                                Timber.d("주소 선택 ${taxiSearchViewModel.selectedSearchItem.value}")
-                                if (args.isStartLocation) {
-                                    taxiViewModel.setTaxiStartLocation(taxiSearchViewModel.selectedSearchItem.value!!)
-                                } else {
-                                    taxiViewModel.setTaxiEndLocation(taxiSearchViewModel.selectedSearchItem.value!!)
-                                }
-                                navigatePopBackStack()
+                                setSearchItem(result, center)
                             } else {
                                 showSnackBar("주소를 가져오는데 실패 했습니다.")
                             }
@@ -151,15 +124,25 @@ class TaxiSearchFragment :
         }
     }
 
-    private fun initObserve(naverMap: NaverMap) {
-        taxiSearchViewModel.reverseGeocode.flowWithLifecycle(viewLifecycleOwner.lifecycle)
-            .onEach { result ->
-                result?.onSuccess { data ->
-                    Timber.d("주소는?? ${data}")
-                }?.onFailure {
-                    Timber.d("주소를 가져오지 못했습니다.")
-                }
-            }.launchIn(viewLifecycleOwner.lifecycleScope)
+    private suspend fun setSearchItem(result: Result<String>, center: LatLng) {
+        taxiSearchViewModel.setSelectedSearchItem(
+            Search(
+                "${result.getOrNull()}",
+                "",
+                "",
+                center.longitude,
+                center.latitude
+            )
+        )
+        Timber.d("선택된 주소 : ${result.getOrNull()}")
+        delay(100)
+        Timber.d("주소 선택 ${taxiSearchViewModel.selectedSearchItem.value}")
+        if (args.isStartLocation) {
+            taxiViewModel.setTaxiStartLocation(taxiSearchViewModel.selectedSearchItem.value!!)
+        } else {
+            taxiViewModel.setTaxiEndLocation(taxiSearchViewModel.selectedSearchItem.value!!)
+        }
+        navigatePopBackStack()
     }
 
     private fun initObserve() {
@@ -179,6 +162,15 @@ class TaxiSearchFragment :
                     showSnackBar("오류가 발생했습니다.")
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+        taxiSearchViewModel.reverseGeocode.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach { result ->
+                result?.onSuccess { data ->
+                    Timber.d("주소는?? ${data}")
+                }?.onFailure {
+                    Timber.d("주소를 가져오지 못했습니다.")
+                }
+            }.launchIn(viewLifecycleOwner.lifecycleScope
     }
 
     private fun initBottomSheet() {
@@ -217,6 +209,7 @@ class TaxiSearchFragment :
             }
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                //슬라이드
             }
         })
     }
@@ -227,4 +220,3 @@ class TaxiSearchFragment :
         const val DEFAULT_ZOOM = 17.4
     }
 }
-

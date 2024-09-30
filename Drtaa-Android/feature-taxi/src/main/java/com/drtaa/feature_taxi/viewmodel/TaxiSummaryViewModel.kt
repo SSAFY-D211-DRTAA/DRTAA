@@ -8,6 +8,6 @@ import javax.inject.Inject
 @HiltViewModel
 class TaxiSummaryViewModel @Inject constructor(
     private val taxiRepository: TaxiRepository
-) : ViewModel(){
+) : ViewModel() {
 
 }

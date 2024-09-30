@@ -38,7 +38,8 @@ class NaverRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getReverseGeocode(latitude: Double, longitude: Double): Flow<Result<ResponseReverseGeocode>> = flow {
+    override suspend fun getReverseGeocode(latitude: Double, longitude: Double):
+            Flow<Result<ResponseReverseGeocode>> = flow {
         when (
             val response = safeApiCall { naverDataSource.getReverseGeocode(latitude, longitude) }
         ) {

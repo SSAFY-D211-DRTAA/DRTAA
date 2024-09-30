@@ -15,11 +15,9 @@ import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.MapView
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.overlay.ArrowheadPathOverlay
-import com.naver.maps.map.overlay.PathOverlay
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @AndroidEntryPoint
@@ -64,7 +62,7 @@ class TaxiSummaryFragment :
             .onEach { routeInfo ->
                 routeInfo?.let {
                     binding.apply {
-                        tvTaxiDuration.text = "${routeInfo.totalTime/Hour}분"
+                        tvTaxiDuration.text = "${routeInfo.totalTime / Hour}분"
                         tvTaxiPrice.text = "${routeInfo.taxiFare}원"
                     }
                 }
@@ -77,14 +75,14 @@ class TaxiSummaryFragment :
         pathOverlay = ArrowheadPathOverlay().apply {
             coords = routePoints
             map = naverMap
-            width = 20
+            width = WIDTH
             color = Color.BLUE
-            outlineWidth = 2
+            outlineWidth = OUTLINE_WIDTH
             outlineColor = Color.WHITE
         }
 
         val bounds = LatLngBounds.Builder().include(routePoints).build()
-        naverMap.moveCamera(CameraUpdate.fitBounds(bounds,100))
+        naverMap.moveCamera(CameraUpdate.fitBounds(bounds, PADDING))
     }
 
     private fun requestRoute() {
@@ -96,11 +94,16 @@ class TaxiSummaryFragment :
     }
 
     private fun initEvent() {
-
+        Timber.d("추후 넣기")
     }
 
     companion object {
         const val Hour = 60
-    }
+        const val PADDING = 100
+        const val WIDTH = 20
+        const val COLOR = Color.BLUE
+        const val OUTLINE_WIDTH = 2
+        const val OUTLINE_COLOR = Color.WHITE
 
+    }
 }

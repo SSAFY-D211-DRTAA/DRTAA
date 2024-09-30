@@ -14,5 +14,5 @@ interface GeoAPI {
         @Query("coords") coords: String,
         @Query("output") output: String = "json",
         @Query("orders") orders: String = "roadaddr"
-    ) : ResponseReverseGeocode
+    ): ResponseReverseGeocode
 }

@@ -1,6 +1,5 @@
 package com.drtaa.core_network.api
 
-import com.drtaa.core_model.network.ResponseReverseGeocode
 import com.drtaa.core_model.network.ResponseSearch
 import com.drtaa.core_network.BuildConfig
 import retrofit2.http.GET

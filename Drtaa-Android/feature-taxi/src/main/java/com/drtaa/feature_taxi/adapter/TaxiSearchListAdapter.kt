@@ -50,5 +50,4 @@ class TaxiSearchListAdapter :
     fun setItemClickListener(itemClickListener: ItemClickListener) {
         this.itemClickListener = itemClickListener
     }
-
 }

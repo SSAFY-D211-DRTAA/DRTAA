@@ -12,9 +12,9 @@ import javax.inject.Inject
 
 class TaxiRepositoryImpl @Inject constructor(
     private val taxiDataSource: TaxiDataSource,
-) : TaxiRepository{
-    override suspend fun getRoute(start: Search, end: Search): Flow<Result<ResponseGeoJson>> = flow  {
-        when (val result = safeApiCall { taxiDataSource.getRoute(start, end) }){
+) : TaxiRepository {
+    override suspend fun getRoute(start: Search, end: Search): Flow<Result<ResponseGeoJson>> = flow {
+        when (val result = safeApiCall { taxiDataSource.getRoute(start, end) }) {
             is ResultWrapper.Success -> {
                 emit(Result.success(result.data))
             }

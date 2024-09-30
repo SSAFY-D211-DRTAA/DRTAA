@@ -41,7 +41,6 @@ class TaxiFragment : BaseFragment<FragmentTaxiBinding>(R.layout.fragment_taxi) {
             }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
-
     private fun initEvent() {
         binding.clTaxiStartLocation.setOnClickListener {
             navigationToSearch(isStartLocation = true)
@@ -54,12 +53,10 @@ class TaxiFragment : BaseFragment<FragmentTaxiBinding>(R.layout.fragment_taxi) {
         binding.btnTaxiNext.setOnClickListener {
             navigateDestination(R.id.action_taxiFragment_to_taxiSummaryFragment)
         }
-
     }
 
     private fun navigationToSearch(isStartLocation: Boolean) {
         val action = TaxiFragmentDirections.actionTaxiFragmentToTaxiSearchFragment(isStartLocation)
         findNavController().navigate(action)
     }
-
 }
