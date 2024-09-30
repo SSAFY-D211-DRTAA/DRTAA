@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import androidx.activity.viewModels
 import androidx.core.view.isVisible
@@ -12,6 +13,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
+import com.drtaa.core_model.auth.Event
+import com.drtaa.core_model.auth.EventBus
 import com.drtaa.core_ui.base.BaseActivity
 import com.drtaa.core_ui.component.LocationHelper
 import com.drtaa.core_ui.showToast
@@ -34,11 +37,29 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
     lateinit var locationHelper: LocationHelper
     private lateinit var navController: NavController
     private val viewModel: MainViewModel by viewModels()
+
+    @Inject
+    lateinit var eventBus: EventBus
+
     override fun init() {
         initBottomNavBar()
         initLocationPermission()
         initFCM()
         initNotificationChannel(CHANNEL_ID, CHANNEL_NAME)
+        initObserve()
+    }
+
+    private fun initObserve() {
+        lifecycleScope.launch {
+//            eventBus.events.collect { event ->
+//                when (event) {
+//                    is Event.LogoutEvent -> {
+//                        //로그인 화면으로 이동
+//                        startActivity(Intent(this@MainActivity, SignActivity::class.java))
+//                    }
+//                }
+//            }
+        }
     }
 
     private fun initFCM() {

@@ -3,6 +3,8 @@ package com.drtaa.core_data.auth
 import com.drtaa.core_data.repository.TokenRepository
 import com.drtaa.core_data.util.ResultWrapper
 import com.drtaa.core_data.util.safeApiCall
+import com.drtaa.core_model.auth.Event
+import com.drtaa.core_model.auth.EventBus
 import com.drtaa.core_model.auth.TokenProvider
 import com.drtaa.core_model.data.Tokens
 import com.drtaa.core_model.util.toTokens
@@ -17,7 +19,8 @@ import javax.inject.Inject
 class TokenProviderImpl @Inject constructor(
     private val tokenRepository: TokenRepository,
     @Auth
-    private val authSignAPI: Lazy<SignAPI>
+    private val authSignAPI: Lazy<SignAPI>,
+    private val eventBus: EventBus
 ) : TokenProvider {
     override suspend fun getAccessToken(): String {
         return tokenRepository.getAccessToken()
@@ -68,11 +71,14 @@ class TokenProviderImpl @Inject constructor(
             if (!newAccessToken.isNullOrBlank()) {
                 setAccessToken(newAccessToken!!)
             } else {
+                eventBus.emitEvent(Event.LogoutEvent)
+                tokenRepository.clearToken()
                 return null
             }
             newAccessToken
         } catch (e: Exception) {
             Timber.d("토큰 갱신 실패: ${e.message}")
+            eventBus.emitEvent(Event.LogoutEvent)
             tokenRepository.clearToken()
             null
         }
