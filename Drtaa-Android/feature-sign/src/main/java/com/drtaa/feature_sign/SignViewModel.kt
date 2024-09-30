@@ -34,6 +34,7 @@ class SignViewModel @Inject constructor(
                 }.onFailure {
                     Timber.tag("tokens").d("fail")
                     _tokens.emit(Result.failure(Exception("fail")))
+                    tokenRepository.clearToken()
                 }
             }
         }

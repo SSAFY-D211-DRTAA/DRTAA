@@ -49,22 +49,6 @@ class AccessTokenInterceptor @Inject constructor(
         return originResponse
     }
 
-//    private suspend fun getNewAccessToken(): String? {
-//        return try {
-//            val newAccessToken = tokenProvider.getNewAccessToken()
-//
-//            if (!newAccessToken.isNullOrBlank()) {
-//                tokenProvider.setAccessToken(newAccessToken)
-//            } else {
-//                return null
-//            }
-//            newAccessToken
-//        } catch (e: Exception) {
-//            Timber.d("토큰 갱신 실패: ${e.message}")
-//            null
-//        }
-//    }
-
     companion object {
         private const val TOKEN_ERROR_CODE = 401
     }

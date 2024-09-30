@@ -73,6 +73,7 @@ class TokenProviderImpl @Inject constructor(
             newAccessToken
         } catch (e: Exception) {
             Timber.d("토큰 갱신 실패: ${e.message}")
+            tokenRepository.clearToken()
             null
         }
     }
