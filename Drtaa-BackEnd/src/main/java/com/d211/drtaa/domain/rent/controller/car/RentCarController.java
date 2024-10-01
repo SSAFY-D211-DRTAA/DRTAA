@@ -2,7 +2,7 @@ package com.d211.drtaa.domain.rent.controller.car;
 
 import com.d211.drtaa.domain.rent.dto.request.*;
 import com.d211.drtaa.domain.rent.dto.response.RentCarDriveStatusResponseDTO;
-import com.d211.drtaa.domain.rent.dto.response.RentCarDrivingResponseDTO;
+import com.d211.drtaa.domain.rent.dto.response.RentCarManipulateResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentCarLocationResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentCarResponseDTO;
 import com.d211.drtaa.domain.rent.entity.car.RentDrivingStatus;
@@ -11,7 +11,6 @@ import com.d211.drtaa.global.exception.rent.NoAvailableRentCarException;
 import com.d211.drtaa.global.exception.rent.RentCarNotFoundException;
 import com.d211.drtaa.global.exception.rent.RentNotFoundException;
 import com.d211.drtaa.global.exception.travel.TravelAllPlacesVisitedException;
-import com.d211.drtaa.global.exception.travel.TravelDateNotMatchException;
 import com.d211.drtaa.global.exception.websocket.WebSocketDisConnectedException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -124,9 +123,9 @@ public class RentCarController {
 
     @PatchMapping("/driving")
     @Operation(summary = "렌트 차량 탑승", description = "회원이 진행중인 렌트 차량을 탑승한 경우 탑승(driving) 상태로 수정")
-    public ResponseEntity updateRentCarDriveStatustoDriving (@RequestBody RentCarParkingRequestDTO rentCarParkingRequestDTO) {
+    public ResponseEntity updateRentCarDriveStatustoDriving (@RequestBody RentCarManipulateRequestDTO rentCarManipulateRequestDTO) {
         try{
-            RentCarDrivingResponseDTO response = rentCarService.updateRentCarDriveStatustoDriving(rentCarParkingRequestDTO);
+            RentCarManipulateResponseDTO response = rentCarService.updateRentCarDriveStatustoDriving(rentCarManipulateRequestDTO);
 
             return ResponseEntity.ok(response); //200
         } catch (RentNotFoundException | RentCarNotFoundException e) {
@@ -140,9 +139,9 @@ public class RentCarController {
 
     @PatchMapping("/parking")
     @Operation(summary = "렌트 차량 하차", description = "회원이 진행중인 렌트 차량을 탑승한 경우 하차(parking) 상태로 수정")
-    public ResponseEntity updateRentCarDriveStatustoParking (@RequestBody RentCarParkingRequestDTO rentCarParkingRequestDTO) {
+    public ResponseEntity updateRentCarDriveStatustoParking (@RequestBody RentCarManipulateRequestDTO rentCarManipulateRequestDTO) {
         try{
-            RentCarDrivingResponseDTO response = rentCarService.updateRentCarDriveStatustoParking(rentCarParkingRequestDTO);
+            RentCarManipulateResponseDTO response = rentCarService.updateRentCarDriveStatustoParking(rentCarManipulateRequestDTO);
 
             return ResponseEntity.ok(response); //200
         } catch (RentNotFoundException | RentCarNotFoundException e) {

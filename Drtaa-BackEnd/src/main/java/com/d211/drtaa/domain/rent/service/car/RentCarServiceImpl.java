@@ -2,7 +2,7 @@ package com.d211.drtaa.domain.rent.service.car;
 
 import com.d211.drtaa.domain.rent.dto.request.*;
 import com.d211.drtaa.domain.rent.dto.response.RentCarDriveStatusResponseDTO;
-import com.d211.drtaa.domain.rent.dto.response.RentCarDrivingResponseDTO;
+import com.d211.drtaa.domain.rent.dto.response.RentCarManipulateResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentCarLocationResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentCarResponseDTO;
 import com.d211.drtaa.domain.rent.entity.Rent;
@@ -328,9 +328,9 @@ public class RentCarServiceImpl implements RentCarService {
 
     @Override
     @Transactional
-    public RentCarDrivingResponseDTO updateRentCarDriveStatustoDriving(RentCarParkingRequestDTO rentCarParkingRequestDTO) {
+    public RentCarManipulateResponseDTO updateRentCarDriveStatustoDriving(RentCarManipulateRequestDTO rentCarManipulateRequestDTO) {
         // rentId에 해당하는 렌트 찾기
-        Rent rent = rentRepository.findByRentId(rentCarParkingRequestDTO.getRentId())
+        Rent rent = rentRepository.findByRentId(rentCarManipulateRequestDTO.getRentId())
                 .orElseThrow(() -> new RentNotFoundException("해당 rentId의 맞는 렌트를 찾을 수 없습니다."));
 
         // rentCarId에 해당하는 렌트 차량 찾기
@@ -338,11 +338,11 @@ public class RentCarServiceImpl implements RentCarService {
                 .orElseThrow(() -> new RentCarNotFoundException("해당 rentCarId의 맞는 차량을 찾을 수 없습니다."));
 
         // travelDatesId에 해당하는 일정 찾기
-        TravelDates dates = travelDatesRepository.findByTravelDatesId(rentCarParkingRequestDTO.getTravelDatesId())
+        TravelDates dates = travelDatesRepository.findByTravelDatesId(rentCarManipulateRequestDTO.getTravelDatesId())
                 .orElseThrow(() -> new TravelNotFoundException("해당 travelDatesId에 맞는 일정을 찾을 수 없습니다."));
 
         // datePlacesId에 해당하는 장소 찾기
-        DatePlaces currentPlace = datePlacesRepository.findByDatePlacesId(rentCarParkingRequestDTO.getDatePlacesId())
+        DatePlaces currentPlace = datePlacesRepository.findByDatePlacesId(rentCarManipulateRequestDTO.getDatePlacesId())
                 .orElseThrow(() -> new TravelNotFoundException("해당 datePlacesId의 맞는 장소를 찾을 수 없습니다."));
 
 
@@ -428,7 +428,7 @@ public class RentCarServiceImpl implements RentCarService {
         // 변경 상태 저장
         rentCarRepository.save(car);
 
-        RentCarDrivingResponseDTO response = RentCarDrivingResponseDTO.builder()
+        RentCarManipulateResponseDTO response = RentCarManipulateResponseDTO.builder()
                 .travelId(travel.getTravelId())
                 .travelDatesId(dates.getTravelDatesId())
                 .datePlacesId(currentPlace.getDatePlacesId())
@@ -439,9 +439,9 @@ public class RentCarServiceImpl implements RentCarService {
 
     @Override
     @Transactional
-    public RentCarDrivingResponseDTO updateRentCarDriveStatustoParking(RentCarParkingRequestDTO rentCarParkingRequestDTO) {
+    public RentCarManipulateResponseDTO updateRentCarDriveStatustoParking(RentCarManipulateRequestDTO rentCarManipulateRequestDTO) {
         // rentId에 해당하는 렌트 찾기
-        Rent rent = rentRepository.findByRentId(rentCarParkingRequestDTO.getRentId())
+        Rent rent = rentRepository.findByRentId(rentCarManipulateRequestDTO.getRentId())
                 .orElseThrow(() -> new RentNotFoundException("해당 rentId의 맞는 렌트를 찾을 수 없습니다."));
 
         // rentCarId에 해당하는 렌트 차량 찾기
@@ -452,11 +452,11 @@ public class RentCarServiceImpl implements RentCarService {
         Travel travel = rent.getTravel();
 
         // travelDatesId에 해당하는 일정 찾기
-        TravelDates date = travelDatesRepository.findByTravelDatesId(rentCarParkingRequestDTO.getTravelDatesId())
+        TravelDates date = travelDatesRepository.findByTravelDatesId(rentCarManipulateRequestDTO.getTravelDatesId())
                 .orElseThrow(() -> new TravelNotFoundException("해당 travelDatesId에 맞는 일정을 찾을 수 없습니다."));
 
         // datePlacesId에 해당하는 장소 찾기
-        DatePlaces place = datePlacesRepository.findByDatePlacesId(rentCarParkingRequestDTO.getDatePlacesId())
+        DatePlaces place = datePlacesRepository.findByDatePlacesId(rentCarManipulateRequestDTO.getDatePlacesId())
                 .orElseThrow(() -> new TravelDateNotMatchException("해당 datePlacesId에 맞는 장소를 찾을 수 없습니다."));
 
         // 찾은 장소 방문으로 상태 변경
@@ -519,7 +519,7 @@ public class RentCarServiceImpl implements RentCarService {
        }
 
         // datePlacesId 에 해당하는 장소(호출하기 전 방문한 장소) 찾기
-        DatePlaces beforePlace = datePlacesRepository.findByDatePlacesId(rentCarParkingRequestDTO.getDatePlacesId())
+        DatePlaces beforePlace = datePlacesRepository.findByDatePlacesId(rentCarManipulateRequestDTO.getDatePlacesId())
                 .orElseThrow(() -> new TravelNotFoundException("해당 datePlacesId의 맞는 일정 장소를 찾을 수 없습니다."));
 
         // 찾은 일정의 장소들 중 찾은 장소 순서 바로 뒤 하나 찾기
@@ -528,7 +528,7 @@ public class RentCarServiceImpl implements RentCarService {
         log.info("다음 장소 id: {}", nextPlace.getDatePlacesId());
         log.info("다음 장소 이름: {}", nextPlace.getDatePlacesName());
 
-        RentCarDrivingResponseDTO response = RentCarDrivingResponseDTO.builder()
+        RentCarManipulateResponseDTO response = RentCarManipulateResponseDTO.builder()
                 .travelId(travel.getTravelId())
                 .travelDatesId(date.getTravelDatesId())
                 .datePlacesId(nextPlace.getDatePlacesId()) // 다음장소 id반환
