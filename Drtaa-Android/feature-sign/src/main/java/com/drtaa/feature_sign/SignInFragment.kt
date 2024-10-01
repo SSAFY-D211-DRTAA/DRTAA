@@ -25,8 +25,8 @@ class SignInFragment : BaseFragment<FragmentSignInBinding>(R.layout.fragment_sig
     lateinit var socialLoginManager: SocialLoginManager
 
     override fun initView() {
+        showLoading()
         autoSignIn()
-
         initEvent()
         initObserver()
     }
@@ -79,6 +79,7 @@ class SignInFragment : BaseFragment<FragmentSignInBinding>(R.layout.fragment_sig
                     startActivity(Intent(requireContext(), MainActivity::class.java))
                     requireActivity().finish()
                 }.onFailure {
+                    dismissLoading()
                     showSnackBar("로그인에 실패하였습니다.")
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)

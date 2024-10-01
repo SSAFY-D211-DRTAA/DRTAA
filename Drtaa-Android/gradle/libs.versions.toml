@@ -2,6 +2,7 @@
 agp = "8.5.0"
 android = "4.4.3"
 circleimageview = "3.1.0"
+coreSplashscreen = "1.0.1"
 firebaseBom = "33.3.0"
 gson = "2.10.1"
 hiltAndroidCompiler = "2.51.1"
@@ -68,6 +69,7 @@ playService = "4.4.2"
 firebaseMessagingKtx = "24.0.1"
 
 [libraries]
+androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
 androidx-viewpager2 = { module = "androidx.viewpager2:viewpager2", version.ref = "viewpager2" }
 bootpay = { module = "io.github.bootpay:android", version.ref = "android" }
 circleimageview = { module = "de.hdodenhof:circleimageview", version.ref = "circleimageview" }
