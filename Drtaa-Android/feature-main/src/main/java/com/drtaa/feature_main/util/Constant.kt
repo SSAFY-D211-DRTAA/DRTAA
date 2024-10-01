@@ -14,7 +14,8 @@ enum class Page(val hideBottomNav: Boolean) {
     PLAN_HISTORY(true),
     PLAN_LIST(true),
     PLAN_SEARCH(true),
-    CAR_TRACKING(true)
+    CAR_TRACKING(true),
+    TRAVEL(true),
     ;
 
     companion object {
@@ -35,5 +36,6 @@ enum class Page(val hideBottomNav: Boolean) {
             PLAN_SEARCH -> com.drtaa.feature_plan.R.id.planSearchFragment
             PLAN_HISTORY -> com.drtaa.feature_plan.R.id.planHistoryFragment
             CAR_TRACKING -> com.drtaa.feature_car.R.id.carTrackingFragment
+            TRAVEL -> com.drtaa.feature_plan.R.id.travelFragment
         }
 }

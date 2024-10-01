@@ -8,7 +8,7 @@ import javax.inject.Inject
 
 class TravelDataSourceImpl @Inject constructor(
     private val travelAPI: TravelAPI
-): TravelDataSource {
+) : TravelDataSource {
 
     override suspend fun getBlogPostList(keyword: String): List<NaverPost> {
         return travelAPI.getBlogPostList(keyword)

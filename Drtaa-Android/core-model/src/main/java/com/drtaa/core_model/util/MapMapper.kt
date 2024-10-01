@@ -2,7 +2,7 @@ package com.drtaa.core_model.util
 
 import com.drtaa.core_model.map.Search
 import com.drtaa.core_model.network.SearchItem
-import com.drtaa.core_model.plan.Plan.DayPlan.PlanItem
+import com.drtaa.core_model.plan.PlanItem
 
 fun SearchItem.toSearch(): Search {
     return Search(
