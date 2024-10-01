@@ -25,10 +25,10 @@ public interface RentCarService {
     RentCarLocationResponseDTO reCallRentCar(RentCarCallRequestDTO rentCarCallRequestDTO);
 
     // rentId의 맞는 렌트 차량 탑승(driving) 상태로 변경
-    RentCarDrivingResponseDTO updateRentCarDriveStatustoDriving(long rentId);
+    RentCarDrivingResponseDTO updateRentCarDriveStatustoDriving(RentCarParkingRequestDTO rentCarParkingRequestDTO);
 
     // rentId의 맞는 렌트 차량 하차(parking) 상태로 변경
-    void updateRentCarDriveStatustoParking(RentCarParkingRequestDTO rentCarParkingRequestDTO);
+    RentCarDrivingResponseDTO updateRentCarDriveStatustoParking(RentCarParkingRequestDTO rentCarParkingRequestDTO);
 
     // rentCarId의 맞는 렌트를 찾아 사용자에게 차량 상태 알림 전송
     void alarmToAndroid(RentCarDriveStatusRequestDTO rentCarDriveStatusRequestDTO);

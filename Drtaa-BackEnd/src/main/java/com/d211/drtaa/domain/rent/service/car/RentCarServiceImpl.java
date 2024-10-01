@@ -246,24 +246,6 @@ public class RentCarServiceImpl implements RentCarService {
         RentCar car = rentCarRepository.findByRentCarId(rent.getRentCar().getRentCarId())
                 .orElseThrow(() -> new RentCarNotFoundException("해당 rentCarId의 맞는 차량을 찾을 수 없습니다."));
 
-        // travelDatesId 에 해당하는 일정 찾기
-        TravelDates date = travelDatesRepository.findByTravelDatesId(rentCarCallRequestDTO.getTravelDatesId())
-                .orElseThrow(() -> new TravelNotFoundException("해당 travelDatesId의 맞는 여행 일정을 찾을 수 없습니다."));
-
-        // datePlacesId 에 해당하는 장소(호출하기 전 방문한 장소) 찾기
-        DatePlaces beforePlace = datePlacesRepository.findByDatePlacesId(rentCarCallRequestDTO.getDatePlacesId())
-                .orElseThrow(() -> new TravelNotFoundException("해당 datePlacesId의 맞는 일정 장소를 찾을 수 없습니다."));
-
-        // 찾은 일정의 장소들 중 찾은 장소 순서 바로 뒤 하나 찾기
-        DatePlaces nextPlace = datePlacesRepository.findByTravelDatesAndDatePlaceOrder(date, beforePlace.getDatePlacesOrder() + 1)
-                .orElseThrow(() -> new TravelNotFoundException("해당 datePlacesId의 맞는 일정 장소 다음 장소를 찾을 수 없습니다."));
-        log.info("다음 장소 id: {}", nextPlace.getDatePlacesId());
-        log.info("다음 장소 이름: {}", nextPlace.getDatePlacesName());
-
-        // 서버로 보낼 위도, 경도
-        double lattitude = nextPlace.getDatePlacesLat();
-        double longitude = nextPlace.getDatePlacesLon();
-
         // 응답 DTO 초기화
         final RentCarLocationResponseDTO[] response = {null};
         // 자율주행 서버로 메시지 전송
@@ -304,7 +286,7 @@ public class RentCarServiceImpl implements RentCarService {
             }, webSocketConfig.getUrl()).get();
 
             // 상태와 사용자 탑승 호출 위치 전송
-            MyMessage message = new MyMessage("vehicle_dispatch", lattitude, longitude, car.getRentCarId());
+            MyMessage message = new MyMessage("vehicle_dispatch", rentCarCallRequestDTO.getUserLat(), rentCarCallRequestDTO.getUserLon(), car.getRentCarId());
             String jsonMessage = objectMapper.writeValueAsString(message);
             session.sendMessage(new TextMessage(jsonMessage));
             log.info("Sent message: {}", jsonMessage);
@@ -330,14 +312,11 @@ public class RentCarServiceImpl implements RentCarService {
             log.info("Message: {}", content);
             fcmUtil.singleFcmSend(rent.getUser(), fcmDTO);
 
-            // 현재 렌트 id
+            // 호출한 장소 그대로 반환
             response[0].setRentId(rent.getRentId());
-            // 현재 렌트에 해당하는 여행 id
-            response[0].setTravelId(rent.getTravel().getTravelId());
-            // 현재 여행 중 현재 날짜에 해당하는 일정 id
-            response[0].setTravelDatesId(date.getTravelDatesId());
-            // 현재 일정 중 다음으로 이동할 장소 id
-            response[0].setDatePlacesId(nextPlace.getDatePlacesId());
+            response[0].setTravelId(rentCarCallRequestDTO.getTravelId());
+            response[0].setTravelDatesId(rentCarCallRequestDTO.getTravelDatesId());
+            response[0].setDatePlacesId(rentCarCallRequestDTO.getDatePlacesId());
 
             // 응답 반환
             return response[0];
@@ -349,58 +328,63 @@ public class RentCarServiceImpl implements RentCarService {
 
     @Override
     @Transactional
-    public RentCarDrivingResponseDTO updateRentCarDriveStatustoDriving(long rentId) {
+    public RentCarDrivingResponseDTO updateRentCarDriveStatustoDriving(RentCarParkingRequestDTO rentCarParkingRequestDTO) {
         // rentId에 해당하는 렌트 찾기
-        Rent rent = rentRepository.findByRentId(rentId)
+        Rent rent = rentRepository.findByRentId(rentCarParkingRequestDTO.getRentId())
                 .orElseThrow(() -> new RentNotFoundException("해당 rentId의 맞는 렌트를 찾을 수 없습니다."));
 
         // rentCarId에 해당하는 렌트 차량 찾기
         RentCar car = rentCarRepository.findByRentCarId(rent.getRentCar().getRentCarId())
                 .orElseThrow(() -> new RentCarNotFoundException("해당 rentCarId의 맞는 차량을 찾을 수 없습니다."));
 
-        // 자율주행 서버로 보낼 위도, 경도
-        double lattitude = 37.576636819990284;
-        double longitude = 126.89879021208397;
+        // travelDatesId에 해당하는 일정 찾기
+        TravelDates dates = travelDatesRepository.findByTravelDatesId(rentCarParkingRequestDTO.getTravelDatesId())
+                .orElseThrow(() -> new TravelNotFoundException("해당 travelDatesId에 맞는 일정을 찾을 수 없습니다."));
+
+        // datePlacesId에 해당하는 장소 찾기
+        DatePlaces currentPlace = datePlacesRepository.findByDatePlacesId(rentCarParkingRequestDTO.getDatePlacesId())
+                .orElseThrow(() -> new TravelNotFoundException("해당 datePlacesId의 맞는 장소를 찾을 수 없습니다."));
+
+
+        // 서버로 보낼 위도, 경도
+        double lattitude = currentPlace.getDatePlacesLat();
+        double longitude = currentPlace.getDatePlacesLon();
 
         // 해당 렌트의 여행
         Travel travel = rent.getTravel();
         LocalDate now = LocalDate.now(); // 현재 날짜
         log.info("현재 날짜: {}", now);
 
-        // rentId의 해당하는 여행을 기준으로 현재 날짜와 같은 여행 일자 찾기
-        TravelDates dates = travelDatesRepository.findByTravelAndTravelDatesDate(travel, now)
-                .orElseThrow(() -> new TravelNotFoundException("현재 날짜에 진행중인 여행을 찾을 수 없습니다."));
+//        // 찾은 일정을 기준으로 방문하지 않은 장소 찾기
+//        List<DatePlaces> placesList = datePlacesRepository.findByTravelDatesId(dates.getTravelDatesId());
+//        DatePlaces placeResponse = null;
+//        boolean chkPlace = true; // 방문하지 않은 장소 찾음 여부
+//
+//        // 찾은 일정을 기준으로 방문하지 않은 장소 찾기
+//        for(DatePlaces place: placesList) {
+//            // 해당 장소를 방문한 경우
+//            if (place.getDatePlacesIsVisited())
+//                continue; // 넘기기
+//
+//            // 방문하지 않은 장소를 찾은 경우
+//            placeResponse = place;
+//            lattitude = place.getDatePlacesLat();
+//            longitude = place.getDatePlacesLon();
+//            chkPlace = false; // 방문하지 않은 장소 찾음
+//            break;
+//        }
+//
+//        // 방문하지 않은 장소를 찾지 못한 경우
+//        if (chkPlace) {
+//            // 마지막 날인 경우 반납 처리 또는 장소 추가 유도
+//            if (now.equals(rent.getRentEndTime().toLocalDate()))
+//                throw new TravelAllPlacesVisitedException("모든 여행지를 방문했고 렌트의 마지막날 입니다. 반납 또는 여행지 장소 추가를 유도해주세요.");
+//
+//            // 해당 일정의 모든 장소에 방문 했다고 응답
+//            throw new TravelAllPlacesVisitedException("오늘에 해당하는 모든 일정을 방문했습니다.");
+//        }
 
-        // 찾은 일정을 기준으로 방문하지 않은 장소 찾기
-        List<DatePlaces> placesList = datePlacesRepository.findByTravelDatesId(dates.getTravelDatesId());
-        DatePlaces placeResponse = null;
-        boolean chkPlace = true; // 방문하지 않은 장소 찾음 여부
-
-        // 찾은 일정을 기준으로 방문하지 않은 장소 찾기
-        for(DatePlaces place: placesList) {
-            // 해당 장소를 방문한 경우
-            if (place.getDatePlacesIsVisited())
-                continue; // 넘기기
-
-            // 방문하지 않은 장소를 찾은 경우
-            placeResponse = place;
-            lattitude = place.getDatePlacesLat();
-            longitude = place.getDatePlacesLon();
-            chkPlace = false; // 방문하지 않은 장소 찾음
-            break;
-        }
-
-        // 방문하지 않은 장소를 찾지 못한 경우
-        if (chkPlace) {
-            // 마지막 날인 경우 반납 처리 또는 장소 추가 유도
-            if (now.equals(rent.getRentEndTime().toLocalDate()))
-                throw new TravelAllPlacesVisitedException("모든 여행지를 방문했고 렌트의 마지막날 입니다. 반납 또는 여행지 장소 추가를 유도해주세요.");
-
-            // 해당 일정의 모든 장소에 방문 했다고 응답
-            throw new TravelAllPlacesVisitedException("오늘에 해당하는 모든 일정을 방문했습니다.");
-        }
-
-        // 방문하지 않은 장소 위도, 경도를 자율주행 서버로 전송
+        // 이동할 목적지 서버로 전송
         try {
             StandardWebSocketClient client = new StandardWebSocketClient();
             WebSocketSession session = client.execute(new TextWebSocketHandler() {
@@ -447,7 +431,7 @@ public class RentCarServiceImpl implements RentCarService {
         RentCarDrivingResponseDTO response = RentCarDrivingResponseDTO.builder()
                 .travelId(travel.getTravelId())
                 .travelDatesId(dates.getTravelDatesId())
-                .datePlacesId(placeResponse.getDatePlacesId())
+                .datePlacesId(currentPlace.getDatePlacesId())
                 .build();
 
         return response;
@@ -455,7 +439,7 @@ public class RentCarServiceImpl implements RentCarService {
 
     @Override
     @Transactional
-    public void updateRentCarDriveStatustoParking(RentCarParkingRequestDTO rentCarParkingRequestDTO) {
+    public RentCarDrivingResponseDTO updateRentCarDriveStatustoParking(RentCarParkingRequestDTO rentCarParkingRequestDTO) {
         // rentId에 해당하는 렌트 찾기
         Rent rent = rentRepository.findByRentId(rentCarParkingRequestDTO.getRentId())
                 .orElseThrow(() -> new RentNotFoundException("해당 rentId의 맞는 렌트를 찾을 수 없습니다."));
@@ -478,7 +462,7 @@ public class RentCarServiceImpl implements RentCarService {
         // 찾은 장소 방문으로 상태 변경
         place.setDatePlacesIsVisited(true);
 
-        // 자율주행 서버로 메시지 전송
+        // 자율주행 서버로 하차 메시지 전송
         try {
             StandardWebSocketClient client = new StandardWebSocketClient();
             WebSocketSession session = client.execute(new TextWebSocketHandler() {
@@ -533,6 +517,24 @@ public class RentCarServiceImpl implements RentCarService {
            fcmUtil.singleFcmSend(rent.getUser(), fcmDTO); // 비동기로 전송
            throw new TravelAllPlacesVisitedException("오늘 예정된 모든 여행지를 방문했습니다.");
        }
+
+        // datePlacesId 에 해당하는 장소(호출하기 전 방문한 장소) 찾기
+        DatePlaces beforePlace = datePlacesRepository.findByDatePlacesId(rentCarParkingRequestDTO.getDatePlacesId())
+                .orElseThrow(() -> new TravelNotFoundException("해당 datePlacesId의 맞는 일정 장소를 찾을 수 없습니다."));
+
+        // 찾은 일정의 장소들 중 찾은 장소 순서 바로 뒤 하나 찾기
+        DatePlaces nextPlace = datePlacesRepository.findByTravelDatesAndDatePlacesOrder(date, beforePlace.getDatePlacesOrder() + 1)
+                .orElseThrow(() -> new TravelNotFoundException("해당 datePlacesId의 맞는 일정 장소 다음 장소를 찾을 수 없습니다."));
+        log.info("다음 장소 id: {}", nextPlace.getDatePlacesId());
+        log.info("다음 장소 이름: {}", nextPlace.getDatePlacesName());
+
+        RentCarDrivingResponseDTO response = RentCarDrivingResponseDTO.builder()
+                .travelId(travel.getTravelId())
+                .travelDatesId(date.getTravelDatesId())
+                .datePlacesId(nextPlace.getDatePlacesId()) // 다음장소 id반환
+                .build();
+
+       return response;
     }
 
     @Override

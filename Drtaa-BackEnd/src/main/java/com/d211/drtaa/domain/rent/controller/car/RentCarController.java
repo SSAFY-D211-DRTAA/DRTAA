@@ -124,9 +124,9 @@ public class RentCarController {
 
     @PatchMapping("/driving")
     @Operation(summary = "렌트 차량 탑승", description = "회원이 진행중인 렌트 차량을 탑승한 경우 탑승(driving) 상태로 수정")
-    public ResponseEntity updateRentCarDriveStatustoDriving (@RequestParam long rentId) {
+    public ResponseEntity updateRentCarDriveStatustoDriving (@RequestBody RentCarParkingRequestDTO rentCarParkingRequestDTO) {
         try{
-            RentCarDrivingResponseDTO response = rentCarService.updateRentCarDriveStatustoDriving(rentId);
+            RentCarDrivingResponseDTO response = rentCarService.updateRentCarDriveStatustoDriving(rentCarParkingRequestDTO);
 
             return ResponseEntity.ok(response); //200
         } catch (RentNotFoundException | RentCarNotFoundException e) {
@@ -142,9 +142,9 @@ public class RentCarController {
     @Operation(summary = "렌트 차량 하차", description = "회원이 진행중인 렌트 차량을 탑승한 경우 하차(parking) 상태로 수정")
     public ResponseEntity updateRentCarDriveStatustoParking (@RequestBody RentCarParkingRequestDTO rentCarParkingRequestDTO) {
         try{
-            rentCarService.updateRentCarDriveStatustoParking(rentCarParkingRequestDTO);
+            RentCarDrivingResponseDTO response = rentCarService.updateRentCarDriveStatustoParking(rentCarParkingRequestDTO);
 
-            return ResponseEntity.ok("Success"); //200
+            return ResponseEntity.ok(response); //200
         } catch (RentNotFoundException | RentCarNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
         } catch (WebSocketDisConnectedException e) {
