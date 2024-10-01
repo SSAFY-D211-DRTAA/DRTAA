@@ -74,6 +74,15 @@ class CarTrackingFragment :
     }
 
     private fun observeState() {
+        viewModel.isSuccessComplete.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach { isSuccess ->
+                if (isSuccess) {
+                    showSnackBar("반납 성공")
+                    navigatePopBackStack()
+                } else {
+                    showSnackBar("반납 실패")
+                }
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
         viewModel.mqttConnectionStatus.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { status ->
                 Timber.tag("connect mqtt").d("$status")
