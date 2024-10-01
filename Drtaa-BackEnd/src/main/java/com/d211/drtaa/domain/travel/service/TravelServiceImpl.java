@@ -1,7 +1,5 @@
 package com.d211.drtaa.domain.travel.service;
 
-import com.d211.drtaa.domain.rent.dto.response.RentCarDrivingResponseDTO;
-import com.d211.drtaa.domain.rent.dto.response.RentCarLocationResponseDTO;
 import com.d211.drtaa.domain.rent.entity.Rent;
 import com.d211.drtaa.domain.rent.entity.RentStatus;
 import com.d211.drtaa.domain.rent.repository.RentRepository;
@@ -15,13 +13,10 @@ import com.d211.drtaa.domain.travel.repository.TravelDatesRepository;
 import com.d211.drtaa.domain.travel.repository.TravelRepository;
 import com.d211.drtaa.domain.user.entity.User;
 import com.d211.drtaa.domain.user.repository.UserRepository;
-import com.d211.drtaa.global.config.websocket.MyMessage;
 import com.d211.drtaa.global.config.websocket.WebSocketConfig;
 import com.d211.drtaa.global.exception.rent.RentNotFoundException;
 import com.d211.drtaa.global.exception.travel.TravelNotFoundException;
-import com.d211.drtaa.global.exception.websocket.WebSocketDisConnectedException;
 import com.d211.drtaa.global.service.weather.WeatherService;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -30,10 +25,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketSession;
-import org.springframework.web.socket.client.standard.StandardWebSocketClient;
-import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.time.LocalDate;
 import java.util.ArrayList;

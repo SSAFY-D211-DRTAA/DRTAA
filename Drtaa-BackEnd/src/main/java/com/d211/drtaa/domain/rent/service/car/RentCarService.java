@@ -2,7 +2,7 @@ package com.d211.drtaa.domain.rent.service.car;
 
 import com.d211.drtaa.domain.rent.dto.request.*;
 import com.d211.drtaa.domain.rent.dto.response.RentCarDriveStatusResponseDTO;
-import com.d211.drtaa.domain.rent.dto.response.RentCarDrivingResponseDTO;
+import com.d211.drtaa.domain.rent.dto.response.RentCarManipulateResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentCarLocationResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentCarResponseDTO;
 
@@ -25,10 +25,10 @@ public interface RentCarService {
     RentCarLocationResponseDTO reCallRentCar(RentCarCallRequestDTO rentCarCallRequestDTO);
 
     // rentId의 맞는 렌트 차량 탑승(driving) 상태로 변경
-    RentCarDrivingResponseDTO updateRentCarDriveStatustoDriving(long rentId);
+    RentCarManipulateResponseDTO updateRentCarDriveStatustoDriving(RentCarManipulateRequestDTO rentCarManipulateRequestDTO);
 
     // rentId의 맞는 렌트 차량 하차(parking) 상태로 변경
-    void updateRentCarDriveStatustoParking(RentCarParkingRequestDTO rentCarParkingRequestDTO);
+    RentCarManipulateResponseDTO updateRentCarDriveStatustoParking(RentCarManipulateRequestDTO rentCarManipulateRequestDTO);
 
     // rentCarId의 맞는 렌트를 찾아 사용자에게 차량 상태 알림 전송
     void alarmToAndroid(RentCarDriveStatusRequestDTO rentCarDriveStatusRequestDTO);

@@ -8,7 +8,7 @@ import lombok.Getter;
 @Data
 @AllArgsConstructor
 @Getter
-public class RentCarParkingRequestDTO {
+public class RentCarManipulateRequestDTO {
     @Schema(description = "렌트 고유 번호", example = "1")
     private Long rentId;
     @Schema(description = "여행 고유 번호", example = "1")

@@ -1,6 +1,5 @@
 package com.d211.drtaa.domain.travel.service;
 
-import com.d211.drtaa.domain.rent.dto.response.RentCarDrivingResponseDTO;
 import com.d211.drtaa.domain.travel.dto.request.PlaceAddRequestDTO;
 import com.d211.drtaa.domain.travel.dto.request.PlacesAddRequestDTO;
 import com.d211.drtaa.domain.travel.dto.request.TravelDetailRequestDTO;
