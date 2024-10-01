@@ -31,7 +31,6 @@ import java.util.stream.Collectors;
 public class TaxiServiceImpl implements TaxiService {
 
     private final UserRepository userRepository;
-    private final TaxiRepository taxiRepository;
     private final RentRepository rentRepository;
     private final RentCarRepository rentCarRepository;
     private final FcmUtil fcmUtil;
