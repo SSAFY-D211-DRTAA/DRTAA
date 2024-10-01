@@ -19,6 +19,7 @@ public interface DatePlacesRepository extends JpaRepository<DatePlaces, Long> {
     Optional<DatePlaces> findLastPlaceByTravelDatesId(@Param("travelDatesId") Long travelDatesId);
     List<DatePlaces> findByTravelDatesAndDatePlacesOrderGreaterThan(TravelDates date, int datePlacesOrder);
     Optional<DatePlaces> findByTravelDatesAndDatePlacesOrder(TravelDates date, int datePlacesOrder);
+    DatePlaces findFirstByTravelDatesIdOrderByDatePlacesOrderAsc(Long travelDatesId);
 
     // delete
     void deleteAllByTravelAndTravelDates(Travel travel, TravelDates dates);

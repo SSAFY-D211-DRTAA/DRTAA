@@ -221,11 +221,11 @@ public class RentCarServiceImpl implements RentCarService {
             // 현재 렌트에 해당하는 여행 id
             response[0].setTravelId(rent.getTravel().getTravelId());
             // 현재 렌트에 해당하는 첫째날 id
-            List<TravelDates> travelDates = travelDatesRepository.findByTravel(rent.getTravel());
-            response[0].setTravelDatesId(travelDates.get(0).getTravelDatesId());
+            TravelDates date = travelDatesRepository.findFirstByTravel(rent.getTravel());
+            response[0].setTravelDatesId(date.getTravelDatesId());
             // 첫째날의 첫 장소(탑승 장소) id
-            List<DatePlaces> datePlaces = datePlacesRepository.findByTravelDatesId(travelDates.get(0).getTravelDatesId());
-            response[0].setDatePlacesId(datePlaces.get(0).getDatePlacesId());
+            DatePlaces place = datePlacesRepository.findFirstByTravelDatesIdOrderByDatePlacesOrderAsc(date.getTravelDatesId());
+            response[0].setDatePlacesId(place.getDatePlacesId());
 
             // 응답 반환
             return response[0];
