@@ -5,6 +5,8 @@
 
     <data>
 
+        <import type="android.view.View" />
+
         <variable
             name="plan"
             type="com.drtaa.core_model.plan.Plan.DayPlan.PlanItem" />
@@ -81,9 +83,10 @@
                 android:id="@+id/tv_plan_select"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
+                android:padding="3dp"
                 android:src="@drawable/ic_check"
                 android:textColor="@color/white"
-                android:padding="3dp"
+                android:visibility="@{plan.datePlacesIsVisited? View.GONE : View.VISIBLE}"
                 app:layout_constraintBottom_toBottomOf="@+id/view_circle_edit"
                 app:layout_constraintEnd_toEndOf="@+id/view_circle_edit"
                 app:layout_constraintStart_toStartOf="@+id/view_circle_edit"

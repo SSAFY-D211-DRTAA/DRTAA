@@ -20,10 +20,13 @@ class PlanListAdapter(
     ItemTouchHelperListener {
 
     private var isEditMode: Boolean = false
+
     private val backgroundBlueCircle =
         AppCompatResources.getDrawable(context, com.drtaa.core_ui.R.drawable.circle_call)
     private val backgroundGrayCircle =
         AppCompatResources.getDrawable(context, com.drtaa.core_ui.R.drawable.circle_gray_d9d9)
+    private val backgroundGray = context.getColorStateList(com.drtaa.core_ui.R.color.gray_eeee)
+    private val backgroundWhite = context.getColorStateList(com.drtaa.core_ui.R.color.white)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlanItemViewHolder {
         val binding = ItemPlanBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -56,20 +59,30 @@ class PlanListAdapter(
             binding.tvPlanOrder.text = position.toString()
             setEditItemBackGround(planItem.isSelected)
 
+            initVisibility(planItem.datePlacesIsVisited)
+
+            binding.root.setOnClickListener {
+                if (isEditMode && !planItem.datePlacesIsVisited) {
+                    planItem.isSelected = !planItem.isSelected
+                    onPlanSelectListener(planItem)
+                    setEditItemBackGround(planItem.isSelected)
+                }
+            }
+        }
+
+        private fun initVisibility(isVisited: Boolean) {
+            binding.cvPlan.backgroundTintList = if (isVisited) {
+                backgroundGray
+            } else {
+                backgroundWhite
+            }
+
             if (isEditMode) {
                 binding.clPlanEditMode.visibility = View.VISIBLE
                 binding.clPlanViewMode.visibility = View.GONE
             } else {
                 binding.clPlanEditMode.visibility = View.GONE
                 binding.clPlanViewMode.visibility = View.VISIBLE
-            }
-
-            binding.root.setOnClickListener {
-                if (isEditMode) {
-                    planItem.isSelected = !planItem.isSelected
-                    onPlanSelectListener(planItem)
-                    setEditItemBackGround(planItem.isSelected)
-                }
             }
         }
 

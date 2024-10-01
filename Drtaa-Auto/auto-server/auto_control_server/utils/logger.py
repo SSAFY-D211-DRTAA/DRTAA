@@ -1,6 +1,10 @@
 import logging
 import os
-from logging.handlers import RotatingFileHandler
+
+from datetime import time
+
+# from logging.handlers import RotatingFileHandler
+from logging.handlers import TimedRotatingFileHandler
 
 class ColoredFormatter(logging.Formatter):
     COLORS = {
@@ -59,7 +63,19 @@ def setup_logger(name, log_file='main.log', level=logging.INFO):
     log_dir = 'logs'
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
-    file_handler = RotatingFileHandler(os.path.join(log_dir, log_file), maxBytes=10*1024*1024, backupCount=5)
+
+    # 특정 시간 설정
+    rotation_time = time(hour=0, minute=0, second=0)
+    
+    # file_handler = RotatingFileHandler(os.path.join(log_dir, log_file), maxBytes=10*1024*1024, backupCount=5)
+    file_handler = TimedRotatingFileHandler(
+        os.path.join(log_dir, log_file),
+        when='midnight',  # 매일 자정에 새 파일 생성
+        interval=1,  # 1일 간격
+        backupCount=30,  # 최대 30일치 로그 파일 유지
+        encoding='utf-8',
+        atTime=rotation_time  # 특정 시간 지정
+    )
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
 

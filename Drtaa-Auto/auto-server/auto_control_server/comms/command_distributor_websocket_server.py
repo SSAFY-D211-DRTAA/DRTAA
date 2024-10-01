@@ -1,17 +1,26 @@
 import asyncio
 import json
 import websockets
+import os
 
 from utils.logger import setup_logger
+from .mqtt_client import MQTTClient
 from .event_system import event_system
 from .message_handler import MessageHandler
 
 logger = setup_logger(__name__)
 
+# 디렉토리 생성 (없는 경우)
+data_dir = './data'
+if not os.path.exists(data_dir):
+    os.makedirs(data_dir)
+
 class CommandDistributorWebSocketServer:
-    def __init__(self, host='0.0.0.0', port=8766):
+    def __init__(self, host='0.0.0.0', port: int=8766, mqtt_client: MQTTClient=None):
         self.host = host
         self.port = port
+        self.mqtt_client: MQTTClient = mqtt_client
+
         # self.clients = set()
         self.client = None
 
@@ -23,13 +32,53 @@ class CommandDistributorWebSocketServer:
             async for message in websocket:
                 try:
                     data = json.loads(message)
-                    logger.info(f"recv cmd from client: {data}")
-                    try:
-                        with open('gps_data.json', 'w') as f:
-                            json.dump(data, f)
-                    except IOError as e:
-                        logger.error(f"GPS file save error: {e}")
-                    await websocket.send(json.dumps(data))
+                    tag = data.get("tag")
+                    response = None
+
+                    if tag == "gps":
+                        logger.debug(f"saved gps data")
+                        response = "gps"
+                        try:
+                            with open(f'{data_dir}/gps_data.json', 'w') as f:
+                                json.dump(data, f)
+                        except IOError as e:
+                            logger.error(f"GPS file save error: {e}")
+                    elif tag == "orientation":
+                        logger.debug(f"saved orientation data")
+                        response = "orientation"
+                        try:
+                            with open(f'{data_dir}/orientation_data.json', 'w') as f:
+                                json.dump(data, f)
+                        except IOError as e:
+                            logger.error(f"Orientation file save error: {e}")
+                    elif tag == "imu":
+                        logger.debug(f"saved imu data")
+                        response = "imu"
+                        try:
+                            with open(f'{data_dir}/imu_data.json', 'w') as f:
+                                json.dump(data, f)
+                        except IOError as e:
+                            logger.error(f"IMU file save error: {e}")
+                    elif tag == "global_path":
+                        logger.info(f"saved global path data")
+                        response = "global path"
+                        try:
+                            with open(f'{data_dir}/global_path.json', 'w') as f:
+                                json.dump(data, f)
+                        except IOError as e:
+                            logger.error(f"Global Path file save error: {e}")
+                        
+                        self.mqtt_client.publish_global_path(json.dumps(data))
+                    elif tag == "complete_drive":
+                        logger.info(f"ack complete drive")
+                        response = "complete drive"
+                    elif tag == "connect":
+                        logger.info(f"Local client connected")
+                        response = data
+                    else:
+                        logger.warning(f"unknown tag: {data}")
+                    
+                    await websocket.send(json.dumps({f"success": response}))
                 except json.JSONDecodeError:
                     await websocket.send(json.dumps({"error": "Invalid JSON"}))
         except websockets.exceptions.ConnectionClosed:
@@ -43,7 +92,6 @@ class CommandDistributorWebSocketServer:
     #         self.clients.remove(websocket)
 
     async def distribute_command(self, command):
-        message = json.dumps(command)
 
         # for client in self.clients:
         #     try:
@@ -53,7 +101,8 @@ class CommandDistributorWebSocketServer:
         
         if self.client:
             try:
-                await self.client.send(message)
+                logger.info(f"Send command to local client: {command}")
+                await self.client.send(command)
             except websockets.exceptions.ConnectionClosed:
                 logger.info("Failed to send command to a client")
 

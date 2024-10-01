@@ -39,11 +39,11 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginTop="20dp"
+            android:autoSizeMaxTextSize="28sp"
             android:autoSizeTextType="uniform"
             android:lineSpacingExtra="3dp"
-            android:text='@{socialUser.name +"님,\n안녕하세요!\n어디로 가시나요?"}'
+            android:text='@{(!socialUser.name.isEmpty()) ? socialUser.name + "님,\n안녕하세요!\n어디로 가시나요?" : socialUser.nickname + "님,\n안녕하세요!\n어디로 가시나요?"}'
             android:textColor="@color/white"
-            android:autoSizeMaxTextSize="28sp"
             app:layout_constraintBottom_toTopOf="@id/guideline3"
             app:layout_constraintEnd_toStartOf="@+id/guideline"
             app:layout_constraintStart_toStartOf="@+id/textView7"
@@ -204,9 +204,6 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             app:layout_constraintGuide_begin="216dp" />
-
-
-
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
