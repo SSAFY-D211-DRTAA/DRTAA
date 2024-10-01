@@ -2,11 +2,12 @@ package com.drtaa.core_network.di
 
 import com.drtaa.core_network.api.MapAPI
 import com.drtaa.core_network.api.PaymentAPI
+import com.drtaa.core_network.api.PlanAPI
 import com.drtaa.core_network.api.RentAPI
 import com.drtaa.core_network.api.RentCarAPI
 import com.drtaa.core_network.api.SignAPI
-import com.drtaa.core_network.api.PlanAPI
 import com.drtaa.core_network.api.TourAPI
+import com.drtaa.core_network.api.TravelAPI
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -85,4 +86,11 @@ object APIModule {
         @AuthRetrofit
         retrofit: Retrofit
     ): PlanAPI = retrofit.create(PlanAPI::class.java)
+
+    @Singleton
+    @Provides
+    fun provideTravelAPI(
+        @AuthRetrofit
+        retrofit: Retrofit
+    ): TravelAPI = retrofit.create(TravelAPI::class.java)
 }
