@@ -76,7 +76,6 @@ class TaxiSummaryFragment :
             rentCarScheduleEndDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
         )
         taxiSummaryViewModel.getUnAssignedCar(taxiSchedule)
-        taxiViewModel.getTaxiInfo()
         Timber.d("택시 정보는요 ${taxiViewModel.taxiInfo}")
     }
 
@@ -95,9 +94,9 @@ class TaxiSummaryFragment :
                         tvTaxiDuration.text = "${routeInfo.totalTime / Hour}분"
                         tvTaxiPrice.text = "${routeInfo.taxiFare}원"
                     }
+                    taxiViewModel.getTaxiInfo()
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
-
 
     }
 
