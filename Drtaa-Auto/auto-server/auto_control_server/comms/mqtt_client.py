@@ -27,6 +27,9 @@ class MQTTClient():
         self.sub_gps_topic = "gps/data/v1/subscribe"
         self.pub_gps_topic = "gps/data/v1/publish"
 
+        self.sub_orientation_topic = "orientation/data/v1/subscribe"
+        self.pub_orientation_topic = "orientation/data/v1/publish"
+
         self.sub_path_topic = "path/data/v1/subscribe"
         self.pub_path_topic = "path/data/v1/publish"
 
@@ -40,6 +43,7 @@ class MQTTClient():
 
         client.subscribe(self.sub_topic, qos=2)
         client.subscribe(self.sub_gps_topic, qos=2)
+        client.subscribe(self.sub_orientation_topic, qos=2)
         client.subscribe(self.sub_path_topic, qos=2)
         client.subscribe(self.sub_cmd_topic, qos=2)
 
@@ -52,6 +56,8 @@ class MQTTClient():
 
         if msg.topic == self.sub_gps_topic:
             self.client.publish(f"{self.pub_gps_topic}", json.dumps(response))
+        elif msg.topic == self.sub_orientation_topic:
+            self.client.publish(f"{self.pub_orientation_topic}", json.dumps(response))
         elif msg.topic == self.sub_path_topic:
             self.client.publish(f"{self.pub_path_topic}", json.dumps(response))
 

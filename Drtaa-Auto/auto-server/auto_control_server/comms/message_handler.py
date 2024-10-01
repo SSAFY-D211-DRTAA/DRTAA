@@ -3,6 +3,8 @@ from utils.logger import setup_logger
 
 logger = setup_logger(__name__)
 
+data_dir = './data'
+
 class MessageHandler:
     def __init__(self):
         # 여기에 차량 관리자 등 필요한 객체를 초기화합니다.
@@ -26,6 +28,8 @@ class MessageHandler:
     def process_action(self, action, data):
         if action == 'vehicle_gps':
             return self.handle_vehicle_gps(data)
+        elif action == 'vehicle_orientation':
+            return self.handle_vehicle_orientaion(data)
         elif action == 'Auto Client Connect':
             return self.handle_connect(data)
         elif action == 'Spring Boot Connect':
@@ -70,7 +74,18 @@ class MessageHandler:
     def handle_vehicle_gps(self, data):
         # 차량 GPS
         try:
-            with open('gps_data.json') as f:
+            with open(f'{data_dir}/gps_data.json') as f:
+                return json.load(f)
+
+        except FileNotFoundError:
+            return {"status": "fail", "message": "설정 파일을 찾을 수 없습니다."}
+        except json.JSONDecodeError:
+            return {"status": "fail", "message": "설정 파일 형식이 잘못되었습니다."}
+        
+    def handle_vehicle_orientaion(self, data):
+        # 차량 방향
+        try:
+            with open(f'{data_dir}/orientation_data.json') as f:
                 return json.load(f)
 
         except FileNotFoundError:

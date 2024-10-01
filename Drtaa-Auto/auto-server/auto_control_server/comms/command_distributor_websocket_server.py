@@ -1,6 +1,7 @@
 import asyncio
 import json
 import websockets
+import os
 
 from utils.logger import setup_logger
 from .mqtt_client import MQTTClient
@@ -8,6 +9,11 @@ from .event_system import event_system
 from .message_handler import MessageHandler
 
 logger = setup_logger(__name__)
+
+# 디렉토리 생성 (없는 경우)
+data_dir = './data'
+if not os.path.exists(data_dir):
+    os.makedirs(data_dir)
 
 class CommandDistributorWebSocketServer:
     def __init__(self, host='0.0.0.0', port: int=8766, mqtt_client: MQTTClient=None):
@@ -30,18 +36,34 @@ class CommandDistributorWebSocketServer:
                     response = None
 
                     if tag == "gps":
-                        logger.info(f"saved gps data")
+                        logger.debug(f"saved gps data")
                         response = "gps"
                         try:
-                            with open('gps_data.json', 'w') as f:
+                            with open(f'{data_dir}/gps_data.json', 'w') as f:
                                 json.dump(data, f)
                         except IOError as e:
                             logger.error(f"GPS file save error: {e}")
+                    elif tag == "orientation":
+                        logger.debug(f"saved orientation data")
+                        response = "orientation"
+                        try:
+                            with open(f'{data_dir}/orientation_data.json', 'w') as f:
+                                json.dump(data, f)
+                        except IOError as e:
+                            logger.error(f"Orientation file save error: {e}")
+                    elif tag == "imu":
+                        logger.debug(f"saved imu data")
+                        response = "imu"
+                        try:
+                            with open(f'{data_dir}/imu_data.json', 'w') as f:
+                                json.dump(data, f)
+                        except IOError as e:
+                            logger.error(f"IMU file save error: {e}")
                     elif tag == "global_path":
                         logger.info(f"saved global path data")
                         response = "global path"
                         try:
-                            with open('global_path.json', 'w') as f:
+                            with open(f'{data_dir}/global_path.json', 'w') as f:
                                 json.dump(data, f)
                         except IOError as e:
                             logger.error(f"Global Path file save error: {e}")
