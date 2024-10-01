@@ -1,6 +1,5 @@
 package com.drtaa.core_network.di
 
-import com.drtaa.core_model.auth.EventBus
 import com.drtaa.core_model.auth.TokenProvider
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor

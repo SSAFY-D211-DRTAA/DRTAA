@@ -25,12 +25,12 @@ class SignViewModel @Inject constructor(
     val tokens: SharedFlow<Result<Tokens>> = _tokens
 
     fun getTokens() {
-        // 자동 로그인
         viewModelScope.launch {
             tokenProvider.getNewTokens().collect { result ->
                 result.onSuccess { data ->
                     Timber.tag("tokens").d("success $data")
                     _tokens.emit(Result.success(data))
+                    setTokens(data)
                 }.onFailure {
                     Timber.tag("tokens").d("fail")
                     _tokens.emit(Result.failure(Exception("fail")))
@@ -43,6 +43,7 @@ class SignViewModel @Inject constructor(
     private fun setTokens(tokens: Tokens) {
         viewModelScope.launch {
             tokenRepository.setAccessToken(tokens.accessToken)
+            tokenRepository.setRefreshToken(tokens.refreshToken)
             signRepository.getUserInfo().collect { result ->
                 result.onSuccess { data ->
                     signRepository.setUserData(data)
@@ -51,7 +52,6 @@ class SignViewModel @Inject constructor(
                     Timber.tag("tokens").d("유저 정보 불러오기 및 저장 실패")
                 }
             }
-            tokenRepository.setRefreshToken(tokens.refreshToken)
         }
     }
 
