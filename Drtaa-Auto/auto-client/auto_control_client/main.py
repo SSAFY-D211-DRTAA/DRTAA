@@ -1,14 +1,18 @@
 import websocket
 import json
+import numpy as np
 import os
 import signal
 import sys
 import time
 import threading
 
+
+
 from dotenv import load_dotenv
 from enum import StrEnum, unique
 from pyproj import CRS, Transformer
+from scipy.spatial.transform import Rotation as R
 from typing import Tuple, Dict, Any, Union
 from websocket import WebSocketApp
 
@@ -26,6 +30,7 @@ logger = setup_logger(__name__)
 # 상수 정의
 CONFIG_FILE_PATH = 'config.json'
 GPS_TOPIC = "/gps"
+IMU_TOPIC = "/imu"
 COMPLETE_DRIVE_TOPIC = "/complete_drive"
 MOVE_BASE_GOAL_TOPIC = "/move_base_simple/goal"
 COMMAND_STATUS_TOPIC = "/command_status"
@@ -34,9 +39,15 @@ GLOBAL_PATH_TOPIC = "/global_path"
 
 current_goal_index = 0
 gps_count_index = 0
+imu_count_index = 0
 
 # .env 파일 로드
 load_dotenv()
+
+# 디렉토리 생성 (없는 경우)
+data_dir = './data'
+if not os.path.exists(data_dir):
+    os.makedirs(data_dir)
 
 # 환경 변수
 ws_server_url = os.getenv('WS_SERVER_URL')
@@ -47,7 +58,6 @@ db_port = int(os.getenv('DB_PORT'))
 db_user = os.getenv('DB_USER')
 db_password = os.getenv('DB_PASSWD')
 db_database = os.getenv('DB_DATABASE')
-
 
 # 설정 파일 로드
 def load_config() -> Dict[str, Union[str, float, int]]:
@@ -236,7 +246,7 @@ rent_car_api_client: RentCarAPI = None
 db_api_client: DBClient = None
 
 def on_ros_bridge_message(ws: WebSocketApp, message: str) -> None:
-    global gps_count_index
+    global gps_count_index, imu_count_index
     try:
         data: Dict[str, Any] = json.loads(message)
         if data['op'] == 'publish':
@@ -247,7 +257,7 @@ def on_ros_bridge_message(ws: WebSocketApp, message: str) -> None:
                     "msg": msg_data
                 }
                 try:
-                    with open('gps_data.json', 'w') as f:
+                    with open(f'{data_dir}/gps_data.json', 'w') as f:
                         json.dump(gps_data, f)
                 except IOError as e:
                     logger.error(f"GPS 데이터를 파일에 저장하는 중 오류 발생: {e}")
@@ -256,6 +266,45 @@ def on_ros_bridge_message(ws: WebSocketApp, message: str) -> None:
                 if gps_count_index > 20:
                     gps_count_index = 0
                     send_to_ec2(gps_data)
+            elif data['topic'] == IMU_TOPIC:
+                msg_data = data['msg']
+                imu_data = {
+                    "tag": "imu",
+                    "msg": msg_data
+                }
+                try:
+                    with open(f'{data_dir}/imu_data.json', 'w') as f:
+                        json.dump(imu_data, f)
+                except IOError as e:
+                    logger.error(f"IMU 데이터를 파일에 저장하는 중 오류 발생: {e}")
+
+                imu_count_index += 1
+                if imu_count_index > 20:
+                    imu_count_index = 0
+                    # send_to_ec2(imu_data)
+
+                    x, y, z, w = msg_data['orientation'].values()
+                    quaternion_list = [x, y, z, w]
+                    euler_angles = R.from_quat(quaternion_list).as_euler('zyx', degrees=True)
+                    yaw, pitch, roll = euler_angles
+
+                    orientation_data = {
+                        "tag": "orientation",
+                        "msg": {
+                            "orientation": {
+                                "x": round(roll, 3),
+                                "y": round(pitch, 3),
+                                "z": round(yaw, 3),
+                            }
+                        }
+                    }
+
+                    try:
+                        with open(f'{data_dir}/orientation_data.json', 'w') as f:
+                            json.dump(orientation_data, f)
+                    except IOError as e:
+                        logger.error(f"Orientation 데이터를 파일에 저장하는 중 오류 발생: {e}")
+                    send_to_ec2(orientation_data)
 
             elif data['topic'] == COMPLETE_DRIVE_TOPIC:
                 logger.info("도착지에 도착했습니다.")
@@ -265,7 +314,7 @@ def on_ros_bridge_message(ws: WebSocketApp, message: str) -> None:
                     "msg": msg_data
                 }
                 try:
-                    with open('complete_drive_data.json', 'w') as f:
+                    with open(f'{data_dir}/complete_drive_data.json', 'w') as f:
                         json.dump(complete_data, f)
                 except IOError as e:
                     logger.error(f"완료 데이터를 파일에 저장하는 중 오류 발생: {e}")
@@ -277,7 +326,7 @@ def on_ros_bridge_message(ws: WebSocketApp, message: str) -> None:
                 path_data = data['msg']
 
                 try:
-                    with open('global_path_data.json', 'w') as f:
+                    with open(f'{data_dir}/global_path_data.json', 'w') as f:
                         json.dump(path_data, f)
                 except IOError as e:
                     logger.error(f"Global Path 데이터를 파일에 저장하는 중 오류 발생: {e}")
@@ -311,7 +360,8 @@ def on_ros_bridge_close(ws: WebSocketApp, close_status_code: int, close_msg: str
 def on_ros_bridge_open(ws: WebSocketApp) -> None:
     logger.info("ROS Bridge WebSocket 연결 성공")
 
-    subscribe(ws, GPS_TOPIC, "morai_msgs/GPSMessage")
+    subscribe(ws, GPS_TOPIC, "morai_msgs/GPSMessage") # GPS
+    subscribe(ws, IMU_TOPIC, "sensor_msgs/Imu") # IMU
     subscribe(ws, COMPLETE_DRIVE_TOPIC, "geometry_msgs/PoseStamped")
     subscribe(ws, GLOBAL_PATH_TOPIC, "nav_msgs/Path")
     subscribe(ws, COMMAND_STATUS_TOPIC, "std_msgs/String")
@@ -342,12 +392,12 @@ def on_ec2_message(ws: WebSocketApp, message: str) -> None:
             db_api_client.update_rent_car_status(car_id=car_id, status=VehicleStatus.WAITING)
             publish_next_goal(ros_bridge_ws)
         elif action == 'default':
-            logger.info(f"recv from ec2: {data}")
+            pass
             
 
         # 데이터를 파일에 저장
         try:
-            with open('ec2_recv.json', 'w') as f:
+            with open(f'{data_dir}/ec2_recv.json', 'w') as f:
                 json.dump(data, f)
         except IOError as e:
             logger.error(f"GPS 데이터를 파일에 저장하는 중 오류 발생: {e}")
@@ -386,6 +436,7 @@ def signal_handler(sig: int, frame: Any) -> None:
 
     if ros_bridge_ws:
         unsubscribe(ros_bridge_ws, GPS_TOPIC)
+        unsubscribe(ros_bridge_ws, IMU_TOPIC)
         unsubscribe(ros_bridge_ws, COMPLETE_DRIVE_TOPIC)
         unsubscribe(ros_bridge_ws, GLOBAL_PATH_TOPIC)
         unsubscribe(ros_bridge_ws, COMMAND_STATUS_TOPIC)
