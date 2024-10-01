@@ -11,6 +11,7 @@ import com.d211.drtaa.domain.rent.repository.car.RentCarScheduleRepository;
 import com.d211.drtaa.domain.taxi.dto.request.TaxiCreateRequestDTO;
 import com.d211.drtaa.domain.taxi.dto.response.TaxiDetailResponseDTO;
 import com.d211.drtaa.domain.taxi.repository.TaxiRepository;
+import com.d211.drtaa.domain.travel.entity.Travel;
 import com.d211.drtaa.domain.user.entity.User;
 import com.d211.drtaa.domain.user.repository.UserRepository;
 import com.d211.drtaa.global.util.fcm.FcmMessage;
@@ -46,6 +47,10 @@ public class TaxiServiceImpl implements TaxiService {
         // 시작, 종료 시간
         LocalDateTime startDateTime = taxiCreateRequestDTO.getTaxiStartTime();
         LocalDateTime endDateTime = taxiCreateRequestDTO.getTaxiEndTime();
+        LocalDate startDate = startDateTime.toLocalDate();
+        LocalDate endDate = endDateTime.toLocalDate();
+
+
         // ** 결제 **
         List<RentCar> availableCars = rentCarRepository.findAll().stream()
                 .filter(car -> {
@@ -74,11 +79,17 @@ public class TaxiServiceImpl implements TaxiService {
         // 배차 가능한 차량이 있는 경우
         RentCar availableCar = availableCars.get(0); // 가장 첫번째 차량 선택
 
+        Travel travel = Travel.builder()
+                .travelName("택시")
+                .travelStartDate(startDate)
+                .travelEndDate(endDate)
+                .build();
+
         // 렌트 생성
         Rent taxi = Rent.builder()
                 .user(user)
                 .rentCar(availableCar)
-                .travel(null)
+                .travel(travel)
                 .rentStatus(RentStatus.reserved)
                 .rentHeadCount(1)
                 .rentPrice(taxiCreateRequestDTO.getTaxiPrice())
