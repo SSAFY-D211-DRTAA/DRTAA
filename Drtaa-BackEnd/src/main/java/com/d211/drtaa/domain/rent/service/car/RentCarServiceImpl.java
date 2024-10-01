@@ -469,26 +469,7 @@ public class RentCarServiceImpl implements RentCarService {
         log.info("RentId: {}", rent.getRentId());
 
         // Android에게 알림 보내기
-        String body = null;
-        switch (rentCarDriveStatusRequestDTO.getRentCarDrivingStatus()) {
-            case calling:
-                body = "📞 호출중";
-                break;
-            case driving:
-                body = "🚗 주행중";
-                break;
-            case parking:
-                body = "\uD83C\uDD7F\uFE0F 주차중";
-                break;
-            case waiting:
-                body = "🌀 배회중";
-                break;
-            case charging:
-                body = "⚡ 충전중";
-                break;
-        }
-
-        FcmMessage.FcmDTO fcmDTO = fcmUtil.makeFcmDTO("렌트 차량 상태", "렌트 차량이 " + body + "입니다.");
+        FcmMessage.FcmDTO fcmDTO = fcmUtil.makeFcmDTO("렌트 차량 상태", rentCarDriveStatusRequestDTO.getContents());
         log.info("Message: {}", fcmDTO.getBody());
         fcmUtil.singleFcmSend(rent.getUser(), fcmDTO); // 비동기로 전송
     }
@@ -510,14 +491,7 @@ public class RentCarServiceImpl implements RentCarService {
         log.info("RentId: {}", rent.getRentId());
 
         // Android에게 알림 보내기
-        String body = null;
-        if(rentCarArriveStatusRequestDTO.isArrived()) {
-            body = "렌트 차량이 호출 장소로 도착했습니다. 확인해주세요 !!";
-        } else {
-            body = "렌트 차량의 도착 예상 시간이 " + rentCarArriveStatusRequestDTO.getExpectedMinutes() + "분 남았습니다.";
-        }
-
-        FcmMessage.FcmDTO fcmDTO = fcmUtil.makeFcmDTO("렌트 차량 도착 여부", body);
+        FcmMessage.FcmDTO fcmDTO = fcmUtil.makeFcmDTO("렌트 차량 위치", rentCarArriveStatusRequestDTO.getContents());
         log.info("Message: {}", fcmDTO.getBody());
         fcmUtil.singleFcmSend(rent.getUser(), fcmDTO); // 비동기로 전송
     }

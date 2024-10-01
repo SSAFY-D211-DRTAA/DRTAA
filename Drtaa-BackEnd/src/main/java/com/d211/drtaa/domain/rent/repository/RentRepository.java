@@ -35,6 +35,7 @@ public interface RentRepository extends JpaRepository<Rent, Long> {
     @Query("SELECT r FROM Rent r " +
             "WHERE r.user = :user AND r.rentStatus = 'completed'")
     List<Rent> findByUserAndRentStatusCompleted(User user);
+    List<Rent> findByRentEndTimeBetween(LocalDateTime startDate, LocalDateTime endDate);
 
     // exists
     boolean existsByUserAndRentStatusAndRentStartTimeBetweenAndRentEndTimeBetween(

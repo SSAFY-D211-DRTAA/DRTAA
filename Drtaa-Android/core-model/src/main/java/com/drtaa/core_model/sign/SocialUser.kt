@@ -9,7 +9,7 @@ data class SocialUser(
     val accessToken: String? = null,
     val refreshToken: String? = null,
 ) : UserLoginInfo {
-    fun isVaild(): Boolean {
+    fun isValid(): Boolean {
         return userLogin.isNotEmpty() && id.isNotEmpty() && nickname.isNotEmpty()
     }
 }
