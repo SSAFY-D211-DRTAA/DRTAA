@@ -11,7 +11,9 @@ import com.d211.drtaa.global.exception.rent.NoAvailableRentCarException;
 import com.d211.drtaa.global.exception.rent.RentCarNotFoundException;
 import com.d211.drtaa.global.exception.rent.RentNotFoundException;
 import com.d211.drtaa.global.exception.travel.TravelAllPlacesVisitedException;
+import com.d211.drtaa.global.exception.travel.TravelNotFoundException;
 import com.d211.drtaa.global.exception.websocket.WebSocketDisConnectedException;
+import com.d211.drtaa.global.util.fcm.FcmUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +33,7 @@ import java.util.List;
 public class RentCarController {
 
     private final RentCarService rentCarService;
+    private final FcmUtil fcmUtil;
 
     @GetMapping("/dispatch")
     @Operation(summary = "전체 배차 상태 조회", description = "전체 렌트 차량의 배차 상태 조회")
@@ -140,12 +143,14 @@ public class RentCarController {
     @PatchMapping("/parking")
     @Operation(summary = "렌트 차량 하차", description = "회원이 진행중인 렌트 차량을 탑승한 경우 하차(parking) 상태로 수정")
     public ResponseEntity updateRentCarDriveStatustoParking (@RequestBody RentCarManipulateRequestDTO rentCarManipulateRequestDTO) {
-        try{
+        try {
             RentCarManipulateResponseDTO response = rentCarService.updateRentCarDriveStatustoParking(rentCarManipulateRequestDTO);
 
             return ResponseEntity.ok(response); //200
-        } catch (RentNotFoundException | RentCarNotFoundException e) {
+        } catch (RentNotFoundException | RentCarNotFoundException | TravelNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
+        } catch(TravelAllPlacesVisitedException e) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(e.getMessage()); // 204
         } catch (WebSocketDisConnectedException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage()); // 500
         } catch (Exception e) {
