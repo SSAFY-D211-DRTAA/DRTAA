@@ -1,1 +1,0 @@
-{"op": "publish", "topic": "/complete_drive", "msg": {"header": {"seq": 1, "stamp": {"secs": 1727227613, "nsecs": 721756696}, "frame_id": "map"}, "pose": {"position": {"x": 1444.7833590016235, "y": -780.1760972561315, "z": 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": 0.0, "w": 0.0}}}}

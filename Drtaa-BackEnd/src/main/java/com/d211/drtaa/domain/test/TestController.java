@@ -21,4 +21,5 @@ public class TestController {
 //    public String home() {
 //        return "redirect:/index.html"; // static 폴더의 index.html로 리다이렉트
 //    }
+    
 }

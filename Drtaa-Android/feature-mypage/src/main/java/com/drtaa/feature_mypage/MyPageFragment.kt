@@ -33,6 +33,7 @@ class MyPageFragment : BaseFragment<FragmentMyPageBinding>(R.layout.fragment_my_
         }
 
     override fun initView() {
+        //인잇
         setupMyPageItems()
         initObserve()
         initEvent()
