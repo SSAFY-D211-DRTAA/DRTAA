@@ -428,19 +428,19 @@ public class RentServiceImpl implements RentService{
 
         // 상태 변경
         rent.setRentStatus(RentStatus.completed); // 완료
+        car.setRentCarDrivingStatus(RentDrivingStatus.idling); // 무상태
         carSchedule.setRentCarScheduleIsDone(true); // 완료
-        
+
         // 렌트 기록 생성
         RentHistory history = RentHistory.builder()
                 .user(rent.getUser())
                 .rent(rent)
                 .build();
 
-        // 생성된 기록 저장
-        rentHistoryRepository.save(history);
-
         // 변경 상태 저장
+        rentHistoryRepository.save(history);
         rentRepository.save(rent);
+        rentCarRepository.save(car);
         rentCarScheduleRepository.save(carSchedule);
 
         // 자율주행 서버로 반납 상태 전송
@@ -462,7 +462,7 @@ public class RentServiceImpl implements RentService{
             }, webSocketConfig.getUrl()).get();
 
             // 상태와 렌트 탑승 위치 전송
-            MyMessage message = new MyMessage("vehicle_return", rent.getRentCar().getRentCarId());
+            MyMessage message = new MyMessage("viehcle_return", rent.getRentCar().getRentCarId());
             String jsonMessage = objectMapper.writeValueAsString(message);
             session.sendMessage(new TextMessage(jsonMessage));
             log.info("Sent message: {}", jsonMessage);
