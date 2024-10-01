@@ -12,7 +12,7 @@ import javax.inject.Named
 
 class TokenDataSourceImpl @Inject constructor(
     @Named("TOKEN_DATASTORE")
-    private val dataStore: DataStore<Preferences>,
+    private val dataStore: DataStore<Preferences>
 ) : TokenDataSource {
     override suspend fun getAccessToken(): String {
         return dataStore.data.map { prefs ->
@@ -31,6 +31,18 @@ class TokenDataSourceImpl @Inject constructor(
             prefs.remove(ACCESS_TOKEN_KEY)
             prefs.remove(REFRESH_TOKEN_KEY)
         }
+    }
+
+    override suspend fun setRefreshToken(refreshToken: String) {
+        dataStore.edit { prefs ->
+            prefs[REFRESH_TOKEN_KEY] = refreshToken
+        }
+    }
+
+    override suspend fun getRefreshToken(): String {
+        return dataStore.data.map { prefs ->
+            prefs[REFRESH_TOKEN_KEY] ?: ""
+        }.first()
     }
 
     companion object {

@@ -20,7 +20,9 @@ def main():
     converter = GPSConverter(config['utm_zone'], config['east_offset'], config['north_offset'])
 
     gps_coordinates = converter.calc_gps_from_pose_batch(data_list[0]["optimized"])
-
+    
+    json_data = convert_points_to_json(gps_coordinates)
+    print(json_data)
     plot_coordinates(data_list)
 
 if __name__ == "__main__":

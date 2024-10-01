@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TourViewModel @Inject constructor(
-    private val tourRepository: TourRepository
+    private val tourRepository: TourRepository,
 ) : ViewModel() {
     private val _pagedTour = MutableStateFlow<PagingData<TourItem>>(PagingData.empty())
     val pagedTour: StateFlow<PagingData<TourItem>>
@@ -23,11 +23,19 @@ class TourViewModel @Inject constructor(
 
     fun getLocationBasedList(mapX: String, mapY: String, radius: String) {
         viewModelScope.launch {
-            tourRepository.getLocationBasedList(mapX, mapY, radius).cachedIn(viewModelScope)
+            val result = "$mapX $mapY"
+//            tourRepository.getLocationBasedList(mapX, mapY, radius).cachedIn(viewModelScope)
+            tourRepository.getLocationBasedList(DEFAULT_LNG, DEFAULT_LAT, radius)
+                .cachedIn(viewModelScope)
                 .collect {
-                    Timber.tag("pager").d("")
+                    Timber.tag("pager").d("$result")
                     _pagedTour.value = it
                 }
         }
+    }
+
+    companion object {
+        const val DEFAULT_LAT = "37.57578754990568"
+        const val DEFAULT_LNG = "126.90027478459672"
     }
 }

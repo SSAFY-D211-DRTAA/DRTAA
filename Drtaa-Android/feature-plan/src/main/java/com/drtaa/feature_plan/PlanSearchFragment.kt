@@ -130,6 +130,7 @@ class PlanSearchFragment :
             }
 
             this.btnSearchSelect.setOnClickListener {
+                Timber.tag("happy").d("args.day ${args.day}")
                 planSearchViewModel.selectedSearchItem.value.apply {
                     if (this != null) {
                         planViewModel.addPlan(

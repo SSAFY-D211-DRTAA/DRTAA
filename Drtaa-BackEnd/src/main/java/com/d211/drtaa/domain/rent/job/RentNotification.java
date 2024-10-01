@@ -37,7 +37,6 @@ public class RentNotification {
         log.info("rentReservationNotificationJob");
 
         return new JobBuilder("rentReservationNotification", jobRepository) // 새로운 작업을 생성하는 빌더
-                .preventRestart() // 작업을 재시작할 수 없도록 설정
                 .incrementer(new RunIdIncrementer()) // 작업 실행 시 고유한 ID를 증가시켜주는 설정
                 .start(rentReservationNotificationStep) // 작업이 시작할 스텝을 지정
                 .build();
@@ -96,7 +95,6 @@ public class RentNotification {
         log.info("rentStartOrEndNotificationJob");
 
         return new JobBuilder("rentStartOrEndNotificationJob", jobRepository) // 새로운 작업을 생성하는 빌더
-                .preventRestart() // 작업을 재시작할 수 없도록 설정
                 .incrementer(new RunIdIncrementer()) // 작업 실행 시 고유한 ID를 증가시켜주는 설정
                 .start(rentStartOrEndNotificationStep) // 작업이 시작할 스텝을 지정
                 .build();

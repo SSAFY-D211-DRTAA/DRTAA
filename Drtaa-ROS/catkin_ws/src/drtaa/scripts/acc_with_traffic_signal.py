@@ -43,7 +43,10 @@ class pure_pursuit:
         rospy.init_node('pure_pursuit', anonymous=True)
 
         rospy.Subscriber("/global_path", Path, self.global_path_callback)
+        # rospy.Subscriber("/lattice_path", Path, self.path_callback)
         rospy.Subscriber("/local_path", Path, self.path_callback)
+        # rospy.Subscriber("/lane_change_path", Path, self.path_callback)
+
         rospy.Subscriber("/odom", Odometry, self.odom_callback)
         rospy.Subscriber("/Ego_topic", EgoVehicleStatus, self.status_callback)
         rospy.Subscriber("/Object_topic", ObjectStatusList, self.object_info_callback)
@@ -91,6 +94,7 @@ class pure_pursuit:
         self.vel_planning = velocityPlanning(self.target_velocity / 3.6, 0.15)
 
         self.traffic_light_manager = TrafficLightManager()
+        self.is_parking = False
 
         rate = rospy.Rate(20)  ## 30hz
 
@@ -132,10 +136,9 @@ class pure_pursuit:
                                                                     ,global_ped_info, local_ped_info
                                                                     ,global_obs_info, local_obs_info) # 주변 객체 정보를 통해 ACC를 위한 정보 업데이트
                 
-                
                 self.acc_velocity = self.adaptive_cruise_control.get_target_velocity(local_npc_info, local_ped_info, local_obs_info,
-                                                                                                        self.status_msg.velocity.x, self.target_velocity/3.6) # ACC를 통한 속도 제어
-                
+                                                                                    self.status_msg.velocity.x, self.target_velocity/3.6) # ACC를 통한 속도 제어
+
                 if(self.acc_velocity < 0):  # 비상 정지
                     self.ctrl_cmd_msg.accel = 0.0
                     self.ctrl_cmd_msg.brake = 1.0
@@ -143,7 +146,6 @@ class pure_pursuit:
                     rospy.logwarn("Emergency stop initiated!")
                     continue
 
-                self.acc_velocity = 20
                 # ACC와 조향각 기반 속도 제한 중 더 낮은 값 선택
                 self.target_velocity = min(self.target_velocity, self.acc_velocity) 
                 # rospy.loginfo(f"Target Velocity: {self.target_velocity}")

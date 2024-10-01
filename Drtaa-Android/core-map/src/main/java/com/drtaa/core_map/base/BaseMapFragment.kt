@@ -12,9 +12,11 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.NavDirections
 import androidx.navigation.fragment.findNavController
 import com.drtaa.core_map.LOCATION_PERMISSION_REQUEST_CODE
+import com.drtaa.core_map.moveCameraBounds
 import com.drtaa.core_map.setup
 import com.drtaa.core_ui.component.LoadingDialog
 import com.naver.maps.geometry.LatLng
+import com.naver.maps.geometry.LatLngBounds
 import com.naver.maps.map.MapView
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
@@ -122,6 +124,17 @@ abstract class BaseMapFragment<T : ViewDataBinding>(private val layoutResId: Int
             marker.map = null
         }
         _markerList.clear()
+    }
+
+    fun NaverMap.adjustCamera() {
+        val boundsBuilder = LatLngBounds.Builder()
+
+        _markerList.forEach { marker ->
+            boundsBuilder.include(marker.position)
+        }
+
+        val bounds = boundsBuilder.build()
+        moveCameraBounds(bounds)
     }
 
     fun navigateDestination(@IdRes action: Int) { // Navigation 이동
