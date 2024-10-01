@@ -1,5 +1,6 @@
 package com.d211.drtaa.domain.travel.service;
 
+import com.d211.drtaa.domain.rent.dto.response.RentCarManipulateResponseDTO;
 import com.d211.drtaa.domain.travel.dto.request.PlaceAddRequestDTO;
 import com.d211.drtaa.domain.travel.dto.request.PlacesAddRequestDTO;
 import com.d211.drtaa.domain.travel.dto.request.TravelDetailRequestDTO;
@@ -27,7 +28,7 @@ public interface TravelService {
     void createTravelDatesPlaces(PlacesAddRequestDTO placesAddRequestDTO);
 
     // 여행 일정 장소 이전 또는 이후에 추가
-    RentCarDrivingResponseDTO addTravelDatesPlace(PlaceAddRequestDTO placeAddRequestDTO);
+    RentCarManipulateResponseDTO addTravelDatesPlace(PlaceAddRequestDTO placeAddRequestDTO);
 
     // travelId의 해당하는 여행 이름 변경
     void updateTravelName(TravelNameRequestDTO travelNameRequestDTO);

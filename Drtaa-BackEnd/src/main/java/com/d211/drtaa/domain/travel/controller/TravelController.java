@@ -1,5 +1,6 @@
 package com.d211.drtaa.domain.travel.controller;
 
+import com.d211.drtaa.domain.rent.dto.response.RentCarManipulateResponseDTO;
 import com.d211.drtaa.domain.travel.dto.request.PlaceAddRequestDTO;
 import com.d211.drtaa.domain.travel.dto.request.PlacesAddRequestDTO;
 import com.d211.drtaa.domain.travel.dto.request.TravelDetailRequestDTO;
@@ -7,6 +8,7 @@ import com.d211.drtaa.domain.travel.dto.request.TravelNameRequestDTO;
 import com.d211.drtaa.domain.travel.dto.response.TravelDetailResponseDTO;
 import com.d211.drtaa.domain.travel.dto.response.TravelResponseDTO;
 import com.d211.drtaa.domain.travel.service.TravelService;
+import com.d211.drtaa.global.exception.rent.RentNotFoundException;
 import com.d211.drtaa.global.exception.travel.TravelNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -110,10 +112,10 @@ public class TravelController {
     @Operation(summary = "검색 후 장소 추가", description = "travelId의 해당하는 여행 중 travelDatesId의 해당하는 일정에 이전 또는 이후에 추가")
     public ResponseEntity addTravelDatesPlace(@RequestBody PlaceAddRequestDTO placeAddRequestDTO) {
         try {
-            RentCarDrivingResponseDTO response = travelService.addTravelDatesPlace(placeAddRequestDTO);
+            RentCarManipulateResponseDTO response = travelService.addTravelDatesPlace(placeAddRequestDTO);
 
             return ResponseEntity.ok(response);
-        } catch (TravelNotFoundException e) {
+        } catch (TravelNotFoundException | RentNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage()); // 400
