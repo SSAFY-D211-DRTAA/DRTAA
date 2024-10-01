@@ -6,10 +6,10 @@ import com.drtaa.core_data.repository.RentRepository
 import com.drtaa.core_data.repository.TaxiRepository
 import com.drtaa.core_model.map.Search
 import com.drtaa.core_model.network.RequestDuplicatedSchedule
-import com.drtaa.core_model.rent.RentInfo
 import com.drtaa.core_model.rent.RentSchedule
 import com.drtaa.core_model.route.ResponseGeoJson
 import com.drtaa.core_model.route.RouteInfo
+import com.drtaa.core_model.taxi.TaxiInfo
 import com.naver.maps.geometry.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -46,8 +46,8 @@ class TaxiViewModel @Inject constructor(
     private val _isDuplicatedSchedule = MutableSharedFlow<Boolean?>()
     val isDuplicatedSchedule: SharedFlow<Boolean?> = _isDuplicatedSchedule
 
-    private val _taxiInfo = MutableStateFlow<RentInfo?>(null)
-    val taxiInfo: StateFlow<RentInfo?> = _taxiInfo
+    private val _taxiInfo = MutableStateFlow<TaxiInfo?>(null)
+    val taxiInfo: StateFlow<TaxiInfo?> = _taxiInfo
 
     fun setTaxiStartLocation(search: Search) {
         viewModelScope.launch {
@@ -116,14 +116,12 @@ class TaxiViewModel @Inject constructor(
             val now = LocalDateTime.now()
             val dayOfWeek = now.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault())
             _taxiInfo.emit(
-                RentInfo(
+                TaxiInfo(
                     carInfo = null,
-                    hours = 1.0,
-                    price = 100,
-                    discount = 0,
-                    finalPrice = 100,
-                    people = 1,
+                    minutes = routeInfo.value?.totalTime!!,
+                    price = 100, // price 넣어야함
                     startLocation = _taxiStartLocation.value!!,
+                    endLocation = _taxiEndLocation.value!!,
                     startSchedule = RentSchedule(
                         year = now.year,
                         month = now.monthValue,

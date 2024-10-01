@@ -18,6 +18,8 @@ import com.drtaa.core_model.rent.RentInfo
 import com.drtaa.core_model.rent.RentSchedule
 import com.drtaa.core_model.route.RouteInfo
 import com.drtaa.core_model.sign.SocialUser
+import com.drtaa.core_model.taxi.RequestCallTaxi
+import com.drtaa.core_model.taxi.TaxiInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -52,14 +54,21 @@ class TaxiSummaryViewModel @Inject constructor(
     private val _taxiStartLocation = MutableStateFlow<Search?>(null)
     val taxiStartLocation: StateFlow<Search?> = _taxiStartLocation
 
+    private val _taxiEndLocation = MutableStateFlow<Search?>(null)
+    val taxiEndLocation: StateFlow<Search?> = _taxiEndLocation
+
     fun setTaxiStartLocation(search: Search) {
         _taxiStartLocation.value = search
     }
 
+    fun setTaxiEndLocation(search: Search) {
+        _taxiEndLocation.value = search
+    }
 
-    fun getUnAssignedCar(rentSchedule: RequestUnassignedCar) {
+
+    fun getUnAssignedCar(taxiSchedule: RequestUnassignedCar) {
         viewModelScope.launch {
-            rentCarRepository.getUnassignedCar(rentSchedule).collect { result ->
+            rentCarRepository.getUnassignedCar(taxiSchedule).collect { result ->
                 result.onSuccess { data ->
                     Timber.d("성공")
                     _assignedCar.emit(data)
@@ -71,7 +80,7 @@ class TaxiSummaryViewModel @Inject constructor(
         }
     }
 
-    fun processBootpayPayment(paymentData: String, taxiInfo: RentInfo) {
+    fun processBootpayPayment(paymentData: String, taxiInfo: TaxiInfo) {
         viewModelScope.launch {
             runCatching {
                 val currentUser = signRepository.getUserData().first().getOrThrow()
@@ -80,7 +89,7 @@ class TaxiSummaryViewModel @Inject constructor(
                 paymentRepository.savePaymentInfo(paymentRequest).collect{ result ->
                     result.onSuccess {
                         _paymentStatus.emit(PaymentStatus.Success("결제가 완료되었습니다."))
-                        callRent(taxiInfo)
+                        callTaxi(taxiInfo)
                     }.onFailure {
                         _paymentStatus.emit(PaymentStatus.Error("결제에 실패했습니다."))
                     }
@@ -92,7 +101,7 @@ class TaxiSummaryViewModel @Inject constructor(
     private fun parseBootpayData(
         data: String,
         currentUser: SocialUser,
-        taxiInfo: RentInfo,
+        taxiInfo: TaxiInfo,
     ): PaymentCompletionInfo {
         val jsonObject = JSONObject(data)
         val dataObject = jsonObject.getJSONObject("data")
@@ -106,32 +115,32 @@ class TaxiSummaryViewModel @Inject constructor(
             purchasedAt = dateFormat.parse(dataObject.getString("purchased_at")) ?: Date(),
             userId = currentUser.id,
             carId = taxiInfo.carInfo?.rentCarId ?: 0,
-            headCount = taxiInfo.people,
+            headCount = 1,
             rentStartTime = taxiInfo.startSchedule.toDate(),
             rentEndTime = taxiInfo.endSchedule.toDate()
         )
     }
 
-    private fun callRent(rentInfo: RentInfo) {
+    private fun callTaxi(taxiInfo: TaxiInfo) {
         viewModelScope.launch {
-            val taxiStartLocation = _taxiStartLocation.value
-
+            val taxiStartLocation = _taxiStartLocation.value?.title
+            val taxiEndLocation = _taxiEndLocation.value?.title
             val dateFormatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
 
-            val requestCallRent = RequestCallRent(
-                rentHeadCount = rentInfo.people,
-                rentTime = rentInfo.hours.toInt(),
-                rentPrice = rentInfo.finalPrice.toLong(),
-                rentStartTime = dateFormatter.format(rentInfo.startSchedule.toDate()),
-                rentEndTime = dateFormatter.format(rentInfo.endSchedule.toDate()),
-                rentDptLat = taxiStartLocation!!.lat,
-                rentDptLon = taxiStartLocation.lng,
-                datePlacesName = taxiStartLocation.title,
-                datePlacesCategory = taxiStartLocation.category,
-                datePlacesAddress = taxiStartLocation.roadAddress
+            val requestCallTaxi = RequestCallTaxi(
+                taxiTime = taxiInfo.minutes,
+                taxiPrice = taxiInfo.price,
+                taxiStartTime = dateFormatter.format(taxiInfo.startSchedule.toDate()),
+                taxiEndTime = dateFormatter.format(taxiInfo.endSchedule.toDate()),
+                taxiStartLat = taxiInfo.startLocation.lat,
+                taxiStartLon = taxiInfo.endLocation.lng,
+                taxiEndLat = taxiInfo.startLocation.lat,
+                taxiEndLon = taxiInfo.endLocation.lng,
+                startAddress = taxiStartLocation!!,
+                endAddress = taxiEndLocation!!
             )
 
-            rentRepository.callRent(requestCallRent).collect { result ->
+            taxiRepository.callTaxi(requestCallTaxi).collect { result ->
                 result.onSuccess { response ->
                     Timber.d("호출 성공")
                 }.onFailure { error ->

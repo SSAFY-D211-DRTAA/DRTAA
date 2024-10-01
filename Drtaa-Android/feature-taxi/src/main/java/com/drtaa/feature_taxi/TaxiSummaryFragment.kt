@@ -63,8 +63,12 @@ class TaxiSummaryFragment :
 
     private fun initData() {
         val taxiStartLocation = taxiViewModel.taxiStartLocation.value
-        if (taxiStartLocation !=null) {
-            taxiSummaryViewModel.setTaxiStartLocation(taxiStartLocation)
+        val taxiEndLocation = taxiViewModel.taxiEndLocation.value
+        if (taxiStartLocation !=null && taxiEndLocation != null) {
+            taxiSummaryViewModel.apply {
+                setTaxiStartLocation(taxiStartLocation)
+                setTaxiEndLocation(taxiEndLocation)
+            }
         }
 
         val taxiSchedule = RequestUnassignedCar(
@@ -73,6 +77,7 @@ class TaxiSummaryFragment :
         )
         taxiSummaryViewModel.getUnAssignedCar(taxiSchedule)
         taxiViewModel.getTaxiInfo()
+        Timber.d("택시 정보는요 ${taxiViewModel.taxiInfo}")
     }
 
     private fun initObserve() {

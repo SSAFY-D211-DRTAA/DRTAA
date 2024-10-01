@@ -6,6 +6,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.drtaa.core_ui.base.BaseFragment
 import com.drtaa.core_ui.component.OneButtonMessageDialog
+import com.drtaa.core_ui.showSnackBar
 import com.drtaa.feature_taxi.databinding.FragmentTaxiBinding
 import com.drtaa.feature_taxi.viewmodel.TaxiViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -70,7 +71,12 @@ class TaxiFragment : BaseFragment<FragmentTaxiBinding>(R.layout.fragment_taxi) {
         }
 
         binding.btnTaxiNext.setOnClickListener {
-            taxiViewModel.checkDuplicatedSchedule()
+            if(taxiViewModel.taxiStartLocation.value == null || taxiViewModel.taxiEndLocation.value==null) {
+                showSnackBar("장소를 선택해주세요!")
+            } else {
+                taxiViewModel.checkDuplicatedSchedule()
+            }
+
         }
     }
 
