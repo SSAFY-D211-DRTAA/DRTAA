@@ -6,15 +6,16 @@ import rospy
 import os
 import sys
 import copy
+import tf
 import numpy as np
 from math import sqrt, pow, atan2
-from geometry_msgs.msg import PoseStamped
+from geometry_msgs.msg import PoseStamped, PoseWithCovarianceStamped
 from nav_msgs.msg import Path, Odometry
 from scipy.spatial import KDTree
 from std_msgs.msg import String
 from morai_msgs.srv import MoraiEventCmdSrv
 from morai_msgs.msg import EventInfo
-import tf
+from std_msgs.msg import Bool
 
 current_path = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(current_path)
@@ -28,9 +29,19 @@ class AStarPathPublisher:
         rospy.Subscriber('/odom', Odometry, self.odom_callback)
         rospy.Subscriber('/command_status', String, self.command_callback)
 
-        self.global_path_pub = rospy.Publisher('/global_path', Path, queue_size=1)
-        self.destination_reached_pub = rospy.Publisher('/complete_drive', PoseStamped, queue_size=1)
+        # 차량의 기어 등 상태를 제어하기 위한 서비스 클라이언트
         self.event_cmd_client = rospy.ServiceProxy('/Service_MoraiEventCmd', MoraiEventCmdSrv)
+
+        self.global_path_pub = rospy.Publisher('/global_path', Path, queue_size=1)
+        self.global_path_pub_per = rospy.Publisher('/global_path_per', Path, queue_size=1)
+
+
+        # 목적지 도착 여부 
+        self.destination_reached_pub = rospy.Publisher('/complete_drive', PoseStamped, queue_size=1)
+
+        # 목적지 도착 후 승객 하차 여부
+        rospy.Subscriber("/passenger_dropoff", Bool, self.dropoff_callback)  
+        rospy.Subscriber("/is_roaming", Bool, self.roaming_callback)
 
         # 초기 상태 변수 설정
         self.is_goal_pose = False
@@ -42,9 +53,13 @@ class AStarPathPublisher:
         self.vehicle_state = None
         
         # Flag to check if destination reached message is published
-        self.destination_reached = False
+        self.is_destination_reached = False
         self.goal_position = None
         self.is_global_path_once_pub = False
+
+        self.last_dropoff_position = None
+        self.is_roaming = False
+        self.roaming_path = None
 
         try:
             # MGeo 데이터 로드
@@ -53,6 +68,7 @@ class AStarPathPublisher:
             self.nodes = mgeo_planner_map.node_set.nodes
             self.links = mgeo_planner_map.link_set.lines
             self.build_kd_tree()
+            self.path_cache = {}  # 경로 캐싱을 위한 딕셔너리
         except Exception as e:
             rospy.logerr(f"Failed to load Mgeo data: {e}")
 
@@ -64,6 +80,7 @@ class AStarPathPublisher:
         while not rospy.is_shutdown():
             if self.global_path_msg is not None:
                 # self.global_path_pub.publish(self.global_path_msg)
+                self.global_path_pub_per.publish(self.global_path_msg)
 
                 if self.is_global_path_once_pub is not True:
                     self.global_path_pub.publish(self.global_path_msg)
@@ -74,16 +91,14 @@ class AStarPathPublisher:
                     event_info.option = 1  # ctrl_mode option
                     event_info.ctrl_mode = 3  # automode
                     self.event_cmd_client(event_info)
-                    
-            # else:
-            #     rospy.loginfo('Waiting for goal and current position data')
+
             rate.sleep()
 
     def goal_callback(self, msg):
-   
+        
         self.end_node = self.find_closest_node(msg.pose.position)
         self.is_goal_pose = True
-        self.is_global_path_once_pub = False
+        # self.is_global_path_once_pub = False
         rospy.loginfo(f"목적지 노드: {self.end_node}")
         # [INFO] [1727033826.562245]: 목적지 노드: A119AS319285
 
@@ -102,7 +117,7 @@ class AStarPathPublisher:
         orientation = msg.pose.pose.orientation
         _, _, yaw = tf.transformations.euler_from_quaternion([orientation.x, orientation.y, orientation.z, orientation.w])
         self.current_heading = yaw
-
+        
         if self.is_goal_pose: # 목표 위치가 설정되어 있을 때만 시작 위치 설정
             # self.start_node = self.find_closest_node(msg.pose.pose.position)
             self.start_node = self.find_closest_node_in_direction(msg.pose.pose.position, yaw)
@@ -110,11 +125,16 @@ class AStarPathPublisher:
             # rospy.loginfo(f"현재 위치 근접 노드: {self.start_node}")
             self.update_path()
 
-        if self.goal_position is not None:
-            if not self.destination_reached and self.is_destination_reached(self.current_position):
-                    rospy.loginfo("Destination reached!")
-                    self.destination_reached = True
-                    # Create PoseStamped message
+        if self.destination_reached(self.current_position): # 목적지 도착 여부 확인
+            if self.vehicle_state == 'roaming': # 배회 모드인 경우 
+                rospy.loginfo("배회 목적지 도착!, 새로운 배회 경로 갱신")
+                self.reset_global_path()
+                self.start_node = self.find_closest_node_in_direction(msg.pose.pose.position, yaw)
+                self.is_init_pose = True
+                self.generate_roaming_path()
+            else:
+                if self.goal_position is not None:
+                    rospy.loginfo("목적지 도착!")
                     goal_pose_msg = PoseStamped()
                     goal_pose_msg.header.stamp = rospy.Time.now()
                     goal_pose_msg.header.frame_id = "map"  # Set appropriate frame ID   
@@ -125,20 +145,57 @@ class AStarPathPublisher:
                     # Reset state variables and global path
                     self.reset_global_path()
 
+    def dropoff_callback(self, msg):
+        if msg.data:
+            rospy.loginfo("Passenger dropped off. Resetting global path.")
+            self.last_dropoff_position = self.current_position # 마지막 하차 위치 저장 
+            self.vehicle_state = 'parking' # 승객 하차하면 주차 중 상태로 변경     
+            # self.vehicle_state = 'roaming' 
+    
+    def roaming_callback(self, msg):
+        if msg.data and self.is_roaming is not True:
+            rospy.loginfo("주차장 만석!, 배회 모드 시작")
+            self.is_roaming = True
+            self.vehicle_state = 'roaming'
+            self.move_to_last_dropoff()
+
+    def start_roaming(self):
+        if self.roaming_path is None:
+            rospy.loginfo("배회 목적지 도착!, 새로운 배회 경로 갱신")
+            self.generate_roaming_path()
+        else:
+            rospy.loginfo("계속 배회 중")
+
+    def move_to_last_dropoff(self): # 승객이 하차한 위치로 이동 
+        rospy.loginfo("Moving to last drop-off position")
+        self.end_node = self.find_closest_node(self.last_dropoff_position)
+        self.is_goal_pose = True
+        # self.is_global_path_once_pub = False
+        self.goal_position = [self.last_dropoff_position.x, self.last_dropoff_position.y]
+        self.update_path()
+
+    def generate_roaming_path(self): # 배회 경로 생성
+        rospy.loginfo("Generating roaming path")
+        backward_node = self.find_backward_waypoint(self.last_dropoff_position) # self.current_position
+        if backward_node:
+            self.end_node = backward_node
+            self.goal_position = [self.nodes[backward_node].point[0], self.nodes[backward_node].point[1]]
+            self.is_goal_pose = True
+            self.is_global_path_once_pub = False
+            self.update_path()
+        else:
+            rospy.logwarn("Could not find a suitable backward waypoint. Staying in place.")
+
     def command_callback(self, msg):
         self.is_status = True
-        if msg.data == 'driving':
-            self.vehicle_state = 'driving'
-        elif msg.data == 'wait':
-            self.vehicle_state = 'wait'
+        self.vehicle_state = msg.data
 
-    def is_destination_reached(self, current_position):
+    def destination_reached(self, current_position):
         if self.goal_position is None:
             rospy.logwarn("Goal position is not set.")
             return False
-        # Define a threshold distance to consider as "reached"
-        # rospy.loginfo(f"현재 위치: {current_position}")
-        threshold_distance = 1.0  # meters
+        
+        threshold_distance = 5.0  # meters
         current_pos_array = np.array([current_position.x, current_position.y])
         distance_to_goal = np.linalg.norm(np.array(self.goal_position) - current_pos_array)
         # rospy.loginfo(f"Distance to goal: {distance_to_goal}")
@@ -150,13 +207,13 @@ class AStarPathPublisher:
         self.is_goal_pose = False
         self.is_init_pose = False
         self.goal_position = None # 추가: 목적지 위치 초기화
-        self.destination_reached = False  # 추가: 목적지 도달 상태 초기화
+        self.is_global_path_once_pub = False
+        self.is_destination_reached = False  # 추가: 목적지 도달 상태 초기화
 
     def build_kd_tree(self):
-
-        if not self.kd_tree: # KD-Tree가 아직 생성되지 않은 경우에만 생성
+        if not self.kd_tree:  # KD-Tree가 아직 생성되지 않은 경우에만 생성
             node_positions = np.array([[node.point[0], node.point[1]] for node in self.nodes.values()])
-        self.kd_tree = KDTree(node_positions)
+            self.kd_tree = KDTree(node_positions)
         
     def find_closest_node(self, position):
         # KD-Tree를 사용하여 노드 검색 최적화
@@ -195,35 +252,67 @@ class AStarPathPublisher:
         # 시작점과 목표점이 설정되면 경로 계산
         if self.is_goal_pose and self.is_init_pose:
                 
-            # if self.vehicle_state == 'wait':
-            #     backward_node = self.find_backward_waypoint(self.current_position)
-            #     if backward_node:
-            #         self.global_path_msg = self.calc_astar_path_node(self.start_node, backward_node)
-            # else:
-            #         self.global_path_msg = self.calc_astar_path_node(self.start_node, self.end_node)
-
             self.global_path_msg = self.calc_astar_path_node(self.start_node, self.end_node)
-            
                     
             if self.global_path_msg is not None:
                 rospy.loginfo("Global path calculated and fixed")
                 self.is_goal_pose = False
                 self.is_global_path_once_pub = False
-                
+
+    def update_path(self):
+
+        if self.is_goal_pose and self.is_init_pose:
+            self.global_path_msg = self.calc_astar_path_node(self.start_node, self.end_node)
+            
+            if self.global_path_msg is not None:
+                rospy.loginfo("Global path calculated and fixed")
+                self.is_goal_pose = False
+                self.is_global_path_once_pub = False
+
+    def find_backward_waypoint(self, position):
+        if not self.kd_tree:
+            self.build_kd_tree()
+        
+        distances, indices = self.kd_tree.query([position.x, position.y], k=50)  # 더 많은 후보 노드 검색
+        
+        min_distance = 20.0  # 최소 거리 설정 (미터 단위)
+        max_distance = 50.0  # 최대 거리 설정
+        
+        for idx in indices:
+            node = list(self.nodes.values())[idx]
+            node_vector = np.array([node.point[0] - position.x, node.point[1] - position.y])
+            distance = np.linalg.norm(node_vector)
+            angle_to_node = atan2(node_vector[1], node_vector[0])
+            
+            # 차량의 후방 방향에 있고, 지정된 거리 범위 내에 있는 노드 선택
+            if abs(angle_to_node - self.current_heading) > np.pi/2 and min_distance < distance < max_distance:
+                return node.idx
+        
+        return None   
+      
     def calc_astar_path_node(self, start_node, end_node):
         # A* 알고리즘을 사용하여 경로 계산
         rospy.loginfo(f"Attempting to find path from {start_node} to {end_node}")
+        # 1. 기본 A* 알고리즘 시도
         success, path = self.global_planner.find_shortest_path(start_node, end_node)
-        if not success:
-            rospy.logerr(f"Failed to find path. Start: {start_node}, End: {end_node}")
-            rospy.logerr(f"Number of nodes: {len(self.nodes)}")
-            rospy.logerr(f"Number of links: {len(self.links)}")
-            return None
+        if success:
+            return self.create_path_msg(path['point_path'])
 
-        # 경로 평활화 적용
-        smoothed_point_path = self.global_planner.smooth_path(path['point_path'])
+        # 2. 탐색 범위 확장
+        expanded_path = self.global_planner.find_path_with_expanded_search(start_node, end_node)
+        if expanded_path:
+            return self.create_path_msg(expanded_path['point_path'])
 
-        # ROS Path 메시지 생성
+        # 3. 중간 목표점 설정
+        intermediate_path = self.global_planner.find_path_with_intermediate_goals(start_node, end_node)
+        if intermediate_path:
+            return self.create_path_msg(intermediate_path['point_path'])
+
+        rospy.logerr(f"Failed to find path. Start: {start_node}, End: {end_node}")
+        return None
+    
+    def create_path_msg(self, point_path):
+        smoothed_point_path = self.global_planner.smooth_path(point_path)
         global_path_msg = Path()
         global_path_msg.header.frame_id = 'map'
         for point in smoothed_point_path:
@@ -232,24 +321,23 @@ class AStarPathPublisher:
             pose.pose.position.y = point[1]
             pose.pose.position.z = 0
             global_path_msg.poses.append(pose)
-
         return global_path_msg
-
+    
 class AStar:
     def __init__(self, nodes, links):
         self.nodes = nodes
         self.links = links
+
         # 가중치 행렬 초기화 개선: 실제 연결된 노드만 초기화
         self.weight = {from_node_id: {} for from_node_id in nodes.keys()}
-        rospy.Subscriber('/odom', Odometry, self.odom_callback)
-
-        
         for from_node_id, from_node in nodes.items():
             for to_node in from_node.get_to_nodes():
                 shortest_link, min_cost = from_node.find_shortest_link_leading_to_node(to_node)
                 if shortest_link is not None:
                     self.weight[from_node_id][to_node.idx] = min_cost
-    
+        
+        rospy.Subscriber('/odom', Odometry, self.odom_callback)
+
     # def heuristic(self, a, b):
     #     # 휴리스틱 함수: 두 노드 간의 유클리드 거리
     #     return sqrt(pow(a.point[0] - b.point[0], 2) + pow(a.point[1] - b.point[1], 2))
@@ -260,7 +348,7 @@ class AStar:
         angle_diff = abs(atan2(direction_vector[1], direction_vector[0]) - current_heading)
         return distance + angle_diff * 10
 
-    def smooth_path(self, path, weight_data=0.8, weight_smooth=0.1, tolerance=0.000001): # 0.5 0.1
+    def smooth_path(self, path, weight_data=0.6, weight_smooth=0.1, tolerance=0.001): # 0.5 0.1 0.000001
         # 경로 평활화
         newpath = copy.deepcopy(path)
         change = tolerance
@@ -273,7 +361,6 @@ class AStar:
                     newpath[i][j] += weight_smooth * (newpath[i-1][j] + newpath[i+1][j] - (2.0 * newpath[i][j]))
                     change += abs(aux - newpath[i][j])
         return newpath
-    
 
     def odom_callback(self, msg):
         
@@ -281,7 +368,7 @@ class AStar:
         orientation = msg.pose.pose.orientation
         _, _, yaw = tf.transformations.euler_from_quaternion([orientation.x, orientation.y, orientation.z, orientation.w])
         self.current_heading = yaw
-    
+
     def find_shortest_path(self, start_node_idx, end_node_idx):
         start_node = self.nodes[start_node_idx]
         end_node = self.nodes[end_node_idx]
@@ -339,6 +426,79 @@ class AStar:
             for point in shortest_link.points:
                 point_path.append([point[0], point[1], 0])
         return link_path, point_path
+    
+    def find_path_with_expanded_search(self, start_node_idx, end_node_idx):
+        max_iterations = 5  # 최대 반복 횟수
+        expansion_factor = 1.5  # 탐색 범위 확장 계수
+
+        for iteration in range(max_iterations):
+            expanded_radius = self.heuristic(self.nodes[start_node_idx], self.nodes[end_node_idx], self.current_heading) * expansion_factor * (iteration + 1)
+            
+            open_list = []
+            heapq.heappush(open_list, (0, start_node_idx))
+            came_from = {}
+            g_score = {node_id: float('inf') for node_id in self.nodes.keys()}
+            g_score[start_node_idx] = 0
+            f_score = {node_id: float('inf') for node_id in self.nodes.keys()}
+            f_score[start_node_idx] = self.heuristic(self.nodes[start_node_idx], self.nodes[end_node_idx], self.current_heading)
+
+            while open_list:
+                current_f_score, current_node_idx = heapq.heappop(open_list)
+                
+                if current_node_idx == end_node_idx:
+                    return self.reconstruct_path(came_from, end_node_idx)
+                
+                for neighbor_idx in self.weight[current_node_idx]:
+                    if self.heuristic(self.nodes[neighbor_idx], self.nodes[start_node_idx], self.current_heading) > expanded_radius:
+                        continue  # 확장된 반경을 벗어난 노드는 무시
+
+                    tentative_g_score = g_score[current_node_idx] + self.weight[current_node_idx][neighbor_idx]
+                    if tentative_g_score < g_score[neighbor_idx]:
+                        came_from[neighbor_idx] = current_node_idx
+                        g_score[neighbor_idx] = tentative_g_score
+                        f_score[neighbor_idx] = g_score[neighbor_idx] + self.heuristic(self.nodes[neighbor_idx], self.nodes[end_node_idx], self.current_heading)
+                        heapq.heappush(open_list, (f_score[neighbor_idx], neighbor_idx))
+
+        return None
+
+    def find_path_with_intermediate_goals(self, start_node_idx, end_node_idx):
+        num_intermediate_goals = 3  # 중간 목표점 개수
+        path = []
+
+        current_node = start_node_idx
+        for _ in range(num_intermediate_goals + 1):
+            if current_node == end_node_idx:
+                break
+
+            # 현재 노드와 목표 노드 사이의 중간 지점 찾기
+            mid_point = self.find_midpoint(self.nodes[current_node], self.nodes[end_node_idx])
+            intermediate_goal = self.find_close_node(mid_point)
+
+            # 현재 노드에서 중간 목표점까지의 경로 찾기
+            success, partial_path = self.find_shortest_path(current_node, intermediate_goal)
+            if not success:
+                return None
+
+            path.extend(partial_path['point_path'][:-1])  # 마지막 점은 중복을 피하기 위해 제외
+            current_node = intermediate_goal
+
+        # 마지막 중간 목표점에서 최종 목표점까지의 경로 찾기
+        success, final_path = self.find_shortest_path(current_node, end_node_idx)
+        if not success:
+            return None
+
+        path.extend(final_path['point_path'])
+        return {'point_path': path}
+
+    def find_midpoint(self, node1, node2):
+        return [(node1.point[0] + node2.point[0]) / 2, (node1.point[1] + node2.point[1]) / 2]
+
+    def find_close_node(self, point):
+        closest_node = min(self.nodes.values(), key=lambda node: self.distance(node.point, point))
+        return closest_node.idx
+
+    def distance(self, point1, point2):
+        return sqrt((point1[0] - point2[0])**2 + (point1[1] - point2[1])**2)
 
 if __name__ == '__main__':
     try:
