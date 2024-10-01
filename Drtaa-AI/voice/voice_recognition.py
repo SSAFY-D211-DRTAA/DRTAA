@@ -13,7 +13,7 @@ try:
     print(f"인식된 텍스트: {text}")
 
     # 파일에 텍스트 저장
-    with open("stt.txt", 'w') as file:
+    with open("output/stt.txt", 'w') as file:
         file.write(text)
     print("음성 데이터가 파일에 저장되었습니다.")
 except sr.UnknownValueError:

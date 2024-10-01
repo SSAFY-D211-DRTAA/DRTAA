@@ -36,7 +36,7 @@ def read_region_from_file(file_path):
         return None
 
 # 파일 경로 지정
-file_path = "stt.txt"
+file_path = "output/stt.txt"
 
 # 파일에서 지역명 가져오기
 region_name = read_region_from_file(file_path)
