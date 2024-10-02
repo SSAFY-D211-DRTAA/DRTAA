@@ -9,5 +9,4 @@ import kotlinx.coroutines.flow.Flow
 interface TaxiRepository {
     suspend fun getRoute(start: Search, end: Search): Flow<Result<ResponseGeoJson>>
     suspend fun callTaxi(requestCallTaxi: RequestCallTaxi): Flow<Result<TaxiDetail>>
-
 }

@@ -92,7 +92,7 @@ class TaxiSearchFragment :
                     return@setOnClickListener
                 }
                 behavior.apply {
-                    maxHeight = BOTTOM_SHEET_PEEK_HEIGHT*2
+                    maxHeight = BOTTOM_SHEET_PEEK_HEIGHT * 2
                     peekHeight = BOTTOM_SHEET_PEEK_HEIGHT / 2
                 }
                 rvSearchResult.visibility = View.VISIBLE
@@ -139,7 +139,7 @@ class TaxiSearchFragment :
             )
         )
         Timber.d("선택된 주소 : ${result.getOrNull()}")
-        delay(100)
+        delay(DELAY)
         Timber.d("주소 선택 ${taxiSearchViewModel.selectedSearchItem.value}")
         if (args.isStartLocation) {
             taxiViewModel.setTaxiStartLocation(taxiSearchViewModel.selectedSearchItem.value!!)
@@ -170,7 +170,7 @@ class TaxiSearchFragment :
         taxiSearchViewModel.reverseGeocode.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { result ->
                 result?.onSuccess { data ->
-                    Timber.d("주소는?? ${data}")
+                    Timber.d(" 주소는?? $data ")
                 }?.onFailure {
                     Timber.d("주소를 가져오지 못했습니다.")
                 }
@@ -214,7 +214,7 @@ class TaxiSearchFragment :
             }
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                //슬라이드
+                // 슬라이드
             }
         })
     }
@@ -223,5 +223,6 @@ class TaxiSearchFragment :
         const val BOTTOM_SHEET_PEEK_HEIGHT = 620
         const val MAP_BOTTOM_CONTENT_PADDING = 100
         const val DEFAULT_ZOOM = 17.4
+        const val DELAY = 100L
     }
 }

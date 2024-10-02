@@ -64,7 +64,7 @@ class TaxiSummaryFragment :
     private fun initData() {
         val taxiStartLocation = taxiViewModel.taxiStartLocation.value
         val taxiEndLocation = taxiViewModel.taxiEndLocation.value
-        if (taxiStartLocation !=null && taxiEndLocation != null) {
+        if (taxiStartLocation != null && taxiEndLocation != null) {
             taxiSummaryViewModel.apply {
                 setTaxiStartLocation(taxiStartLocation)
                 setTaxiEndLocation(taxiEndLocation)
@@ -97,7 +97,6 @@ class TaxiSummaryFragment :
                     taxiViewModel.getTaxiInfo()
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
-
     }
 
     private fun drawRoute(routePoints: List<LatLng>) {
@@ -159,9 +158,9 @@ class TaxiSummaryFragment :
                 findNavController()
                     .currentBackStackEntry
                     ?.savedStateHandle
-                    ?.getStateFlow(Pay.SUCCESS.type, Pair(false,""))
+                    ?.getStateFlow(Pay.SUCCESS.type, Pair(false, ""))
                     ?.collectLatest { (success, paymentData) ->
-                        if(success) {
+                        if (success) {
                             showSnackBar("결제에 성공했습니다.")
                             Timber.tag("bootpay").d("택시용 ${Pay.SUCCESS.type} : $paymentData")
                             taxiSummaryViewModel.processBootpayPayment(
@@ -175,9 +174,9 @@ class TaxiSummaryFragment :
                 findNavController()
                     .currentBackStackEntry
                     ?.savedStateHandle
-                    ?.getStateFlow(Pay.CLOSED.type,false)
+                    ?.getStateFlow(Pay.CLOSED.type, false)
                     ?.collectLatest { closed ->
-                        if(closed) {
+                        if (closed) {
                             showSnackBar("결제가 취소되었습니다.")
                             Timber.tag("bootpay").d("택시용 ${Pay.CLOSED.type} : $closed")
                         }
@@ -189,7 +188,7 @@ class TaxiSummaryFragment :
                     ?.savedStateHandle
                     ?.getStateFlow(Pay.CANCELED.type, false)
                     ?.collectLatest { canceled ->
-                        if(canceled) {
+                        if (canceled) {
                             showSnackBar("결제가 취소되었습니다.")
                             Timber.tag("bootpay").d("택시용 ${Pay.CANCELED.type} : $canceled")
                         }

@@ -71,12 +71,11 @@ class TaxiFragment : BaseFragment<FragmentTaxiBinding>(R.layout.fragment_taxi) {
         }
 
         binding.btnTaxiNext.setOnClickListener {
-            if(taxiViewModel.taxiStartLocation.value == null || taxiViewModel.taxiEndLocation.value==null) {
+            if (taxiViewModel.taxiStartLocation.value == null || taxiViewModel.taxiEndLocation.value == null) {
                 showSnackBar("장소를 선택해주세요!")
             } else {
                 taxiViewModel.checkDuplicatedSchedule()
             }
-
         }
     }
 

@@ -1,22 +1,15 @@
 package com.drtaa.feature_taxi.viewmodel
 
-import android.provider.ContactsContract.Data
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.drtaa.core_data.repository.PaymentRepository
 import com.drtaa.core_data.repository.RentCarRepository
-import com.drtaa.core_data.repository.RentRepository
 import com.drtaa.core_data.repository.SignRepository
 import com.drtaa.core_data.repository.TaxiRepository
 import com.drtaa.core_model.data.PaymentCompletionInfo
 import com.drtaa.core_model.map.Search
-import com.drtaa.core_model.network.RequestCallRent
-import com.drtaa.core_model.network.RequestDuplicatedSchedule
 import com.drtaa.core_model.network.RequestUnassignedCar
 import com.drtaa.core_model.rent.RentCar
-import com.drtaa.core_model.rent.RentInfo
-import com.drtaa.core_model.rent.RentSchedule
-import com.drtaa.core_model.route.RouteInfo
 import com.drtaa.core_model.sign.SocialUser
 import com.drtaa.core_model.taxi.RequestCallTaxi
 import com.drtaa.core_model.taxi.TaxiInfo
@@ -30,8 +23,6 @@ import kotlinx.coroutines.launch
 import org.json.JSONObject
 import timber.log.Timber
 import java.text.SimpleDateFormat
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
@@ -42,7 +33,6 @@ class TaxiSummaryViewModel @Inject constructor(
     private val rentCarRepository: RentCarRepository,
     private val signRepository: SignRepository,
     private val paymentRepository: PaymentRepository,
-    private val rentRepository: RentRepository
 ) : ViewModel() {
 
     private val _paymentStatus = MutableSharedFlow<PaymentStatus>()
@@ -65,7 +55,6 @@ class TaxiSummaryViewModel @Inject constructor(
         _taxiEndLocation.value = search
     }
 
-
     fun getUnAssignedCar(taxiSchedule: RequestUnassignedCar) {
         viewModelScope.launch {
             rentCarRepository.getUnassignedCar(taxiSchedule).collect { result ->
@@ -84,9 +73,9 @@ class TaxiSummaryViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 val currentUser = signRepository.getUserData().first().getOrThrow()
-                val paymentInfo = parseBootpayData(paymentData,currentUser,taxiInfo)
+                val paymentInfo = parseBootpayData(paymentData, currentUser, taxiInfo)
                 val paymentRequest = paymentInfo.toPaymentRequest()
-                paymentRepository.savePaymentInfo(paymentRequest).collect{ result ->
+                paymentRepository.savePaymentInfo(paymentRequest).collect { result ->
                     result.onSuccess {
                         _paymentStatus.emit(PaymentStatus.Success("결제가 완료되었습니다."))
                         callTaxi(taxiInfo)
@@ -149,8 +138,6 @@ class TaxiSummaryViewModel @Inject constructor(
             }
         }
     }
-
-
 
     sealed class PaymentStatus {
         data class Success(val message: String) : PaymentStatus()

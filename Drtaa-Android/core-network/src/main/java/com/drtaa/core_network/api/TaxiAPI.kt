@@ -11,5 +11,4 @@ interface TaxiAPI {
     suspend fun callTaxi(
         @Body requestCallTaxi: RequestCallTaxi,
     ): TaxiDetail
-
 }

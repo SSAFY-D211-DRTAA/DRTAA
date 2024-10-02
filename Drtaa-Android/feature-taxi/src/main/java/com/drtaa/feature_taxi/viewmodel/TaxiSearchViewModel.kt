@@ -29,7 +29,7 @@ class TaxiSearchViewModel @Inject constructor(
 
     fun setSelectedSearchItem(search: Search) {
         _selectedSearchItem.value = search
-        Timber.d("뷰모델 선택된 주소 : ${search}")
+        Timber.d(" 뷰모델 선택된 주소 : $search ")
     }
 
     fun getSearchList(keyword: String) {
