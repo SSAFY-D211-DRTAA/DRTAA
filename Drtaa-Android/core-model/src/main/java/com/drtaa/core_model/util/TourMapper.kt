@@ -2,6 +2,7 @@ package com.drtaa.core_model.util
 
 import com.drtaa.core_model.tour.TourItem
 import com.drtaa.core_model.network.ResponseTour
+import com.drtaa.core_model.plan.PlanItem
 
 fun (ResponseTour.Response.Body.Items.Item).toEntity(): TourItem {
     return TourItem(
@@ -26,5 +27,19 @@ fun (ResponseTour.Response.Body.Items.Item).toEntity(): TourItem {
         cat1 = this.cat1,
         cat2 = this.cat2,
         cat3 = this.cat3
+    )
+}
+
+fun TourItem.toPlanItem(): PlanItem {
+    return PlanItem(
+        travelDatesId = 0,
+        datePlacesAddress = this.addr1,
+        datePlacesCategory = this.cat1,
+        datePlacesIsVisited = false,
+        datePlacesLat = this.mapy.toDouble(),
+        datePlacesLon = this.mapx.toDouble(),
+        datePlacesName = this.title,
+        datePlacesId = 0,
+        datePlacesOrder = 0
     )
 }
