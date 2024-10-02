@@ -5,6 +5,15 @@
     android:id="@+id/nav_graph_plan"
     app:startDestination="@id/planHistoryFragment">
 
+    <include app:graph="@navigation/nav_graph_travel"/>
+    <action
+        android:id="@+id/action_fragment_plan_to_nav_graph_travel"
+        app:destination="@id/nav_graph_travel">
+        <argument
+            android:name="planItem"
+            app:argType="com.drtaa.core_model.plan.PlanItem" />
+    </action>
+
     <fragment
         android:id="@+id/planListFragment"
         android:name="com.drtaa.feature_plan.PlanListFragment"

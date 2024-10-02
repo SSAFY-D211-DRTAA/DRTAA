@@ -97,7 +97,7 @@ public class RentCarController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
         } catch(TravelAllPlacesVisitedException e) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(e.getMessage()); // 204
-        }catch (AuthenticationException e) {
+        } catch (AuthenticationException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("권한 인증에 실패하였습니다."); // 401
         } catch (WebSocketDisConnectedException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage()); // 500
@@ -113,7 +113,7 @@ public class RentCarController {
             RentCarLocationResponseDTO response = rentCarService.reCallRentCar(rentCarCallRequestDTO);
 
             return ResponseEntity.ok(response); //200
-        } catch (RentNotFoundException | RentCarNotFoundException e) {
+        } catch (RentNotFoundException | RentCarNotFoundException | TravelNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
         } catch (AuthenticationException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("권한 인증에 실패하였습니다."); // 401
@@ -131,7 +131,7 @@ public class RentCarController {
             RentCarManipulateResponseDTO response = rentCarService.updateRentCarDriveStatustoDriving(rentCarManipulateRequestDTO);
 
             return ResponseEntity.ok(response); //200
-        } catch (RentNotFoundException | RentCarNotFoundException e) {
+        } catch (RentNotFoundException | RentCarNotFoundException | TravelNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
         } catch (WebSocketDisConnectedException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage()); // 500

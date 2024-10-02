@@ -81,27 +81,53 @@ class local_path_pub:
         self.left_turn_pub.publish(Bool(is_turning_left))
         self.local_path_pub.publish(local_path_msg)
 
-    def find_closest_waypoint(self, x, y, start_index):
-        if self.global_path_msg is None or len(self.global_path_msg.poses) == 0:
-            rospy.logwarn("Global path is empty or not received yet.")
-            return start_index
-
-        min_dis = float('inf')
-        current_waypoint = start_index
-        for i in range(start_index, len(self.global_path_msg.poses)):
-            pose = self.global_path_msg.poses[i]
-            dis = sqrt((x - pose.pose.position.x)**2 + (y - pose.pose.position.y)**2)
-            if dis < min_dis:
-                min_dis = dis
-                current_waypoint = i
-            elif dis > min_dis + 5.0:
-                break
-
-        angle_to_waypoint = atan2(pose.pose.position.y - y, pose.pose.position.x - x)
-        angle_difference = (angle_to_waypoint - self.heading + np.pi) % (2 * np.pi) - np.pi
+    # def find_closest_waypoint(self, x, y, start_index):
+    #     global pose
         
-        if angle_difference < -0.1 or angle_difference > 0.1:
-            return self.prev_current_waypoint
+    #     if self.global_path_msg is None or len(self.global_path_msg.poses) == 0:
+    #         rospy.logwarn("Global path is empty or not received yet.")
+    #         return start_index
+
+    #     min_dis = float('inf')
+    #     current_waypoint = start_index
+    #     for i in range(start_index, len(self.global_path_msg.poses)):
+    #         pose = self.global_path_msg.poses[i]
+    #         dis = sqrt((x - pose.pose.position.x)**2 + (y - pose.pose.position.y)**2)
+    #         if dis < min_dis:
+    #             min_dis = dis
+    #             current_waypoint = i
+    #         elif dis > min_dis + 5.0:
+    #             break
+
+    #     angle_to_waypoint = atan2(pose.pose.position.y - y, pose.pose.position.x - x)
+    #     angle_difference = (angle_to_waypoint - self.heading + np.pi) % (2 * np.pi) - np.pi
+        
+    #     if angle_difference < -0.1 or angle_difference > 0.1:
+    #         return self.prev_current_waypoint
+
+    #     return current_waypoint
+    
+    def find_closest_waypoint(self, x, y, start_index):
+        
+        current_waypoint = start_index
+
+        if self.global_path_msg is not None and len(self.global_path_msg.poses) != 0:
+            min_dis = float('inf')
+            current_waypoint = start_index
+            for i in range(start_index, len(self.global_path_msg.poses)):
+                pose = self.global_path_msg.poses[i]
+                dis = sqrt((x - pose.pose.position.x)**2 + (y - pose.pose.position.y)**2)
+                if dis < min_dis:
+                    min_dis = dis
+                    current_waypoint = i
+                elif dis > min_dis + 5.0:
+                    break
+
+            angle_to_waypoint = atan2(pose.pose.position.y - y, pose.pose.position.x - x)
+            angle_difference = (angle_to_waypoint - self.heading + np.pi) % (2 * np.pi) - np.pi
+            
+            if angle_difference < -0.1 or angle_difference > 0.1:
+                return self.prev_current_waypoint
 
         return current_waypoint
 

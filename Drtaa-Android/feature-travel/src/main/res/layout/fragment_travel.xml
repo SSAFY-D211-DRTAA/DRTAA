@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:overScrollMode="never"
+        android:scrollbars="none">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="20dp"
+            android:paddingTop="30dp">
+
+            <TextView
+                android:id="@+id/tv_travel_title"
+                style="@style/jua"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="28sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="여행지 이름" />
+
+            <TextView
+                android:id="@+id/tv_travel_address_title"
+                style="@style/jua"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="주소: "
+                android:textSize="14sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_travel_title" />
+
+            <TextView
+                android:id="@+id/tv_travel_address"
+                style="@style/jua"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                app:layout_constraintBottom_toBottomOf="@id/tv_travel_address_title"
+                app:layout_constraintStart_toEndOf="@id/tv_travel_address_title"
+                app:layout_constraintTop_toTopOf="@+id/tv_travel_address_title"
+                tools:text="여행지 주소" />
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cv_travel_image"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                app:cardCornerRadius="5dp"
+                app:cardElevation="0dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_travel_address_title"
+                app:strokeColor="@color/white">
+
+                <ImageView
+                    android:id="@+id/iv_travel"
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    tools:src="@android:drawable/ic_menu_gallery" />
+
+            </androidx.cardview.widget.CardView>
+
+            <View
+                android:id="@+id/view_line1"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="10dp"
+                android:background="@color/gray_d9d9"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/cv_travel_image" />
+
+            <TextView
+                android:id="@+id/tv_travel_weather_title"
+                style="@style/jua"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="여행지 날씨 예보"
+                android:textSize="24sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/view_line1" />
+
+            <TextView
+                android:id="@+id/tv_travel_weather_help"
+                style="@style/ptd_regular"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:text="*10월01일 기준"
+                android:textColor="@color/red"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="@+id/tv_travel_weather_title"
+                app:layout_constraintStart_toEndOf="@+id/tv_travel_weather_title"
+                app:layout_constraintTop_toTopOf="@id/tv_travel_weather_title" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cl_travel_weather"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="20dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_travel_weather_title">
+
+                <include
+                    android:id="@+id/item_weather1"
+                    layout="@layout/item_travel_weather"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:tag="weather1"
+                    app:layout_constraintEnd_toStartOf="@+id/item_weather2"
+                    app:layout_constraintHorizontal_weight="1"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <include
+                    android:id="@+id/item_weather2"
+                    layout="@layout/item_travel_weather"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:tag="weather2"
+                    app:layout_constraintEnd_toStartOf="@+id/item_weather3"
+                    app:layout_constraintHorizontal_weight="1"
+                    app:layout_constraintStart_toEndOf="@+id/item_weather1" />
+
+                <include
+                    android:id="@+id/item_weather3"
+                    layout="@layout/item_travel_weather"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:tag="weather3"
+                    app:layout_constraintEnd_toStartOf="@+id/item_weather4"
+                    app:layout_constraintHorizontal_weight="1"
+                    app:layout_constraintStart_toEndOf="@+id/item_weather2" />
+
+                <include
+                    android:id="@+id/item_weather4"
+                    layout="@layout/item_travel_weather"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:tag="weather4"
+                    app:layout_constraintEnd_toStartOf="@+id/item_weather5"
+                    app:layout_constraintHorizontal_weight="1"
+                    app:layout_constraintStart_toEndOf="@+id/item_weather3" />
+
+                <include
+                    android:id="@+id/item_weather5"
+                    layout="@layout/item_travel_weather"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:tag="weather5"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_weight="1"
+                    app:layout_constraintStart_toEndOf="@+id/item_weather4" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <View
+                android:id="@+id/view_line2"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="20dp"
+                android:background="@color/gray_d9d9"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/cl_travel_weather" />
+
+            <TextView
+                android:id="@+id/tv_travel_blog_title"
+                style="@style/jua"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="네이버 블로그 리뷰"
+                android:textSize="24sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/view_line2" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_travel_blog"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="vertical"
+                android:overScrollMode="never"
+                android:scrollbars="none"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_travel_blog_title"
+                tools:itemCount="3"
+                tools:listitem="@layout/item_travel_blog" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+</layout>

@@ -3,13 +3,14 @@ package com.drtaa.core_network.di
 import com.drtaa.core_network.api.GeoAPI
 import com.drtaa.core_network.api.MapAPI
 import com.drtaa.core_network.api.PaymentAPI
+import com.drtaa.core_network.api.PlanAPI
 import com.drtaa.core_network.api.RentAPI
 import com.drtaa.core_network.api.RentCarAPI
 import com.drtaa.core_network.api.SignAPI
 import com.drtaa.core_network.api.TaxiAPI
 import com.drtaa.core_network.api.TmapAPI
-import com.drtaa.core_network.api.PlanAPI
 import com.drtaa.core_network.api.TourAPI
+import com.drtaa.core_network.api.TravelAPI
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -116,5 +117,23 @@ object APIModule {
     ): TmapAPI {
         return retrofitFactory.create(TMAP_URL)
             .create(TmapAPI::class.java)
+    }
+
+    @Singleton
+    @Auth
+    @Provides
+    fun provideTravelAuthAPI(
+        @AuthRetrofit
+        retrofit: Retrofit
+    ): TravelAPI = retrofit.create(TravelAPI::class.java)
+
+    @Singleton
+    @NoAuth
+    @Provides
+    fun provideTravelNoAuthAPI(
+        retrofitFactory: RetrofitFactory
+    ): TravelAPI {
+        return retrofitFactory.create(MAP_SEARCH_URL)
+            .create(TravelAPI::class.java)
     }
 }
