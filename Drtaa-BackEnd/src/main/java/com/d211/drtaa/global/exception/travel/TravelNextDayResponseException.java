@@ -7,23 +7,30 @@ import com.d211.drtaa.global.util.fcm.FcmUtil;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
-public class TravelAllPlacesVisitedException extends RuntimeException {
+public class TravelNextDayResponseException extends RuntimeException {
 
-    FcmUtil fcmUtil;
+    private FcmUtil fcmUtil;
+    private RentCarManipulateResponseDTO response;
 
-    public TravelAllPlacesVisitedException(String message, Rent rent) {
+    public TravelNextDayResponseException(String message, Rent rent, RentCarManipulateResponseDTO response) {
         super(message);
         // Android에게 알림 보내기
         FcmMessage.FcmDTO fcmDTO = fcmUtil.makeFcmDTO("렌트 일정", "오늘 예정된 모든 여행지를 방문했습니다.\n 이동하려면 여행지 장소 추가를 해주세요 !!");
         log.info("Message: {}", fcmDTO.getBody());
         fcmUtil.singleFcmSend(rent.getUser(), fcmDTO); // 비동기로 전송
+
+        this.response = response;
     }
 
-    public TravelAllPlacesVisitedException(String message) {
+    public TravelNextDayResponseException(String message) {
         super(message);
     }
 
-    public TravelAllPlacesVisitedException(String message, Throwable cause) {
+    public TravelNextDayResponseException(String message, Throwable cause) {
         super(message, cause);
+    }
+
+    public RentCarManipulateResponseDTO getResponse() {
+        return response;
     }
 }
