@@ -63,7 +63,7 @@ public class RentController {
     }
 
     @GetMapping("/status/active")
-    @Operation(summary = "진행중 & 예약된 렌트 조회", description = "해당 회원의 진행중인 렌트 한개와 예약된 렌트 전체 조회")
+    @Operation(summary = "예약된 렌트 조회", description = "해당 회원의 예약된 렌트 전체 조회")
     public ResponseEntity getActiveRent(Authentication authentication) {
         try {
             List<RentResponseDTO> response = rentService.getActiveRent(authentication.getName());
