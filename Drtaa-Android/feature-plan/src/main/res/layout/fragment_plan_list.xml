@@ -37,8 +37,8 @@
                 android:id="@+id/iv_edit_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_edit"
                 android:layout_marginStart="10dp"
+                android:src="@drawable/ic_edit"
                 app:layout_constraintBottom_toBottomOf="@id/tv_plan_title"
                 app:layout_constraintStart_toEndOf="@+id/tv_plan_title"
                 app:layout_constraintTop_toTopOf="@id/tv_plan_title" />
@@ -62,6 +62,16 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_plan_date" />
+
+            <ImageView
+                android:id="@+id/iv_plan_current_location"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginBottom="10dp"
+                app:layout_constraintBottom_toBottomOf="@+id/mv_plan_map"
+                app:layout_constraintStart_toStartOf="parent"
+                app:srcCompat="@drawable/ic_current_location" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/cl_plan_day_control"

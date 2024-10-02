@@ -42,22 +42,26 @@ class pure_pursuit:
     def __init__(self):
         rospy.init_node('pure_pursuit', anonymous=True)
 
-        rospy.Subscriber("/global_path", Path, self.global_path_callback)
+        rospy.Subscriber("/global_path_per", Path, self.global_path_callback)
+        # rospy.Subscriber("/lattice_path", Path, self.path_callback)
         rospy.Subscriber("/local_path", Path, self.path_callback)
+        # rospy.Subscriber("/lane_change_path", Path, self.path_callback)
+
         rospy.Subscriber("/odom", Odometry, self.odom_callback)
         rospy.Subscriber("/Ego_topic", EgoVehicleStatus, self.status_callback)
         rospy.Subscriber("/Object_topic", ObjectStatusList, self.object_info_callback)
-        rospy.Subscriber('/command_status', String, self.command_callback)
         # rospy.Subscriber("/Object_topic_to_lidar", ObjectStatusList, self.object_info_callback) => 추후에 npc, ped, obs 구별하는 로직 및 기둥, 중앙분리대 같은 것은 해당 리스트에 포함 안되도록 해야함!!!
+        
+        # 차량 상태 확인
+        rospy.Subscriber('/command_status', String, self.command_callback)
 
         # 좌회전 여부 확인
         rospy.Subscriber("/is_left_turn", Bool, self.turning_left_callback)
 
-        # 주차 상태 구독
+        # 승객 하차 시에 우선 적으로 True로 설정 되어야함!!! -> 일단은 주차장으로 이동해야하는 상황
         rospy.Subscriber("/is_parking", Bool, self.parking_status_callback)  
-
-        self.ctrl_cmd_pub = rospy.Publisher('/ctrl_cmd', CtrlCmd, queue_size=1)
-        # self.complete_drive_pub = rospy.Publisher('/complete_drive', Bool, queue_size=1)
+        
+        self.ctrl_cmd_pub = rospy.Publisher('/ctrl_cmd', CtrlCmd, queue_size=1) # 제어 메시지 발행
 
         self.ctrl_cmd_msg = CtrlCmd()
         self.ctrl_cmd_msg.longlCmdType = 1
@@ -67,29 +71,28 @@ class pure_pursuit:
         self.is_status = False
         self.is_global_path = False
         self.is_look_forward_point = False
-        # self.has_published_complete = False  # 주행 완료 메시지 발행 여부
+        self.is_parking = False
 
         self.forward_point = Point()
-        self.current_position = Point()
+        # self.current_position = Point()
 
+        self.velocity_list = [] 
+        self.previous_global_path = None  # 이전 경로 저장 변수 추가
+        self.local_path_point = None
+ 
         self.vehicle_length = 2.7
         self.lfd = 8
         self.min_lfd = 5
         self.max_lfd = 15
         self.lfd_gain = 0.78
-        self.target_velocity = 40 
-
+        self.target_velocity = 35 
         self.stop_line_threshold = 15  ## 정지선 감지 거리 
-        self.previous_global_path = None  # 이전 경로 저장 변수 추가
-        self.velocity_list = [] 
-        self.local_path_point = None
 
         self.nodes = self.load_nodes()
 
         self.pid = pidControl()
         self.adaptive_cruise_control = AdaptiveCruiseControl(velocity_gain=0.5, distance_gain=1, time_gap=0.8, vehicle_length=2.7)
         self.vel_planning = velocityPlanning(self.target_velocity / 3.6, 0.15)
-
         self.traffic_light_manager = TrafficLightManager()
 
         rate = rospy.Rate(20)  ## 30hz
@@ -120,11 +123,6 @@ class pure_pursuit:
                     self.ctrl_cmd_msg.accel = 0.0
                     self.ctrl_cmd_msg.brake = 1.0  # 브레이크를 최대로 설정하여 차량 정지
                     self.ctrl_cmd_pub.publish(self.ctrl_cmd_msg)
-
-                    #if not self.has_published_complete:
-                        #rospy.loginfo("목적지 도착!!")
-                        # self.has_published_complete = True  # 플래그 업데이트
-                        # self.complete_drive_pub.publish(self.has_published_complete)  # 주행 완료 메시지 발행
                     
                     continue
 
@@ -132,10 +130,9 @@ class pure_pursuit:
                                                                     ,global_ped_info, local_ped_info
                                                                     ,global_obs_info, local_obs_info) # 주변 객체 정보를 통해 ACC를 위한 정보 업데이트
                 
-                
                 self.acc_velocity = self.adaptive_cruise_control.get_target_velocity(local_npc_info, local_ped_info, local_obs_info,
-                                                                                                        self.status_msg.velocity.x, self.target_velocity/3.6) # ACC를 통한 속도 제어
-                
+                                                                                    self.status_msg.velocity.x, self.target_velocity/3.6) # ACC를 통한 속도 제어
+
                 if(self.acc_velocity < 0):  # 비상 정지
                     self.ctrl_cmd_msg.accel = 0.0
                     self.ctrl_cmd_msg.brake = 1.0
@@ -143,7 +140,6 @@ class pure_pursuit:
                     rospy.logwarn("Emergency stop initiated!")
                     continue
 
-                self.acc_velocity = 20
                 # ACC와 조향각 기반 속도 제한 중 더 낮은 값 선택
                 self.target_velocity = min(self.target_velocity, self.acc_velocity) 
                 # rospy.loginfo(f"Target Velocity: {self.target_velocity}")
@@ -168,8 +164,9 @@ class pure_pursuit:
         self.is_odom = True
         odom_quaternion = (msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w)
         _, _, self.vehicle_yaw = euler_from_quaternion(odom_quaternion)
-        self.current_position.x = msg.pose.pose.position.x
-        self.current_position.y = msg.pose.pose.position.y
+        self.current_position = msg.pose.pose.position
+        # self.current_position.x = msg.pose.pose.position.x
+        # self.current_position.y = msg.pose.pose.position.y
 
     def status_callback(self, msg):
         self.is_status = True
@@ -180,7 +177,6 @@ class pure_pursuit:
         if self.previous_global_path is None or not self.is_same_path(self.previous_global_path, msg):
             self.global_path = msg
             self.is_global_path = True
-            # self.has_published_complete = False # 경로가 업데이트되면 주행 완료 메시지 발행 플래그 초기화
             self.velocity_list = self.vel_planning.curvedBaseVelocity(self.global_path, 50)
             rospy.loginfo("Global path updated and velocity list recalculated")
             self.previous_global_path = msg  # 이전 경로 업데이트
@@ -284,7 +280,7 @@ class pure_pursuit:
             self.target_velocity = 0
 
     def calculate_approach_velocity(self, distance):
-        max_approach_speed = 40  ## km/h # 20
+        max_approach_speed = 35  ## km/h # 20
         min_approach_speed = 0   # km/h
         
         if distance > self.stop_line_threshold:

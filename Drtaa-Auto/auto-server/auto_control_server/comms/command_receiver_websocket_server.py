@@ -20,7 +20,7 @@ class CommandReceiverWebSocketServer:
                 try:
                     data = json.loads(message)
                     # logger.debug(f"recv msg: {data}")
-                    await event_system.publish('recv_command', data)
+                    await event_system.publish('recv_command', message)
                     response = self.message_handler.handle_message(data, "WebSocket")
                     await websocket.send(json.dumps(response))
                 except json.JSONDecodeError:

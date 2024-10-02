@@ -5,6 +5,7 @@ import android.view.MotionEvent
 import android.view.View
 import com.google.android.material.snackbar.Snackbar
 import com.naver.maps.geometry.LatLng
+import com.naver.maps.geometry.LatLngBounds
 import com.naver.maps.map.CameraAnimation
 import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.LocationTrackingMode
@@ -75,3 +76,14 @@ fun NaverMap.moveCameraTo(latitude: Double, longitude: Double) {
     val cameraUpdate = CameraUpdate.scrollTo(LatLng(latitude, longitude)).animate(CameraAnimation.Easing)
     this.moveCamera(cameraUpdate)
 }
+
+/**
+ *  마커를 한눈에 볼 수 있게 카메라 이동
+ *  @param LatLngBounds
+ */
+fun NaverMap.moveCameraBounds(bounds: LatLngBounds) {
+    val cameraUpdate = CameraUpdate.fitBounds(bounds, BOUNDS_PADDING).animate(CameraAnimation.Easing)
+    this.moveCamera(cameraUpdate)
+}
+
+const val BOUNDS_PADDING = 70

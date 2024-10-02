@@ -30,10 +30,13 @@
         tools:targetApi="31">
         <activity
             android:name="com.drtaa.feature_main.MainActivity"
-            android:exported="true" />
+            android:exported="true">
+
+        </activity>
 
         <activity
             android:name="com.drtaa.feature_sign.SignActivity"
+            android:theme="@style/Theme.DRTAA.Splash"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
