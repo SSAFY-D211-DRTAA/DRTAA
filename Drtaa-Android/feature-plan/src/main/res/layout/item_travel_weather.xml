@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+
+    </data>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_weather_day"
+            style="@style/jua"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="월"
+            android:textSize="18sp" />
+
+        <ImageView
+            android:id="@+id/iv_weather_icon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            tools:src="@drawable/naver_blog"
+            android:layout_marginTop="5dp" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tv_weather_min_temp"
+                style="@style/ptd_regular"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="16°"
+                android:textColor="@color/blue"
+                android:textSize="14sp" />
+
+            <View
+                android:layout_width="3dp"
+                android:layout_height="match_parent" />
+
+            <TextView
+                android:id="@+id/tv_weather_max_temp"
+                style="@style/ptd_regular"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="26°"
+                android:textColor="@color/red"
+                android:textSize="14sp" />
+        </LinearLayout>
+    </LinearLayout>
+</layout>

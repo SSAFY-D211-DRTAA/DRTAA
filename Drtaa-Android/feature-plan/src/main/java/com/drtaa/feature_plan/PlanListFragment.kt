@@ -10,7 +10,8 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView
 import com.drtaa.core_map.base.BaseMapFragment
 import com.drtaa.core_map.setCustomLocationButton
-import com.drtaa.core_model.plan.Plan
+import com.drtaa.core_model.plan.DayPlan
+import com.drtaa.core_model.plan.PlanItem
 import com.drtaa.core_model.util.toDate
 import com.drtaa.core_ui.component.TwoButtonMessageDialog
 import com.drtaa.core_ui.component.TwoButtonTypingDialog
@@ -34,7 +35,7 @@ class PlanListFragment :
     private val planViewModel: PlanViewModel by hiltNavGraphViewModels(R.id.nav_graph_plan)
     private lateinit var viewPagerAdapter: PlanViewPagerAdapter
 
-    private val editPlanList = arrayListOf<ArrayList<Plan.DayPlan.PlanItem>>()
+    private val editPlanList = arrayListOf<ArrayList<PlanItem>>()
 
     private var fragmentList = listOf<DayPlanFragment>()
 
@@ -245,6 +246,9 @@ class PlanListFragment :
                             if (planViewModel.isEditMode.value) {
                                 editPlan(planItem)
                             }
+                        },
+                        onPlanClickListener = { planItem ->
+                            moveToTravel(planItem)
                         }
                     )
                 }
@@ -269,12 +273,20 @@ class PlanListFragment :
         }
     }
 
-    private fun getRVAdapterList(): List<Plan.DayPlan.PlanItem> {
+    private fun moveToTravel(planItem: PlanItem) {
+        navigateDestination(
+            PlanListFragmentDirections.actionPlanListFragmentToTravelFragment(
+                planItem = planItem
+            )
+        )
+    }
+
+    private fun getRVAdapterList(): List<PlanItem> {
         val dayIdx = binding.vpPlanDay.currentItem
         return fragmentList[dayIdx].planListAdapter.currentList
     }
 
-    private fun editPlan(planItem: Plan.DayPlan.PlanItem) {
+    private fun editPlan(planItem: PlanItem) {
         val dayIdx = binding.vpPlanDay.currentItem
 
         binding.clEditBottomSheet.visibility = View.VISIBLE
@@ -310,7 +322,7 @@ class PlanListFragment :
         }
     }
 
-    private fun updateDayPlanText(dayPlan: Plan.DayPlan) {
+    private fun updateDayPlanText(dayPlan: DayPlan) {
         binding.tvPlanDay.text =
             "Day ${binding.vpPlanDay.currentItem + 1} ${dayPlan.travelDatesDate.toDate()}"
     }

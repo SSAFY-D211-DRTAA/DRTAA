@@ -9,7 +9,7 @@
 
         <variable
             name="plan"
-            type="com.drtaa.core_model.plan.Plan.DayPlan.PlanItem" />
+            type="com.drtaa.core_model.plan.PlanItem" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

@@ -6,7 +6,8 @@ import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
-import com.drtaa.core_model.plan.Plan
+import com.drtaa.core_model.plan.DayPlan
+import com.drtaa.core_model.plan.PlanItem
 import com.drtaa.core_ui.base.BaseFragment
 import com.drtaa.feature_plan.adapter.ItemTouchHelperCallback
 import com.drtaa.feature_plan.adapter.PlanListAdapter
@@ -21,14 +22,20 @@ import timber.log.Timber
 class DayPlanFragment(
     private val context: Context,
     private val day: Int,
-    private val onPlanSelectListener: (planItem: Plan.DayPlan.PlanItem) -> Unit,
+    private val onPlanSelectListener: (planItem: PlanItem) -> Unit,
+    private val onPlanClickListener: (planItem: PlanItem) -> Unit
 ) : BaseFragment<FragmentDayPlanBinding>(R.layout.fragment_day_plan) {
 
     private val planViewModel: PlanViewModel by hiltNavGraphViewModels(R.id.nav_graph_plan)
 
     private var visitedIdxRange: IntRange? = null
 
-    val planListAdapter = PlanListAdapter(context, onPlanSelectListener)
+    val planListAdapter = PlanListAdapter(
+        context = context,
+        onPlanSelectListener = onPlanSelectListener,
+        onPlanClickListener = onPlanClickListener
+    )
+
     private val itemTouchHelperCallback = ItemTouchHelperCallback(
         listener = planListAdapter,
         disabledRange = null
@@ -82,7 +89,7 @@ class DayPlanFragment(
             }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
-    private fun getVisitedIdxRange(dayPlan: Plan.DayPlan) {
+    private fun getVisitedIdxRange(dayPlan: DayPlan) {
         val firstVisitedIndex = dayPlan.placesDetail.indexOfFirst { it.datePlacesIsVisited }
         val lastVisitedIndex = dayPlan.placesDetail.indexOfLast { it.datePlacesIsVisited }
 
