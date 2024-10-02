@@ -59,7 +59,9 @@ class CarTrackingFragment :
             if (viewModel.currentRentDetail.value?.rentStatus == "reserved") {
                 viewModel.callFirstAssignedCar()
             } else {
-                viewModel.callAssignedCar(STARBUCKS)
+                viewModel.callFirstAssignedCar()
+
+//                viewModel.callAssignedCar(STARBUCKS)
             }
         }
         carMarker.map = naverMap
