@@ -1,10 +1,8 @@
 package com.d211.drtaa.domain.rent.controller.car;
 
-import com.d211.drtaa.domain.rent.dto.request.RentCarArriveStatusRequestDTO;
-import com.d211.drtaa.domain.rent.dto.request.RentCarCallRequestDTO;
-import com.d211.drtaa.domain.rent.dto.request.RentCarDriveStatusRequestDTO;
-import com.d211.drtaa.domain.rent.dto.request.RentCarUnassignedDispatchStatusRequestDTO;
+import com.d211.drtaa.domain.rent.dto.request.*;
 import com.d211.drtaa.domain.rent.dto.response.RentCarDriveStatusResponseDTO;
+import com.d211.drtaa.domain.rent.dto.response.RentCarManipulateResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentCarLocationResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentCarResponseDTO;
 import com.d211.drtaa.domain.rent.entity.car.RentDrivingStatus;
@@ -12,16 +10,17 @@ import com.d211.drtaa.domain.rent.service.car.RentCarService;
 import com.d211.drtaa.global.exception.rent.NoAvailableRentCarException;
 import com.d211.drtaa.global.exception.rent.RentCarNotFoundException;
 import com.d211.drtaa.global.exception.rent.RentNotFoundException;
+import com.d211.drtaa.global.exception.travel.TravelAllPlacesVisitedException;
+import com.d211.drtaa.global.exception.travel.TravelNotFoundException;
 import com.d211.drtaa.global.exception.websocket.WebSocketDisConnectedException;
+import com.d211.drtaa.global.util.fcm.FcmUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,6 +33,7 @@ import java.util.List;
 public class RentCarController {
 
     private final RentCarService rentCarService;
+    private final FcmUtil fcmUtil;
 
     @GetMapping("/dispatch")
     @Operation(summary = "전체 배차 상태 조회", description = "전체 렌트 차량의 배차 상태 조회")
@@ -89,13 +89,15 @@ public class RentCarController {
     @PatchMapping("/call/{rentId}")
     @Operation(summary = "렌트 차량 첫호출", description = "회원의 진행할 렌트 차량 첫호출(렌트 요청 시 입력했던 탑승 위치 전송), 렌트 상태 진행중으로 변경")
     public ResponseEntity callRentCar(@PathVariable("rentId") long rentId) {
-        try{
+        try {
             RentCarLocationResponseDTO response = rentCarService.callRentCar(rentId);
 
             return ResponseEntity.ok(response); //200
         } catch (RentNotFoundException | RentCarNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
-        } catch (AuthenticationException e) {
+        } catch(TravelAllPlacesVisitedException e) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(e.getMessage()); // 204
+        }catch (AuthenticationException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("권한 인증에 실패하였습니다."); // 401
         } catch (WebSocketDisConnectedException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage()); // 500
@@ -122,13 +124,13 @@ public class RentCarController {
         }
     }
 
-    @PatchMapping("/{rentId}/driving")
+    @PatchMapping("/driving")
     @Operation(summary = "렌트 차량 탑승", description = "회원이 진행중인 렌트 차량을 탑승한 경우 탑승(driving) 상태로 수정")
-    public ResponseEntity updateRentCarDriveStatustoDriving (@PathVariable("rentId") long rentId) {
+    public ResponseEntity updateRentCarDriveStatustoDriving (@RequestBody RentCarManipulateRequestDTO rentCarManipulateRequestDTO) {
         try{
-            rentCarService.updateRentCarDriveStatustoDriving(rentId);
+            RentCarManipulateResponseDTO response = rentCarService.updateRentCarDriveStatustoDriving(rentCarManipulateRequestDTO);
 
-            return ResponseEntity.ok("Success"); //200
+            return ResponseEntity.ok(response); //200
         } catch (RentNotFoundException | RentCarNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
         } catch (WebSocketDisConnectedException e) {
@@ -138,15 +140,17 @@ public class RentCarController {
         }
     }
 
-    @PatchMapping("/{rentId}/parking")
+    @PatchMapping("/parking")
     @Operation(summary = "렌트 차량 하차", description = "회원이 진행중인 렌트 차량을 탑승한 경우 하차(parking) 상태로 수정")
-    public ResponseEntity updateRentCarDriveStatustoParking (@PathVariable("rentId") long rentId) {
-        try{
-            rentCarService.updateRentCarDriveStatustoParking(rentId);
+    public ResponseEntity updateRentCarDriveStatustoParking (@RequestBody RentCarManipulateRequestDTO rentCarManipulateRequestDTO) {
+        try {
+            RentCarManipulateResponseDTO response = rentCarService.updateRentCarDriveStatustoParking(rentCarManipulateRequestDTO);
 
-            return ResponseEntity.ok("Success"); //200
-        } catch (RentNotFoundException | RentCarNotFoundException e) {
+            return ResponseEntity.ok(response); //200
+        } catch (RentNotFoundException | RentCarNotFoundException | TravelNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
+        } catch(TravelAllPlacesVisitedException e) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(e.getMessage()); // 204
         } catch (WebSocketDisConnectedException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage()); // 500
         } catch (Exception e) {
