@@ -16,7 +16,7 @@ enum class Page(val hideBottomNav: Boolean) {
     PLAN_SEARCH(true),
     TAXI(true),
     TAXI_SEARCH(true),
-    TAXI_SUMMARY(true)
+    TAXI_SUMMARY(true),
     CAR_TRACKING(true)
     ;
 
