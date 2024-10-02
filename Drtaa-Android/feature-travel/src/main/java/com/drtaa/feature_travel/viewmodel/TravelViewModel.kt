@@ -1,4 +1,4 @@
-package com.drtaa.feature_plan.viewmodel
+package com.drtaa.feature_travel.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

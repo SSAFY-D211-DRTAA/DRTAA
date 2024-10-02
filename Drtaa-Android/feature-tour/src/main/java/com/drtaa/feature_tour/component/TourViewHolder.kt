@@ -19,6 +19,7 @@ class TourViewHolder(
                 tvTourTel.visibility = View.GONE
             } else {
                 imgTourTel.visibility = View.VISIBLE
+                tvTourTel.visibility = View.VISIBLE
                 tvTourTel.text = data.tel
             }
 

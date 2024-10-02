@@ -1,4 +1,4 @@
-package com.drtaa.feature_plan.adapter
+package com.drtaa.feature_travel.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.drtaa.core_model.travel.NaverPost
 import com.drtaa.core_ui.base.BaseDiffUtil
-import com.drtaa.feature_plan.databinding.ItemTravelBlogBinding
+import com.drtaa.feature_travel.databinding.ItemTravelBlogBinding
 
 class PostListAdapter(
     private val onClick: (NaverPost) -> Unit
