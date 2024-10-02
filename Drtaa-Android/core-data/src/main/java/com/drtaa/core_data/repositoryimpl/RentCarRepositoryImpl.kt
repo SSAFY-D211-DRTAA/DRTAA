@@ -62,7 +62,10 @@ class RentCarRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getOnCar(rentInfo: RequestCarStatus): Flow<Result<String>> = flow {
-        when (val response = safeApiCall { rentCarDataSource.getOnCar(rentInfo) }) {
+        when (val response = safeApiCall {
+            Timber.tag("getOnCar").d("$rentInfo")
+            rentCarDataSource.getOnCar(rentInfo)
+        }) {
             is ResultWrapper.Success -> {
                 emit(Result.success(response.data))
                 Timber.d("성공")

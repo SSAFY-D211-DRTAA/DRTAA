@@ -371,12 +371,12 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
     private fun checkRentReservation(qrRentId: Long, qrCarId: Int) {
         Timber.tag("qr").d("qrRentId: $qrRentId, qrCarId: $qrCarId")
         val currentRentDetail = carViewModel.currentRentDetail.value
-        Timber.tag("qr").d("$currentRentDetail")
         if (currentRentDetail != null) {
 //            if (currentRentDetail.rentId == qrRentId && currentRentDetail.rentCarId == qrCarId) {
 //                carViewModel.getOnCar(rentId = currentRentDetail.rentId!!)
 //            }
             if (true) {
+                Timber.tag("qr").d("$currentRentDetail")
                 carViewModel.getOnCar(rentId = currentRentDetail.rentId!!)
             } else {
                 showSnackBar("배정된 차량이 아닙니다!")

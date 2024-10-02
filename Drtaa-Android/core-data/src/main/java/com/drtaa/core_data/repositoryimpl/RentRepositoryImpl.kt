@@ -211,11 +211,11 @@ class RentRepositoryImpl @Inject constructor(
             val response = safeApiCall { rentDataSource.getAllRentState() }
         ) {
             is ResultWrapper.Success -> {
-                val result = response.data.firstOrNull()
-                if (result == null) {
+                val result = response.data.lastOrNull()
+                if (result == null || result.rentStatus == "completed") {
                     emit(Result.failure(Exception("예약 내역 없음")))
                 } else {
-                    emit(Result.success(result.rentId ?: 1))
+                    emit(Result.success(result.rentId))
                 }
                 Timber.d("전체 렌트/내역 조회 성공 ${response.data}")
             }

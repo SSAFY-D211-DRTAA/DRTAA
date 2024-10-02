@@ -107,35 +107,37 @@ class CarViewModel @Inject constructor(
 
     fun getOnCar(rentId: Long) {
         viewModelScope.launch {
-            val lastCarPosition = getCarInfo()
-            rentCarRepository.getOnCar(
-                RequestCarStatus(
-                    rentId = rentId,
-                    travelId = lastCarPosition.travelId,
-                    travelDatesId = lastCarPosition.travelDatesId,
-                    datePlacesId = lastCarPosition.datePlacesId
-                )
-            ).collect { result ->
-                result.onSuccess { data ->
-                    Timber.tag("rent latest").d("성공 $data")
-                    _currentRentDetail.value?.let {
-                        rentCarRepository.getDriveStatus(it.rentCarId.toLong()).collect { result ->
-                            result.onSuccess { data ->
-                                _drivingStatus.value = CarStatus.DRIVING
-                                Timber.tag("rent latest").d("성공 $data")
-                            }.onFailure {
-                                _drivingStatus.value = CarStatus.IDLE
-                                Timber.tag("rent").d("현재 진행 중인 렌트가 없습니다.")
-                            }
-                        }
-                    }
 
-                    _rentState.value = true
-                }.onFailure {
-                    Timber.tag("rent").d("현재 진행 중인 렌트가 없습니다.")
-                    _rentState.value = false
-                }
-            }
+            val lastCarPosition = getCarInfo()
+            Timber.tag("qr").d("$lastCarPosition")
+//            rentCarRepository.getOnCar(
+//                RequestCarStatus(
+//                    rentId = rentId,
+//                    travelId = lastCarPosition.travelId,
+//                    travelDatesId = lastCarPosition.travelDatesId,
+//                    datePlacesId = lastCarPosition.datePlacesId
+//                )
+//            ).collect { result ->
+//                result.onSuccess { data ->
+//                    Timber.tag("rent qr").d("성공 $data")
+//                    _currentRentDetail.value?.let {
+//                        rentCarRepository.getDriveStatus(it.rentCarId.toLong()).collect { result ->
+//                            result.onSuccess { data ->
+//                                _drivingStatus.value = CarStatus.DRIVING
+//                                Timber.tag("rent qr").d("성공 $data")
+//                            }.onFailure {
+//                                _drivingStatus.value = CarStatus.IDLE
+//                                Timber.tag("rent").d("현재 진행 중인 렌트가 없습니다.")
+//                            }
+//                        }
+//                    }
+//
+//                    _rentState.value = true
+//                }.onFailure {
+//                    Timber.tag("rent").d("현재 진행 중인 렌트가 없습니다.")
+//                    _rentState.value = false
+//                }
+//            }
         }
     }
 
