@@ -123,9 +123,8 @@ public class RentServiceImpl implements RentService{
         User user = userRepository.findByUserProviderId(userProviderId)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 userProviderId의 맞는 회원을 찾을 수 없습니다."));
 
-        // 사용자의 진행중 & 예약중인 렌트 찾기
-        List<Rent> rents = rentRepository.findByUserAndRentStatusInOrderByRentStatusDesc(
-                user, Arrays.asList(RentStatus.in_progress, RentStatus.reserved));
+        // 사용자의 예약중인 렌트 찾기
+        List<Rent> rents = rentRepository.findByUserAndRentStatus(user, RentStatus.reserved);
 
         List<RentResponseDTO> response = new ArrayList<>();
         for(Rent rent: rents) {

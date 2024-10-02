@@ -36,6 +36,7 @@ public interface RentRepository extends JpaRepository<Rent, Long> {
             "WHERE r.user = :user AND r.rentStatus = 'completed'")
     List<Rent> findByUserAndRentStatusCompleted(User user);
     List<Rent> findByRentEndTimeBetween(LocalDateTime startDate, LocalDateTime endDate);
+    List<Rent> findByUserAndRentStatus(User user, RentStatus rentStatus);
 
     // exists
     boolean existsByUserAndRentStatusAndRentStartTimeBetweenAndRentEndTimeBetween(
