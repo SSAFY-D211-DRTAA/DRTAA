@@ -6,7 +6,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.drtaa.core_model.rent.RentPayment
+import com.drtaa.core_model.rent.Payment
 import com.drtaa.core_model.sign.SocialUser
 import com.drtaa.core_model.util.Pay
 import com.drtaa.core_ui.base.BaseDialogFragment
@@ -41,7 +41,7 @@ class PaymentFragment : BaseDialogFragment<FragmentPaymentBinding>(R.layout.frag
         }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
-    private fun requestPayment(user: SocialUser, payment: RentPayment) {
+    private fun requestPayment(user: SocialUser, payment: Payment) {
         val bootUser = getBootUser(user)
         val extra = BootExtra()
             .setCardQuota("0,2,3")
@@ -121,6 +121,6 @@ class PaymentFragment : BaseDialogFragment<FragmentPaymentBinding>(R.layout.frag
     }
 
     companion object {
-        const val SALE = 239900.0
+        const val SALE = 4700.0
     }
 }
