@@ -123,9 +123,8 @@ public class RentServiceImpl implements RentService{
         User user = userRepository.findByUserProviderId(userProviderId)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 userProviderId의 맞는 회원을 찾을 수 없습니다."));
 
-        // 사용자의 진행중 & 예약중인 렌트 찾기
-        List<Rent> rents = rentRepository.findByUserAndRentStatusInOrderByRentStatusDesc(
-                user, Arrays.asList(RentStatus.in_progress, RentStatus.reserved));
+        // 사용자의 예약중인 렌트 찾기
+        List<Rent> rents = rentRepository.findByUserAndRentStatus(user, RentStatus.reserved);
 
         List<RentResponseDTO> response = new ArrayList<>();
         for(Rent rent: rents) {
@@ -304,29 +303,25 @@ public class RentServiceImpl implements RentService{
             // 여행별 일정 저장
             travelDatesRepository.save(travelDates);
 
+            // 각 일정 별 첫번째 장소(탑승 장소) 추가하기
+            DatePlaces dptPlace = DatePlaces.builder()
+                    .travel(travel)
+                    .travelDates(travelDates)  // 현재 일정에 대한 장소 추가
+                    .datePlacesOrder(1)
+                    .datePlacesName(rentCreateRequestDTO.getDatePlacesName())
+                    .datePlacesCategory(rentCreateRequestDTO.getDatePlacesCategory())
+                    .datePlacesAddress(rentCreateRequestDTO.getDatePlacesAddress())
+                    .datePlacesLat(rentCreateRequestDTO.getRentDptLat())
+                    .datePlacesLon(rentCreateRequestDTO.getRentDptLon())
+                    .datePlacesIsVisited(false)
+                    .build();
+
+            // 추가한 장소 저장
+            datePlacesRepository.save(dptPlace);
+
             // 다음날로 이동
             startDate = startDate.plusDays(1);
         }
-
-        // 첫 번째 일정 찾기
-        TravelDates firstTravelDate = travelDatesRepository.findFirstByTravelOrderByTravelDatesDateAsc(travel)
-                .orElseThrow(() -> new RuntimeException("여행 일정이 존재하지 않습니다."));
-
-        // 여행 별 일정의 첫번째 일정에 탑승 장소 추가하기
-        DatePlaces dptPlace = DatePlaces.builder()
-                .travel(travel)
-                .travelDates(firstTravelDate)
-                .datePlacesOrder(1)
-                .datePlacesName(rentCreateRequestDTO.getDatePlacesName())
-                .datePlacesCategory(rentCreateRequestDTO.getDatePlacesCategory())
-                .datePlacesAddress(rentCreateRequestDTO.getDatePlacesAddress())
-                .datePlacesLat(rentCreateRequestDTO.getRentDptLat())
-                .datePlacesLon(rentCreateRequestDTO.getRentDptLon())
-                .datePlacesIsVisited(false)
-                .build();
-
-        // 추가한 장소 저장
-        datePlacesRepository.save(dptPlace);
 
         // 렌트 생성
         Rent rent = Rent.builder()

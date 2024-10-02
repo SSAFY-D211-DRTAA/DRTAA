@@ -1,5 +1,6 @@
 package com.d211.drtaa.global.exception.travel;
 
+import com.d211.drtaa.domain.rent.dto.response.RentCarManipulateResponseDTO;
 import com.d211.drtaa.domain.rent.entity.Rent;
 import com.d211.drtaa.global.util.fcm.FcmMessage;
 import com.d211.drtaa.global.util.fcm.FcmUtil;
