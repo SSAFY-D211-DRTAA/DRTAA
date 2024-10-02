@@ -24,7 +24,6 @@ class TourViewModel @Inject constructor(
     fun getLocationBasedList(mapX: String, mapY: String, radius: String) {
         viewModelScope.launch {
             val result = "$mapX $mapY"
-//            tourRepository.getLocationBasedList(mapX, mapY, radius).cachedIn(viewModelScope)
             tourRepository.getLocationBasedList(DEFAULT_LNG, DEFAULT_LAT, radius)
                 .cachedIn(viewModelScope)
                 .collect {

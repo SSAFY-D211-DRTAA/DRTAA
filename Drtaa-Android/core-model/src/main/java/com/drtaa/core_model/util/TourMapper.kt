@@ -22,7 +22,7 @@ fun (ResponseTour.Response.Body.Items.Item).toEntity(): TourItem {
         mlevel = this.mlevel,
         modifiedtime = this.modifiedtime,
         sigungucode = this.sigungucode,
-        tel = this.tel,
+        tel = this.tel.removeHtmlTags(),
         title = this.title,
         cat1 = this.cat1,
         cat2 = this.cat2,
