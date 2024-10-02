@@ -1,5 +1,6 @@
 package com.d211.drtaa.domain.travel.service;
 
+import com.d211.drtaa.domain.rent.dto.response.RentCarManipulateResponseDTO;
 import com.d211.drtaa.domain.rent.entity.Rent;
 import com.d211.drtaa.domain.rent.entity.RentStatus;
 import com.d211.drtaa.domain.rent.repository.RentRepository;
@@ -13,9 +14,14 @@ import com.d211.drtaa.domain.travel.repository.TravelDatesRepository;
 import com.d211.drtaa.domain.travel.repository.TravelRepository;
 import com.d211.drtaa.domain.user.entity.User;
 import com.d211.drtaa.domain.user.repository.UserRepository;
+import com.d211.drtaa.global.config.websocket.MyMessage;
+import com.d211.drtaa.global.config.websocket.WebSocketConfig;
 import com.d211.drtaa.global.exception.rent.RentNotFoundException;
 import com.d211.drtaa.global.exception.travel.TravelNotFoundException;
+import com.d211.drtaa.global.exception.websocket.WebSocketDisConnectedException;
 import com.d211.drtaa.global.service.weather.WeatherService;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
@@ -23,6 +29,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketSession;
+import org.springframework.web.socket.client.standard.StandardWebSocketClient;
+import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -46,6 +56,8 @@ public class TravelServiceImpl implements TravelService {
     private final DatePlacesRepository datePlacesRepository;
     private final UserRepository userRepository;
     private final RentRepository rentRepository;
+    private final WebSocketConfig webSocketConfig;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public List<TravelResponseDTO> getAllTravels(String userProviderId) {
@@ -207,6 +219,128 @@ public class TravelServiceImpl implements TravelService {
 
         // 생성한 일정 장소 저장
         datePlacesRepository.save(places);
+    }
+
+    @Override
+    @Transactional
+    public RentCarManipulateResponseDTO addTravelDatesPlace(PlaceAddRequestDTO placeAddRequestDTO) {
+        // travelId에 해당하는 여행 찾기
+        Travel travel = travelRepository.findByTravelId(placeAddRequestDTO.getTravelId())
+                .orElseThrow(() -> new TravelNotFoundException("해당 travelId의 맞는 여행을 찾을 수 없습니다."));
+
+        // 여행에 해당하는 렌트 찾기
+        Rent rent = rentRepository.findByTravel(travel)
+                .orElseThrow(() -> new RentNotFoundException("해당 여행에 맞는 렌트를 찾을 수 없습니다."));
+
+        // travelDatesId에 해당하는 여행 일정 찾기
+        TravelDates date = travelDatesRepository.findByTravelDatesId(placeAddRequestDTO.getTravelDatesId())
+                .orElseThrow(() -> new TravelNotFoundException("해당 travelDatesId의 맞는 여행 일정을 찾을 수 없습니다."));
+
+        // datePlacesId에 해당하는 장소 = 일정의 원래 목적지 장소 찾기
+        DatePlaces destinationPlace = datePlacesRepository.findByDatePlacesId(placeAddRequestDTO.getDatePlacesId())
+                .orElseThrow(() -> new TravelNotFoundException("해당 datePlacesId의 맞는 일정 장소를 찾을 수 없습니다."));
+
+        // 입력받은 일정(원래 목적지) 이후 장소들 찾기
+        List<DatePlaces> afterPlaces = datePlacesRepository.findByTravelDatesAndDatePlacesOrderGreaterThan(date, destinationPlace.getDatePlacesOrder());
+
+        // 추가로 등록할 장소 만들기
+        DatePlaces newPlace = DatePlaces.builder()
+                .travel(travel)
+                .travelDates(date)
+                // 순서는 아래에서 저장
+                .datePlacesName(placeAddRequestDTO.getDatePlacesName())
+                .datePlacesCategory(placeAddRequestDTO.getDatePlacesCategory())
+                .datePlacesAddress(placeAddRequestDTO.getDatePlacesAddress())
+                .datePlacesLat(placeAddRequestDTO.getDatePlacesLat())
+                .datePlacesLon(placeAddRequestDTO.getDatePlacesLon())
+                .datePlacesIsVisited(false)
+                .build();
+
+        // 응답할 빌더 생성
+        RentCarManipulateResponseDTO response = RentCarManipulateResponseDTO.builder()
+                .travelId(travel.getTravelId())
+                .travelDatesId(date.getTravelDatesId())
+                // 현재 이동할 장소
+                .build();
+
+        // 서버로 보낼 위도, 경도
+        double lattitude = destinationPlace.getDatePlacesLat();
+        double longitude = destinationPlace.getDatePlacesLon();
+        
+        // 목적지 이전에 이동
+        if(placeAddRequestDTO.getIsBefore()) {
+            // 추가로 등록할 장소 순서 조정 -> 원래 목적지 순서로 들어감
+            newPlace.setDatePlacesOrder(destinationPlace.getDatePlacesOrder());
+
+            // 입력받은 일정(원래 목적지) 순서 조정 -> 하나 뒤로 밀려남
+            destinationPlace.setDatePlacesOrder(destinationPlace.getDatePlacesOrder() + 1);
+            datePlacesRepository.save(destinationPlace); // 상태 변경 저장
+
+            // 추가한 장소로 응답
+            response.setDatePlacesId(newPlace.getDatePlacesId());
+
+            // 서버로 보낼 위도, 경도 변경
+            lattitude = newPlace.getDatePlacesLat();
+            longitude = newPlace.getDatePlacesLon();
+        }
+
+        // 목적지 이후에 이동
+        else {
+            // 추가로 등록할 장소 순서 조정 -> 원래 목적지 순서 뒤로 들어감
+            newPlace.setDatePlacesOrder(destinationPlace.getDatePlacesOrder() + 1);
+
+            // 원래 장소로 응답
+            response.setDatePlacesId(destinationPlace.getDatePlacesId());
+        }
+
+        // 추가된 장소 상태 변경 저장
+        datePlacesRepository.save(newPlace);
+
+        // 이후 일정 순서 조정 -> 순서 하나씩 뒤로 밀기
+        for(DatePlaces afterPlace: afterPlaces) {
+            afterPlace.setDatePlacesOrder(destinationPlace.getDatePlacesOrder() + 1);
+            datePlacesRepository.save(afterPlace);  // 순서 저장
+        }
+
+        // 이동할 목적지 서버로 전송
+        try {
+            StandardWebSocketClient client = new StandardWebSocketClient();
+            WebSocketSession session = client.execute(new TextWebSocketHandler() {
+                @Override
+                protected void handleTextMessage(WebSocketSession session, TextMessage message) {
+                    // 서버로부터 받은 메시지를 처리하는 로직
+                    try {
+                        // JSON 메시지를 JsonNode로 파싱
+                        JsonNode jsonNode = objectMapper.readTree(message.getPayload());
+                        log.info("Received message: {}", jsonNode);
+
+                        // null 체크 추가
+                        JsonNode latNode = jsonNode.get("latitude");
+                        JsonNode lonNode = jsonNode.get("longitude");
+                        JsonNode rentCarId = jsonNode.get("rentCarId");
+                        log.info("latitude: {}", latNode);
+                        log.info("longitude: {}", lonNode);
+                        log.info("rentCarId: {}", rentCarId);
+
+                    } catch (Exception e) {
+                        log.error("Error processing received message: ", e);
+                    }
+                }
+            }, webSocketConfig.getUrl()).get();
+
+            // 상태와 렌트 탑승 위치 전송
+            MyMessage message = new MyMessage("vehicle_drive", lattitude, longitude, rent.getRentCar().getRentCarId());
+            String jsonMessage = objectMapper.writeValueAsString(message);
+            session.sendMessage(new TextMessage(jsonMessage));
+            log.info("Sent message: {}", jsonMessage);
+            Thread.sleep(1000); // 필요에 따라 대기 시간 조절
+
+        } catch (Exception e) {
+            log.error("Error during WebSocket communication: ", e);
+            throw new WebSocketDisConnectedException("WebSocket이 네트워크 연결을 거부했습니다.");
+        }
+
+        return response;
     }
 
     @Override
