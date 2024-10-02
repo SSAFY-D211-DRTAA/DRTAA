@@ -49,6 +49,7 @@ dependencies {
     // modules
     implementation(project(":feature-mypage"))
     implementation(project(":feature-home"))
+    implementation(project(":feature-taxi"))
     implementation(project(":feature-tour"))
     implementation(project(":feature-car"))
     implementation(project(":feature-rent"))

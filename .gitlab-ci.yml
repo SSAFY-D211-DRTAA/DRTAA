@@ -33,6 +33,7 @@ before_script:
   - echo "BASE_URL=\"$BASE_URL\"" >> local.properties
   - echo "MQTT_URL=\"$MQTT_URL\"" >> local.properties
   - echo "BOOTPAY_APP_ID=\"$BOOTPAY_APP_ID\"" >> local.properties
+  - echo "APP_KEY=\"$APP_KEY\"" >> local.properties
 
 detektAnalysis:
   stage: test

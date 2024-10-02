@@ -51,6 +51,7 @@ public class NaverBlogController {
         requestHeaders.put("X-Naver-Client-Secret", clientSecret);
         String responseBody = get(apiURL, requestHeaders);
         log.info("Naver Blog Get Success !!");
+        log.info("Naver Blog Response: {}", responseBody);
 
         List<Map<String, Object>> blogList = new ArrayList<>();
 

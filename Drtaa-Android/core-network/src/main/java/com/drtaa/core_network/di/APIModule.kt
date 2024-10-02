@@ -1,11 +1,15 @@
 package com.drtaa.core_network.di
 
+import com.drtaa.core_network.api.GeoAPI
 import com.drtaa.core_network.api.MapAPI
 import com.drtaa.core_network.api.PaymentAPI
 import com.drtaa.core_network.api.PlanAPI
 import com.drtaa.core_network.api.RentAPI
 import com.drtaa.core_network.api.RentCarAPI
 import com.drtaa.core_network.api.SignAPI
+import com.drtaa.core_network.api.TaxiAPI
+import com.drtaa.core_network.api.TmapAPI
+import com.drtaa.core_network.api.PlanAPI
 import com.drtaa.core_network.api.TourAPI
 import com.drtaa.core_network.api.TravelAPI
 import dagger.Module
@@ -19,7 +23,9 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object APIModule {
     const val MAP_SEARCH_URL = "https://openapi.naver.com/v1/search/"
+    const val MAP_GEOCODE_URL = "https://naveropenapi.apigw.ntruss.com/"
     const val TOUR_URL = "http://apis.data.go.kr/B551011/KorService1/"
+    const val TMAP_URL = "https://apis.openapi.sk.com/"
 
     @Singleton
     @NoAuth
@@ -44,6 +50,15 @@ object APIModule {
     ): MapAPI {
         return retrofitFactory.create(MAP_SEARCH_URL)
             .create(MapAPI::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideGeoAPI(
+        retrofitFactory: RetrofitFactory
+    ): GeoAPI {
+        return retrofitFactory.create(MAP_GEOCODE_URL)
+            .create(GeoAPI::class.java)
     }
 
     @Singleton
@@ -86,6 +101,24 @@ object APIModule {
         @AuthRetrofit
         retrofit: Retrofit
     ): PlanAPI = retrofit.create(PlanAPI::class.java)
+
+    @Singleton
+    @Provides
+    fun provideTaxiAPI(
+        @AuthRetrofit
+        retrofit: Retrofit
+    ): TaxiAPI {
+        return retrofit.create(TaxiAPI::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideTmapAPI(
+        retrofitFactory: RetrofitFactory
+    ): TmapAPI {
+        return retrofitFactory.create(TMAP_URL)
+            .create(TmapAPI::class.java)
+    }
 
     @Singleton
     @Auth

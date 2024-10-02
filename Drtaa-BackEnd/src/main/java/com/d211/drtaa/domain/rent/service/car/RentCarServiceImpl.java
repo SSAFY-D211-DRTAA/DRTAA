@@ -1,10 +1,8 @@
 package com.d211.drtaa.domain.rent.service.car;
 
-import com.d211.drtaa.domain.rent.dto.request.RentCarArriveStatusRequestDTO;
-import com.d211.drtaa.domain.rent.dto.request.RentCarCallRequestDTO;
-import com.d211.drtaa.domain.rent.dto.request.RentCarDriveStatusRequestDTO;
-import com.d211.drtaa.domain.rent.dto.request.RentCarUnassignedDispatchStatusRequestDTO;
+import com.d211.drtaa.domain.rent.dto.request.*;
 import com.d211.drtaa.domain.rent.dto.response.RentCarDriveStatusResponseDTO;
+import com.d211.drtaa.domain.rent.dto.response.RentCarManipulateResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentCarLocationResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentCarResponseDTO;
 import com.d211.drtaa.domain.rent.entity.Rent;
@@ -27,6 +25,7 @@ import com.d211.drtaa.global.exception.rent.NoAvailableRentCarException;
 import com.d211.drtaa.global.exception.rent.RentCarNotFoundException;
 import com.d211.drtaa.global.exception.rent.RentNotFoundException;
 import com.d211.drtaa.global.exception.travel.TravelAllPlacesVisitedException;
+import com.d211.drtaa.global.exception.travel.TravelDateNotMatchException;
 import com.d211.drtaa.global.exception.travel.TravelNotFoundException;
 import com.d211.drtaa.global.exception.websocket.WebSocketDisConnectedException;
 import com.d211.drtaa.global.util.fcm.FcmMessage;
@@ -148,6 +147,7 @@ public class RentCarServiceImpl implements RentCarService {
 
         // 응답 DTO 초기화
         final RentCarLocationResponseDTO[] response = {null};
+        // 자율주행 서버로 메시지 전송
         try {
             StandardWebSocketClient client = new StandardWebSocketClient();
             WebSocketSession session = client.execute(new TextWebSocketHandler() {
@@ -160,9 +160,9 @@ public class RentCarServiceImpl implements RentCarService {
                         log.info("Received message: {}", jsonNode);
 
                         // null 체크 추가
+                        JsonNode rentCarId = jsonNode.get("rentCarId");
                         JsonNode latNode = jsonNode.get("latitude");
                         JsonNode lonNode = jsonNode.get("longitude");
-                        JsonNode rentCarId = jsonNode.get("rentCarId");
                         log.info("latitude: {}", latNode);
                         log.info("longitude: {}", lonNode);
                         log.info("rentCarId: {}", rentCarId);
@@ -208,8 +208,30 @@ public class RentCarServiceImpl implements RentCarService {
         // 렌트 변경 상태 저장
         rentRepository.save(rent);
 
-        // 응답이 없으면 빈 DTO 반환
-        return response[0] != null ? response[0] : RentCarLocationResponseDTO.builder().build();
+        if(response[0] != null) {
+            // 알림 보낼 내용
+            String content = "차량이 여행 첫번째 탑승 위치(" + rent.getTravel().getTravelName() + ")로 이동중입니다.\n 위치를 확인해 주세요 !!";
+
+            // 사용자에게 알림 전송
+            FcmMessage.FcmDTO fcmDTO = fcmUtil.makeFcmDTO("렌트 차량 위치", content);
+            log.info("Message: {}", content);
+            fcmUtil.singleFcmSend(rent.getUser(), fcmDTO);
+
+            // 현재 렌트에 해당하는 여행 id
+            response[0].setTravelId(rent.getTravel().getTravelId());
+            // 현재 렌트에 해당하는 첫째날 id
+            TravelDates date = travelDatesRepository.findFirstByTravel(rent.getTravel());
+            response[0].setTravelDatesId(date.getTravelDatesId());
+            // 첫째날의 첫 장소(탑승 장소) id
+            DatePlaces place = datePlacesRepository.findFirstByTravelDatesOrderByDatePlacesOrderAsc(date);
+            response[0].setDatePlacesId(place.getDatePlacesId());
+
+            // 응답 반환
+            return response[0];
+        } else {
+            // 응답이 없으면 빈 DTO 반환
+            return RentCarLocationResponseDTO.builder().build();
+        }
     }
 
     @Override
@@ -223,9 +245,13 @@ public class RentCarServiceImpl implements RentCarService {
         RentCar car = rentCarRepository.findByRentCarId(rent.getRentCar().getRentCarId())
                 .orElseThrow(() -> new RentCarNotFoundException("해당 rentCarId의 맞는 차량을 찾을 수 없습니다."));
 
+        // datePlacesId에 해당하는 여행 장소 찾기
+        DatePlaces requestPlace = datePlacesRepository.findByDatePlacesId(rentCarCallRequestDTO.getDatePlacesId())
+                .orElseThrow(() -> new TravelNotFoundException("해당 datePlacesId에 맞는 장소를 찾을 수 없습니다."));
+
         // 응답 DTO 초기화
         final RentCarLocationResponseDTO[] response = {null};
-
+        // 자율주행 서버로 메시지 전송
         try {
             StandardWebSocketClient client = new StandardWebSocketClient();
             WebSocketSession session = client.execute(new TextWebSocketHandler() {
@@ -238,12 +264,12 @@ public class RentCarServiceImpl implements RentCarService {
                         log.info("Received message: {}", jsonNode);
 
                         // null 체크 추가
+                        JsonNode rentCarId = jsonNode.get("rentCarId");
                         JsonNode latNode = jsonNode.get("latitude");
                         JsonNode lonNode = jsonNode.get("longitude");
-                        JsonNode rentCarId = jsonNode.get("rentCarId");
+                        log.info("rentCarId: {}", rentCarId);
                         log.info("latitude: {}", latNode);
                         log.info("longitude: {}", lonNode);
-                        log.info("rentCarId: {}", rentCarId);
 
                         if (latNode != null && lonNode != null && !latNode.isNull() && !lonNode.isNull()) {
                             // DTO 생성
@@ -263,7 +289,7 @@ public class RentCarServiceImpl implements RentCarService {
             }, webSocketConfig.getUrl()).get();
 
             // 상태와 사용자 탑승 호출 위치 전송
-            MyMessage message = new MyMessage("vehicle_dispatch", rentCarCallRequestDTO.getUserLat(), rentCarCallRequestDTO.getUserLon(), rent.getRentCar().getRentCarId());
+            MyMessage message = new MyMessage("vehicle_dispatch", rentCarCallRequestDTO.getUserLat(), rentCarCallRequestDTO.getUserLon(), car.getRentCarId());
             String jsonMessage = objectMapper.writeValueAsString(message);
             session.sendMessage(new TextMessage(jsonMessage));
             log.info("Sent message: {}", jsonMessage);
@@ -280,56 +306,49 @@ public class RentCarServiceImpl implements RentCarService {
         // 렌트 차량 변경 상태 저장
         rentCarRepository.save(car);
 
-        // 응답이 없으면 빈 DTO 반환
-        return response[0] != null ? response[0] : RentCarLocationResponseDTO.builder().build();
+        if(response[0] != null) {
+            // 알림 보낼 내용
+            String content = "차량이 요청 위치(" + requestPlace.getDatePlacesName() + ")로 이동중입니다.\n 조금만 기다려주세요 !!";
+
+            // 사용자에게 알림 전송
+            FcmMessage.FcmDTO fcmDTO = fcmUtil.makeFcmDTO("렌트 차량 위치", content);
+            log.info("Message: {}", content);
+            fcmUtil.singleFcmSend(rent.getUser(), fcmDTO);
+
+            // 호출한 장소 그대로 반환
+            response[0].setRentId(rent.getRentId());
+            response[0].setTravelId(rentCarCallRequestDTO.getTravelId());
+            response[0].setTravelDatesId(rentCarCallRequestDTO.getTravelDatesId());
+            response[0].setDatePlacesId(rentCarCallRequestDTO.getDatePlacesId());
+
+            // 응답 반환
+            return response[0];
+        } else {
+            // 응답이 없으면 빈 DTO 반환
+            return RentCarLocationResponseDTO.builder().build();
+        }
     }
 
     @Override
     @Transactional
-    public void updateRentCarDriveStatustoDriving(long rentId) {
+    public RentCarManipulateResponseDTO updateRentCarDriveStatustoDriving(RentCarManipulateRequestDTO rentCarManipulateRequestDTO) {
         // rentId에 해당하는 렌트 찾기
-        Rent rent = rentRepository.findByRentId(rentId)
+        Rent rent = rentRepository.findByRentId(rentCarManipulateRequestDTO.getRentId())
                 .orElseThrow(() -> new RentNotFoundException("해당 rentId의 맞는 렌트를 찾을 수 없습니다."));
 
         // rentCarId에 해당하는 렌트 차량 찾기
         RentCar car = rentCarRepository.findByRentCarId(rent.getRentCar().getRentCarId())
                 .orElseThrow(() -> new RentCarNotFoundException("해당 rentCarId의 맞는 차량을 찾을 수 없습니다."));
 
-        // ** 방문하지 않은 여행 일정 장소 찾기 로직 **
-        double lattitude = 37.576636819990284;
-        double longitude = 126.89879021208397;
-//        Travel travel = rent.getTravel(); // 해당 렌트의 여행
-//        LocalDate now = LocalDate.now(); // 현재 날짜
-//        boolean chk = true;
-//        log.info("현재 날짜: {}", now);
-//
-//        // 현재 날짜 기준 여행 일정 찾기
-//        TravelDates dates = travelDatesRepository.findByTravelAndTravelDatesDate(travel, now)
-//                .orElseThrow(() -> new TravelNotFoundException("현재 날짜에 진행중인 여행을 찾을 수 없습니다."));
-//
-//        // 현재 날짜 기준 여행 일정의 여행 장소 찾기
-//        List<DatePlaces> placesList = datePlacesRepository.findByTravelDatesId(dates.getTravelDatesId());
-//        for(DatePlaces places : placesList) {
-//            // 방문하지 않은 여행 일정 찾기
-//            if(!places.getDatePlacesIsVisited()) {
-//                lattitude = places.getDatePlacesLat();
-//                longitude = places.getDatePlacesLon();
-//                chk = false;
-//
-//                break; // 반복 종료
-//            }
-//        }
+        // datePlacesId에 해당하는 장소 찾기
+        DatePlaces currentPlace = datePlacesRepository.findByDatePlacesId(rentCarManipulateRequestDTO.getDatePlacesId())
+                .orElseThrow(() -> new TravelNotFoundException("해당 datePlacesId의 맞는 장소를 찾을 수 없습니다."));
 
-        // ** 방문하지 않은 여행 일정 장소가 없는 경우 로직 **
-//        if(chk) {
-//            FcmMessage.FcmDTO fcmDTO = fcmUtil.makeFcmDTO("렌트 일정", "렌트 일정의 모든 여행지를 방문했습니다.\n 반납 예정이 아니라면 여행지를 추가해주세요.");
-//            log.info("Message: {}", fcmDTO.getBody());
-//            fcmUtil.singleFcmSend(rent.getUser(), fcmDTO); // 비동기로 전송
-//
-//            new TravelAllPlacesVisitedException("렌트 일정의 모든 여행지를 방문했습니다. 반납 예정이 아니라면 여행지를 추가해주세요.");
-//            return;
-//        }
+        // 서버로 보낼 위도, 경도
+        double lattitude = currentPlace.getDatePlacesLat();
+        double longitude = currentPlace.getDatePlacesLon();
 
+        // 이동할 목적지 서버로 전송
         try {
             StandardWebSocketClient client = new StandardWebSocketClient();
             WebSocketSession session = client.execute(new TextWebSocketHandler() {
@@ -372,19 +391,42 @@ public class RentCarServiceImpl implements RentCarService {
 
         // 변경 상태 저장
         rentCarRepository.save(car);
+
+        RentCarManipulateResponseDTO response = RentCarManipulateResponseDTO.builder()
+                .travelId(rentCarManipulateRequestDTO.getTravelId())
+                .travelDatesId(rentCarManipulateRequestDTO.getTravelDatesId())
+                .datePlacesId(currentPlace.getDatePlacesId())
+                .build();
+
+        return response;
     }
 
     @Override
     @Transactional
-    public void updateRentCarDriveStatustoParking(long rentId) {
+    public RentCarManipulateResponseDTO updateRentCarDriveStatustoParking(RentCarManipulateRequestDTO rentCarManipulateRequestDTO) {
         // rentId에 해당하는 렌트 찾기
-        Rent rent = rentRepository.findByRentId(rentId)
+        Rent rent = rentRepository.findByRentId(rentCarManipulateRequestDTO.getRentId())
                 .orElseThrow(() -> new RentNotFoundException("해당 rentId의 맞는 렌트를 찾을 수 없습니다."));
 
         // rentCarId에 해당하는 렌트 차량 찾기
         RentCar car = rentCarRepository.findByRentCarId(rent.getRentCar().getRentCarId())
                 .orElseThrow(() -> new RentCarNotFoundException("해당 rentCarId의 맞는 차량을 찾을 수 없습니다."));
 
+        // 해당 렌트에 맞는 여행 = travelId에 해당하는 여행
+        Travel travel = rent.getTravel();
+
+        // travelDatesId에 해당하는 일정 찾기
+        TravelDates date = travelDatesRepository.findByTravelDatesId(rentCarManipulateRequestDTO.getTravelDatesId())
+                .orElseThrow(() -> new TravelNotFoundException("해당 travelDatesId에 맞는 일정을 찾을 수 없습니다."));
+
+        // datePlacesId에 해당하는 장소 찾기 -> 도착한 장소
+        DatePlaces arrivedPlace = datePlacesRepository.findByDatePlacesId(rentCarManipulateRequestDTO.getDatePlacesId())
+                .orElseThrow(() -> new TravelDateNotMatchException("해당 datePlacesId에 맞는 장소를 찾을 수 없습니다."));
+
+        // 찾은 장소 = 도착한 장소 방문으로 상태 변경
+        arrivedPlace.setDatePlacesIsVisited(true);
+
+        // 자율주행 서버로 하차 메시지 전송
         try {
             StandardWebSocketClient client = new StandardWebSocketClient();
             WebSocketSession session = client.execute(new TextWebSocketHandler() {
@@ -395,7 +437,6 @@ public class RentCarServiceImpl implements RentCarService {
                         // JSON 메시지를 JsonNode로 파싱
                         JsonNode jsonNode = objectMapper.readTree(message.getPayload());
                         log.info("Received message: {}", jsonNode);
-
 
                     } catch (Exception e) {
                         log.error("Error processing received message: ", e);
@@ -419,37 +460,37 @@ public class RentCarServiceImpl implements RentCarService {
         car.setRentCarDrivingStatus(RentDrivingStatus.parking);
 
         // 변경 상태 저장
+        datePlacesRepository.save(arrivedPlace);
         rentCarRepository.save(car);
 
-        // 해당 일정 방문 여부 변경 -> travelId와 travelDatesId를 서버로 보내야 함
-//        Travel travel = rent.getTravel(); // 해당 렌트의 여행
-//        LocalDate now = LocalDate.now(); // 현재 날짜
-//        // 현재 날짜 기준 여행 일정 찾기
-//        TravelDates dates = travelDatesRepository.findByTravelAndTravelDatesDate(travel, now)
-//                .orElseThrow(() -> new TravelNotFoundException("현재 날짜에 진행중인 여행을 찾을 수 없습니다."));
+        // 찾은 여행 일정의 마지막 장소 찾기
+       DatePlaces lastPlace = datePlacesRepository.findLastPlaceByTravelDatesId(date.getTravelDatesId())
+               .orElseThrow(() -> new TravelNotFoundException("해당 datePlacesId에 맞는 마지막 장소를 찾을 수 없습니다."));
 
-        // ** 마지막 일정인 경우 사용자에게 알림 로직 **
-        // ** 마지막 일정의 마지막 장소 전인 경우 사용자에게 알림 로직 **
-//        log.info("현재 날짜: {}", now);
-//        // 현재 날짜와 렌트 종료 날짜가 같은지 확인
-//        if(now.equals(rent.getRentEndTime())) {
-//            // 현재 날짜 기준 여행 일정의 여행 장소 찾기
-//            List<DatePlaces> placesList = datePlacesRepository.findByTravelDatesId(dates.getTravelDatesId());
-//
-//            // 여행 장소의 마지막인 경우
-//            if(placesList.get(placesList.size() - 1).getDatePlacesIsVisited()) {
-//                FcmMessage.FcmDTO fcmDTO = fcmUtil.makeFcmDTO("렌트 일정", "렌트 일정의 모든 여행지를 방문했습니다.\n 반납 예정이 아니라면 여행지를 추가해주세요.");
-//                log.info("Message: {}", fcmDTO.getBody());
-//                fcmUtil.singleFcmSend(rent.getUser(), fcmDTO); // 비동기로 전송
-//            }
-//
-//            // 여행 장소 중 마지막 장소 전이 true인 경우
-//            if(placesList.size() > 2 && placesList.get(placesList.size() - 2).getDatePlacesIsVisited()) {
-//                FcmMessage.FcmDTO fcmDTO = fcmUtil.makeFcmDTO("렌트 일정", "해당 여행지 이후 마지막 여행지만 남았습니다.\n 마지막 여행지에서 반납 예정이 아니라면 여행지를 추가해주세요.");
-//                log.info("Message: {}", fcmDTO.getBody());
-//                fcmUtil.singleFcmSend(rent.getUser(), fcmDTO); // 비동기로 전송
-//            }
-//        }
+       // 찾은 장소가 여행 일정의 마지막 장소와 같을 경우
+       if(arrivedPlace.getDatePlacesId() == lastPlace.getDatePlacesId()) {
+           // 해당 일정이 렌트 일정의 마지막인 경우
+           if (date.getTravelDatesDate().equals(rent.getRentEndTime())) {
+               throw new TravelAllPlacesVisitedException("모든 여행지를 방문했고 렌트의 마지막날 입니다. 반납 또는 여행지 장소 추가를 유도해주세요.");
+           }
+
+           // 해당 일정이 렌트 일정의 마지막 일정이 아닌 경우
+           throw new TravelAllPlacesVisitedException("다음 장소를 찾을 수 없습니다. 오늘 예정된 모든 여행지를 방문했습니다.", rent);
+       }
+
+        // 다음 순서 장소 찾기
+        DatePlaces nextPlace = datePlacesRepository.findByTravelDatesAndDatePlacesOrder(date, arrivedPlace.getDatePlacesOrder() + 1)
+                .orElseThrow(() -> new TravelAllPlacesVisitedException("다음 장소를 찾을 수 없습니다. 오늘 예정된 모든 여행지를 방문했습니다.", rent));
+        log.info("다음 장소 id: {}", nextPlace.getDatePlacesId());
+        log.info("다음 장소 이름: {}", nextPlace.getDatePlacesName());
+
+        RentCarManipulateResponseDTO response = RentCarManipulateResponseDTO.builder()
+                .travelId(travel.getTravelId())
+                .travelDatesId(date.getTravelDatesId())
+                .datePlacesId(nextPlace.getDatePlacesId()) // 다음장소 id반환
+                .build();
+
+       return response;
     }
 
     @Override

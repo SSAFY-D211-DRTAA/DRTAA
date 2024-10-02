@@ -14,7 +14,7 @@ import com.naver.maps.map.NaverMap
 import com.naver.maps.map.util.FusedLocationSource
 
 const val LOCATION_PERMISSION_REQUEST_CODE = 1000
-const val MIN_ZOOM = 15.0
+const val MIN_ZOOM = 8.0
 const val MAX_ZOOM = 18.0
 
 /**
