@@ -92,7 +92,7 @@ class pure_pursuit:
 
         self.pid = pidControl()
         self.adaptive_cruise_control = AdaptiveCruiseControl(velocity_gain=0.5, distance_gain=1, time_gap=0.8, vehicle_length=2.7)
-        self.vel_planning = velocityPlanning(self.target_velocity / 3.6, 0.15)
+        self.vel_planning = velocityPlanning(self.target_velocity / 3.6, 0.5) # 0.15
         self.traffic_light_manager = TrafficLightManager()
 
         rate = rospy.Rate(20)  ## 30hz
