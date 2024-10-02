@@ -1,5 +1,6 @@
 package com.drtaa.core_network.api
 
+import com.drtaa.core_model.network.RequestCarStatus
 import com.drtaa.core_model.network.RequestDrivingCar
 import com.drtaa.core_model.network.RequestRentCarCall
 import com.drtaa.core_model.network.RequestUnassignedCar
@@ -18,14 +19,14 @@ interface RentCarAPI {
         @Body rentSchedule: RequestUnassignedCar,
     ): RentCar
 
-    @PATCH("rent-car/{rentId}/parking")
+    @PATCH("rent-car/parking")
     suspend fun getOffCar(
-        @Path("rentId") rentId: Long,
+        @Body rentInfo: RequestCarStatus,
     ): String
 
-    @PATCH("rent-car/{rentId}/driving")
+    @PATCH("rent-car/driving")
     suspend fun getOnCar(
-        @Path("rentId") rentId: Long,
+        @Body rentInfo: RequestCarStatus,
     ): String
 
     @PATCH("rent-car/call")

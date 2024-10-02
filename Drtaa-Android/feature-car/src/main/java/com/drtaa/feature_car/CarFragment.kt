@@ -386,6 +386,11 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        carViewModel.getLatestRent()
+    }
+
     companion object {
         const val OVERLAY_VIEW = 0.6f
         const val POINT_XY = 0.5f

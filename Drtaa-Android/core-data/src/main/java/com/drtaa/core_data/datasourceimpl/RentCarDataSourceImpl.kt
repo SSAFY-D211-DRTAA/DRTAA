@@ -1,6 +1,7 @@
 package com.drtaa.core_data.datasourceimpl
 
 import com.drtaa.core_data.datasource.RentCarDataSource
+import com.drtaa.core_model.network.RequestCarStatus
 import com.drtaa.core_model.network.RequestDrivingCar
 import com.drtaa.core_model.network.RequestRentCarCall
 import com.drtaa.core_model.network.RequestUnassignedCar
@@ -17,12 +18,12 @@ class RentCarDataSourceImpl @Inject constructor(
         return rentCarAPI.getUnassignedCar(rentSchedule)
     }
 
-    override suspend fun getOffCar(rentId: Long): String {
-        return rentCarAPI.getOffCar(rentId)
+    override suspend fun getOffCar(rentInfo: RequestCarStatus): String {
+        return rentCarAPI.getOffCar(rentInfo)
     }
 
-    override suspend fun getOnCar(rentId: Long): String {
-        return rentCarAPI.getOnCar(rentId)
+    override suspend fun getOnCar(rentInfo: RequestCarStatus): String {
+        return rentCarAPI.getOnCar(rentInfo)
     }
 
     override suspend fun callAssignedCar(requestCallCar: RequestRentCarCall): ResponseRentCarCall {

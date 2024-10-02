@@ -63,7 +63,7 @@ class CarTrackingFragment :
             }
         }
         carMarker.map = naverMap
-        naverMap.moveCameraTo(STARBUCKS.latitude, STARBUCKS.longitude)
+//        naverMap.moveCameraTo(STARBUCKS.latitude, STARBUCKS.longitude)
         binding.btnTracking.setOnClickListener {
             viewModel.toggleTrackingState()
         }

@@ -6,6 +6,7 @@ import com.drtaa.core_data.repository.GPSRepository
 import com.drtaa.core_data.repository.RentCarRepository
 import com.drtaa.core_data.repository.RentRepository
 import com.drtaa.core_model.map.CarRoute
+import com.drtaa.core_model.network.RequestCarStatus
 import com.drtaa.core_model.network.RequestCompleteRent
 import com.drtaa.core_model.rent.CarPosition
 import com.drtaa.core_model.rent.RentDetail
@@ -102,9 +103,19 @@ class CarViewModel @Inject constructor(
         _mqttConnectionStatus.value = -1
     }
 
+    private suspend fun getCarInfo() = _carPosition.first()
+
     fun getOnCar(rentId: Long) {
         viewModelScope.launch {
-            rentCarRepository.getOnCar(rentId).collect { result ->
+            val lastCarPosition = getCarInfo()
+            rentCarRepository.getOnCar(
+                RequestCarStatus(
+                    rentId = rentId,
+                    travelId = lastCarPosition.travelId,
+                    travelDatesId = lastCarPosition.travelDatesId,
+                    datePlacesId = lastCarPosition.datePlacesId
+                )
+            ).collect { result ->
                 result.onSuccess { data ->
                     Timber.tag("rent latest").d("성공 $data")
                     _currentRentDetail.value?.let {
@@ -130,7 +141,15 @@ class CarViewModel @Inject constructor(
 
     fun getOffCar(rentId: Long) {
         viewModelScope.launch {
-            rentCarRepository.getOffCar(rentId).collect { result ->
+            val lastCarPosition = getCarInfo()
+            rentCarRepository.getOffCar(
+                RequestCarStatus(
+                    rentId = rentId,
+                    travelId = lastCarPosition.travelId,
+                    travelDatesId = lastCarPosition.travelDatesId,
+                    datePlacesId = lastCarPosition.datePlacesId
+                )
+            ).collect { result ->
                 result.onSuccess { data ->
                     _drivingStatus.value = CarStatus.PARKING
                     Timber.tag("rent latest").d("성공 $data")
@@ -257,18 +276,21 @@ class CarViewModel @Inject constructor(
      */
     fun callAssignedCar(userPosition: LatLng) {
         viewModelScope.launch {
+            val carInfo = getCarInfo()
             val rentId = _latestReservedId.value
             rentCarRepository.callAssignedCar(
                 rentId,
                 userPosition.latitude,
-                userPosition.longitude
+                userPosition.longitude,
+                carInfo.travelId,
+                carInfo.travelDatesId,
+                carInfo.datePlacesId
             ).collect { result ->
                 result.onSuccess {
                     Timber.tag("call car").d("성공 $it")
                     _carPosition.emit(it)
                 }.onFailure {
                     Timber.tag("call car").d("실패 $it")
-                    _carPosition.emit(CarPosition(0.0, 0.0))
                 }
             }
         }
@@ -280,10 +302,10 @@ class CarViewModel @Inject constructor(
                 result.onSuccess {
                     _carPosition.emit(it)
                     _firstCall.emit(true)
-                    Timber.tag("첫 호출").d("성공")
+                    Timber.tag("first call").d("성공 $it")
                 }.onFailure {
                     _firstCall.emit(false)
-                    Timber.tag("첫 호출").d("실패")
+                    Timber.tag("first call").d("실패")
                 }
             }
         }

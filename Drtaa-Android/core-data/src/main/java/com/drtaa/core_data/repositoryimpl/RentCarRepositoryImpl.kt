@@ -4,13 +4,14 @@ import com.drtaa.core_data.datasource.RentCarDataSource
 import com.drtaa.core_data.repository.RentCarRepository
 import com.drtaa.core_data.util.ResultWrapper
 import com.drtaa.core_data.util.safeApiCall
+import com.drtaa.core_model.network.RequestCarStatus
 import com.drtaa.core_model.network.RequestDrivingCar
 import com.drtaa.core_model.network.RequestRentCarCall
 import com.drtaa.core_model.network.RequestUnassignedCar
 import com.drtaa.core_model.network.ResponseDrivingCar
 import com.drtaa.core_model.rent.CarPosition
 import com.drtaa.core_model.rent.RentCar
-import com.drtaa.core_model.util.toCarPosition
+import com.drtaa.core_model.util.toCarInfo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import timber.log.Timber
@@ -41,8 +42,8 @@ class RentCarRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun getOffCar(rentId: Long): Flow<Result<String>> = flow {
-        when (val response = safeApiCall { rentCarDataSource.getOffCar(rentId) }) {
+    override suspend fun getOffCar(rentInfo: RequestCarStatus): Flow<Result<String>> = flow {
+        when (val response = safeApiCall { rentCarDataSource.getOffCar(rentInfo) }) {
             is ResultWrapper.Success -> {
                 emit(Result.success(response.data))
                 Timber.d("성공")
@@ -60,8 +61,8 @@ class RentCarRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getOnCar(rentId: Long): Flow<Result<String>> = flow {
-        when (val response = safeApiCall { rentCarDataSource.getOnCar(rentId) }) {
+    override suspend fun getOnCar(rentInfo: RequestCarStatus): Flow<Result<String>> = flow {
+        when (val response = safeApiCall { rentCarDataSource.getOnCar(rentInfo) }) {
             is ResultWrapper.Success -> {
                 emit(Result.success(response.data))
                 Timber.d("성공")
@@ -83,21 +84,27 @@ class RentCarRepositoryImpl @Inject constructor(
         rentId: Long,
         userLat: Double,
         userLon: Double,
+        travelId: Long,
+        travelDatesId: Long,
+        datePlacesId: Long,
     ): Flow<Result<CarPosition>> =
         flow {
             when (
                 val response = safeApiCall {
                     rentCarDataSource.callAssignedCar(
                         RequestRentCarCall(
-                            rentId,
-                            userLat,
-                            userLon
+                            rentId = rentId,
+                            userLat = userLat,
+                            userLon = userLon,
+                            travelId = travelId,
+                            travelDatesId = travelDatesId,
+                            datePlacesId = datePlacesId
                         )
                     )
                 }
             ) {
                 is ResultWrapper.Success -> {
-                    emit(Result.success(response.data.toCarPosition()))
+                    emit(Result.success(response.data.toCarInfo()))
                     Timber.d("현재 렌트카 호출 성공 ${response.data}")
                 }
 
@@ -116,7 +123,7 @@ class RentCarRepositoryImpl @Inject constructor(
     override suspend fun callFirstAssignedCar(rentId: Long): Flow<Result<CarPosition>> = flow {
         when (val response = safeApiCall { rentCarDataSource.callFirstAssignedCar(rentId) }) {
             is ResultWrapper.Success -> {
-                emit(Result.success(response.data.toCarPosition()))
+                emit(Result.success(response.data.toCarInfo()))
             }
 
             is ResultWrapper.GenericError -> {
