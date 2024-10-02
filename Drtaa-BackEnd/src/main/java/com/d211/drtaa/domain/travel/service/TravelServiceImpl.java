@@ -160,8 +160,8 @@ public class TravelServiceImpl implements TravelService {
         List<TravelDates> datesList = travelDatesRepository.findByTravel(travel);
 
         // 각 일정에 대해 일정 장소 리스트를 찾고, DTO로 변환
-        List<DatesDetailResponseDTO> datesDtoList = datesList.stream().map(dates -> {
-            List<DatePlaces> placesList = datePlacesRepository.findByTravelDatesId(dates.getTravelDatesId());
+        List<DatesDetailResponseDTO> datesDtoList = datesList.stream().map(date -> {
+            List<DatePlaces> placesList = datePlacesRepository.findByTravelDates(date);
 
             // 일정 장소 DTO 리스트 생성
             List<PlacesDetailResponseDTO> placesDtoList = placesList.stream().map(places ->
@@ -180,9 +180,9 @@ public class TravelServiceImpl implements TravelService {
 
             // 일정 DTO 생성
             return DatesDetailResponseDTO.builder()
-                    .travelId(dates.getTravel().getTravelId())
-                    .travelDatesId(dates.getTravelDatesId())
-                    .travelDatesDate(dates.getTravelDatesDate())
+                    .travelId(date.getTravel().getTravelId())
+                    .travelDatesId(date.getTravelDatesId())
+                    .travelDatesDate(date.getTravelDatesDate())
                     .placesDetail(placesDtoList) // 일정 장소 리스트를 설정
                     .build();
         }).collect(Collectors.toList());

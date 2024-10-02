@@ -4,7 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.drtaa.core_data.repository.PlanRepository
 import com.drtaa.core_model.map.Search
+import com.drtaa.core_model.plan.DayPlan
 import com.drtaa.core_model.plan.Plan
+import com.drtaa.core_model.plan.PlanItem
 import com.drtaa.core_model.plan.RequestPlanName
 import com.drtaa.core_model.util.toPlanItem
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,11 +27,11 @@ class PlanViewModel @Inject constructor(
     private val _plan = MutableStateFlow<Plan?>(null)
     val plan: StateFlow<Plan?> = _plan
 
-    private val _dayPlanList = MutableStateFlow<List<Plan.DayPlan>?>(null)
-    val dayPlanList: StateFlow<List<Plan.DayPlan>?> = _dayPlanList
+    private val _dayPlanList = MutableStateFlow<List<DayPlan>?>(null)
+    val dayPlanList: StateFlow<List<DayPlan>?> = _dayPlanList
 
-    private val _dayPlan = MutableStateFlow<Plan.DayPlan?>(null)
-    val dayPlan: StateFlow<Plan.DayPlan?> = _dayPlan
+    private val _dayPlan = MutableStateFlow<DayPlan?>(null)
+    val dayPlan: StateFlow<DayPlan?> = _dayPlan
 
     private val _dayIdx = MutableStateFlow(0)
     val dayIdx: StateFlow<Int> = _dayIdx
@@ -120,7 +122,7 @@ class PlanViewModel @Inject constructor(
     fun updateDate(
         dayIdxFrom: Int,
         dayIdxTo: Int,
-        movePlanList: List<Plan.DayPlan.PlanItem>
+        movePlanList: List<PlanItem>
     ) {
         val currentPlan = _plan.value ?: return
 
@@ -156,7 +158,7 @@ class PlanViewModel @Inject constructor(
         putNewPlan(tempNewPlan)
     }
 
-    fun updatePlan(dayIdx: Int, newPlanList: List<Plan.DayPlan.PlanItem>) {
+    fun updatePlan(dayIdx: Int, newPlanList: List<PlanItem>) {
         val currentPlan = _plan.value ?: return
 
         val updatedDatesDetail = currentPlan.datesDetail.mapIndexed { index, dayPlan ->
@@ -175,7 +177,7 @@ class PlanViewModel @Inject constructor(
         putNewPlan(tempNewPlan)
     }
 
-    fun deletePlan(dayIdx: Int, deletedPlanList: List<Plan.DayPlan.PlanItem>) {
+    fun deletePlan(dayIdx: Int, deletedPlanList: List<PlanItem>) {
         val currentPlan = _plan.value ?: return
 
         val updatedDatesDetail = currentPlan.datesDetail.mapIndexed { index, dayPlan ->
