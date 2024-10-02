@@ -11,7 +11,6 @@ import com.d211.drtaa.global.exception.rent.NoAvailableRentCarException;
 import com.d211.drtaa.global.exception.rent.RentCarNotFoundException;
 import com.d211.drtaa.global.exception.rent.RentNotFoundException;
 import com.d211.drtaa.global.exception.travel.TravelAllPlacesVisitedException;
-import com.d211.drtaa.global.exception.travel.TravelNextDayResponseException;
 import com.d211.drtaa.global.exception.travel.TravelNotFoundException;
 import com.d211.drtaa.global.exception.websocket.WebSocketDisConnectedException;
 import com.d211.drtaa.global.util.fcm.FcmUtil;
@@ -98,7 +97,7 @@ public class RentCarController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
         } catch(TravelAllPlacesVisitedException e) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(e.getMessage()); // 204
-        }catch (AuthenticationException e) {
+        } catch (AuthenticationException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("권한 인증에 실패하였습니다."); // 401
         } catch (WebSocketDisConnectedException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage()); // 500
@@ -150,9 +149,6 @@ public class RentCarController {
             return ResponseEntity.ok(response); //200
         } catch (RentNotFoundException | RentCarNotFoundException | TravelNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
-        } catch(TravelNextDayResponseException e) {
-            RentCarManipulateResponseDTO response = e.getResponse();
-            return ResponseEntity.status(HttpStatus.RESET_CONTENT).body(response); // 205
         } catch(TravelAllPlacesVisitedException e) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(e.getMessage()); // 204
         } catch (WebSocketDisConnectedException e) {
