@@ -5,13 +5,14 @@ import com.drtaa.core_model.network.RequestUnassignedCar
 import com.drtaa.core_model.network.ResponseDrivingCar
 import com.drtaa.core_model.rent.CarPosition
 import com.drtaa.core_model.rent.RentCar
+import com.drtaa.core_model.rent.RentTravelInfo
 import kotlinx.coroutines.flow.Flow
 
 interface RentCarRepository {
     // rent-car
     suspend fun getUnassignedCar(rentSchedule: RequestUnassignedCar): Flow<Result<RentCar>>
     suspend fun getOffCar(rentInfo: RequestCarStatus): Flow<Result<String>>
-    suspend fun getOnCar(rentInfo: RequestCarStatus): Flow<Result<String>>
+    suspend fun getOnCar(rentInfo: RequestCarStatus): Flow<Result<RentTravelInfo>>
     suspend fun callAssignedCar(
         rentId: Long,
         userLat: Double,
@@ -23,4 +24,6 @@ interface RentCarRepository {
     suspend fun callFirstAssignedCar(rentId: Long): Flow<Result<CarPosition>>
     suspend fun editDriveStatus(rentCarId: Long, driveStatus: String): Flow<Result<ResponseDrivingCar>>
     suspend fun getDriveStatus(rentCarId: Long): Flow<Result<ResponseDrivingCar>>
+    suspend fun getCarWithTravelInfo(): Flow<Result<RequestCarStatus>>
+    suspend fun setCarWithTravelInfo(rentInfo: RequestCarStatus)
 }

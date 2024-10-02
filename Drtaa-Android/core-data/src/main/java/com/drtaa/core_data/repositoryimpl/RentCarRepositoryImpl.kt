@@ -11,6 +11,7 @@ import com.drtaa.core_model.network.RequestUnassignedCar
 import com.drtaa.core_model.network.ResponseDrivingCar
 import com.drtaa.core_model.rent.CarPosition
 import com.drtaa.core_model.rent.RentCar
+import com.drtaa.core_model.rent.RentTravelInfo
 import com.drtaa.core_model.util.toCarInfo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -61,7 +62,7 @@ class RentCarRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getOnCar(rentInfo: RequestCarStatus): Flow<Result<String>> = flow {
+    override suspend fun getOnCar(rentInfo: RequestCarStatus): Flow<Result<RentTravelInfo>> = flow {
         when (val response = safeApiCall {
             Timber.tag("getOnCar").d("$rentInfo")
             rentCarDataSource.getOnCar(rentInfo)
@@ -185,5 +186,30 @@ class RentCarRepositoryImpl @Inject constructor(
                 Timber.d("드라이브 상태 조회 네트워크 에러")
             }
         }
+    }
+
+    override suspend fun getCarWithTravelInfo(): Flow<Result<RequestCarStatus>> = flow {
+        when (val response = safeApiCall { rentCarDataSource.getCarWithTravelInfo() }) {
+            is ResultWrapper.GenericError -> {
+                emit(Result.failure(Exception(response.message)))
+                Timber.d("차량 일정 정보 조회 실패: ${response.message}")
+            }
+
+            is ResultWrapper.NetworkError -> {
+                emit(Result.failure(Exception("네트워크 에러")))
+                Timber.d("차량 일정 정보 조회 실패: 네트워크 에러")
+            }
+
+            is ResultWrapper.Success -> {
+                if (response.data.travelId * response.data.travelDatesId * response.data.datePlacesId != 0) {
+                    emit(Result.success(response.data))
+                    Timber.d("차량 일정 정보 조회 성공")
+                }
+            }
+        }
+    }
+
+    override suspend fun setCarWithTravelInfo(rentInfo: RequestCarStatus) {
+        rentCarDataSource.setCarWithTravelInfo(rentInfo)
     }
 }

@@ -7,9 +7,9 @@ fun ResponseRentCarCall.toCarInfo(): CarPosition {
     return CarPosition(
         latitude = rentCarLat,
         longitude = rentCarLon,
-        rentId = rentId,
-        travelId = travelId,
-        travelDatesId = travelDatesId,
-        datePlacesId = datePlacesId
+        rentId = rentId.toInt(),
+        travelId = travelId.toInt(),
+        travelDatesId = travelDatesId.toInt(),
+        datePlacesId = datePlacesId.toInt()
     )
 }

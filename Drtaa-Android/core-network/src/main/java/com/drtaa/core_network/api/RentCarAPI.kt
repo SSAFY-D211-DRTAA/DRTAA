@@ -7,6 +7,7 @@ import com.drtaa.core_model.network.RequestUnassignedCar
 import com.drtaa.core_model.network.ResponseDrivingCar
 import com.drtaa.core_model.network.ResponseRentCarCall
 import com.drtaa.core_model.rent.RentCar
+import com.drtaa.core_model.rent.RentTravelInfo
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.PATCH
@@ -27,7 +28,7 @@ interface RentCarAPI {
     @PATCH("rent-car/driving")
     suspend fun getOnCar(
         @Body rentInfo: RequestCarStatus,
-    ): String
+    ): RentTravelInfo
 
     @PATCH("rent-car/call")
     suspend fun callAssignedCar(

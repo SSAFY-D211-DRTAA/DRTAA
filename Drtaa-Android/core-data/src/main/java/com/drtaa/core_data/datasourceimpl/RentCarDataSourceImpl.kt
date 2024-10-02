@@ -1,5 +1,9 @@
 package com.drtaa.core_data.datasourceimpl
 
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import com.drtaa.core_data.datasource.RentCarDataSource
 import com.drtaa.core_model.network.RequestCarStatus
 import com.drtaa.core_model.network.RequestDrivingCar
@@ -8,10 +12,16 @@ import com.drtaa.core_model.network.RequestUnassignedCar
 import com.drtaa.core_model.network.ResponseDrivingCar
 import com.drtaa.core_model.network.ResponseRentCarCall
 import com.drtaa.core_model.rent.RentCar
+import com.drtaa.core_model.rent.RentTravelInfo
 import com.drtaa.core_network.api.RentCarAPI
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
+import javax.inject.Named
 
 class RentCarDataSourceImpl @Inject constructor(
+    @Named("RENT")
+    private val dataStore: DataStore<Preferences>,
     private val rentCarAPI: RentCarAPI,
 ) : RentCarDataSource {
     override suspend fun getUnassignedCar(rentSchedule: RequestUnassignedCar): RentCar {
@@ -22,7 +32,7 @@ class RentCarDataSourceImpl @Inject constructor(
         return rentCarAPI.getOffCar(rentInfo)
     }
 
-    override suspend fun getOnCar(rentInfo: RequestCarStatus): String {
+    override suspend fun getOnCar(rentInfo: RequestCarStatus): RentTravelInfo {
         return rentCarAPI.getOnCar(rentInfo)
     }
 
@@ -40,5 +50,32 @@ class RentCarDataSourceImpl @Inject constructor(
 
     override suspend fun getDriveStatus(rentCarId: Long): ResponseDrivingCar {
         return rentCarAPI.getDriveStatus(rentCarId)
+    }
+
+    override suspend fun getCarWithTravelInfo(): RequestCarStatus {
+        return dataStore.data.map { prefs ->
+            RequestCarStatus(
+                prefs[RENT_ID] ?: -1,
+                prefs[TRAVEL_ID] ?: -1,
+                prefs[TRAVEL_DATES_ID] ?: -1,
+                prefs[DATE_PLACES_ID] ?: -1,
+            )
+        }.first()
+    }
+
+    override suspend fun setCarWithTravelInfo(rentInfo: RequestCarStatus) {
+        dataStore.edit { prefs ->
+            prefs[RENT_ID] = rentInfo.rentId
+            prefs[TRAVEL_ID] = rentInfo.travelId
+            prefs[TRAVEL_DATES_ID] = rentInfo.travelDatesId
+            prefs[DATE_PLACES_ID] = rentInfo.datePlacesId
+        }
+    }
+
+    companion object {
+        val RENT_ID = intPreferencesKey("rentId")
+        val TRAVEL_ID = intPreferencesKey("travelId")
+        val TRAVEL_DATES_ID = intPreferencesKey("travelDatesId")
+        val DATE_PLACES_ID = intPreferencesKey("datePlacesId")
     }
 }
