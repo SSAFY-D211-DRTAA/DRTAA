@@ -169,27 +169,28 @@
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_home_rent_history"
-            style="@style/btn_long_blue"
+            style="@style/btn_short_blue"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="20dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="30dp"
+            android:backgroundTint="#A0BAFE"
             android:text="렌트 기록"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btn_home_car_rent" />
+            app:layout_constraintTop_toBottomOf="@+id/btn_home_plan" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_home_plan"
-            style="@style/btn_long_blue"
+            style="@style/btn_stroke_blue"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="20dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="35dp"
             android:text="일정 관리"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btn_home_rent_history" />
+            app:layout_constraintTop_toBottomOf="@+id/btn_home_car_rent" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline"

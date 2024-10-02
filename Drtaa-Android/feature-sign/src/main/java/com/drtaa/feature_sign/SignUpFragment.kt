@@ -1,9 +1,12 @@
 package com.drtaa.feature_sign
 
+import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Color
 import android.net.Uri
 import android.os.Environment
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
@@ -121,6 +124,7 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>(R.layout.fragment_sig
         return file
     }
 
+    @SuppressLint("ResourceType")
     private fun initObserver() {
         signUpFragmentViewModel.isSignUpSuccess.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { isSignUpSuccess ->
@@ -133,10 +137,25 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>(R.layout.fragment_sig
 
         signUpFragmentViewModel.isDuplicatedId.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { isDuplicatedId ->
-                binding.tvSignUpIdHelp.text = when (isDuplicatedId) {
-                    null -> ""
-                    true -> "이미 사용중인 아이디입니다."
-                    false -> "사용 가능한 아이디입니다."
+                when (isDuplicatedId) {
+                    null -> {
+                        binding.tvSignUpIdHelp.apply {
+                            text = ""
+                            setTextColor(ContextCompat.getColor(context, Color.BLACK))
+                        }
+                    }
+                    true -> {
+                        binding.tvSignUpIdHelp.apply {
+                            text = "이미 사용중인 아이디입니다."
+                            setTextColor(ContextCompat.getColor(context, Color.RED))
+                        }
+                    }
+                    false -> {
+                        binding.tvSignUpIdHelp.apply {
+                            text = "사용 가능한 아이디입니다."
+                            setTextColor(ContextCompat.getColor(context, Color.BLUE))
+                        }
+                    }
                 }
                 signUpFragmentViewModel.setIsPossibleSignUp()
             }.launchIn(viewLifecycleOwner.lifecycleScope)
