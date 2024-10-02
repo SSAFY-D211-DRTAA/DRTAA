@@ -14,66 +14,66 @@
         android:id="@+id/cv_plan"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="5dp"
+        android:layout_marginTop="3dp"
         android:layout_marginBottom="10dp"
         app:cardCornerRadius="5dp"
         app:cardElevation="3dp"
-        android:layout_marginTop="3dp"
-        android:layout_marginHorizontal="5dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/view_line"
         app:layout_constraintTop_toTopOf="parent"
         app:strokeColor="@color/white">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingHorizontal="20dp"
-        android:paddingTop="20dp"
-        android:paddingBottom="10dp">
-
-        <TextView
-            android:id="@+id/tv_blog_title"
-            style="@style/jua"
-            android:layout_width="0dp"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="20dp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:text="@{post.title}"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toStartOf="@+id/iv_blog"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="블로그 제목입니다." />
+            android:paddingHorizontal="20dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="10dp">
 
-        <TextView
-            android:id="@+id/tv_blog_body"
-            style="@style/ptd_regular"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:layout_marginEnd="20dp"
-            android:ellipsize="end"
-            android:maxLines="3"
-            android:textColor="@color/gray_5858"
-            android:text="@{post.description}"
-            android:textSize="12sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/iv_blog"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_blog_title"
-            tools:text="블로그 제목입니다.블로그 제목입니다.블로그 제목입니다.블로그 제목입니다.블로그 제목입니다.블로그 제목입니다.블로그 제목입니다.블로그 제목입니다.블로그 제목입니다.블로그 제목입니다.블로그 제목입니다." />
+            <TextView
+                android:id="@+id/tv_blog_title"
+                style="@style/jua"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="@{post.title}"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toStartOf="@+id/iv_blog"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="블로그 제목입니다." />
 
-        <ImageView
-            android:id="@+id/iv_blog"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:src="@drawable/naver_blog"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            <TextView
+                android:id="@+id/tv_blog_body"
+                style="@style/ptd_regular"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="20dp"
+                android:ellipsize="end"
+                android:maxLines="3"
+                android:text="@{post.description}"
+                android:textColor="@color/gray_5858"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/iv_blog"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_blog_title"
+                tools:text="블로그 제목입니다.블로그 제목입니다.블로그 제목입니다.블로그 제목입니다.블로그 제목입니다.블로그 제목입니다.블로그 제목입니다.블로그 제목입니다.블로그 제목입니다.블로그 제목입니다.블로그 제목입니다." />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <ImageView
+                android:id="@+id/iv_blog"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:src="@drawable/naver_blog"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 </layout>

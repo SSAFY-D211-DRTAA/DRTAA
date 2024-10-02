@@ -3,6 +3,7 @@ package com.drtaa.feature_plan.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.drtaa.core_data.repository.TravelRepository
+import com.drtaa.core_model.travel.NaverImage
 import com.drtaa.core_model.travel.NaverPost
 import com.drtaa.core_model.travel.Weather
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,6 +22,9 @@ class TravelViewModel @Inject constructor(
 
     private val _weatherList = MutableStateFlow<List<Weather>?>(null)
     val weatherList: StateFlow<List<Weather>?> = _weatherList
+
+    private val _mainImage = MutableStateFlow<NaverImage?>(null)
+    val mainImage: StateFlow<NaverImage?> = _mainImage
 
     fun getBlogPostList(keyword: String) {
         viewModelScope.launch {
@@ -41,6 +45,18 @@ class TravelViewModel @Inject constructor(
                     _weatherList.value = data
                 }.onFailure {
                     _weatherList.value = null
+                }
+            }
+        }
+    }
+
+    fun getImage(keyword: String) {
+        viewModelScope.launch {
+            travelRepository.getImage(keyword).collect { result ->
+                result.onSuccess { data ->
+                    _mainImage.value = data
+                }.onFailure {
+                    _mainImage.value = null
                 }
             }
         }

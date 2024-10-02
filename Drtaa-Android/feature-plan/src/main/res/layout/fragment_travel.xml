@@ -51,24 +51,35 @@
                 app:layout_constraintTop_toTopOf="@+id/tv_travel_address_title"
                 tools:text="여행지 주소" />
 
-            <ImageView
-                android:id="@+id/iv_travel"
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cv_travel_image"
                 android:layout_width="0dp"
-                android:layout_height="150dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
+                app:cardCornerRadius="5dp"
+                app:cardElevation="0dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_travel_address_title"
-                tools:src="@android:drawable/ic_menu_gallery" />
+                app:strokeColor="@color/white">
+
+                <ImageView
+                    android:id="@+id/iv_travel"
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    tools:src="@android:drawable/ic_menu_gallery" />
+
+            </androidx.cardview.widget.CardView>
 
             <View
                 android:id="@+id/view_line1"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
+                android:layout_marginTop="10dp"
                 android:background="@color/gray_d9d9"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/iv_travel" />
+                app:layout_constraintTop_toBottomOf="@+id/cv_travel_image" />
 
             <TextView
                 android:id="@+id/tv_travel_weather_title"
@@ -87,8 +98,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
-                android:text="오늘 기준입니다."
-                android:textColor="@color/gray_5858"
+                android:text="*10월01일 기준"
+                android:textColor="@color/red"
                 android:textSize="12sp"
                 app:layout_constraintBottom_toBottomOf="@+id/tv_travel_weather_title"
                 app:layout_constraintStart_toEndOf="@+id/tv_travel_weather_title"

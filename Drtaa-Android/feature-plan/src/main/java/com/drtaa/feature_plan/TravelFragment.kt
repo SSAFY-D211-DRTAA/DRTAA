@@ -10,6 +10,7 @@ import androidx.navigation.fragment.navArgs
 import com.drtaa.core_model.plan.PlanItem
 import com.drtaa.core_model.travel.Weather
 import com.drtaa.core_ui.base.BaseFragment
+import com.drtaa.core_ui.centerCrop
 import com.drtaa.core_ui.loadImageUrl
 import com.drtaa.feature_plan.adapter.PostListAdapter
 import com.drtaa.feature_plan.databinding.FragmentTravelBinding
@@ -18,6 +19,8 @@ import com.drtaa.feature_plan.viewmodel.TravelViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @AndroidEntryPoint
 class TravelFragment :
@@ -31,17 +34,29 @@ class TravelFragment :
     private lateinit var postListAdapter: PostListAdapter
 
     override fun initView() {
+        val notice = LocalDate.now().format(DateTimeFormatter.ofPattern("*MM월 dd일 기준입니다."))
+        binding.tvTravelWeatherHelp.text = notice
         binding.tvTravelTitle.text = planItem.datePlacesName
         binding.tvTravelAddress.text = planItem.datePlacesAddress
 
         initRVAdapter()
         initObserve()
 
+        travelViewModel.getImage(planItem.datePlacesName)
         travelViewModel.getBlogPostList(planItem.datePlacesName)
         travelViewModel.getWeatherList(planItem.datePlacesLat, planItem.datePlacesLon)
     }
 
     private fun initObserve() {
+        travelViewModel.mainImage.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach { image ->
+                if (image == null) {
+                    binding.ivTravel.setImageResource(android.R.drawable.ic_menu_gallery)
+                    return@onEach
+                }
+
+                binding.ivTravel.centerCrop(image.link, requireActivity())
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
         travelViewModel.postList.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { postList ->
                 if (postList == null) return@onEach
@@ -69,7 +84,9 @@ class TravelFragment :
                     weatherView.tvWeatherDay.text = weatherList[index].dayOfWeek
                     weatherView.tvWeatherMinTemp.text = "${weatherList[index].min.toInt()}°"
                     weatherView.tvWeatherMaxTemp.text = "${weatherList[index].max.toInt()}°"
-                    weatherView.ivWeatherIcon.loadImageUrl("${WEATHER_IMG_URL}${weatherList[index].description}.png")
+
+                    val weatherStatus = weatherList[index].description.replace("d", "n")
+                    weatherView.ivWeatherIcon.loadImageUrl("${WEATHER_IMG_URL + weatherStatus}.png")
                 }
             }
         }

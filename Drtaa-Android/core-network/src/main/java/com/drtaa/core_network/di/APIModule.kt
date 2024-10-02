@@ -88,9 +88,20 @@ object APIModule {
     ): PlanAPI = retrofit.create(PlanAPI::class.java)
 
     @Singleton
+    @Auth
     @Provides
-    fun provideTravelAPI(
+    fun provideTravelAuthAPI(
         @AuthRetrofit
         retrofit: Retrofit
     ): TravelAPI = retrofit.create(TravelAPI::class.java)
+
+    @Singleton
+    @NoAuth
+    @Provides
+    fun provideTravelNoAuthAPI(
+        retrofitFactory: RetrofitFactory
+    ): TravelAPI {
+        return retrofitFactory.create(MAP_SEARCH_URL)
+            .create(TravelAPI::class.java)
+    }
 }
