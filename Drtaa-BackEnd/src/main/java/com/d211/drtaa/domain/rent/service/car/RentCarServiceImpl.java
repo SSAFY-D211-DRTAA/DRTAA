@@ -340,13 +340,6 @@ public class RentCarServiceImpl implements RentCarService {
         RentCar car = rentCarRepository.findByRentCarId(rent.getRentCar().getRentCarId())
                 .orElseThrow(() -> new RentCarNotFoundException("해당 rentCarId의 맞는 차량을 찾을 수 없습니다."));
 
-        // 해당 렌트에 맞는 여행 = travelId에 해당하는 여행
-        Travel travel = rent.getTravel();
-
-        // travelDatesId에 해당하는 일정 찾기
-        TravelDates dates = travelDatesRepository.findByTravelDatesId(rentCarManipulateRequestDTO.getTravelDatesId())
-                .orElseThrow(() -> new TravelNotFoundException("해당 travelDatesId에 맞는 일정을 찾을 수 없습니다."));
-
         // datePlacesId에 해당하는 장소 찾기
         DatePlaces currentPlace = datePlacesRepository.findByDatePlacesId(rentCarManipulateRequestDTO.getDatePlacesId())
                 .orElseThrow(() -> new TravelNotFoundException("해당 datePlacesId의 맞는 장소를 찾을 수 없습니다."));
@@ -400,8 +393,8 @@ public class RentCarServiceImpl implements RentCarService {
         rentCarRepository.save(car);
 
         RentCarManipulateResponseDTO response = RentCarManipulateResponseDTO.builder()
-                .travelId(travel.getTravelId())
-                .travelDatesId(dates.getTravelDatesId())
+                .travelId(rentCarManipulateRequestDTO.getTravelId())
+                .travelDatesId(rentCarManipulateRequestDTO.getTravelDatesId())
                 .datePlacesId(currentPlace.getDatePlacesId())
                 .build();
 
@@ -482,7 +475,7 @@ public class RentCarServiceImpl implements RentCarService {
            }
 
            // 해당 일정이 렌트 일정의 마지막 일정이 아닌 경우
-           throw new TravelAllPlacesVisitedException("오늘 예정된 모든 여행지를 방문했습니다.", rent);
+           throw new TravelAllPlacesVisitedException("다음 장소를 찾을 수 없습니다. 오늘 예정된 모든 여행지를 방문했습니다.", rent);
        }
 
         // 다음 순서 장소 찾기
