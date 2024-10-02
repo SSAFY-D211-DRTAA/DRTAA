@@ -24,6 +24,7 @@ from utils.logger import setup_logger
 from scripts.curve_simplification import simplify_curve
 from scripts.gps_converter import GPSConverter
 from scripts.convert_json import convert_points_to_json
+# from scripts.path_calculator import haversine
 
 logger = setup_logger(__name__)
 
@@ -31,6 +32,7 @@ logger = setup_logger(__name__)
 CONFIG_FILE_PATH = 'config.json'
 GPS_TOPIC = "/gps"
 IMU_TOPIC = "/imu"
+ODOM_TOPIC = "/odom"
 COMPLETE_DRIVE_TOPIC = "/complete_drive"
 MOVE_BASE_GOAL_TOPIC = "/move_base_simple/goal"
 COMMAND_STATUS_TOPIC = "/command_status"
@@ -58,6 +60,8 @@ db_port = int(os.getenv('DB_PORT'))
 db_user = os.getenv('DB_USER')
 db_password = os.getenv('DB_PASSWD')
 db_database = os.getenv('DB_DATABASE')
+
+car_id = None
 
 # 설정 파일 로드
 def load_config() -> Dict[str, Union[str, float, int]]:
@@ -246,7 +250,7 @@ rent_car_api_client: RentCarAPI = None
 db_api_client: DBClient = None
 
 def on_ros_bridge_message(ws: WebSocketApp, message: str) -> None:
-    global gps_count_index, imu_count_index
+    global car_id, gps_count_index, imu_count_index
     try:
         data: Dict[str, Any] = json.loads(message)
         if data['op'] == 'publish':
@@ -305,7 +309,17 @@ def on_ros_bridge_message(ws: WebSocketApp, message: str) -> None:
                     except IOError as e:
                         logger.error(f"Orientation 데이터를 파일에 저장하는 중 오류 발생: {e}")
                     send_to_ec2(orientation_data)
-
+            elif data['topic'] == ODOM_TOPIC:
+                msg_data = data['msg']
+                odom_data = {
+                    "tag": "odom",
+                    "msg": msg_data
+                }
+                try:
+                    with open(f'{data_dir}/odom_data.json', 'w') as f:
+                        json.dump(odom_data, f)
+                except IOError as e:
+                    logger.error(f"Odom 데이터를 파일에 저장하는 중 오류 발생: {e}")
             elif data['topic'] == COMPLETE_DRIVE_TOPIC:
                 logger.info("도착지에 도착했습니다.")
                 msg_data = data['msg']
@@ -320,7 +334,7 @@ def on_ros_bridge_message(ws: WebSocketApp, message: str) -> None:
                     logger.error(f"완료 데이터를 파일에 저장하는 중 오류 발생: {e}")
 
                 send_to_ec2(complete_data)
-                rent_car_api_client.send_arrival_info(rent_car_id=1, expected_minutes=0, arrived=True)
+                rent_car_api_client.send_arrival_info(rent_car_id=car_id, expected_minutes=0, arrived=True)
 
             elif data['topic'] == GLOBAL_PATH_TOPIC:
                 path_data = data['msg']
@@ -362,12 +376,15 @@ def on_ros_bridge_open(ws: WebSocketApp) -> None:
 
     subscribe(ws, GPS_TOPIC, "morai_msgs/GPSMessage") # GPS
     subscribe(ws, IMU_TOPIC, "sensor_msgs/Imu") # IMU
+    subscribe(ws, ODOM_TOPIC, "nav_msgs/Odometry") # ODOM
+    
     subscribe(ws, COMPLETE_DRIVE_TOPIC, "geometry_msgs/PoseStamped")
     subscribe(ws, GLOBAL_PATH_TOPIC, "nav_msgs/Path")
     subscribe(ws, COMMAND_STATUS_TOPIC, "std_msgs/String")
 
 
 def on_ec2_message(ws: WebSocketApp, message: str) -> None:
+    global car_id
     logger.info(f"EC2로부터 메시지 수신: {message}")
     try:
         data: Dict[str, Any] = json.loads(message)
@@ -437,6 +454,8 @@ def signal_handler(sig: int, frame: Any) -> None:
     if ros_bridge_ws:
         unsubscribe(ros_bridge_ws, GPS_TOPIC)
         unsubscribe(ros_bridge_ws, IMU_TOPIC)
+        unsubscribe(ros_bridge_ws, ODOM_TOPIC)
+        
         unsubscribe(ros_bridge_ws, COMPLETE_DRIVE_TOPIC)
         unsubscribe(ros_bridge_ws, GLOBAL_PATH_TOPIC)
         unsubscribe(ros_bridge_ws, COMMAND_STATUS_TOPIC)
