@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.drtaa.feature_plan"
+    namespace = "com.drtaa.feature_travel"
     compileSdk = 34
 
     defaultConfig {
@@ -38,8 +38,5 @@ android {
 }
 
 dependencies {
-    implementation(libs.map.sdk)
-    implementation(project(":core-map"))
-    implementation(project(":feature-travel"))
-    implementation(libs.androidx.viewpager2)
+
 }

@@ -55,6 +55,7 @@ dependencies {
     implementation(project(":feature-rent"))
     implementation(project(":feature-payment"))
     implementation(project(":feature-plan"))
+    implementation(project(":feature-travel"))
     implementation(libs.map.sdk)
     // Firebase
     implementation(platform(libs.firebase.bom))

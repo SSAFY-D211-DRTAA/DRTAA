@@ -1,4 +1,4 @@
-package com.drtaa.feature_plan
+package com.drtaa.feature_travel
 
 import android.content.Intent
 import android.net.Uri
@@ -7,15 +7,15 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
+import com.drtaa.feature_travel.databinding.FragmentTravelBinding
+import com.drtaa.feature_travel.databinding.ItemTravelWeatherBinding
 import com.drtaa.core_model.plan.PlanItem
 import com.drtaa.core_model.travel.Weather
 import com.drtaa.core_ui.base.BaseFragment
 import com.drtaa.core_ui.centerCrop
 import com.drtaa.core_ui.loadImageUrl
-import com.drtaa.feature_plan.adapter.PostListAdapter
-import com.drtaa.feature_plan.databinding.FragmentTravelBinding
-import com.drtaa.feature_plan.databinding.ItemTravelWeatherBinding
-import com.drtaa.feature_plan.viewmodel.TravelViewModel
+import com.drtaa.feature_travel.adapter.PostListAdapter
+import com.drtaa.feature_travel.viewmodel.TravelViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
