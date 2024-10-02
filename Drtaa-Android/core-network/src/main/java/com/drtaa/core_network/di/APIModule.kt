@@ -9,7 +9,6 @@ import com.drtaa.core_network.api.RentCarAPI
 import com.drtaa.core_network.api.SignAPI
 import com.drtaa.core_network.api.TaxiAPI
 import com.drtaa.core_network.api.TmapAPI
-import com.drtaa.core_network.api.PlanAPI
 import com.drtaa.core_network.api.TourAPI
 import com.drtaa.core_network.api.TravelAPI
 import dagger.Module
