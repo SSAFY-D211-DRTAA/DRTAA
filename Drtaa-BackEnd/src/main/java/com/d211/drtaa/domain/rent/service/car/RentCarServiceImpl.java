@@ -223,7 +223,7 @@ public class RentCarServiceImpl implements RentCarService {
             TravelDates date = travelDatesRepository.findFirstByTravel(rent.getTravel());
             response[0].setTravelDatesId(date.getTravelDatesId());
             // 첫째날의 첫 장소(탑승 장소) id
-            DatePlaces place = datePlacesRepository.findFirstByTravelDatesIdOrderByDatePlacesOrderAsc(date.getTravelDatesId());
+            DatePlaces place = datePlacesRepository.findFirstByTravelDatesOrderByDatePlacesOrderAsc(date);
             response[0].setDatePlacesId(place.getDatePlacesId());
 
             // 응답 반환
