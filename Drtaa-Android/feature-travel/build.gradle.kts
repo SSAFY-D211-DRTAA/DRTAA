@@ -1,4 +1,3 @@
-
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
@@ -6,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.drtaa.feature_tour"
+    namespace = "com.drtaa.feature_travel"
     compileSdk = 34
 
     defaultConfig {
@@ -14,7 +13,6 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
-
     }
 
     buildTypes {
@@ -33,13 +31,12 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
-    buildFeatures{
+    buildFeatures {
         dataBinding = true
         buildConfig = true
     }
 }
 
 dependencies {
-    implementation(libs.androidx.paging.runtime.ktx)
-    implementation(project(":feature-travel"))
+
 }

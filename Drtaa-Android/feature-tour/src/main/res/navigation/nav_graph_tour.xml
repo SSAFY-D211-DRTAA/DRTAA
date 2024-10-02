@@ -1,11 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph_tour"
     app:startDestination="@id/tourFragment">
+
+    <include app:graph="@navigation/nav_graph_travel" />
+    <action
+        android:id="@+id/action_fragment_tour_to_nav_graph_travel"
+        app:destination="@id/nav_graph_travel" >
+        <argument
+            android:name="planItem"
+            app:argType="com.drtaa.core_model.plan.PlanItem" />
+    </action>
 
     <fragment
         android:id="@+id/tourFragment"
         android:name="com.drtaa.feature_tour.TourFragment"
-        android:label="TourFragment" />
+        android:label="TourFragment"
+        tools:layout="@layout/fragment_tour" />
 </navigation>

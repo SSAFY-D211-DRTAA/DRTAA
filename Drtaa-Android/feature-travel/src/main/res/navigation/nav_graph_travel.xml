@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph_travel"
+    app:startDestination="@id/travelFragment">
+
+    <argument
+        android:name="planItem"
+        app:argType="com.drtaa.core_model.plan.PlanItem" />
+
+    <fragment
+        android:id="@+id/travelFragment"
+        android:name="com.drtaa.feature_travel.TravelFragment"
+        android:label="TravelFragment"
+        tools:layout="@layout/fragment_travel">
+        <argument
+            android:name="planItem"
+            app:argType="com.drtaa.core_model.plan.PlanItem" />
+    </fragment>
+</navigation>

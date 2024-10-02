@@ -127,8 +127,9 @@ abstract class BaseMapFragment<T : ViewDataBinding>(private val layoutResId: Int
     }
 
     fun NaverMap.adjustCamera() {
-        val boundsBuilder = LatLngBounds.Builder()
+        if (_markerList.isEmpty()) return
 
+        val boundsBuilder = LatLngBounds.Builder()
         _markerList.forEach { marker ->
             boundsBuilder.include(marker.position)
         }
