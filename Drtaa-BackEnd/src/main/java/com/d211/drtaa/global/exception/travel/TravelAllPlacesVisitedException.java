@@ -17,6 +17,11 @@ public class TravelAllPlacesVisitedException extends RuntimeException {
         log.info("Message: {}", fcmDTO.getBody());
         fcmUtil.singleFcmSend(rent.getUser(), fcmDTO); // 비동기로 전송
     }
+
+    public TravelAllPlacesVisitedException(String message) {
+        super(message);
+    }
+
     public TravelAllPlacesVisitedException(String message, Throwable cause) {
         super(message, cause);
     }

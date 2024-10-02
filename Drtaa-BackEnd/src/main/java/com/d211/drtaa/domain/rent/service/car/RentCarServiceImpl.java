@@ -470,38 +470,26 @@ public class RentCarServiceImpl implements RentCarService {
         datePlacesRepository.save(arrivedPlace);
         rentCarRepository.save(car);
 
-//        // 찾은 여행 일정의 마지막 장소 찾기
-//       DatePlaces lastPlace = datePlacesRepository.findLastPlaceByTravelDatesId(date.getTravelDatesId())
-//               .orElseThrow(() -> new TravelNotFoundException("해당 datePlacesId에 맞는 마지막 장소를 찾을 수 없습니다."));
-//
-//       // 찾은 장소가 여행 일정의 마지막 장소와 같을 경우
-//       if(arrivedPlace.getDatePlacesId() == lastPlace.getDatePlacesId()) {
-//           // 해당 일정이 렌트 일정의 마지막인 경우
-//           if(date.getTravelDatesDate().equals(rent.getRentEndTime())) {
-//               throw new TravelAllPlacesVisitedException("모든 여행지를 방문했고 렌트의 마지막날 입니다. 반납 또는 여행지 장소 추가를 유도해주세요.");
-//           }
-//
-//           // 해당 일정이 렌트 일정의 마지막 일정이 아닌 경우
-//           // Android에게 알림 보내기
-//           FcmMessage.FcmDTO fcmDTO = fcmUtil.makeFcmDTO("렌트 일정", "오늘 예정된 모든 여행지를 방문했습니다.\n 이동하려면 여행지 장소 추가를 해주세요 !!");
-//           log.info("Message: {}", fcmDTO.getBody());
-//           fcmUtil.singleFcmSend(rent.getUser(), fcmDTO); // 비동기로 전송
-//           throw new TravelAllPlacesVisitedException("오늘 예정된 모든 여행지를 방문했습니다.");
-//       }
-//
-//        // datePlacesId 에 해당하는 장소(호출하기 전 방문한 장소) 찾기
-//        DatePlaces beforePlace = datePlacesRepository.findByDatePlacesId(rentCarManipulateRequestDTO.getDatePlacesId())
-//                .orElseThrow(() -> new TravelNotFoundException("해당 datePlacesId의 맞는 일정 장소를 찾을 수 없습니다."));
-//
-//        // 찾은 일정의 장소들 중 찾은 장소 순서 바로 뒤 하나 찾기
-//        DatePlaces nextPlace = datePlacesRepository.findByTravelDatesAndDatePlacesOrder(date, beforePlace.getDatePlacesOrder() + 1)
-//                .orElseThrow(() -> new TravelNotFoundException("해당 datePlacesId의 맞는 일정 장소 다음 장소를 찾을 수 없습니다."));
-//        log.info("다음 장소 id: {}", nextPlace.getDatePlacesId());
-//        log.info("다음 장소 이름: {}", nextPlace.getDatePlacesName());
+        // 찾은 여행 일정의 마지막 장소 찾기
+       DatePlaces lastPlace = datePlacesRepository.findLastPlaceByTravelDatesId(date.getTravelDatesId())
+               .orElseThrow(() -> new TravelNotFoundException("해당 datePlacesId에 맞는 마지막 장소를 찾을 수 없습니다."));
+
+       // 찾은 장소가 여행 일정의 마지막 장소와 같을 경우
+       if(arrivedPlace.getDatePlacesId() == lastPlace.getDatePlacesId()) {
+           // 해당 일정이 렌트 일정의 마지막인 경우
+           if (date.getTravelDatesDate().equals(rent.getRentEndTime())) {
+               throw new TravelAllPlacesVisitedException("모든 여행지를 방문했고 렌트의 마지막날 입니다. 반납 또는 여행지 장소 추가를 유도해주세요.");
+           }
+
+           // 해당 일정이 렌트 일정의 마지막 일정이 아닌 경우
+           throw new TravelAllPlacesVisitedException("오늘 예정된 모든 여행지를 방문했습니다.", rent);
+       }
 
         // 다음 순서 장소 찾기
         DatePlaces nextPlace = datePlacesRepository.findByTravelDatesAndDatePlacesOrder(date, arrivedPlace.getDatePlacesOrder() + 1)
                 .orElseThrow(() -> new TravelAllPlacesVisitedException("다음 장소를 찾을 수 없습니다. 오늘 예정된 모든 여행지를 방문했습니다.", rent));
+        log.info("다음 장소 id: {}", nextPlace.getDatePlacesId());
+        log.info("다음 장소 이름: {}", nextPlace.getDatePlacesName());
 
         RentCarManipulateResponseDTO response = RentCarManipulateResponseDTO.builder()
                 .travelId(travel.getTravelId())
