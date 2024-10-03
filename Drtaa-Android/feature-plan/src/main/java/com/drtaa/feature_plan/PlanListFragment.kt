@@ -58,7 +58,6 @@ class PlanListFragment :
                 initViewPager()
             }
         }
-
     }
 
     override fun onDestroyView() {
@@ -86,8 +85,6 @@ class PlanListFragment :
     }
 
     override fun iniView() {
-//        initData()
-
         initEvent()
         initObserve()
         initEditObserve()
@@ -176,7 +173,7 @@ class PlanListFragment :
 
                 val targetDate = LocalDate.parse(dayPlan.travelDatesDate)
                 val today = LocalDate.now()
-                if (today > targetDate) {
+                if ((today > targetDate) or dayPlan.travelDatesIsExpired) {
                     setEditable(false)
                 } else {
                     setEditable(true)

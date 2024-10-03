@@ -36,7 +36,7 @@ class PlanHistoryViewModel @Inject constructor(
         }
     }
 
-    private fun descendingPlanList(list : List<PlanSimple>): List<PlanSimple> {
+    private fun descendingPlanList(list: List<PlanSimple>): List<PlanSimple> {
         return list.sortedByDescending { it.travelEndDate }
     }
 }

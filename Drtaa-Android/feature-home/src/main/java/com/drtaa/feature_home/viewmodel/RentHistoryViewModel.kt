@@ -35,7 +35,7 @@ class RentHistoryViewModel @Inject constructor(
         }
     }
 
-    private fun descendingRentList(list : List<RentSimple>): List<RentSimple> {
+    private fun descendingRentList(list: List<RentSimple>): List<RentSimple> {
         return list.sortedByDescending { it.rentStartTime }
     }
 }
