@@ -425,14 +425,14 @@ public class TravelServiceImpl implements TravelService {
         // 렌트 변경 상태 저장
         rentRepository.save(rent);
 
-        // 여러 여행 일정 중 datePlacesIsVisited가 false인 것 들 중 datePlacesId가 가장 작은 것 찾기
-        DatePlaces place = datePlacesRepository.findFirstByTravelAndDatePlacesIsVisitedFalseOrderByDatePlacesIdAsc(travel)
+        // 여러 여행 일정 중 datePlacesIsExpired가 false인 것 들 중 datePlacesId가 가장 작은 것 찾기
+        DatePlaces place = datePlacesRepository.findFirstByTravelAndDatePlacesIsExpiredFalseOrderByDatePlacesIdAsc(travel)
                 .orElseThrow(() -> new TravelNotFoundException("모든 장소를 방문했습니다."));
-
 
         TravelUpdateResponseDTO response = TravelUpdateResponseDTO.builder()
                 .travelId(travel.getTravelId())
                 .travelDatesId(place.getTravelDates().getTravelDatesId())
+                .travelDatesDate(place.getTravelDates().getTravelDatesDate())
                 .datePlacesId(place.getDatePlacesId())
                 .build();
 
