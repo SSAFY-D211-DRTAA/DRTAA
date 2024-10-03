@@ -2,6 +2,7 @@ package com.drtaa.core_data.datasourceimpl
 
 import com.drtaa.core_data.datasource.PlanDataSource
 import com.drtaa.core_model.plan.Plan
+import com.drtaa.core_model.plan.PlanItem
 import com.drtaa.core_model.plan.PlanSimple
 import com.drtaa.core_model.plan.RequestPlanName
 import com.drtaa.core_model.plan.ResponsePutPlan
@@ -25,5 +26,9 @@ class PlanDataSourceImpl @Inject constructor(
 
     override suspend fun updatePlanName(planName: RequestPlanName): String {
         return planAPI.updatePlanName(planName)
+    }
+
+    override suspend fun getTodayPlanList(): List<PlanItem> {
+        return planAPI.getTodayPlanList()
     }
 }

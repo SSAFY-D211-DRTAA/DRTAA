@@ -7,25 +7,75 @@
 
     </data>
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <com.google.android.material.appbar.AppBarLayout
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:animateLayoutChanges="true"
+            android:orientation="vertical">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/cl_tour"
+            <LinearLayout
+                android:id="@+id/ll_expand_plan"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_scrollFlags="scroll|enterAlways|exitUntilCollapsed">
+                android:background="@color/blue_a0ba"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="20dp"
+                android:paddingVertical="20dp">
+
+                <TextView
+                    style="@style/jua"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="오늘의 일정"
+                    android:textColor="@color/white"
+                    android:textSize="24sp" />
+
+                <ImageView
+                    android:id="@+id/iv_expend_plan"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:padding="5dp"
+                    android:rotation="90"
+                    android:src="@drawable/ic_next"
+                    app:tint="@color/white" />
+            </LinearLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cl_plan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_plan"
+                    android:layout_width="match_parent"
+                    android:layout_height="250dp"
+                    android:background="@color/white"
+                    android:overScrollMode="never"
+                    android:scrollbars="none"
+                    android:visibility="gone"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:listitem="@layout/item_plan" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/cl_tour_empty"
+                    android:id="@+id/cl_plan_empty"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="20dp"
+                    android:background="@color/white"
+                    android:visibility="gone"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
 
@@ -37,26 +87,21 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <TextView
+                        android:id="@+id/tv_plan_help"
                         style="@style/jua"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
-                        android:text="@string/tour_empty"
                         android:textSize="24dp"
                         app:layout_constraintBottom_toBottomOf="@id/iv_tour_empty"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="@id/iv_tour_empty" />
+                        app:layout_constraintTop_toTopOf="@id/iv_tour_empty"
+                        tools:text="@string/tour_empty" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
-                <View
-                    android:id="@+id/view_line"
-                    android:layout_width="match_parent"
-                    android:layout_height="2dp"
-                    android:layout_marginHorizontal="16dp"
-                    android:background="@color/black"
-                    app:layout_constraintBottom_toBottomOf="parent" />
             </androidx.constraintlayout.widget.ConstraintLayout>
-        </com.google.android.material.appbar.AppBarLayout>
+
+        </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_tour"
@@ -67,8 +112,8 @@
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
             app:layout_constraintBottom_toBottomOf="parent"
-            tools:listitem="@layout/item_tour" />
+            tools:listitem="@layout/item_tour"
+            tools:visibility="visible" />
 
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
+    </LinearLayout>
 </layout>
