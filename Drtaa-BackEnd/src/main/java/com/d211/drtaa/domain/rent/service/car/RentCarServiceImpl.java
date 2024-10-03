@@ -427,6 +427,9 @@ public class RentCarServiceImpl implements RentCarService {
         // 찾은 장소 = 도착한 장소 방문으로 상태 변경
         arrivedPlace.setDatePlacesIsVisited(true);
 
+        // 찾은 장소 = 도착한 장소 만료로 상태 변경
+        arrivedPlace.setDatePlacesIsExpired(true);
+
         // 자율주행 서버로 하차 메시지 전송
         try {
             StandardWebSocketClient client = new StandardWebSocketClient();

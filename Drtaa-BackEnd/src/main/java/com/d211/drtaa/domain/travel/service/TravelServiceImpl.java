@@ -253,7 +253,8 @@ public class TravelServiceImpl implements TravelService {
                 .datePlacesAddress(placeAddRequestDTO.getDatePlacesAddress())
                 .datePlacesLat(placeAddRequestDTO.getDatePlacesLat())
                 .datePlacesLon(placeAddRequestDTO.getDatePlacesLon())
-                .datePlacesIsVisited(false)
+                .datePlacesIsVisited(false) // 미방문
+                .datePlacesIsExpired(false) // 유효
                 .build();
 
         // 응답할 빌더 생성
@@ -359,7 +360,7 @@ public class TravelServiceImpl implements TravelService {
 
     @Override
     @Transactional
-    public void updateTravelDatesPlaces(TravelDetailRequestDTO travelDetailRequestDTO) {
+    public TravelUpdateResponseDTO updateTravelDatesPlaces(TravelDetailRequestDTO travelDetailRequestDTO) {
         // 여행 찾기
         Travel travel = travelRepository.findByTravelId(travelDetailRequestDTO.getTravelId())
                 .orElseThrow(() -> new TravelNotFoundException("해당 travelId의 맞는 여행을 찾을 수 없습니다."));
@@ -396,6 +397,7 @@ public class TravelServiceImpl implements TravelService {
                             .datePlacesLat(placeDetail.getDatePlacesLat())
                             .datePlacesLon(placeDetail.getDatePlacesLon())
                             .datePlacesIsVisited(placeDetail.getDatePlacesIsVisited())
+                            .datePlacesIsExpired(placeDetail.getDatePlacesIsExpired())
                             .build();
 
                     log.info("{} 일정 추가", placeDetail.getDatePlacesName());
@@ -422,6 +424,19 @@ public class TravelServiceImpl implements TravelService {
 
         // 렌트 변경 상태 저장
         rentRepository.save(rent);
+
+        // 여러 여행 일정 중 datePlacesIsExpired가 false인 것 들 중 datePlacesId가 가장 작은 것 찾기
+        DatePlaces place = datePlacesRepository.findFirstByTravelAndDatePlacesIsExpiredFalseOrderByDatePlacesIdAsc(travel)
+                .orElseThrow(() -> new TravelNotFoundException("모든 장소를 방문했습니다."));
+
+        TravelUpdateResponseDTO response = TravelUpdateResponseDTO.builder()
+                .travelId(travel.getTravelId())
+                .travelDatesId(place.getTravelDates().getTravelDatesId())
+                .travelDatesDate(place.getTravelDates().getTravelDatesDate())
+                .datePlacesId(place.getDatePlacesId())
+                .build();
+
+        return response;
     }
 
     @Override
