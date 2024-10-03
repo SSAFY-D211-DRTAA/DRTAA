@@ -253,7 +253,8 @@ public class TravelServiceImpl implements TravelService {
                 .datePlacesAddress(placeAddRequestDTO.getDatePlacesAddress())
                 .datePlacesLat(placeAddRequestDTO.getDatePlacesLat())
                 .datePlacesLon(placeAddRequestDTO.getDatePlacesLon())
-                .datePlacesIsVisited(false)
+                .datePlacesIsVisited(false) // 미방문
+                .datePlacesIsExpired(false) // 유효
                 .build();
 
         // 응답할 빌더 생성
