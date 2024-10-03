@@ -26,12 +26,16 @@ class RentHistoryViewModel @Inject constructor(
         viewModelScope.launch {
             rentRepository.getRentHistory().collect { result ->
                 result.onSuccess { data ->
-                    _rentHistory.emit(data)
+                    _rentHistory.emit(descendingRentList(data))
                     Timber.d("렌트 기록 조회 성공")
                 }.onFailure {
                     Timber.d("렌트 기록 조회 실패")
                 }
             }
         }
+    }
+
+    private fun descendingRentList(list : List<RentSimple>): List<RentSimple> {
+        return list.sortedByDescending { it.rentStartTime }
     }
 }
