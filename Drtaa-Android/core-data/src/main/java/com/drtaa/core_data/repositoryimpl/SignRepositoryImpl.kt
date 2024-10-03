@@ -12,6 +12,7 @@ import com.drtaa.core_model.sign.UserLoginInfo
 import com.drtaa.core_model.util.toSocialUser
 import com.drtaa.core_model.util.toTokens
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import okhttp3.MultipartBody
 import timber.log.Timber
@@ -111,14 +112,12 @@ class SignRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getUserData(): Flow<Result<SocialUser>> {
-        return flow {
-            val user = signDataSource.getUserData()
-            Timber.d("유저 정보 조회: $user")
-            when (user.isValid()) {
-                true -> emit(Result.success(user))
-                false -> emit(Result.failure(Exception("유저 정보가 없습니다.")))
-            }
+    override suspend fun getUserData(): Flow<Result<SocialUser>> = flow {
+        val user = signDataSource.getUserData().first()
+        if (user.isValid()) {
+            emit(Result.success(user))
+        } else {
+            emit(Result.failure(Exception("유저 정보가 없습니다.")))
         }
     }
 

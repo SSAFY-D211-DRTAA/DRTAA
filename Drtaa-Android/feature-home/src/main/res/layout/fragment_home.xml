@@ -8,10 +8,6 @@
         <variable
             name="socialUser"
             type="com.drtaa.core_model.sign.SocialUser" />
-
-        <variable
-            name="homeviewModel"
-            type="com.drtaa.feature_home.viewmodel.HomeViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
