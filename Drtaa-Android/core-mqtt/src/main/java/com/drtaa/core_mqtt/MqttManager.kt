@@ -189,7 +189,7 @@ class MqttManager @Inject constructor() {
         private const val GPS_PUB = "gps/data/v1/publish"
 //        private const val PATH_SUB = "path/data/v1/subscribe"
         private const val PATH_PUB = "path/data/v1/publish"
-        private const val ORIENTATION_SUB = "orientation/data/v1/subscribe"
+//        private const val ORIENTATION_SUB = "orientation/data/v1/subscribe"
         private const val ORIENTATION_PUB = "orientation/data/v1/publish"
     }
 }

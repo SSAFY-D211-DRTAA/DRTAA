@@ -1,11 +1,9 @@
 package com.drtaa.feature_car
 
 import android.Manifest
-import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.drawable.GradientDrawable
 import android.view.MotionEvent
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
