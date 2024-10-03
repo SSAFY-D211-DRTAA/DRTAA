@@ -7,6 +7,7 @@ import com.d211.drtaa.domain.travel.dto.request.TravelDetailRequestDTO;
 import com.d211.drtaa.domain.travel.dto.request.TravelNameRequestDTO;
 import com.d211.drtaa.domain.travel.dto.response.TravelDetailResponseDTO;
 import com.d211.drtaa.domain.travel.dto.response.TravelResponseDTO;
+import com.d211.drtaa.domain.travel.dto.response.TravelUpdateResponseDTO;
 import com.d211.drtaa.domain.travel.dto.response.WeatherResponseDTO;
 
 import java.util.List;
@@ -34,7 +35,7 @@ public interface TravelService {
     void updateTravelName(TravelNameRequestDTO travelNameRequestDTO);
 
     // travelId의 해당하고 travelDatesId의 해당하는 여행 장소들 변경
-    void updateTravelDatesPlaces(TravelDetailRequestDTO travelDetailRequestDTO);
+    TravelUpdateResponseDTO updateTravelDatesPlaces(TravelDetailRequestDTO travelDetailRequestDTO);
 
     // datePlaceLat과 datePlacesLon에 맞는 일주일치 날씨 조회
     List<WeatherResponseDTO> getWeather(double datePlacesLat, double datePlacesLon) throws Exception;

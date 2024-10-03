@@ -1,6 +1,7 @@
 package com.d211.drtaa.domain.rent.service;
 
 import com.d211.drtaa.domain.rent.dto.request.*;
+import com.d211.drtaa.domain.rent.dto.response.RentCarManipulateResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentDetailResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentResponseDTO;
 
@@ -39,4 +40,7 @@ public interface RentService {
 
     // rentId의 렌트 시간 변경
     void updateRentTime(RentTimeRequestDTO rentTimeRequestDTO);
+
+    // 오늘에 해당하는 렌트 만료 처리
+    RentCarManipulateResponseDTO todayRentIsDone(RentCarManipulateRequestDTO rentCarManipulateRequestDTO);
 }
