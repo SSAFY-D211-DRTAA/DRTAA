@@ -1,6 +1,7 @@
 package com.d211.drtaa.domain.rent.service;
 
 import com.d211.drtaa.domain.rent.dto.request.*;
+import com.d211.drtaa.domain.rent.dto.response.RentCarManipulateResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentDetailResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentResponseDTO;
 import com.d211.drtaa.domain.rent.entity.Rent;
@@ -505,5 +506,10 @@ public class RentServiceImpl implements RentService{
 
         // 변경 상태 저장
         rentRepository.save(rent);
+    }
+
+    @Override
+    public RentCarManipulateResponseDTO todayRentIsDone(RentCarManipulateRequestDTO rentCarManipulateRequestDTO) {
+        return null;
     }
 }
