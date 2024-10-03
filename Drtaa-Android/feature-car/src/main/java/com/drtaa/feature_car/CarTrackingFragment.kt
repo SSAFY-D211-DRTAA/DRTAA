@@ -79,11 +79,11 @@ class CarTrackingFragment :
     }
 
     private fun observeCarTracking() {
-        viewModel.trackingState.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach {
-            binding.btnTracking.text = if (it) {
-                "차량추적 ON"
+        viewModel.trackingState.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach { isTracking ->
+            binding.btnTracking.backgroundTintList = if (isTracking) {
+                null
             } else {
-                "차량추적 OFF"
+                ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.black))
             }
         }.launchIn(viewLifecycleOwner.lifecycleScope)
 
@@ -129,22 +129,6 @@ class CarTrackingFragment :
                     showSnackBar("다시 접속해 주세요")
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
-    }
-
-    private fun observeViewModelOnMap(naverMap: NaverMap) {
-        viewModel.trackingState.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach {
-            binding.imgTracking.backgroundTintList= if (it) {
-               null
-            } else {
-                ColorStateList.valueOf(ContextCompat.getColor(requireContext(),R.color.black))
-            }
-        }.launchIn(viewLifecycleOwner.lifecycleScope)
-
-        viewModel.firstCall.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach {
-            if (it) {
-                showSnackBar("첫 렌트 요청 장소로 호출됩니다")
-            }
-        }.launchIn(viewLifecycleOwner.lifecycleScope)
 
         viewModel.gpsData.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach { gps ->
             Timber.tag("gps").d("$gps")
