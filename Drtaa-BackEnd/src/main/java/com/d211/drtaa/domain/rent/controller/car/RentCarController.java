@@ -97,7 +97,7 @@ public class RentCarController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
         } catch(TravelAllPlacesVisitedException e) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(e.getMessage()); // 204
-        }catch (AuthenticationException e) {
+        } catch (AuthenticationException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("권한 인증에 실패하였습니다."); // 401
         } catch (WebSocketDisConnectedException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage()); // 500

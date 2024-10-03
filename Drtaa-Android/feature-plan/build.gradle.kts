@@ -40,5 +40,6 @@ android {
 dependencies {
     implementation(libs.map.sdk)
     implementation(project(":core-map"))
+    implementation(project(":feature-travel"))
     implementation(libs.androidx.viewpager2)
 }

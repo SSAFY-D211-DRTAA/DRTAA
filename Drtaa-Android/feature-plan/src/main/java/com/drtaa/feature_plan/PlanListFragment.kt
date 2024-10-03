@@ -275,7 +275,7 @@ class PlanListFragment :
 
     private fun moveToTravel(planItem: PlanItem) {
         navigateDestination(
-            PlanListFragmentDirections.actionPlanListFragmentToTravelFragment(
+            PlanListFragmentDirections.actionFragmentPlanToNavGraphTravel(
                 planItem = planItem
             )
         )

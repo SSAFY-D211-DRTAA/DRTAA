@@ -4,6 +4,8 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
+import com.drtaa.core_model.tour.TourItem
+import com.drtaa.core_model.util.toPlanItem
 import com.drtaa.core_ui.base.BaseFragment
 import com.drtaa.core_ui.component.LocationHelper
 import com.drtaa.feature_tour.component.TourAdapter
@@ -23,7 +25,9 @@ class TourFragment : BaseFragment<FragmentTourBinding>(R.layout.fragment_tour) {
     lateinit var locationHelper: LocationHelper
     private val viewModel: TourViewModel by viewModels()
     private val tourAdapter by lazy {
-        TourAdapter(onTourClickListener = {})
+        TourAdapter(onTourClickListener = { tourItem ->
+            moveToTravel(tourItem)
+        })
     }
 
     override fun initView() {
@@ -48,6 +52,14 @@ class TourFragment : BaseFragment<FragmentTourBinding>(R.layout.fragment_tour) {
                 }
             }
         }
+    }
+
+    private fun moveToTravel(tourItem: TourItem) {
+        navigateDestination(
+            TourFragmentDirections.actionFragmentTourToNavGraphTravel(
+                planItem = tourItem.toPlanItem()
+            )
+        )
     }
 
     private fun observeTourList() {
