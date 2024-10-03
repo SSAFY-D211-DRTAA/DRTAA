@@ -5,6 +5,7 @@ import com.d211.drtaa.domain.travel.dto.request.PlaceAddRequestDTO;
 import com.d211.drtaa.domain.travel.dto.request.PlacesAddRequestDTO;
 import com.d211.drtaa.domain.travel.dto.request.TravelDetailRequestDTO;
 import com.d211.drtaa.domain.travel.dto.request.TravelNameRequestDTO;
+import com.d211.drtaa.domain.travel.dto.response.PlacesDetailResponseDTO;
 import com.d211.drtaa.domain.travel.dto.response.TravelDetailResponseDTO;
 import com.d211.drtaa.domain.travel.dto.response.TravelResponseDTO;
 import com.d211.drtaa.domain.travel.dto.response.TravelUpdateResponseDTO;
@@ -92,6 +93,20 @@ public class TravelController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage()); // 400
+        }
+    }
+
+    @GetMapping("/today")
+    @Operation(summary = "오늘 여행 일정 상세 조회", description = "오늘 날짜에 해당하는 여행 일정 전체 조회")
+    public ResponseEntity getTravelToday(Authentication authentication) {
+        try {
+            List<PlacesDetailResponseDTO> response = travelService.getTravelToday(authentication.getName());
+
+            return ResponseEntity.ok(response); // 200
+        } catch(UsernameNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
+        } catch(Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
         }
     }
 

@@ -27,6 +27,7 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
@@ -35,10 +36,7 @@ import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -199,6 +197,59 @@ public class TravelServiceImpl implements TravelService {
                 .build();
 
         return dto;
+    }
+
+    @Override
+    public List<PlacesDetailResponseDTO> getTravelToday(String userProviderId) {
+        // 응답
+        List<PlacesDetailResponseDTO> response = new ArrayList<>();
+
+        try {
+            // 사용자 찾기
+            User user = userRepository.findByUserProviderId(userProviderId)
+                    .orElseThrow(() -> new UsernameNotFoundException("해당 userProvider에 맞는 사용자를 찾을 수 없습니다."));
+
+            // 사용자의 진행중인 렌트 찾기
+            Rent rent = rentRepository.findByUserAndRentStatusIn(user, Collections.singletonList(RentStatus.in_progress))
+                    .orElseThrow(() -> new RentNotFoundException("해당 사용자의 진행중인 렌트가 없습니다."));
+
+            // 진행중인 여행 찾기
+            Travel travel = rent.getTravel();
+
+            // 현재 날짜
+            LocalDate now = LocalDate.now();
+            log.info("현재 날짜: {}", now);
+
+            // 현재 날짜에 해당하는 여행 일정 찾기
+            TravelDates todayDate = travelDatesRepository.findByTravelAndTravelDatesDate(travel, now)
+                    .orElseThrow(() -> new TravelNotFoundException("현재 날짜에 해당하는 여행 일정을 찾을 수 없습니다."));
+
+            // 찾은 일정의 장소들 찾기
+            List<DatePlaces> placesList = datePlacesRepository.findByTravelDates(todayDate);
+
+            // 장소 별 응답 생성
+            for(DatePlaces datePlace : placesList) {
+                PlacesDetailResponseDTO place = PlacesDetailResponseDTO.builder()
+                        .travelDatesId(datePlace.getTravelDates().getTravelDatesId())
+                        .datePlacesId(datePlace.getDatePlacesId())
+                        .datePlacesOrder(datePlace.getDatePlacesOrder())
+                        .datePlacesName(datePlace.getDatePlacesName())
+                        .datePlacesCategory(datePlace.getDatePlacesCategory())
+                        .datePlacesAddress(datePlace.getDatePlacesAddress())
+                        .datePlacesLat(datePlace.getDatePlacesLat())
+                        .datePlacesLon(datePlace.getDatePlacesLon())
+                        .datePlacesIsVisited(datePlace.getDatePlacesIsVisited())
+                        .datePlacesIsExpired(datePlace.getDatePlacesIsExpired())
+                        .build();
+
+                response.add(place);
+            }
+
+        } catch(RentNotFoundException e) {
+            return response;
+        }
+
+        return response;
     }
 
     @Override
