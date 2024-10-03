@@ -17,4 +17,5 @@ data class RentDetail(
     val rentStartTime: String,
     val rentStatus: String,
     val rentTime: Int,
+    val travelId: Long,
 )
