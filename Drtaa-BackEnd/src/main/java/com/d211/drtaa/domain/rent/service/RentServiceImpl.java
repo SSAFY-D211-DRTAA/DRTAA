@@ -460,7 +460,7 @@ public class RentServiceImpl implements RentService{
             }, webSocketConfig.getUrl()).get();
 
             // 상태와 렌트 탑승 위치 전송
-            MyMessage message = new MyMessage("viehcle_return", rent.getRentCar().getRentCarId());
+            MyMessage message = new MyMessage("vehicle_return", rent.getRentCar().getRentCarId());
             String jsonMessage = objectMapper.writeValueAsString(message);
             session.sendMessage(new TextMessage(jsonMessage));
             log.info("Sent message: {}", jsonMessage);
