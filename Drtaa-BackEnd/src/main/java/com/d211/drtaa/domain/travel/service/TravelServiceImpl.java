@@ -175,6 +175,7 @@ public class TravelServiceImpl implements TravelService {
                             .datePlacesLat(places.getDatePlacesLat())
                             .datePlacesLon(places.getDatePlacesLon())
                             .datePlacesIsVisited(places.getDatePlacesIsVisited())
+                            .datePlacesIsExpired(places.getDatePlacesIsExpired())
                             .build()
             ).collect(Collectors.toList());
 
