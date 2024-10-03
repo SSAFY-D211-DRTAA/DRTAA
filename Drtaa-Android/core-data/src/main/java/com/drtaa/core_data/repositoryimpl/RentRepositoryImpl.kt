@@ -206,16 +206,17 @@ class RentRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getAllRentState(): Flow<Result<Long>> = flow {
+    override suspend fun getReservedRentState(): Flow<Result<ResponseRentStateAll>> = flow {
         when (
             val response = safeApiCall { rentDataSource.getAllRentState() }
         ) {
             is ResultWrapper.Success -> {
-                val result = response.data.firstOrNull()
-                if (result == null) {
+                val result = response.data
+                if (result.isEmpty()) {
                     emit(Result.failure(Exception("예약 내역 없음")))
                 } else {
-                    emit(Result.success(result.rentId ?: 1))
+                    // 가장 가까운 예약내역 긁어옴
+                    emit(Result.success(result.first()))
                 }
                 Timber.d("전체 렌트/내역 조회 성공 ${response.data}")
             }

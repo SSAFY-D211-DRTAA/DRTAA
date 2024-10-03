@@ -121,6 +121,6 @@ class PaymentFragment : BaseDialogFragment<FragmentPaymentBinding>(R.layout.frag
     }
 
     companion object {
-        const val SALE = 4700.0
+        const val SALE = 239900.0
     }
 }

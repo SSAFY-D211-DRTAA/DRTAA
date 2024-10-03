@@ -53,37 +53,66 @@ class CarTrackingFragment :
     }
 
     override fun initOnMapReady(naverMap: NaverMap) {
-        observeViewModelOnMap(naverMap)
-        observeState()
+        observeMQTTOnMap(naverMap)
+        observeCarTracking()
+        carMarker.map = naverMap
         binding.btnCall.setOnClickListener {
             showLoading()
-            if (viewModel.currentRentDetail.value?.rentStatus == "reserved") {
+            // isInProgressed -> 재호출, isReserved -> 첫 호출
+            if (viewModel.isInProgress.value) {
+                // 재호출 시 스타벅스로 지정
+                viewModel.recallAssignedCar(STARBUCKS)
+            } else if (viewModel.isReserved.value) {
                 viewModel.callFirstAssignedCar()
             } else {
-                viewModel.callAssignedCar(STARBUCKS)
+                showSnackBar("배정된 차량이 없습니다")
             }
         }
-        carMarker.map = naverMap
-        naverMap.moveCameraTo(STARBUCKS.latitude, STARBUCKS.longitude)
+
         binding.btnTracking.setOnClickListener {
             viewModel.toggleTrackingState()
         }
 
         binding.btnReturn.setOnClickListener {
-            viewModel.completeRent()
+            viewModel.returnRent()
         }
     }
 
-    private fun observeState() {
-        viewModel.isSuccessComplete.flowWithLifecycle(viewLifecycleOwner.lifecycle)
-            .onEach { isSuccess ->
-                if (isSuccess) {
-                    showSnackBar("반납 성공")
-                    navigatePopBackStack()
-                } else {
-                    showSnackBar("반납 실패")
-                }
-            }.launchIn(viewLifecycleOwner.lifecycleScope)
+    private fun observeCarTracking() {
+        viewModel.trackingState.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach {
+            binding.btnTracking.text = if (it) {
+                "차량추적 ON"
+            } else {
+                "차량추적 OFF"
+            }
+        }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+        viewModel.isReturn.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach {
+            if (it) {
+                showSnackBar("반납 성공")
+                navigatePopBackStack()
+            }
+        }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+        viewModel.isFirst.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach {
+            if (it) {
+                dismissLoading()
+                showSnackBar("첫 렌트 요청 장소로 호출합니다")
+            }
+        }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+        viewModel.isRecall.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach {
+            if (it) {
+                dismissLoading()
+                showSnackBar("요청 장소로 호출하겠습니다")
+            } else {
+                dismissLoading()
+                showSnackBar("렌트카 호출 실패!!!")
+            }
+        }.launchIn(viewLifecycleOwner.lifecycleScope)
+    }
+
+    private fun observeMQTTOnMap(naverMap: NaverMap) {
         viewModel.mqttConnectionStatus.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { status ->
                 Timber.tag("connect mqtt").d("$status")
@@ -136,7 +165,7 @@ class CarTrackingFragment :
                 carMarker.apply {
                     position = LatLng(it.latitude, it.longitude)
                     naverMap.moveCameraTo(position.latitude, position.longitude)
-                    viewModel.toggleTrackingState()
+                    if (!viewModel.trackingState.value) viewModel.toggleTrackingState()
                     showSnackBar("차량을 호출합니다")
                 }
             }
@@ -158,19 +187,16 @@ class CarTrackingFragment :
             val end = path.last().idx
             Timber.tag("gps path").d("$path || $end")
 
-            // 허용 가능한 오차 범위 설정
-            val tolerance = THRESHOLD
-
-            // 현재 GPS와 경로의 점들 간의 거리를 계산하여 tolerance 범위 내에서 가장 가까운 지점을 찾음
+            // 현재 GPS와 경로의 점들 간의 거리를 계산하여 THRESHOLD 범위 내에서 가장 가까운 지점을 찾음
             val closestPoint = path.minByOrNull { point ->
                 gps.distanceTo(LatLng(point.lat, point.lon))
             }
 
-            // 가장 가까운 지점과의 거리가 tolerance 범위 이내일 경우에만 진행 상황 계산
+            // 가장 가까운 지점과의 거리가 THRESHOLD 범위 이내일 경우에만 진행 상황 계산
             closestPoint?.let { matchedPoint ->
                 val distanceToClosestPoint =
                     gps.distanceTo(LatLng(matchedPoint.lat, matchedPoint.lon))
-                if (distanceToClosestPoint <= tolerance) {
+                if (distanceToClosestPoint <= THRESHOLD) {
                     val progress = matchedPoint.idx
                     Timber.tag("gps progress")
                         .d("path and end: $path || $end -- ${(progress.toFloat() / end.toFloat()).toDouble()}")

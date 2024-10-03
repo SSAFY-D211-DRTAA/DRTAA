@@ -34,7 +34,7 @@ class TourViewModel @Inject constructor(
     }
 
     companion object {
-        const val DEFAULT_LAT = "37.57578754990568"
-        const val DEFAULT_LNG = "126.90027478459672"
+        const val DEFAULT_LAT = "37.5749543"
+        const val DEFAULT_LNG = "126.886716"
     }
 }
