@@ -468,7 +468,7 @@ public class RentCarServiceImpl implements RentCarService {
                 .build();
 
        // 찾은 여행 일정의 마지막 장소 찾기
-       DatePlaces lastPlace = datePlacesRepository.findLastPlaceByTravelDatesId(date.getTravelDatesId())
+       DatePlaces lastPlace = datePlacesRepository.findFirstByTravelDatesOrderByDatePlacesOrderDesc(date)
                .orElseThrow(() -> new TravelNotFoundException("해당 datePlacesId에 맞는 마지막 장소를 찾을 수 없습니다."));
 
        // 찾은 장소가 여행 일정의 마지막 장소와 같을 경우
