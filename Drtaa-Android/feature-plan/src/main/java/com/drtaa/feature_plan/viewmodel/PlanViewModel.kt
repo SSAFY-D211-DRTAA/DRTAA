@@ -225,6 +225,7 @@ class PlanViewModel @Inject constructor(
                 )
             ).collect { result ->
                 result.onSuccess {
+                    _plan.value = _plan.value?.copy(travelName = newName)
                     _isEditSuccess.value = true
                 }.onFailure {
                     _isEditSuccess.value = false
