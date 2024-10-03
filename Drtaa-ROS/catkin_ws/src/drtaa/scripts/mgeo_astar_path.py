@@ -83,7 +83,7 @@ class AStarPathPublisher:
         self.global_planner = AStar(self.nodes, self.links)
 
         # 메인 루프
-        rate = rospy.Rate(20) # 1Hz
+        rate = rospy.Rate(10) # 1Hz
         while not rospy.is_shutdown():
             if self.global_path_msg is not None:
                 # self.global_path_pub.publish(self.global_path_msg)
@@ -124,34 +124,36 @@ class AStarPathPublisher:
         orientation = msg.pose.pose.orientation
         _, _, yaw = tf.transformations.euler_from_quaternion([orientation.x, orientation.y, orientation.z, orientation.w])
         self.current_heading = yaw
-        
-        if hasattr(self, 'goal_pos') and self.goal_pos is not None and self.is_goal_pose: # 목표 위치가 설정되어 있을 때만 시작 위치 설정
-            self.start_node = self.find_closest_node(self.current_position)
-            # self.start_node = self.find_closest_node_in_direction(self.current_position, yaw)
-            self.is_init_pose = True
-            # rospy.loginfo(f"현재 위치 근접 노드: {self.start_node}")
-            self.update_path()
 
-        if hasattr(self, 'goal_pos') and self.goal_pos is not None and self.destination_reached(self.current_position): # 목적지 도착 여부 확인
-            if self.vehicle_state == 'roaming': # 배회 모드인 경우 
-                rospy.loginfo("배회 목적지 도착!, 새로운 배회 경로 갱신")
-                self.reset_global_path()
-                self.start_node = self.find_closest_node(self.current_position)
-                # self.start_node = self.find_closest_node_in_direction(msg.pose.pose.position, yaw)
+        if hasattr(self, 'goal_pos') and self.goal_pos is not None:
+        
+            if self.is_goal_pose: # 목표 위치가 설정되어 있을 때만 시작 위치 설정
+                self.start_node = self.find_closest_node_in_direction(self.current_position, self.current_heading)
+                # self.start_node = self.find_closest_node_in_direction(self.current_position, yaw)
                 self.is_init_pose = True
-                self.generate_roaming_path()
-            else:
-                if self.goal_pos is not None:
-                    rospy.loginfo("목적지 도착!")
-                    goal_pose_msg = PoseStamped()
-                    goal_pose_msg.header.stamp = rospy.Time.now()
-                    goal_pose_msg.header.frame_id = "map"  # Set appropriate frame ID   
-                    goal_pose_msg.pose.position.x = self.goal_pos[0]
-                    goal_pose_msg.pose.position.y = self.goal_pos[1]
-                    goal_pose_msg.pose.position.z = 0  # Assuming z=0 for 2D navigation
-                    self.destination_reached_pub.publish(goal_pose_msg) # 목적지 좌표 발행
-                    # Reset state variables and global path
+                # rospy.loginfo(f"현재 위치 근접 노드: {self.start_node}")
+                self.update_path()
+
+            if self.destination_reached(self.current_position): # 목적지 도착 여부 확인
+                if self.vehicle_state == 'roaming': # 배회 모드인 경우 
+                    rospy.loginfo("배회 목적지 도착!, 새로운 배회 경로 갱신")
                     self.reset_global_path()
+                    self.start_node = self.find_closest_node_in_direction(self.current_position, self.current_heading)
+                    # self.start_node = self.find_closest_node_in_direction(msg.pose.pose.position, yaw)
+                    self.is_init_pose = True
+                    self.generate_roaming_path()
+                else:
+                    if self.goal_pos is not None:
+                        rospy.loginfo("목적지 도착!")
+                        goal_pose_msg = PoseStamped()
+                        goal_pose_msg.header.stamp = rospy.Time.now()
+                        goal_pose_msg.header.frame_id = "map"  # Set appropriate frame ID   
+                        goal_pose_msg.pose.position.x = self.goal_pos[0]
+                        goal_pose_msg.pose.position.y = self.goal_pos[1]
+                        goal_pose_msg.pose.position.z = 0  # Assuming z=0 for 2D navigation
+                        self.destination_reached_pub.publish(goal_pose_msg) # 목적지 좌표 발행
+                        # Reset state variables and global path
+                        self.reset_global_path()
 
     def dropoff_callback(self, msg):
         if msg.data and self.is_dropoff is not True:
@@ -206,7 +208,7 @@ class AStarPathPublisher:
 
     def destination_reached(self, current_position):
  
-        threshold_distance = 15.0  # 5 meters 
+        threshold_distance = 6.5  # 5 meters 
         current_pos_array = np.array([current_position.x, current_position.y])
         distance_to_goal = np.linalg.norm(np.array(self.goal_pos) - current_pos_array)
         # rospy.loginfo(f"Distance to goal: {distance_to_goal}")
@@ -267,7 +269,7 @@ class AStarPathPublisher:
         
         best_node = None
         best_score = float('inf')
-        max_angle_diff = np.pi / 6  # 최대 30도 각도 차이 허용
+        max_angle_diff = np.pi / 12  # 최대 15도 각도 차이 허용 :핵심 (좌우 7.5도씩)
         
         for i, idx in enumerate(indices):
             node = list(self.nodes.values())[idx]
