@@ -214,8 +214,10 @@ public class RentController {
             RentCarManipulateResponseDTO response = rentService.todayRentIsDone(rentCarManipulateRequestDTO);
 
             return ResponseEntity.ok(response);
-        } catch (RentNotFoundException | RentCarNotFoundException | TravelNotFoundException e) {
+        } catch (RentNotFoundException | TravelNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
+        } catch (TravelAllPlacesVisitedException e) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(e.getMessage()); // 204
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
         }
