@@ -15,11 +15,11 @@ import com.drtaa.core_model.util.toRequestLogin
 import com.drtaa.core_network.api.SignAPI
 import com.drtaa.core_network.di.Auth
 import com.drtaa.core_network.di.NoAuth
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -50,8 +50,7 @@ class SignDataSourceImpl @Inject constructor(
         return noAuthSignAPI.checkDuplicatedId(userProviderId)
     }
 
-    override suspend fun getUserData(): SocialUser {
-        Timber.tag("getUserData").d("${dataStore.data.first()}")
+    override suspend fun getUserData(): Flow<SocialUser> {
         return dataStore.data.map { prefs ->
             SocialUser(
                 prefs[USER_LOGIN_TYPE] ?: "",
@@ -60,7 +59,7 @@ class SignDataSourceImpl @Inject constructor(
                 prefs[USER_NICKNAME] ?: "",
                 prefs[USER_PROFILE_IMAGE] ?: "",
             )
-        }.first()
+        }
     }
 
     override suspend fun setUserData(user: SocialUser) {
@@ -84,7 +83,7 @@ class SignDataSourceImpl @Inject constructor(
 
         val currentUser = getUserData()
 
-        val updateUser = currentUser.copy(profileImageUrl = newImageUrl)
+        val updateUser = currentUser.first().copy(profileImageUrl = newImageUrl)
 
         setUserData(updateUser)
 
