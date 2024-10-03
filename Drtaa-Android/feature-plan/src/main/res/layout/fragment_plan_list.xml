@@ -27,11 +27,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="20dp"
-                android:text="여름 방학 여행"
                 android:textSize="20sp"
                 android:visibility="@{isEditMode ? View.GONE : View.VISIBLE}"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="여름 방학 여행" />
 
             <ImageView
                 android:id="@+id/iv_edit_title"
@@ -91,6 +91,7 @@
                     android:layout_marginStart="15dp"
                     android:padding="0dp"
                     android:src="@drawable/ic_circle_plus"
+                    android:visibility="gone"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />

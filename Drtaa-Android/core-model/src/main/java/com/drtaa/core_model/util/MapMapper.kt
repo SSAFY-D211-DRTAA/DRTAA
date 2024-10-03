@@ -19,12 +19,13 @@ fun Search.toPlanItem(travelDatesId: Int): PlanItem {
         datePlacesAddress = this.roadAddress,
         datePlacesCategory = this.category,
         datePlacesIsVisited = false,
+        datePlacesIsExpired = false,
         datePlacesLat = this.lat,
         datePlacesLon = this.lng,
         datePlacesName = this.title,
         datePlacesOrder = 0,
         datePlacesId = 0,
-        travelDatesId = travelDatesId,
+        travelDatesId = travelDatesId
     )
 }
 

@@ -4,5 +4,6 @@ data class DayPlan(
     val travelId: Int,
     val placesDetail: List<PlanItem>,
     val travelDatesDate: String,
-    val travelDatesId: Int
+    val travelDatesId: Int,
+    val travelDatesIsExpired: Boolean
 )

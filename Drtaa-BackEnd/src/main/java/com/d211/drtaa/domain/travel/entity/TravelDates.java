@@ -3,6 +3,7 @@ package com.d211.drtaa.domain.travel.entity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -28,8 +29,13 @@ public class TravelDates {
     private Travel travel;
 
     @Column(name = "travel_dates_date", nullable = false)
-    @Schema(name = "여행 일정 날짜", example = "2024/01/01")
+    @Schema(description = "여행 일정 날짜", example = "2024/01/01")
     private LocalDate travelDatesDate;
+
+    @Column(name = "travel_dates_is_expired", nullable = false)
+    @ColumnDefault("0")
+    @Schema(description = "여행 일정 만료 여부", example = "false")
+    private Boolean travelDatesIsExpired;
 
     @OneToMany(mappedBy = "travelDates", cascade = CascadeType.ALL)
     private List<DatePlaces> places;

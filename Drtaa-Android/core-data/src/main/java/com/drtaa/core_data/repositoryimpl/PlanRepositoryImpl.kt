@@ -7,6 +7,7 @@ import com.drtaa.core_data.util.safeApiCall
 import com.drtaa.core_model.plan.Plan
 import com.drtaa.core_model.plan.PlanSimple
 import com.drtaa.core_model.plan.RequestPlanName
+import com.drtaa.core_model.plan.ResponsePutPlan
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import timber.log.Timber
@@ -15,7 +16,7 @@ import javax.inject.Inject
 class PlanRepositoryImpl @Inject constructor(
     private val planDataSource: PlanDataSource
 ) : PlanRepository {
-    override suspend fun putPlan(plan: Plan): Flow<Result<String>> = flow {
+    override suspend fun putPlan(plan: Plan): Flow<Result<ResponsePutPlan>> = flow {
         when (
             val response = safeApiCall { planDataSource.putPlan(plan) }
         ) {

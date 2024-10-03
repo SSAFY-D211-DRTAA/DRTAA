@@ -1,6 +1,7 @@
 package com.d211.drtaa.domain.rent.service;
 
 import com.d211.drtaa.domain.rent.dto.request.*;
+import com.d211.drtaa.domain.rent.dto.response.RentCarManipulateResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentDetailResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentResponseDTO;
 import com.d211.drtaa.domain.rent.entity.Rent;
@@ -26,6 +27,8 @@ import com.d211.drtaa.global.config.websocket.WebSocketConfig;
 import com.d211.drtaa.global.exception.rent.RentCarNotFoundException;
 import com.d211.drtaa.global.exception.rent.RentCarScheduleNotFoundException;
 import com.d211.drtaa.global.exception.rent.RentNotFoundException;
+import com.d211.drtaa.global.exception.travel.TravelAllPlacesVisitedException;
+import com.d211.drtaa.global.exception.travel.TravelNotFoundException;
 import com.d211.drtaa.global.exception.websocket.WebSocketDisConnectedException;
 import com.d211.drtaa.global.util.fcm.FcmMessage;
 import com.d211.drtaa.global.util.fcm.FcmUtil;
@@ -298,6 +301,7 @@ public class RentServiceImpl implements RentService{
             TravelDates travelDates = TravelDates.builder()
                     .travel(travel)
                     .travelDatesDate(startDate)
+                    .travelDatesIsExpired(false)
                     .build();
 
             // 여행별 일정 저장
@@ -314,6 +318,7 @@ public class RentServiceImpl implements RentService{
                     .datePlacesLat(rentCreateRequestDTO.getRentDptLat())
                     .datePlacesLon(rentCreateRequestDTO.getRentDptLon())
                     .datePlacesIsVisited(false)
+                    .datePlacesIsExpired(false)
                     .build();
 
             // 추가한 장소 저장
@@ -505,5 +510,53 @@ public class RentServiceImpl implements RentService{
 
         // 변경 상태 저장
         rentRepository.save(rent);
+    }
+
+    @Override
+    public RentCarManipulateResponseDTO todayRentIsDone(RentCarManipulateRequestDTO rentCarManipulateRequestDTO) {
+        // rentId에 해당하는 렌트 찾기
+        Rent rent = rentRepository.findByRentId(rentCarManipulateRequestDTO.getRentId())
+                .orElseThrow(() -> new RentNotFoundException("해당 rentId의 맞는 렌트를 찾을 수 없습니다."));
+
+        // 해당 렌트에 맞는 여행 = travelId에 해당하는 여행
+        Travel travel = rent.getTravel();
+
+        // travelDatesId에 해당하는 일정 찾기
+        TravelDates date = travelDatesRepository.findByTravelDatesId(rentCarManipulateRequestDTO.getTravelDatesId())
+                .orElseThrow(() -> new TravelNotFoundException("해당 travelDatesId에 맞는 일정을 찾을 수 없습니다."));
+
+        // 일정 만료 처리
+        date.setTravelDatesIsExpired(true);
+
+        // 변경 상태 저장
+        travelDatesRepository.save(date);
+
+        // 해당 일정에 맞는 장소들 isExpired false인 것들 찾기
+        List<DatePlaces> expirePlaces = datePlacesRepository.findByTravelDatesAndDatePlacesIsExpiredFalse(date);
+
+        // 장소들 모두 isExpired true 처리
+        for(DatePlaces place : expirePlaces) {
+            place.setDatePlacesIsExpired(true);
+
+            // 변경 상태 저장
+            datePlacesRepository.save(place);
+        }
+
+        // 다음 날 일정 찾기
+        TravelDates nextDate = travelDatesRepository.findByTravelDatesId(date.getTravelDatesId() + 1)
+                .orElseThrow(() -> new TravelAllPlacesVisitedException("해당 travelDatesId의 다음날 일정을 찾을 수 없습니다. 렌트 일정이 완료되었습니다."));
+
+        // 다음날 첫번째 여행지 찾기
+        DatePlaces nextDayPlace = datePlacesRepository.findByTravelDatesAndDatePlacesOrder(nextDate, 1)
+                .orElseThrow(() -> new TravelNotFoundException("다음 날의 첫번째 장소를 찾을 수 없습니다. 다음날 장소를 추가해주세요."));
+
+        // 응답 생성
+        RentCarManipulateResponseDTO response = RentCarManipulateResponseDTO.builder()
+                .travelId(travel.getTravelId())
+                .travelDatesId(nextDate.getTravelDatesId())
+                .datePlacesId(nextDayPlace.getDatePlacesId())
+                .build();
+
+        return response;
     }
 }

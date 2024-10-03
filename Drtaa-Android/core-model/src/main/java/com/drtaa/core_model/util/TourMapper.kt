@@ -1,8 +1,8 @@
 package com.drtaa.core_model.util
 
-import com.drtaa.core_model.tour.TourItem
 import com.drtaa.core_model.network.ResponseTour
 import com.drtaa.core_model.plan.PlanItem
+import com.drtaa.core_model.tour.TourItem
 
 fun (ResponseTour.Response.Body.Items.Item).toEntity(): TourItem {
     return TourItem(
@@ -36,6 +36,7 @@ fun TourItem.toPlanItem(): PlanItem {
         datePlacesAddress = this.addr1,
         datePlacesCategory = this.cat1,
         datePlacesIsVisited = false,
+        datePlacesIsExpired = false,
         datePlacesLat = this.mapy.toDouble(),
         datePlacesLon = this.mapx.toDouble(),
         datePlacesName = this.title,

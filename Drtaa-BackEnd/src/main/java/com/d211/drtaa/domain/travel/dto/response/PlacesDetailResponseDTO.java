@@ -27,8 +27,6 @@ public class PlacesDetailResponseDTO {
     private double datePlacesLon;
     @Schema(description = "일정 장소 방문 여부", example = "false")
     private boolean datePlacesIsVisited;
-
-    public boolean getDatePlacesIsVisited() {
-        return this.datePlacesIsVisited;
-    }
+    @Schema(description = "일정 장소 만료 여부", example = "false")
+    private boolean datePlacesIsExpired;
 }

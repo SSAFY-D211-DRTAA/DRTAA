@@ -2,12 +2,16 @@ package com.d211.drtaa.domain.rent.controller;
 
 import com.d211.drtaa.domain.rent.dto.request.*;
 import com.d211.drtaa.domain.rent.dto.response.RentCarLocationResponseDTO;
+import com.d211.drtaa.domain.rent.dto.response.RentCarManipulateResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentDetailResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentResponseDTO;
 import com.d211.drtaa.domain.rent.service.RentService;
 import com.d211.drtaa.global.exception.rent.NoAvailableRentCarException;
 import com.d211.drtaa.global.exception.rent.RentCarNotFoundException;
 import com.d211.drtaa.global.exception.rent.RentNotFoundException;
+import com.d211.drtaa.global.exception.travel.TravelAllPlacesVisitedException;
+import com.d211.drtaa.global.exception.travel.TravelNotFoundException;
+import com.d211.drtaa.global.exception.websocket.WebSocketDisConnectedException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -199,6 +203,22 @@ public class RentController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
         } catch (Exception e) {
             log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
+        }
+    }
+
+    @PatchMapping("/today")
+    @Operation(summary = "오늘 렌트 끝내기", description = "오늘에 해당하는 렌트 장소 만료 처리")
+    public ResponseEntity todayRentIsDone(@RequestBody RentCarManipulateRequestDTO rentCarManipulateRequestDTO) {
+        try {
+            RentCarManipulateResponseDTO response = rentService.todayRentIsDone(rentCarManipulateRequestDTO);
+
+            return ResponseEntity.ok(response);
+        } catch (RentNotFoundException | TravelNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
+        } catch (TravelAllPlacesVisitedException e) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(e.getMessage()); // 204
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
         }
     }

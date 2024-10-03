@@ -13,6 +13,7 @@ import com.drtaa.core_map.setCustomLocationButton
 import com.drtaa.core_model.plan.DayPlan
 import com.drtaa.core_model.plan.PlanItem
 import com.drtaa.core_model.util.toDate
+import com.drtaa.core_ui.component.OneButtonMessageDialog
 import com.drtaa.core_ui.component.TwoButtonMessageDialog
 import com.drtaa.core_ui.component.TwoButtonTypingDialog
 import com.drtaa.core_ui.showSnackBar
@@ -25,6 +26,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
+import java.time.LocalDate
 
 @AndroidEntryPoint
 class PlanListFragment :
@@ -46,6 +48,11 @@ class PlanListFragment :
     override fun onResume() {
         super.onResume()
 
+        if (planViewModel.isNewPlanPage) {
+            initData()
+            planViewModel.isNewPlanPage = false
+        }
+
         planViewModel.plan.value?.let {
             if (!planViewModel.isViewPagerLoaded) {
                 initViewPager()
@@ -57,6 +64,7 @@ class PlanListFragment :
         super.onDestroyView()
         planViewModel.setEditMode(false)
         planViewModel.isViewPagerLoaded = false
+        planViewModel.isNewPlanPage = true
     }
 
     override fun initMapView() {
@@ -77,10 +85,9 @@ class PlanListFragment :
     }
 
     override fun iniView() {
-        initData()
-
         initEvent()
         initObserve()
+        initEditObserve()
 
         planViewModel.plan.value?.let {
             binding.tvPlanTitle.text = it.travelName
@@ -90,10 +97,8 @@ class PlanListFragment :
     }
 
     private fun initData() {
-        planViewModel.setTravelId(args.travelId)
-        if (planViewModel.plan.value == null) {
-            planViewModel.getPlan()
-        }
+        planViewModel.setInfo(args.travelId, args.rentId)
+        planViewModel.getPlan()
     }
 
     private fun initDatePickerDialog() {
@@ -124,16 +129,6 @@ class PlanListFragment :
     }
 
     private fun initObserve() {
-        planViewModel.isEditMode.flowWithLifecycle(viewLifecycleOwner.lifecycle)
-            .onEach { isEditMode ->
-                binding.tvEditPlan.isVisible = !isEditMode
-                binding.tvEditFinish.isVisible = isEditMode
-
-                if (!isEditMode) {
-                    binding.clEditBottomSheet.visibility = View.GONE
-                }
-            }.launchIn(viewLifecycleOwner.lifecycleScope)
-
         planViewModel.plan.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { plan ->
                 if (plan == null) return@onEach
@@ -144,7 +139,6 @@ class PlanListFragment :
                 initViewPager()
                 initDatePickerDialog()
                 planViewModel.isViewPagerLoaded = true
-                Timber.d("plan: $plan")
             }.launchIn(viewLifecycleOwner.lifecycleScope)
 
         planViewModel.isEditSuccess.flowWithLifecycle(viewLifecycleOwner.lifecycle)
@@ -158,6 +152,47 @@ class PlanListFragment :
                 }
                 planViewModel.setIsEditSuccess(null)
             }.launchIn(viewLifecycleOwner.lifecycleScope)
+    }
+
+    private fun initEditObserve() {
+        planViewModel.isEditMode.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach { isEditMode ->
+                binding.tvEditPlan.isVisible = !isEditMode
+                binding.tvEditFinish.isVisible = isEditMode
+
+                if (!isEditMode) {
+                    binding.clEditBottomSheet.visibility = View.GONE
+                }
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+        planViewModel.dayPlan.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach { dayPlan ->
+                if (dayPlan == null) return@onEach
+
+                updateDayPlanText(dayPlan)
+
+                val targetDate = LocalDate.parse(dayPlan.travelDatesDate)
+                val today = LocalDate.now()
+                if ((today > targetDate) or dayPlan.travelDatesIsExpired) {
+                    setEditable(false)
+                } else {
+                    setEditable(true)
+                }
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
+    }
+
+    private fun setEditable(isEditable: Boolean) {
+        binding.apply {
+            if (isEditable) {
+                tvEditPlan.isVisible = !planViewModel.isEditMode.value
+                tvEditFinish.isVisible = planViewModel.isEditMode.value
+                ivAddPlan.isVisible = true
+            } else {
+                tvEditPlan.isVisible = false
+                tvEditFinish.isVisible = false
+                ivAddPlan.isVisible = false
+            }
+        }
     }
 
     private fun initEvent() {
@@ -189,6 +224,17 @@ class PlanListFragment :
         binding.btnDeletePlan.setOnClickListener {
             if (editPlanList[binding.vpPlanDay.currentItem].isEmpty()) {
                 showSnackBar("삭제할 일정이 없습니다.")
+                return@setOnClickListener
+            }
+
+            val afterDeleteListSize = planViewModel.dayPlan.value?.let { dayPlan ->
+                editPlanList[binding.vpPlanDay.currentItem].size - dayPlan.placesDetail.size
+            }
+            if (afterDeleteListSize == 0) {
+                OneButtonMessageDialog(
+                    context = requireActivity(),
+                    message = "일정은 최소 하나 이상 남아있어야 합니다.",
+                ).show()
                 return@setOnClickListener
             }
 

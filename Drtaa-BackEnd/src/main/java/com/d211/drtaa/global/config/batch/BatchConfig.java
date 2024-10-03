@@ -1,4 +1,4 @@
-package com.d211.drtaa.domain.rent.job;
+package com.d211.drtaa.global.config.batch;
 
 import com.d211.drtaa.domain.rent.entity.Rent;
 import com.d211.drtaa.domain.rent.repository.RentRepository;
@@ -26,7 +26,7 @@ import java.util.List;
 @Configuration
 @RequiredArgsConstructor
 @Log4j2
-public class RentNotification {
+public class BatchConfig {
 
     private final RentRepository rentRepository; // Rent 테이블을 위한 레포지토리
     private final FcmUtil fcmUtil; // FCM 알림 서비스

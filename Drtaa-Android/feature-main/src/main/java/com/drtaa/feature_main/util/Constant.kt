@@ -10,6 +10,7 @@ enum class Page(val hideBottomNav: Boolean) {
     RENT(true),
     RENT_SEARCH(true),
     RENT_SUMMARY(true),
+    RENT_HISTORY(true),
     PLAN_HISTORY(true),
     PLAN_LIST(true),
     PLAN_SEARCH(true),
@@ -33,6 +34,7 @@ enum class Page(val hideBottomNav: Boolean) {
             RENT -> com.drtaa.feature_rent.R.id.rentFragment
             RENT_SEARCH -> com.drtaa.feature_rent.R.id.rentSearchFragment
             RENT_SUMMARY -> com.drtaa.feature_rent.R.id.rentSummaryFragment
+            RENT_HISTORY -> com.drtaa.feature_home.R.id.rentHistoryFragment
             TAXI -> com.drtaa.feature_taxi.R.id.taxiFragment
             TAXI_SEARCH -> com.drtaa.feature_taxi.R.id.taxiSearchFragment
             TAXI_SUMMARY -> com.drtaa.feature_taxi.R.id.taxiSummaryFragment
