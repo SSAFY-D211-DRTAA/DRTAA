@@ -30,6 +30,8 @@ class PlanViewModel @Inject constructor(
 ) : ViewModel() {
     private var travelId: Int = 0
     private var rentId: Int = 0
+    var isNewPlanPage = true
+    var isViewPagerLoaded = false
 
     private val _plan = MutableStateFlow<Plan?>(null)
     val plan: StateFlow<Plan?> = _plan
@@ -48,8 +50,6 @@ class PlanViewModel @Inject constructor(
 
     private val _isEditSuccess = MutableStateFlow<Boolean?>(null)
     val isEditSuccess: StateFlow<Boolean?> = _isEditSuccess
-
-    var isViewPagerLoaded = false
 
     init {
         observePlan()

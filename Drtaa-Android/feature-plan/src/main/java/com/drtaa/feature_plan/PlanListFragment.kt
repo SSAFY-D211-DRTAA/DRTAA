@@ -48,17 +48,24 @@ class PlanListFragment :
     override fun onResume() {
         super.onResume()
 
+        if (planViewModel.isNewPlanPage) {
+            initData()
+            planViewModel.isNewPlanPage = false
+        }
+
         planViewModel.plan.value?.let {
             if (!planViewModel.isViewPagerLoaded) {
                 initViewPager()
             }
         }
+
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         planViewModel.setEditMode(false)
         planViewModel.isViewPagerLoaded = false
+        planViewModel.isNewPlanPage = true
     }
 
     override fun initMapView() {
@@ -79,7 +86,7 @@ class PlanListFragment :
     }
 
     override fun iniView() {
-        initData()
+//        initData()
 
         initEvent()
         initObserve()
@@ -94,9 +101,7 @@ class PlanListFragment :
 
     private fun initData() {
         planViewModel.setInfo(args.travelId, args.rentId)
-        if (planViewModel.plan.value == null) {
-            planViewModel.getPlan()
-        }
+        planViewModel.getPlan()
     }
 
     private fun initDatePickerDialog() {
@@ -167,9 +172,10 @@ class PlanListFragment :
             .onEach { dayPlan ->
                 if (dayPlan == null) return@onEach
 
+                updateDayPlanText(dayPlan)
+
                 val targetDate = LocalDate.parse(dayPlan.travelDatesDate)
                 val today = LocalDate.now()
-
                 if (today > targetDate) {
                     setEditable(false)
                 } else {
