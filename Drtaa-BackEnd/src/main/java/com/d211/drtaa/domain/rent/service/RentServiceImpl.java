@@ -27,6 +27,7 @@ import com.d211.drtaa.global.config.websocket.WebSocketConfig;
 import com.d211.drtaa.global.exception.rent.RentCarNotFoundException;
 import com.d211.drtaa.global.exception.rent.RentCarScheduleNotFoundException;
 import com.d211.drtaa.global.exception.rent.RentNotFoundException;
+import com.d211.drtaa.global.exception.travel.TravelNotFoundException;
 import com.d211.drtaa.global.exception.websocket.WebSocketDisConnectedException;
 import com.d211.drtaa.global.util.fcm.FcmMessage;
 import com.d211.drtaa.global.util.fcm.FcmUtil;
@@ -510,6 +511,19 @@ public class RentServiceImpl implements RentService{
 
     @Override
     public RentCarManipulateResponseDTO todayRentIsDone(RentCarManipulateRequestDTO rentCarManipulateRequestDTO) {
+        // rentId에 해당하는 렌트 찾기
+        Rent rent = rentRepository.findByRentId(rentCarManipulateRequestDTO.getRentId())
+                .orElseThrow(() -> new RentNotFoundException("해당 rentId의 맞는 렌트를 찾을 수 없습니다."));
+
+        // 해당 렌트에 맞는 여행 = travelId에 해당하는 여행
+        Travel travel = rent.getTravel();
+
+        // travelDatesId에 해당하는 일정 찾기
+        TravelDates date = travelDatesRepository.findByTravelDatesId(rentCarManipulateRequestDTO.getTravelDatesId())
+                .orElseThrow(() -> new TravelNotFoundException("해당 travelDatesId에 맞는 일정을 찾을 수 없습니다."));
+
+        // 해당 일정에 맞는 장소들 모두 isExpired 처리
+
         return null;
     }
 }
