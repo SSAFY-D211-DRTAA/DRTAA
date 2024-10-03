@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.drtaa.feature_mypage"
+    namespace = "com.drtaa.core_auth"
     compileSdk = 34
 
     defaultConfig {
@@ -31,13 +31,16 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+
     buildFeatures{
-        dataBinding = true
         buildConfig = true
     }
 }
 
 dependencies {
-    implementation(project(":core-auth"))
-    implementation (libs.circleimageview)
+    //Sign
+    implementation(libs.naver.oauth)
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.googleid)
 }

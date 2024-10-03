@@ -40,6 +40,7 @@ android {
 dependencies {
     //Module
     implementation(project(":feature-main"))
+    implementation(project(":core-auth"))
 
     //Sign
     implementation(libs.naver.oauth)
@@ -48,5 +49,4 @@ dependencies {
     implementation(libs.googleid)
     implementation(libs.play.services.basement)
     implementation(libs.androidx.core.splashscreen)
-
 }
