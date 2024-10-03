@@ -13,8 +13,7 @@ import java.util.Optional;
 public interface DatePlacesRepository extends JpaRepository<DatePlaces, Long> {
     // find
     Optional<DatePlaces> findByDatePlacesId(Long datePlacesId);
-    @Query("SELECT dp FROM DatePlaces dp WHERE dp.travelDates.travelDatesId = :travelDatesId ORDER BY dp.datePlacesOrder DESC")
-    Optional<DatePlaces> findLastPlaceByTravelDatesId(@Param("travelDatesId") Long travelDatesId);
+    Optional<DatePlaces> findFirstByTravelDatesOrderByDatePlacesOrderDesc(TravelDates date);
     Optional<DatePlaces> findByTravelDatesAndDatePlacesOrder(TravelDates date, int datePlacesOrder);
     DatePlaces findFirstByTravelDatesOrderByDatePlacesOrderAsc(TravelDates travelDates);
     Optional<DatePlaces> findFirstByTravelAndDatePlacesIsExpiredFalseOrderByDatePlacesIdAsc(Travel travel);
