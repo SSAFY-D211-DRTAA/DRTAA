@@ -59,7 +59,16 @@ public class DatePlaces {
     @Schema(description = "일정 장소 방문 여부", example = "false")
     private boolean datePlacesIsVisited;
 
+    @Column(name = "date_places_is_expired", nullable = false)
+    @ColumnDefault("0")
+    @Schema(description = "일정 장소 만료 여부", example = "false")
+    private boolean datePlacesIsExpired;
+
     public boolean getDatePlacesIsVisited() {
         return this.datePlacesIsVisited;
+    }
+
+    public boolean getDatePlacesIsExpired() {
+        return this.datePlacesIsExpired;
     }
 }
