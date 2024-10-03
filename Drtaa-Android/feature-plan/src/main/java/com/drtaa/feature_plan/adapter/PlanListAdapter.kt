@@ -60,7 +60,10 @@ class PlanListAdapter(
             binding.tvPlanOrder.text = position.toString()
             setEditItemBackGround(planItem.isSelected)
 
-            initVisibility(planItem.datePlacesIsVisited)
+            initVisibility(
+                isVisited = planItem.datePlacesIsVisited,
+                isExpired = planItem.datePlacesIsExpired
+            )
 
             binding.root.setOnClickListener {
                 if (isEditMode && !planItem.datePlacesIsVisited) {
@@ -75,8 +78,8 @@ class PlanListAdapter(
             }
         }
 
-        private fun initVisibility(isVisited: Boolean) {
-            binding.cvPlan.backgroundTintList = if (isVisited) {
+        private fun initVisibility(isVisited: Boolean, isExpired: Boolean) {
+            binding.cvPlan.backgroundTintList = if (isVisited or isExpired) {
                 backgroundGray
             } else {
                 backgroundWhite

@@ -8,6 +8,7 @@ data class PlanItem(
     val datePlacesAddress: String,
     val datePlacesCategory: String,
     val datePlacesIsVisited: Boolean,
+    val datePlacesIsExpired: Boolean,
     val datePlacesLat: Double,
     val datePlacesLon: Double,
     val datePlacesName: String,
@@ -19,6 +20,7 @@ data class PlanItem(
         parcel.readInt(),
         parcel.readString() ?: "",
         parcel.readString() ?: "",
+        parcel.readByte() != 0.toByte(),
         parcel.readByte() != 0.toByte(),
         parcel.readDouble(),
         parcel.readDouble(),
@@ -33,6 +35,7 @@ data class PlanItem(
         parcel.writeString(datePlacesAddress)
         parcel.writeString(datePlacesCategory)
         parcel.writeByte(if (datePlacesIsVisited) 1 else 0)
+        parcel.writeByte(if (datePlacesIsExpired) 1 else 0)
         parcel.writeDouble(datePlacesLat)
         parcel.writeDouble(datePlacesLon)
         parcel.writeString(datePlacesName)

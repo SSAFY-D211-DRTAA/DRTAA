@@ -27,12 +27,16 @@ class PlanHistoryViewModel @Inject constructor(
             planRepository.getPlanList().collect { result ->
                 result.onSuccess { data ->
                     Timber.tag("search").d("success $data")
-                    _planList.value = data
+                    _planList.value = descendingPlanList(data)
                 }.onFailure {
                     Timber.tag("search").d("fail")
                     _planList.value = null
                 }
             }
         }
+    }
+
+    private fun descendingPlanList(list: List<PlanSimple>): List<PlanSimple> {
+        return list.sortedByDescending { it.travelEndDate }
     }
 }
