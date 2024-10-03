@@ -6,4 +6,3 @@ data class ResponsePutPlan(
     val travelDatesDate: String,
     val datePlacesId: Int
 )
-
