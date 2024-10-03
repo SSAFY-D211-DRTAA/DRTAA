@@ -55,10 +55,10 @@ class RentCarDataSourceImpl @Inject constructor(
     override suspend fun getCarWithTravelInfo(): RequestCarStatus {
         return dataStore.data.map { prefs ->
             RequestCarStatus(
-                prefs[RENT_ID] ?: -1,
-                prefs[TRAVEL_ID] ?: -1,
-                prefs[TRAVEL_DATES_ID] ?: -1,
-                prefs[DATE_PLACES_ID] ?: -1,
+                prefs[RENT_ID] ?: 0,
+                prefs[TRAVEL_ID] ?: 0,
+                prefs[TRAVEL_DATES_ID] ?: 0,
+                prefs[DATE_PLACES_ID] ?: 0,
             )
         }.first()
     }
