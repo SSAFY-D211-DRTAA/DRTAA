@@ -34,10 +34,11 @@ class PlanHistoryFragment :
     private fun initRVAdapter() {
         planHistoryListAdapter.setItemClickListener(object :
             PlanHistoryListAdapter.ItemClickListener {
-            override fun onItemClicked(travelId: Int) {
+            override fun onItemClicked(travelId: Int, rentId: Int) {
                 navigateDestination(
                     PlanHistoryFragmentDirections.actionPlanHistoryFragmentToPlanListFragment(
-                        travelId = travelId
+                        travelId = travelId,
+                        rentId = rentId
                     )
                 )
             }

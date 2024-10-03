@@ -3,11 +3,14 @@ package com.drtaa.feature_plan.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.drtaa.core_data.repository.PlanRepository
+import com.drtaa.core_data.repository.RentCarRepository
 import com.drtaa.core_model.map.Search
+import com.drtaa.core_model.network.RequestCarStatus
 import com.drtaa.core_model.plan.DayPlan
 import com.drtaa.core_model.plan.Plan
 import com.drtaa.core_model.plan.PlanItem
 import com.drtaa.core_model.plan.RequestPlanName
+import com.drtaa.core_model.plan.ResponsePutPlan
 import com.drtaa.core_model.util.toPlanItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,13 +19,17 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 @HiltViewModel
 class PlanViewModel @Inject constructor(
-    private val planRepository: PlanRepository
+    private val planRepository: PlanRepository,
+    private val rentCarRepository: RentCarRepository
 ) : ViewModel() {
     private var travelId: Int = 0
+    private var rentId: Int = 0
 
     private val _plan = MutableStateFlow<Plan?>(null)
     val plan: StateFlow<Plan?> = _plan
@@ -48,8 +55,9 @@ class PlanViewModel @Inject constructor(
         observePlan()
     }
 
-    fun setTravelId(travelId: Int) {
+    fun setInfo(travelId: Int, rentId: Int) {
         this.travelId = travelId
+        this.rentId = rentId
     }
 
     fun getPlan() {
@@ -204,7 +212,9 @@ class PlanViewModel @Inject constructor(
         Timber.tag("NEW_PLAN").d("$plan")
         viewModelScope.launch {
             planRepository.putPlan(plan).collect { response ->
-                response.onSuccess {
+                response.onSuccess { data ->
+                    setNextCallingData(data)
+
                     _plan.value = plan
                     _isEditSuccess.value = true
                     Timber.tag("NEW_PLAN").d("${_plan.value}")
@@ -231,6 +241,20 @@ class PlanViewModel @Inject constructor(
                     _isEditSuccess.value = false
                 }
             }
+        }
+    }
+
+    private suspend fun setNextCallingData(nextCalling: ResponsePutPlan) {
+        val today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+        if (nextCalling.travelDatesDate == today) {
+            rentCarRepository.setCarWithTravelInfo(
+                RequestCarStatus(
+                    rentId = rentId,
+                    travelId = nextCalling.travelId,
+                    travelDatesId = nextCalling.travelDatesId,
+                    datePlacesId = nextCalling.datePlacesId
+                )
+            )
         }
     }
 

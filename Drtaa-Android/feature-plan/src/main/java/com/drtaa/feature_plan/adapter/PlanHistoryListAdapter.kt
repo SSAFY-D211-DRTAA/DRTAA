@@ -28,13 +28,16 @@ class PlanHistoryListAdapter :
             binding.executePendingBindings()
 
             binding.root.setOnClickListener {
-                itemClickListener.onItemClicked(planSimple.travelId)
+                itemClickListener.onItemClicked(
+                    travelId = planSimple.travelId,
+                    rentId = planSimple.rentId
+                )
             }
         }
     }
 
     interface ItemClickListener {
-        fun onItemClicked(travelId: Int)
+        fun onItemClicked(travelId: Int, rentId: Int)
     }
 
     private lateinit var itemClickListener: ItemClickListener

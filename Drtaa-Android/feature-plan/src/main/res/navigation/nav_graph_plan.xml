@@ -22,6 +22,9 @@
         <argument
             android:name="travelId"
             app:argType="integer" />
+        <argument
+            android:name="rentId"
+            app:argType="integer" />
         <action
             android:id="@+id/action_planListFragment_to_planSearchFragment"
             app:destination="@id/planSearchFragment" />

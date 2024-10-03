@@ -93,7 +93,7 @@ class PlanListFragment :
     }
 
     private fun initData() {
-        planViewModel.setTravelId(args.travelId)
+        planViewModel.setInfo(args.travelId, args.rentId)
         if (planViewModel.plan.value == null) {
             planViewModel.getPlan()
         }
