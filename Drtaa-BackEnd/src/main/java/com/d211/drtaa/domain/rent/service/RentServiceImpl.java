@@ -301,6 +301,7 @@ public class RentServiceImpl implements RentService{
             TravelDates travelDates = TravelDates.builder()
                     .travel(travel)
                     .travelDatesDate(startDate)
+                    .travelDatesIsExpired(false)
                     .build();
 
             // 여행별 일정 저장
@@ -317,6 +318,7 @@ public class RentServiceImpl implements RentService{
                     .datePlacesLat(rentCreateRequestDTO.getRentDptLat())
                     .datePlacesLon(rentCreateRequestDTO.getRentDptLon())
                     .datePlacesIsVisited(false)
+                    .datePlacesIsExpired(false)
                     .build();
 
             // 추가한 장소 저장
