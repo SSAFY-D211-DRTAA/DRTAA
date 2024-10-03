@@ -35,6 +35,9 @@ class MyPageViewModel @Inject constructor(
     private val _profileImageFile = MutableStateFlow<File?>(null)
     private val profileImageFile: StateFlow<File?> = _profileImageFile
 
+    private val _logoutState = MutableSharedFlow<Boolean>()
+    val logoutState: SharedFlow<Boolean> = _logoutState
+
     init {
         getUserData()
     }
@@ -82,7 +85,13 @@ class MyPageViewModel @Inject constructor(
     fun logout() {
         viewModelScope.launch {
             signRepository.clearUserData()
-            tokenRepository.clearToken()
+            tokenRepository.clearToken().collect {
+                it.onSuccess {
+                    _logoutState.emit(true)
+                }.onFailure {
+                    _logoutState.emit(false)
+                }
+            }
         }
     }
 }
