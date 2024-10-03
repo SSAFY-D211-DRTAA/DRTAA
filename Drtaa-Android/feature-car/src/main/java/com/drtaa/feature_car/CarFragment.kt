@@ -20,6 +20,11 @@ import com.drtaa.core_ui.fitCenter
 import com.drtaa.core_ui.parseLocalDateTime
 import com.drtaa.core_ui.showSnackBar
 import com.drtaa.feature_car.databinding.FragmentCarBinding
+import com.drtaa.feature_car.util.resetOverlay
+import com.drtaa.feature_car.util.resetReflection
+import com.drtaa.feature_car.util.rotateCard
+import com.drtaa.feature_car.util.updateOverlay
+import com.drtaa.feature_car.util.updateReflection
 import com.drtaa.feature_car.viewmodel.CarStatus
 import com.drtaa.feature_car.viewmodel.CarViewModel
 import com.google.zxing.integration.android.IntentIntegrator
@@ -71,7 +76,9 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
                 }
             }
             btnGetOffQrcode.setOnClickListener {
-                carViewModel.getOffCar(rentId = carViewModel.latestReservedId.value)
+                carViewModel.currentRentDetail.value?.let {
+                    carViewModel.getOffCar(rentId = it.rentId!!)
+                }
             }
         }
     }
@@ -93,6 +100,7 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
                 // 진행 중인 렌트가 있을 경우
                 dismissLoading()
                 toggleCarOption(true)
+                carViewModel.getCarDrivingStatus()
                 showSnackBar("이용 중인 차량이 있습니다")
             }
         }.launchIn(viewLifecycleOwner.lifecycleScope)
@@ -119,6 +127,7 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
                 // 진행 중인 렌트 없고 예약도 없을 경우
                 dismissLoading()
                 binding.apply {
+                    clCarBottomTextGotoUse.isClickable = false
                     clCarBottomTextGotoUse.visibility = View.VISIBLE
                     btnTrackingCar.isClickable = false
                     clCarBottomText.visibility = View.GONE
@@ -189,24 +198,6 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
                     }
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
-
-        carViewModel.carStatus.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach { isOnCar ->
-            when (isOnCar) {
-                CarStatus.DRIVING -> {
-                    binding.btnTourQrcode.visibility = View.GONE
-                    binding.btnGetOffQrcode.visibility = View.VISIBLE
-                }
-
-                CarStatus.PARKING -> {
-                    binding.btnTourQrcode.visibility = View.VISIBLE
-                    binding.btnGetOffQrcode.visibility = View.GONE
-                }
-
-                CarStatus.IDLE -> {
-
-                }
-            }
-        }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -231,8 +222,8 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
                         .setDuration(DURATION)
                         .start()
 
-                    resetOverlay()
-                    resetReflection()
+                    overlayView.resetOverlay()
+                    reflectionView.resetReflection()
                     // 부모 ScrollView가 다시 터치 이벤트를 가로챌 수 있도록 원복
                     v.parent.requestDisallowInterceptTouchEvent(false)
                     true
@@ -250,59 +241,15 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
     private fun handleActionMove(v: View, event: MotionEvent): Boolean {
         if (isTouching && isLongTouch()) {
             val (x, y) = event.x to event.y
-            rotateCard(v, x, y)
+            cardView.rotateCard(v, x, y)
             updateOverlayAndReflection(v, x, y)
         }
         return true
     }
 
-    private fun rotateCard(v: View, x: Float, y: Float) {
-        val (centerX, centerY) = v.width / HALF to v.height / HALF
-        var rotateX = (centerY - y) / centerY * MAX_ROTATION
-        var rotateY = (x - centerX) / centerX * MAX_ROTATION
-
-        rotateX = rotateX.coerceIn(-MAX_ROTATION, MAX_ROTATION)
-        rotateY = rotateY.coerceIn(-MAX_ROTATION, MAX_ROTATION)
-
-        cardView.animate()
-            .rotationX(rotateX)
-            .rotationY(rotateY)
-            .setDuration(0)
-            .start()
-    }
-
     private fun updateOverlayAndReflection(v: View, x: Float, y: Float) {
-        updateOverlay(x / v.width, y / v.height)
-        updateReflection(y / v.height)
-    }
-
-    private fun updateOverlay(percentX: Float, percentY: Float) {
-        val gradient = overlayView.background as GradientDrawable
-        gradient.setGradientCenter(percentX, percentY)
-        overlayView.alpha = OVERLAY_VIEW
-    }
-
-    private fun resetOverlay() {
-        overlayView.animate()
-            .alpha(0f)
-            .setDuration(DURATION)
-            .start()
-    }
-
-    private fun updateReflection(percentY: Float) {
-        val translationY = (percentY - POINT_XY) * 2 * reflectionView.height
-        ObjectAnimator.ofFloat(reflectionView, "translationY", translationY).apply {
-            duration = 0
-            start()
-        }
-    }
-
-    private fun resetReflection() {
-        ObjectAnimator.ofFloat(reflectionView, "translationY", reflectionView.height.toFloat())
-            .apply {
-                duration = DURATION
-                start()
-            }
+        overlayView.updateOverlay(x / v.width, y / v.height)
+        reflectionView.updateReflection(y / v.height)
     }
 
     private fun checkCameraPermission(): Boolean {

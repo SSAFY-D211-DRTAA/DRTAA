@@ -23,7 +23,7 @@ interface RentCarRepository {
     ): Flow<Result<CarPosition>>
     suspend fun callFirstAssignedCar(rentId: Long): Flow<Result<CarPosition>>
     suspend fun editDriveStatus(rentCarId: Long, driveStatus: String): Flow<Result<ResponseDrivingCar>>
-    suspend fun getDriveStatus(rentCarId: Long): Flow<Result<ResponseDrivingCar>>
+    suspend fun getDriveStatus(rentCarId: Long): Flow<Result<String>>
     suspend fun getCarWithTravelInfo(): Flow<Result<RequestCarStatus>>
     suspend fun setCarWithTravelInfo(rentInfo: RequestCarStatus)
 }
