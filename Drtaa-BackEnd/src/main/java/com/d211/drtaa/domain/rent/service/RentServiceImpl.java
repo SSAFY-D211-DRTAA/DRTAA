@@ -523,7 +523,13 @@ public class RentServiceImpl implements RentService{
         TravelDates date = travelDatesRepository.findByTravelDatesId(rentCarManipulateRequestDTO.getTravelDatesId())
                 .orElseThrow(() -> new TravelNotFoundException("해당 travelDatesId에 맞는 일정을 찾을 수 없습니다."));
 
-        // 해당 일정에 맞는 장소들 모두 isExpired true 처리
+        // 일정 만료 처리
+        date.setTravelDatesIsExpired(true);
+
+        // 변경 상태 저장
+        travelDatesRepository.save(date);
+
+        // 해당 일정에 맞는 장소들 isExpired false인 것들 찾기
         List<DatePlaces> expirePlaces = datePlacesRepository.findByTravelDatesAndDatePlacesIsExpiredFalse(date);
 
         // 장소들 모두 isExpired true 처리

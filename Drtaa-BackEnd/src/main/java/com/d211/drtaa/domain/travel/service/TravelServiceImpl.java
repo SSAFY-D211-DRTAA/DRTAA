@@ -184,6 +184,7 @@ public class TravelServiceImpl implements TravelService {
                     .travelId(date.getTravel().getTravelId())
                     .travelDatesId(date.getTravelDatesId())
                     .travelDatesDate(date.getTravelDatesDate())
+                    .travelDatesIsExpired(date.getTravelDatesIsExpired())
                     .placesDetail(placesDtoList) // 일정 장소 리스트를 설정
                     .build();
         }).collect(Collectors.toList());
