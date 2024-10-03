@@ -28,7 +28,7 @@ class RentCarDataSourceImpl @Inject constructor(
         return rentCarAPI.getUnassignedCar(rentSchedule)
     }
 
-    override suspend fun getOffCar(rentInfo: RequestCarStatus): String {
+    override suspend fun getOffCar(rentInfo: RequestCarStatus): RentTravelInfo {
         return rentCarAPI.getOffCar(rentInfo)
     }
 

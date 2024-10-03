@@ -143,7 +143,14 @@ class CarViewModel @Inject constructor(
         viewModelScope.launch {
             gpsRepository.observeMqttGPSMessages().collectLatest {
                 Timber.tag("Car").d("observeMqttMessages: $it")
-                _gpsData.emit(LatLng(it.msg.latitude, it.msg.longitude))
+                val lat = it.msg.latitude
+                val lng = it.msg.longitude
+                Timber.tag("Car").d("check: $lat, $lng")
+                if(lat != null && lng != null){
+                    _gpsData.emit(LatLng(lat, lng))
+                }else{
+                    Timber.tag("Car").d("null들어왔슈 $it")
+                }
             }
         }
     }
@@ -186,7 +193,6 @@ class CarViewModel @Inject constructor(
                 ).collect { result ->
                     result.onSuccess { data ->
                         // 탑승에 성공했다면 update
-                        getCarDrivingStatus()
                         Timber.tag("Car").d("탑승 $data")
                         rentCarRepository.setCarWithTravelInfo(
                             RequestCarStatus(
@@ -196,8 +202,9 @@ class CarViewModel @Inject constructor(
                                 datePlacesId = data.datePlacesId
                             )
                         )
-                    }.onFailure {
-                        Timber.tag("Car").d("현재 진행 중인 렌트가 없습니다.")
+                        getCarDrivingStatus()
+                    }.onFailure { e ->
+                        Timber.tag("Car").d("승차 $e")
                     }
                 }
             }
@@ -207,20 +214,29 @@ class CarViewModel @Inject constructor(
     fun getOffCar(rentId: Long) {
         viewModelScope.launch {
             _rentTravelInfo.value?.let {
-                rentCarRepository.getOffCar(
-                    RequestCarStatus(
-                        rentId = rentId.toInt(),
-                        travelId = it.travelId,
-                        travelDatesId = it.travelDatesId,
-                        datePlacesId = it.datePlacesId
-                    )
-                ).collect { result ->
+                val reqeust = RequestCarStatus(
+                    rentId = rentId.toInt(),
+                    travelId = it.travelId,
+                    travelDatesId = it.travelDatesId,
+                    datePlacesId = it.datePlacesId
+                )
+                Timber.tag("Car").d("하차 reqeust: $reqeust")
+                rentCarRepository.getOffCar(reqeust).collect { result ->
                     result.onSuccess { data ->
                         // 하차에 성공했다면 다음 목적지가 나올 것
+                        Timber.tag("Car").d("하차성공 $data")
                         getCarDrivingStatus()
+                        rentCarRepository.setCarWithTravelInfo(
+                            RequestCarStatus(
+                                rentId = rentId.toInt(),
+                                travelId = data.travelId,
+                                travelDatesId = data.travelDatesId,
+                                datePlacesId = data.datePlacesId
+                            )
+                        )
                         Timber.tag("Car").d("하차 $data")
-                    }.onFailure {
-                        Timber.tag("Car").d("현재 진행 중인 렌트가 없습니다.")
+                    }.onFailure { e ->
+                        Timber.tag("Car").d("하차 실패 $e")
                     }
                 }
             }
@@ -232,6 +248,7 @@ class CarViewModel @Inject constructor(
             rentCarRepository.getCarWithTravelInfo().collect {
                 it.onSuccess { data ->
                     _rentTravelInfo.value = data
+                    Timber.tag("Car").d("여행 정보 조회 성공 $data")
                 }
             }
         }
@@ -312,14 +329,14 @@ class CarViewModel @Inject constructor(
             rentCarRepository.callFirstAssignedCar(_reservationRent.value!!.rentId)
                 .collect { result ->
                     result.onSuccess { rent ->
-                        rentCarRepository.setCarWithTravelInfo(
-                            rentInfo = RequestCarStatus(
-                                rentId = rent.rentId,
-                                travelId = rent.travelId,
-                                travelDatesId = rent.travelDatesId,
-                                datePlacesId = rent.travelDatesId
-                            )
+                        val request = RequestCarStatus(
+                            rentId = rent.rentId,
+                            travelId = rent.travelId,
+                            travelDatesId = rent.travelDatesId,
+                            datePlacesId = rent.datePlacesId
                         )
+                        Timber.tag("Car").d("첫호출 $request")
+                        rentCarRepository.setCarWithTravelInfo(request)
                         _isFirst.emit(true)
                         Timber.tag("Car").d("성공 $rent")
                     }.onFailure {
