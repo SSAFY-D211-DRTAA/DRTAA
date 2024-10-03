@@ -396,6 +396,7 @@ public class TravelServiceImpl implements TravelService {
                             .datePlacesLat(placeDetail.getDatePlacesLat())
                             .datePlacesLon(placeDetail.getDatePlacesLon())
                             .datePlacesIsVisited(placeDetail.getDatePlacesIsVisited())
+                            .datePlacesIsExpired(placeDetail.getDatePlacesIsExpired())
                             .build();
 
                     log.info("{} 일정 추가", placeDetail.getDatePlacesName());
