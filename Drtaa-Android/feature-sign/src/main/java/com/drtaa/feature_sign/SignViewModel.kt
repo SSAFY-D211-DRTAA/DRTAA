@@ -19,22 +19,27 @@ import javax.inject.Inject
 class SignViewModel @Inject constructor(
     private val tokenRepository: TokenRepository,
     private val signRepository: SignRepository,
-    private val tokenProvider: TokenProvider
+    private val tokenProvider: TokenProvider,
 ) : ViewModel() {
     private val _tokens = MutableSharedFlow<Result<Tokens>>()
     val tokens: SharedFlow<Result<Tokens>> = _tokens
 
     fun getTokens() {
         viewModelScope.launch {
-            tokenProvider.getNewTokens().collect { result ->
-                result.onSuccess { data ->
-                    Timber.tag("tokens").d("success $data")
-                    setTokens(data)
-                }.onFailure {
-                    Timber.tag("tokens").d("fail")
-                    _tokens.emit(Result.failure(Exception("fail")))
-                    tokenRepository.clearToken()
+            if (tokenRepository.getAccessToken().isNotEmpty()) {
+                Timber.tag("tokens").d("token exist")
+                tokenProvider.getNewTokens().collect { result ->
+                    result.onSuccess { data ->
+                        Timber.tag("tokens").d("success $data")
+                        setTokens(data)
+                    }.onFailure {
+                        Timber.tag("tokens").d("fail")
+                        _tokens.emit(Result.failure(Exception("fail")))
+                        tokenRepository.clearToken()
+                    }
                 }
+            } else {
+                _tokens.emit(Result.failure(Exception("fail")))
             }
         }
     }

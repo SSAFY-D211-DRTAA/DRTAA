@@ -9,7 +9,7 @@ import com.drtaa.core_ui.base.BaseFragment
 import com.drtaa.core_ui.showSnackBar
 import com.drtaa.feature_main.MainActivity
 import com.drtaa.feature_sign.databinding.FragmentSignInBinding
-import com.drtaa.feature_sign.util.SocialLoginManager
+import com.drtaa.core_auth.SocialLoginManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach

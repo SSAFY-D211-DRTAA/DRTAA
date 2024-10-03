@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -75,6 +76,7 @@ class SignDataSourceImpl @Inject constructor(
     override suspend fun clearUserData() {
         dataStore.edit { preferences ->
             preferences.clear()
+            Timber.tag("logout").d("clearUserData $preferences")
         }
     }
 
