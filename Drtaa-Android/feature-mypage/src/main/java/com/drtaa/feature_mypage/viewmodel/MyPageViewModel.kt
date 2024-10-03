@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.drtaa.core_data.repository.SignRepository
+import com.drtaa.core_data.repository.TokenRepository
 import com.drtaa.core_model.sign.SocialUser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -18,7 +19,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MyPageViewModel @Inject constructor(
-    private val signRepository: SignRepository
+    private val signRepository: SignRepository,
+    private val tokenRepository: TokenRepository,
 ) : ViewModel() {
 
     private val _currentUser = MutableStateFlow<SocialUser?>(null)
@@ -74,6 +76,13 @@ class MyPageViewModel @Inject constructor(
                     }
                 }
             }
+        }
+    }
+
+    fun logout() {
+        viewModelScope.launch {
+            signRepository.clearUserData()
+            tokenRepository.clearToken()
         }
     }
 }

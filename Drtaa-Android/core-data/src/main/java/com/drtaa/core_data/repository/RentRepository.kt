@@ -19,7 +19,7 @@ interface RentRepository {
     suspend fun completeRent(requestCompleteRent: RequestCompleteRent): Flow<Result<String>>
     suspend fun cancelRent(requestCompleteRent: RequestCompleteRent): Flow<Result<String>>
     suspend fun getRentDetail(rentId: Long): Flow<Result<RentDetail>>
-    suspend fun getAllRentState(): Flow<Result<Long>>
+    suspend fun getReservedRentState(): Flow<Result<ResponseRentStateAll>>
     suspend fun getCurrentRent(): Flow<Result<RentDetail>>
     suspend fun checkDuplicatedRent(rentSchedule: RequestDuplicatedSchedule): Flow<Result<Boolean>>
 

@@ -16,6 +16,14 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object DataStoreModule {
+    @Singleton
+    @Named("RENT")
+    @Provides
+    fun provideRentDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
+        return PreferenceDataStoreFactory.create {
+            context.preferencesDataStoreFile("rent")
+        }
+    }
 
     @Singleton
     @Named("TOKEN_DATASTORE")

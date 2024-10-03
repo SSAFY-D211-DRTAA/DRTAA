@@ -47,7 +47,7 @@ class TourFragment : BaseFragment<FragmentTourBinding>(R.layout.fragment_tour) {
                     viewModel.getLocationBasedList(
                         location.longitude.toString(),
                         location.latitude.toString(),
-                        "20000" // 반경 2키로 검색
+                        "1000" // 반경 2키로 검색
                     )
                 }
             }

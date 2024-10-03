@@ -93,6 +93,7 @@ class MqttManager @Inject constructor() {
         client.subscribeWith()
             .addSubscription(mqtt5Subscription(GPS_PUB))
             .addSubscription(mqtt5Subscription(PATH_PUB))
+            .addSubscription(mqtt5Subscription(ORIENTATION_PUB))
             .callback { publish: Mqtt5Publish ->
                 Timber.tag(TAG).d("$publish")
                 val topic = publish.topic.toString()
@@ -101,6 +102,17 @@ class MqttManager @Inject constructor() {
                     _connectionStatus.emit(1)
                     when (topic) {
                         GPS_PUB -> {
+                            kotlin.runCatching {
+                                gson.fromJson(message, ResponseGPS::class.java)
+                            }.onSuccess { parsedMessage ->
+                                _receivedGPSMessages.emit(parsedMessage)
+                                Timber.tag(TAG).d("GPS 데이터 수신: $parsedMessage")
+                            }.onFailure { e ->
+                                Timber.tag(TAG).e(e, "GPS 메시지 파싱 실패")
+                            }
+                        }
+
+                        ORIENTATION_PUB -> {
                             kotlin.runCatching {
                                 gson.fromJson(message, ResponseGPS::class.java)
                             }.onSuccess { parsedMessage ->
@@ -177,5 +189,7 @@ class MqttManager @Inject constructor() {
         private const val GPS_PUB = "gps/data/v1/publish"
 //        private const val PATH_SUB = "path/data/v1/subscribe"
         private const val PATH_PUB = "path/data/v1/publish"
+//        private const val ORIENTATION_SUB = "orientation/data/v1/subscribe"
+        private const val ORIENTATION_PUB = "orientation/data/v1/publish"
     }
 }

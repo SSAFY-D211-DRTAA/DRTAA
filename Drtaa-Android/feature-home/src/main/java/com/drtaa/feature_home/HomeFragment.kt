@@ -13,24 +13,20 @@ import timber.log.Timber
 
 @AndroidEntryPoint
 class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
-    private val homeviewModel: HomeViewModel by viewModels()
+    private val homeViewModel: HomeViewModel by viewModels()
 
     override fun initView() {
         initObserve()
         initEvent()
-
-        binding.apply {
-            binding.homeviewModel = this@HomeFragment.homeviewModel
-        }
     }
 
     override fun onResume() {
         super.onResume()
-        homeviewModel.refreshUserData()
+        homeViewModel.refreshUserData()
     }
 
     private fun initObserve() {
-        homeviewModel.currentUser.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+        homeViewModel.currentUser.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { result ->
                 if (result == null) return@onEach
                 binding.socialUser = result
