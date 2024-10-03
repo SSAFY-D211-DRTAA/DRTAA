@@ -29,7 +29,6 @@ class SignViewModel @Inject constructor(
             tokenProvider.getNewTokens().collect { result ->
                 result.onSuccess { data ->
                     Timber.tag("tokens").d("success $data")
-                    _tokens.emit(Result.success(data))
                     setTokens(data)
                 }.onFailure {
                     Timber.tag("tokens").d("fail")
@@ -52,6 +51,7 @@ class SignViewModel @Inject constructor(
                     Timber.tag("tokens").d("유저 정보 불러오기 및 저장 실패")
                 }
             }
+            _tokens.emit(Result.success(tokens))
         }
     }
 
@@ -60,7 +60,6 @@ class SignViewModel @Inject constructor(
             signRepository.getTokens(userLoginInfo).collect { result ->
                 result.onSuccess { data ->
                     Timber.tag("tokens").d("success $data")
-                    _tokens.emit(Result.success(data))
                     setTokens(data)
                 }.onFailure {
                     Timber.tag("tokens").d("fail")

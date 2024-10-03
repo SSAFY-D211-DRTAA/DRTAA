@@ -9,6 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.drtaa.core_ui.base.BaseFragment
+import com.drtaa.core_ui.component.TwoButtonMessageDialog
 import com.drtaa.core_ui.showSnackBar
 import com.drtaa.feature_mypage.databinding.FragmentMyPageBinding
 import com.drtaa.feature_mypage.viewmodel.MyPageViewModel
@@ -92,9 +93,16 @@ class MyPageFragment : BaseFragment<FragmentMyPageBinding>(R.layout.fragment_my_
                 }
             }
             llMypageItem4.apply {
-                findViewById<TextView>(R.id.tv_mypage_item_title).text = "내 정보?"
+                findViewById<TextView>(R.id.tv_mypage_item_title).text = "로그아웃"
                 setOnClickListener {
-                    showSnackBar("4클릭")
+                    TwoButtonMessageDialog(
+                        context = requireActivity(),
+                        message = "로그아웃 하시겠습니까?",
+                        onCheckClick = {
+                            myPageViewModel.logout()
+                            requireActivity().finish()
+                        }
+                    ).show()
                 }
             }
         }
