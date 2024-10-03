@@ -75,7 +75,7 @@ class RentSearchFragment :
         rentSearchViewModel.selectedSearchItem.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { selectedSearchItem ->
                 Timber.d("selectedSearchItem $selectedSearchItem")
-                selectedSearchItem?.let {
+                selectedSearchItem ?.let {
                     naverMap.setMarker(selectedSearchItem.lat, selectedSearchItem.lng)
                     naverMap.moveCameraTo(selectedSearchItem.lat, selectedSearchItem.lng)
                     naverMap.setContentPadding(0, 0, 0, MAP_BOTTOM_CONTENT_PADDING)

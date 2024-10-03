@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.drtaa.core_model.plan.Plan.DayPlan.PlanItem
+import com.drtaa.core_model.plan.PlanItem
 import com.drtaa.core_ui.base.BaseDiffUtil
 import com.drtaa.feature_plan.databinding.ItemPlanBinding
 import timber.log.Timber
@@ -15,6 +15,7 @@ import timber.log.Timber
 class PlanListAdapter(
     private val context: Context,
     private val onPlanSelectListener: (planItem: PlanItem) -> Unit,
+    private val onPlanClickListener: (planItem: PlanItem) -> Unit
 ) :
     ListAdapter<PlanItem, PlanListAdapter.PlanItemViewHolder>(BaseDiffUtil<PlanItem>()),
     ItemTouchHelperListener {
@@ -66,6 +67,10 @@ class PlanListAdapter(
                     planItem.isSelected = !planItem.isSelected
                     onPlanSelectListener(planItem)
                     setEditItemBackGround(planItem.isSelected)
+                }
+
+                if (!isEditMode) {
+                    onPlanClickListener(planItem)
                 }
             }
         }

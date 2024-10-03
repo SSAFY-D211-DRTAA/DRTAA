@@ -160,8 +160,8 @@ public class TravelServiceImpl implements TravelService {
         List<TravelDates> datesList = travelDatesRepository.findByTravel(travel);
 
         // 각 일정에 대해 일정 장소 리스트를 찾고, DTO로 변환
-        List<DatesDetailResponseDTO> datesDtoList = datesList.stream().map(dates -> {
-            List<DatePlaces> placesList = datePlacesRepository.findByTravelDatesId(dates.getTravelDatesId());
+        List<DatesDetailResponseDTO> datesDtoList = datesList.stream().map(date -> {
+            List<DatePlaces> placesList = datePlacesRepository.findByTravelDates(date);
 
             // 일정 장소 DTO 리스트 생성
             List<PlacesDetailResponseDTO> placesDtoList = placesList.stream().map(places ->
@@ -180,9 +180,9 @@ public class TravelServiceImpl implements TravelService {
 
             // 일정 DTO 생성
             return DatesDetailResponseDTO.builder()
-                    .travelId(dates.getTravel().getTravelId())
-                    .travelDatesId(dates.getTravelDatesId())
-                    .travelDatesDate(dates.getTravelDatesDate())
+                    .travelId(date.getTravel().getTravelId())
+                    .travelDatesId(date.getTravelDatesId())
+                    .travelDatesDate(date.getTravelDatesDate())
                     .placesDetail(placesDtoList) // 일정 장소 리스트를 설정
                     .build();
         }).collect(Collectors.toList());
@@ -360,7 +360,7 @@ public class TravelServiceImpl implements TravelService {
 
     @Override
     @Transactional
-    public void updateTravelDatesPlaces(TravelDetailRequestDTO travelDetailRequestDTO) {
+    public TravelUpdateResponseDTO updateTravelDatesPlaces(TravelDetailRequestDTO travelDetailRequestDTO) {
         // 여행 찾기
         Travel travel = travelRepository.findByTravelId(travelDetailRequestDTO.getTravelId())
                 .orElseThrow(() -> new TravelNotFoundException("해당 travelId의 맞는 여행을 찾을 수 없습니다."));
@@ -424,6 +424,19 @@ public class TravelServiceImpl implements TravelService {
 
         // 렌트 변경 상태 저장
         rentRepository.save(rent);
+
+        // 여러 여행 일정 중 datePlacesIsVisited가 false인 것 들 중 datePlacesId가 가장 작은 것 찾기
+        DatePlaces place = datePlacesRepository.findFirstByTravelAndDatePlacesIsVisitedFalseOrderByDatePlacesIdAsc(travel)
+                .orElseThrow(() -> new TravelNotFoundException("모든 장소를 방문했습니다."));
+
+
+        TravelUpdateResponseDTO response = TravelUpdateResponseDTO.builder()
+                .travelId(travel.getTravelId())
+                .travelDatesId(place.getTravelDates().getTravelDatesId())
+                .datePlacesId(place.getDatePlacesId())
+                .build();
+
+        return response;
     }
 
     @Override

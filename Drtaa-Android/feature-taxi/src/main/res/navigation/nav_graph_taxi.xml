@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph_taxi"
+    app:startDestination="@id/taxiFragment">
+
+    <fragment
+        android:id="@+id/taxiFragment"
+        android:name="com.drtaa.feature_taxi.TaxiFragment"
+        android:label="TaxiFragment"
+        tools:layout="@layout/fragment_taxi">
+        <action
+            android:id="@+id/action_taxiFragment_to_taxiSearchFragment"
+            app:destination="@id/taxiSearchFragment"></action>
+
+        <action
+            android:id="@+id/action_taxiFragment_to_taxiSummaryFragment"
+            app:destination="@id/taxiSummaryFragment">
+        </action>
+    </fragment>
+
+    <fragment
+        android:id="@+id/taxiSearchFragment"
+        android:name="com.drtaa.feature_taxi.TaxiSearchFragment"
+        android:label="TaxiSearchFragment"
+        tools:layout="@layout/fragment_taxi_search">
+        <argument
+            android:name="isStartLocation"
+            app:argType="boolean" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/taxiSummaryFragment"
+        android:name="com.drtaa.feature_taxi.TaxiSummaryFragment"
+        android:label="TaxiSummaryFragment"
+        tools:layout="@layout/fragment_taxi_summary">
+    </fragment>
+
+    <action
+        android:id="@+id/action_taxiSummaryFragment_to_paymentFragment"
+        app:destination="@id/nav_graph_payment">
+    <argument
+        android:name="payment"
+        app:argType="com.drtaa.core_model.rent.Payment" />
+    </action>
+
+    <include app:graph="@navigation/nav_graph_payment"/>
+</navigation>

@@ -7,6 +7,7 @@ import com.d211.drtaa.domain.travel.dto.request.TravelDetailRequestDTO;
 import com.d211.drtaa.domain.travel.dto.request.TravelNameRequestDTO;
 import com.d211.drtaa.domain.travel.dto.response.TravelDetailResponseDTO;
 import com.d211.drtaa.domain.travel.dto.response.TravelResponseDTO;
+import com.d211.drtaa.domain.travel.dto.response.TravelUpdateResponseDTO;
 import com.d211.drtaa.domain.travel.service.TravelService;
 import com.d211.drtaa.global.exception.rent.RentNotFoundException;
 import com.d211.drtaa.global.exception.travel.TravelNotFoundException;
@@ -140,9 +141,9 @@ public class TravelController {
     @Operation(summary = "여행 일정 장소 변경", description = "travelId의 해당하고 travelDatesId의 해당하는 여행 장소들 변경")
     public ResponseEntity updateTravelDatesPlaces(@RequestBody TravelDetailRequestDTO travelDetailRequestDTO) {
         try {
-            travelService.updateTravelDatesPlaces(travelDetailRequestDTO);
+            TravelUpdateResponseDTO response = travelService.updateTravelDatesPlaces(travelDetailRequestDTO);
 
-            return ResponseEntity.ok("Success"); // 200
+            return ResponseEntity.ok(response); // 200
         } catch(TravelNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
         } catch (Exception e) {
