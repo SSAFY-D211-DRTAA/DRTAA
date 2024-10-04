@@ -1,9 +1,15 @@
 package com.drtaa.feature_plan
 
+import android.net.Uri
 import android.view.View
+import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavDeepLinkRequest
+import androidx.navigation.NavOptions
+import androidx.navigation.fragment.findNavController
+import com.drtaa.core_ui.DeepLinkConstants
 import com.drtaa.core_ui.base.BaseFragment
 import com.drtaa.feature_plan.adapter.PlanHistoryListAdapter
 import com.drtaa.feature_plan.databinding.FragmentPlanHistoryBinding
@@ -29,6 +35,7 @@ class PlanHistoryFragment :
     override fun initView() {
         initObserve()
         initRVAdapter()
+        setupBackPressHandler()
     }
 
     private fun initRVAdapter() {
@@ -67,5 +74,23 @@ class PlanHistoryFragment :
                     planHistoryListAdapter.submitList(planList)
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
+    }
+
+    private fun setupBackPressHandler() {
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            navigateToHome()
+        }
+    }
+
+    private fun navigateToHome() {
+        val request = NavDeepLinkRequest.Builder
+            .fromUri(Uri.parse(DeepLinkConstants.HOME))
+            .build()
+        findNavController().navigate(
+            request,
+            NavOptions.Builder()
+                .setPopUpTo(findNavController().graph.startDestinationId, true)
+                .build()
+        )
     }
 }

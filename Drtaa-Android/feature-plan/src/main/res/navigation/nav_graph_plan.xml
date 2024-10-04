@@ -48,6 +48,7 @@
         android:name="com.drtaa.feature_plan.PlanHistoryFragment"
         android:label="PlanHistoryFragment"
         tools:layout="@layout/fragment_plan_history">
+        <deepLink app:uri="drtaa://app/plan/history" />
         <action
             android:id="@+id/action_planHistoryFragment_to_planListFragment"
             app:destination="@id/planListFragment" />

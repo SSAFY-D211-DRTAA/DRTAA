@@ -15,6 +15,7 @@ import com.drtaa.feature_payment.viewmodel.PaymentViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import kr.co.bootpay.android.Bootpay
 import kr.co.bootpay.android.events.BootpayEventListener
 import kr.co.bootpay.android.models.BootExtra
@@ -28,6 +29,7 @@ class PaymentFragment : BaseDialogFragment<FragmentPaymentBinding>(R.layout.frag
 
     private val viewModel: PaymentViewModel by viewModels()
     private val args: PaymentFragmentArgs by navArgs()
+    private var isPaymentCompleted = false
 
     override fun initView(savedInstanceState: Bundle?) {
         observeViewModel()
@@ -49,7 +51,8 @@ class PaymentFragment : BaseDialogFragment<FragmentPaymentBinding>(R.layout.frag
         val items = ArrayList<BootItem>().apply {
             add(
                 BootItem().setName(product.name).setId(product.id).setQty(product.quantity)
-                    .setPrice(product.price.toDouble() - SALE)
+//                    .setPrice(product.price.toDouble() - SALE)
+                    .setPrice(Defalut_Price)
             )
         }
 
@@ -57,7 +60,7 @@ class PaymentFragment : BaseDialogFragment<FragmentPaymentBinding>(R.layout.frag
             setApplicationId(BuildConfig.BOOTPAY_APP_ID)
             setOrderName(payment.orderName)
             setOrderId(payment.orderId)
-            setPrice(product.price.toDouble() - SALE)
+            setPrice(Defalut_Price)
             setUser(bootUser)
             setExtra(extra)
             this.items = items
@@ -86,12 +89,14 @@ class PaymentFragment : BaseDialogFragment<FragmentPaymentBinding>(R.layout.frag
 
                 override fun onClose() {
                     Timber.tag("bootpay").d("onClose")
-                    findNavController().previousBackStackEntry?.savedStateHandle?.set(
-                        Pay.CANCELED.type,
-                        true
-                    )
-                    Bootpay.removePaymentWindow()
-                    dismiss()
+                    if (!isPaymentCompleted) {
+                        findNavController().previousBackStackEntry?.savedStateHandle?.set(
+                            Pay.CANCELED.type,
+                            true
+                        )
+                        Bootpay.removePaymentWindow()
+                        dismiss()
+                    }
                 }
 
                 override fun onIssued(data: String) {
@@ -105,11 +110,17 @@ class PaymentFragment : BaseDialogFragment<FragmentPaymentBinding>(R.layout.frag
 
                 override fun onDone(data: String) {
                     Timber.tag("bootpay").d("done: %s", data)
-                    findNavController().previousBackStackEntry?.savedStateHandle?.set(
-                        Pay.SUCCESS.type,
-                        Pair(true, data)
-                    )
-                    dismiss()
+                    isPaymentCompleted = true
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        Bootpay.removePaymentWindow()
+                        findNavController().previousBackStackEntry?.savedStateHandle?.set(
+                            Pay.SUCCESS.type,
+                            Pair(true, data)
+                        )
+                        val action = PaymentFragmentDirections.actionPaymentFragmentToPaymentDoneFragment(args.payment)
+                        findNavController().navigate(action)
+                        Timber.d("나 실행되긴 하는겨?")
+                    }
                 }
             }).requestPayment()
     }
@@ -122,5 +133,6 @@ class PaymentFragment : BaseDialogFragment<FragmentPaymentBinding>(R.layout.frag
 
     companion object {
         const val SALE = 239900.0
+        const val Defalut_Price = 100.0
     }
 }
