@@ -6,8 +6,8 @@ data class ResponseGPS(
 ) {
     data class GPSData(
         val header: Header,
-        val latitude: Double,
-        val longitude: Double,
+        val latitude: Double?,
+        val longitude: Double?,
         val altitude: Double,
         val eastOffset: Double,
         val northOffset: Double,

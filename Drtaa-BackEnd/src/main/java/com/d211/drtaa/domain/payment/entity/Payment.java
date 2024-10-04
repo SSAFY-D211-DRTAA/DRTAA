@@ -3,9 +3,7 @@ package com.d211.drtaa.domain.payment.entity;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -14,6 +12,8 @@ import java.time.LocalDateTime;
 @Entity
 @Builder
 @Table(name = "payments")
+@NoArgsConstructor
+@AllArgsConstructor
 public class Payment {
 
     @Id
