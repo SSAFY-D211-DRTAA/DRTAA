@@ -54,32 +54,20 @@
                 android:layout_height="wrap_content"
                 android:visibility="gone">
 
-                <com.google.android.material.card.MaterialCardView
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_plan"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:cardCornerRadius="0dp"
+                    android:background="@color/white"
+                    android:overScrollMode="never"
+                    android:scrollbars="vertical"
+                    android:visibility="gone"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:strokeColor="@color/black"
-                    app:strokeWidth="2dp">
-
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/rv_plan"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@color/white"
-                        android:overScrollMode="never"
-                        android:scrollbars="vertical"
-                        android:visibility="gone"
-                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        tools:listitem="@layout/item_plan" />
-                </com.google.android.material.card.MaterialCardView>
+                    tools:listitem="@layout/item_plan" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/cl_plan_empty"
