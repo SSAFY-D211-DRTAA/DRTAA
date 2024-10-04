@@ -2,15 +2,12 @@ package com.drtaa.feature_rent.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.drtaa.core_data.repository.NaverRepository
 import com.drtaa.core_data.repository.RentRepository
 import com.drtaa.core_model.map.Search
 import com.drtaa.core_model.network.RequestDuplicatedSchedule
-import com.drtaa.core_model.network.ResponseReverseGeocode
 import com.drtaa.core_model.rent.RentInfo
 import com.drtaa.core_model.rent.RentSchedule
 import com.drtaa.core_model.util.toLocalDateTime
-import com.naver.maps.geometry.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,7 +21,6 @@ import javax.inject.Inject
 @HiltViewModel
 class RentViewModel @Inject constructor(
     private val rentRepository: RentRepository,
-    private val naverRepository: NaverRepository,
 ) : ViewModel() {
     private val _rentStartLocation = MutableStateFlow<Search?>(null)
     val rentStartLocation: StateFlow<Search?> = _rentStartLocation

@@ -186,7 +186,7 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
                             binding.btnGetOffQrcode.visibility = View.VISIBLE
                         }
 
-                        CarStatus.PARKING -> {
+                        CarStatus.CALLING -> {
                             binding.btnTourQrcode.visibility = View.VISIBLE
                             binding.btnGetOffQrcode.visibility = View.GONE
                         }

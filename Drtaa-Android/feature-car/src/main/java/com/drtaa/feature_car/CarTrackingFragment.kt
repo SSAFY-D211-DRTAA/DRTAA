@@ -1,7 +1,7 @@
 package com.drtaa.feature_car
 
-import android.content.res.ColorStateList
 import android.graphics.Color
+import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.flowWithLifecycle
@@ -10,9 +10,9 @@ import com.drtaa.core_map.base.BaseMapFragment
 import com.drtaa.core_map.moveCameraTo
 import com.drtaa.core_ui.showSnackBar
 import com.drtaa.feature_car.databinding.FragmentCarTrackingBinding
+import com.drtaa.feature_car.viewmodel.CarStatus
 import com.drtaa.feature_car.viewmodel.CarViewModel
 import com.naver.maps.geometry.LatLng
-import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.MapView
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.overlay.Marker
@@ -34,6 +34,12 @@ class CarTrackingFragment :
         width = ICON_SIZE
         height = ICON_SIZE
         position = LatLng(0.0, 0.0)
+    }
+
+    private var positionMarker: Marker = Marker().apply {
+        icon = OverlayImage.fromResource(com.drtaa.core_ui.R.drawable.ic_center_marker)
+        width = 80
+        height = 80
     }
 
     private val pathOverlay by lazy {
@@ -62,13 +68,29 @@ class CarTrackingFragment :
             showLoading()
             // isInProgressed -> 재호출, isReserved -> 첫 호출
             if (viewModel.isInProgress.value) {
-                // 재호출 시 스타벅스로 지정
-                viewModel.recallAssignedCar(STARBUCKS)
+                viewModel.destination.value?.let {
+                    viewModel.recallAssignedCar(it)
+                } ?: showSnackBar("호출장소를 설정해주세요")
             } else if (viewModel.isReserved.value) {
-                viewModel.callFirstAssignedCar()
+                // 첫 호출 시 로직 변경 필요
+                viewModel.modifyFirstEvent()
             } else {
                 showSnackBar("배정된 차량이 없습니다")
             }
+        }
+
+        naverMap.setOnMapLongClickListener { pointF, latLng ->
+            positionMarker.apply {
+                position = latLng
+                map = naverMap
+            }
+            viewModel.setDestination(latLng)
+        }
+
+        binding.btnReturn.text = if (viewModel.isReserved.value && !viewModel.isInProgress.value) {
+            "렌트\n환불"
+        } else {
+            "차량\n반납"
         }
 
         binding.btnTracking.setOnClickListener {
@@ -81,13 +103,47 @@ class CarTrackingFragment :
     }
 
     private fun observeCarTracking() {
-        viewModel.trackingState.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach { isTracking ->
-            binding.btnTracking.backgroundTintList = if (isTracking) {
-                null
-            } else {
-                ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.black))
+        viewModel.drivingStatus.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach { status ->
+            status?.let {
+                Timber.tag("driving").d("$status")
+                binding.tvPin.visibility = when (it) {
+                    CarStatus.DRIVING -> {
+                        View.VISIBLE
+                    }
+
+                    CarStatus.CALLING -> {
+                        View.GONE
+                    }
+
+                    CarStatus.IDLE -> {
+                        View.VISIBLE
+                    }
+                }
             }
         }.launchIn(viewLifecycleOwner.lifecycleScope)
+        viewModel.reverseGeocode.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach { res ->
+                res?.let {
+                    with(binding.tvPinDesc) {
+                        this.visibility = View.VISIBLE
+                        it.onSuccess { road ->
+                            text = if (road == "주소를 찾을 수 없습니다.") {
+                                road
+                            } else {
+                                road + "\n이 장소로 호출합니다"
+                            }
+                        }
+                    }
+                }
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
+        viewModel.trackingState.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach { isTracking ->
+                binding.btnTracking.text = if (isTracking) {
+                    "차량\n추적\nON"
+                } else {
+                    "차량\n추적\nOFF"
+                }
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
 
         viewModel.isReturn.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach {
             if (it) {
@@ -125,9 +181,11 @@ class CarTrackingFragment :
                         showSnackBar("MQTT 연결 성공")
                         viewModel.getRoute()
                     }
+
                     -1 -> {
                         Timber.tag("mqtt").d("mqtt 연결 실패")
                     }
+
                     else -> {
                         dismissLoading()
                         navigatePopBackStack()
@@ -203,6 +261,8 @@ class CarTrackingFragment :
 
     override fun onDestroy() {
         viewModel.stopGPSPublish()
+        viewModel.clearDestination()
+        viewModel.clearReverseGeocode()
         super.onDestroy()
     }
 
@@ -214,7 +274,7 @@ class CarTrackingFragment :
         private const val THRESHOLD = 10.0
         private const val ICON_SIZE = 100
         val jungryujang = LatLng(37.57578754990568, 126.90027478459672)
-        private val STARBUCKS = LatLng(37.576636819990284, 126.89879021208397)
+//        private val STARBUCKS = LatLng(37.576636819990284, 126.89879021208397)
 //        private val SANGAM_LATLNG = LatLng(37.57569116736151, 126.90039723462993)
     }
 }

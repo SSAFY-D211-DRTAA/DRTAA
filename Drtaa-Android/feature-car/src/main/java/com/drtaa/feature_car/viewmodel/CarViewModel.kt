@@ -3,12 +3,16 @@ package com.drtaa.feature_car.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.drtaa.core_data.repository.GPSRepository
+import com.drtaa.core_data.repository.NaverRepository
+import com.drtaa.core_data.repository.PlanRepository
 import com.drtaa.core_data.repository.RentCarRepository
 import com.drtaa.core_data.repository.RentRepository
 import com.drtaa.core_model.map.CarRoute
 import com.drtaa.core_model.network.RequestCarStatus
 import com.drtaa.core_model.network.RequestCompleteRent
 import com.drtaa.core_model.network.ResponseRentStateAll
+import com.drtaa.core_model.network.ResponseReverseGeocode
+import com.drtaa.core_model.plan.Plan
 import com.drtaa.core_model.rent.CarPosition
 import com.drtaa.core_model.rent.RentDetail
 import com.naver.maps.geometry.LatLng
@@ -30,7 +34,7 @@ import javax.inject.Inject
 
 enum class CarStatus {
     DRIVING,
-    PARKING,
+    CALLING,
     IDLE
 }
 
@@ -39,6 +43,8 @@ class CarViewModel @Inject constructor(
     private val gpsRepository: GPSRepository,
     private val rentRepository: RentRepository,
     private val rentCarRepository: RentCarRepository,
+    private val naverRepository: NaverRepository,
+    private val planRepository: PlanRepository,
 ) : ViewModel() {
 
     // MQTT
@@ -78,6 +84,10 @@ class CarViewModel @Inject constructor(
     val drivingStatus: StateFlow<CarStatus?> = _drivingStatus
     private val _trackingState = MutableStateFlow<Boolean>(false)
     val trackingState: StateFlow<Boolean> get() = _trackingState
+    private val _destination = MutableStateFlow<LatLng?>(null)
+    val destination: StateFlow<LatLng?> = _destination
+    private val _reverseGeocode = MutableStateFlow<Result<String>?>(null)
+    val reverseGeocode: StateFlow<Result<String>?> = _reverseGeocode
 
     init {
         initMQTT()
@@ -116,8 +126,6 @@ class CarViewModel @Inject constructor(
     fun toggleTrackingState() {
         _trackingState.value = !_trackingState.value
     }
-
-    fun isPublising(): Boolean? = publishJob?.isActive
 
     fun startGPSPublish(
         data: String =
@@ -160,16 +168,33 @@ class CarViewModel @Inject constructor(
         _mqttConnectionStatus.value = -1
     }
 
+    fun setDestination(latLng: LatLng) {
+        _destination.value = latLng
+        getReverseGeocode(latLng.latitude, latLng.longitude)
+    }
+
+    fun clearDestination() {
+        _destination.value = null
+    }
+
     fun getCarDrivingStatus() {
         viewModelScope.launch {
             _currentRentDetail.value?.let {
                 rentCarRepository.getDriveStatus(it.rentId!!).collect { status ->
                     status.onSuccess { data ->
                         Timber.tag("Car").d("드라이브 상태 조회 성공 $data")
-                        _drivingStatus.value = if (data == "driving") {
-                            CarStatus.DRIVING
-                        } else {
-                            CarStatus.IDLE
+                        _drivingStatus.value = when (data) {
+                            "driving" -> {
+                                CarStatus.DRIVING
+                            }
+
+                            "calling" -> {
+                                CarStatus.CALLING
+                            }
+
+                            else -> {
+                                CarStatus.IDLE
+                            }
                         }
                     }.onFailure { e ->
                         Timber.tag("Car").d("드라이브 상태 조회 실패 $e")
@@ -336,6 +361,7 @@ class CarViewModel @Inject constructor(
                             travelDatesId = rent.travelDatesId,
                             datePlacesId = rent.datePlacesId
                         )
+                        getCarDrivingStatus()
                         Timber.tag("Car").d("첫호출 $request")
                         rentCarRepository.setCarWithTravelInfo(request)
                         _isFirst.emit(true)
@@ -385,10 +411,94 @@ class CarViewModel @Inject constructor(
         }
     }
 
+    private fun getReverseGeocode(latitude: Double, longitude: Double) {
+        viewModelScope.launch {
+            naverRepository.getReverseGeocode(latitude, longitude).collect { result ->
+                result.onSuccess { data ->
+                    _reverseGeocode.emit(Result.success(formatAddress(data)))
+                }.onFailure {
+                    _reverseGeocode.emit(Result.failure(Exception("fail")))
+                }
+            }
+        }
+    }
+
+    fun clearReverseGeocode() {
+        _reverseGeocode.value = null
+    }
+
+    private fun formatAddress(response: ResponseReverseGeocode): String {
+        val result = response.results.firstOrNull()
+        return if (result != null) {
+            val region = result.region
+            val land = result.land
+            "${region.area1.name} ${region.area2.name} ${region.area3.name} ${land?.addition0?.value}"
+        } else {
+            "주소를 찾을 수 없습니다."
+        }
+    }
+
+    // 첫 호출 리팩토링 -> 일정변경하기
+    fun modifyFirstEvent() {
+        viewModelScope.launch {
+            val latlng = _destination.value ?: return@launch
+            val rent = _reservationRent.value ?: return@launch
+            rentRepository.getRentDetail(rent.rentId).collect { detail ->
+                detail.onSuccess { result ->
+                    planRepository.getPlanDetail(result.travelId.toInt())
+                        .collect { planResult ->
+                            planResult.onSuccess { plan ->
+                                val planList = plan.datesDetail.toMutableList()
+                                val firstDayPlan = plan.datesDetail.first() // 첫 호출이니까
+                                val addressName = _reverseGeocode.value?.getOrNull()
+                                val buildingName = addressName?.split(" ")?.last()
+                                Timber.tag("수정").d("$addressName\n $buildingName")
+                                val placeList =
+                                    plan.datesDetail.first().placesDetail.toMutableList()
+                                val modifiedFirstPlanItem =
+                                    firstDayPlan.placesDetail.first().copy(
+                                        datePlacesName = buildingName ?: "임시 장소",
+                                        datePlacesAddress = addressName ?: "임시 주소",
+                                        datePlacesLat = latlng.latitude,
+                                        datePlacesLon = latlng.longitude
+                                    )
+                                placeList[0] = modifiedFirstPlanItem
+                                val modifiedDayPlan = firstDayPlan.copy(
+                                    placesDetail = placeList
+                                )
+                                planList[0] = modifiedDayPlan
+                                planRepository.putPlan(
+                                    Plan(
+                                        travelId = plan.travelId,
+                                        travelName = plan.travelName,
+                                        datesDetail = planList.toList(),
+                                        travelStartDate = plan.travelStartDate,
+                                        travelEndDate = plan.travelEndDate,
+                                    )
+                                ).collect { planModify ->
+                                    planModify.onSuccess {
+                                        Timber.tag("Car").d("수정 성공")
+                                        callFirstAssignedCar()
+                                    }.onFailure { e ->
+                                        Timber.tag("Car").d("수정 실패 $e")
+                                    }
+                                }
+                                Timber.tag("Car").d("$plan")
+                            }.onFailure { e ->
+                                Timber.tag("Car").d("$e")
+                            }
+                        }
+                }.onFailure { e ->
+                    Timber.tag("Car").d("$e")
+                }
+            }
+        }
+    }
+
     companion object {
         private const val DEFAULT_INTERVAL = 1000L
         private const val GPS_SUB = "gps/data/v1/subscribe"
-        private const val PATH_SUB = "path/data/v1/subscribe"
-        private const val ORIENTATION_SUB = "orientation/data/v1/subscribe"
+//        private const val PATH_SUB = "path/data/v1/subscribe"
+//        private const val ORIENTATION_SUB = "orientation/data/v1/subscribe"
     }
 }
