@@ -9,6 +9,7 @@ import com.drtaa.core_model.plan.PlanItem
 import com.drtaa.core_model.util.toPlanItem
 import com.drtaa.core_ui.base.BaseFragment
 import com.drtaa.core_ui.component.LocationHelper
+import com.drtaa.core_ui.dpToPx
 import com.drtaa.feature_plan.adapter.PlanListAdapter
 import com.drtaa.feature_tour.component.TourAdapter
 import com.drtaa.feature_tour.databinding.FragmentTourBinding
@@ -97,6 +98,22 @@ class TourFragment : BaseFragment<FragmentTourBinding>(R.layout.fragment_tour) {
     private fun initUI() {
         binding.rvTour.adapter = tourAdapter
         binding.rvPlan.adapter = planAdapter
+
+        setRVMaxHeight()
+    }
+
+    private fun setRVMaxHeight() {
+        // RecyclerView의 maxHeight를 250dp로 설정
+        binding.apply {
+            rvPlan.viewTreeObserver.addOnGlobalLayoutListener {
+                val maxHeightInPx = MAX_HEIGHT.dpToPx()
+                if (rvPlan.height > maxHeightInPx) {
+                    val layoutParams = rvPlan.layoutParams
+                    layoutParams.height = maxHeightInPx
+                    rvPlan.layoutParams = layoutParams
+                }
+            }
+        }
     }
 
     private fun getLocation() {
@@ -158,6 +175,7 @@ class TourFragment : BaseFragment<FragmentTourBinding>(R.layout.fragment_tour) {
     }
 
     companion object {
+        const val MAX_HEIGHT = 250
         const val DURATION = 300L
         const val ROTATION_90 = 90f
         const val ROTATION_270 = 270f

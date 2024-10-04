@@ -1,6 +1,7 @@
 package com.drtaa.core_ui
 
 import android.content.Context
+import android.content.res.Resources
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
@@ -46,4 +47,11 @@ fun String.parseLocalDateTime(): String {
     val formatter = DateTimeFormatter.ofPattern("yyyy년 M월 d일\na h시 m분", Locale.KOREAN)
     val formatted = dateTime.format(formatter)
     return formatted.replace("AM", "오전").replace("PM", "오후")
+}
+
+/**
+ * dp 값을 px 값으로 변환하는 확장 함수
+ */
+fun Int.dpToPx(): Int {
+    return (this * Resources.getSystem().displayMetrics.density).toInt()
 }
