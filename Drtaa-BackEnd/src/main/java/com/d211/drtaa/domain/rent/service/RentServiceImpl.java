@@ -84,9 +84,12 @@ public class RentServiceImpl implements RentService{
             RentResponseDTO dto = RentResponseDTO.builder()
                     .rentId(rent.getRentId())
                     .rentStatus(rent.getRentStatus())
-                    .rentHeadCount(rent.getRentHeadCount())
                     .rentTime(rent.getRentTime())
-                    .rentStartTime(rent.getRentStartTime())
+                    .rentTime(rent.getRentTime())
+                    .rentHeadCount(rent.getRentHeadCount())
+                    .rentPrice(rent.getRentPrice())
+                    .rentStartTime(rent.getRentStartTime().toLocalDate())
+                    .rentEndTime(rent.getRentEndTime().toLocalDate())
                     .build();
 
             response.add(dto);
@@ -109,9 +112,12 @@ public class RentServiceImpl implements RentService{
             RentResponseDTO dto = RentResponseDTO.builder()
                     .rentId(rent.getRentId())
                     .rentStatus(rent.getRentStatus())
-                    .rentHeadCount(rent.getRentHeadCount())
                     .rentTime(rent.getRentTime())
-                    .rentStartTime(rent.getRentStartTime())
+                    .rentTime(rent.getRentTime())
+                    .rentHeadCount(rent.getRentHeadCount())
+                    .rentPrice(rent.getRentPrice())
+                    .rentStartTime(rent.getRentStartTime().toLocalDate())
+                    .rentEndTime(rent.getRentEndTime().toLocalDate())
                     .build();
 
             response.add(dto);
@@ -134,9 +140,12 @@ public class RentServiceImpl implements RentService{
             RentResponseDTO dto = RentResponseDTO.builder()
                     .rentId(rent.getRentId())
                     .rentStatus(rent.getRentStatus())
-                    .rentHeadCount(rent.getRentHeadCount())
                     .rentTime(rent.getRentTime())
-                    .rentStartTime(rent.getRentStartTime())
+                    .rentTime(rent.getRentTime())
+                    .rentHeadCount(rent.getRentHeadCount())
+                    .rentPrice(rent.getRentPrice())
+                    .rentStartTime(rent.getRentStartTime().toLocalDate())
+                    .rentEndTime(rent.getRentEndTime().toLocalDate())
                     .build();
 
             response.add(dto);

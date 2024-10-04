@@ -43,7 +43,7 @@ class RentCarRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun getOffCar(rentInfo: RequestCarStatus): Flow<Result<String>> = flow {
+    override suspend fun getOffCar(rentInfo: RequestCarStatus): Flow<Result<RentTravelInfo>> = flow {
         when (val response = safeApiCall { rentCarDataSource.getOffCar(rentInfo) }) {
             is ResultWrapper.Success -> {
                 emit(Result.success(response.data))

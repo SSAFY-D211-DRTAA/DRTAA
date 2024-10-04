@@ -8,7 +8,8 @@ data_dir = './data'
 class MessageHandler:
     def __init__(self):
         # 여기에 차량 관리자 등 필요한 객체를 초기화합니다.
-        pass
+        self.prev_gps = None
+        self.prev_orientaion = None
 
     def handle_message(self, message, source):
         if isinstance(message, dict):
@@ -75,20 +76,24 @@ class MessageHandler:
         # 차량 GPS
         try:
             with open(f'{data_dir}/gps_data.json') as f:
-                return json.load(f)
-
+                self.prev_gps = json.load(f)
+                return self.prev_gps
         except FileNotFoundError:
-            return {"status": "fail", "message": "설정 파일을 찾을 수 없습니다."}
+            logger.error(f"gps_data.json 파일을 찾을 수 없습니다.")
+            return self.prev_gps
         except json.JSONDecodeError:
-            return {"status": "fail", "message": "설정 파일 형식이 잘못되었습니다."}
+            logger.error(f"gps_data.json 파일 형식이 잘못되었습니다.")
+            return self.prev_gps
         
     def handle_vehicle_orientaion(self, data):
         # 차량 방향
         try:
             with open(f'{data_dir}/orientation_data.json') as f:
-                return json.load(f)
-
+                self.prev_orientaion = json.load(f)
+                return self.prev_orientaion
         except FileNotFoundError:
-            return {"status": "fail", "message": "설정 파일을 찾을 수 없습니다."}
+            logger.error(f"orientation_data.json 파일을 찾을 수 없습니다.")
+            return self.prev_orientaion
         except json.JSONDecodeError:
-            return {"status": "fail", "message": "설정 파일 형식이 잘못되었습니다."}
+            logger.error(f"orientation_data.json 파일 형식이 잘못되었습니다.")
+            return self.prev_orientaion

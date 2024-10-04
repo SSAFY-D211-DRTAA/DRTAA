@@ -188,7 +188,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/listlist" />
+                    app:srcCompat="@drawable/ic_home_list" />
 
                 <TextView
                     android:id="@+id/tv_rent_history"
@@ -231,7 +231,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/calcal" />
+                    app:srcCompat="@drawable/ic_home_calender" />
 
                 <TextView
                     android:id="@+id/tv_rent_plan"

@@ -15,6 +15,6 @@
         android:title="관광" />
     <item
         android:id="@+id/nav_graph_my_page"
-        android:icon="@drawable/ic_tour"
+        android:icon="@drawable/ic_user"
         android:title="마이페이지" />
 </menu>

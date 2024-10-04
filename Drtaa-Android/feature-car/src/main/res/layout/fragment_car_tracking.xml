@@ -10,22 +10,63 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_car_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent">
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
         <com.naver.maps.map.MapView
             android:id="@+id/map_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" >
+            android:layout_height="match_parent">
 
         </com.naver.maps.map.MapView>
 
         <TextView
+            android:id="@+id/tv_pin"
+            style="@style/ptd_bold"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/black"
+            android:padding="12dp"
+            android:text="호출할 위치를 길게 눌러주세요"
+            android:textColor="@color/white"
+            android:textSize="24sp"
+            android:gravity="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_pin_desc"
+            style="@style/ptd_bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/rect_black_rad30"
+            android:gravity="center"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="4dp"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_pin" />
+
+        <TextView
             android:id="@+id/btn_call"
             style="@style/ptd_semi_bold"
-            android:layout_width="100dp"
+            android:layout_width="wrap_content"
             android:layout_height="50dp"
             android:layout_marginBottom="12dp"
             android:background="@drawable/selector_btn_blue"
             android:gravity="center"
-            android:text="호출"
+            android:paddingHorizontal="12dp"
+            android:text="호출하기"
             android:textColor="@color/white"
             android:textSize="19sp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -33,40 +74,34 @@
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="parent" />
 
-        <androidx.cardview.widget.CardView
+        <TextView
             android:id="@+id/btn_tracking"
+            style="@style/ptd_extra_bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="30dp"
-            android:elevation="30dp"
-            app:cardCornerRadius="200dp"
-            app:layout_constraintBottom_toTopOf="@+id/btn_call"
-            app:layout_constraintEnd_toEndOf="parent">
-
-            <ImageView
-                android:id="@+id/img_tracking"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_margin="5dp"
-                android:background="@drawable/ic_tracking_detail_car"
-                android:backgroundTint="@color/black"
-                android:gravity="center"
-                app:layout_constraintBottom_toTopOf="@+id/btn_call"
-                app:layout_constraintEnd_toEndOf="parent" />
-        </androidx.cardview.widget.CardView>
-
-        <Button
-            android:id="@+id/btn_return"
-            style="@style/btn_long_blue"
-            android:backgroundTint="#8525ff"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
-            android:layout_marginEnd="10dp"
-            android:text="차량 반납"
-            android:textSize="14sp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/rect_blue_rad30"
+            android:gravity="center"
+            android:padding="12dp"
+            android:text="차량\n추적\nON"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/btn_return"
+            style="@style/ptd_extra_bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/rect_black_rad30"
+            android:padding="12dp"
+            android:text="차량\n반납"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="@+id/btn_tracking"
             app:layout_constraintTop_toBottomOf="@+id/btn_tracking" />
 
 
