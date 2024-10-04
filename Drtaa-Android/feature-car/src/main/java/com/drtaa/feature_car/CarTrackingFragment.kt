@@ -1,5 +1,6 @@
 package com.drtaa.feature_car
 
+import android.content.res.ColorStateList
 import android.graphics.Color
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
@@ -78,11 +79,11 @@ class CarTrackingFragment :
     }
 
     private fun observeCarTracking() {
-        viewModel.trackingState.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach {
-            binding.btnTracking.text = if (it) {
-                "차량추적 ON"
+        viewModel.trackingState.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach { isTracking ->
+            binding.btnTracking.backgroundTintList = if (isTracking) {
+                null
             } else {
-                "차량추적 OFF"
+                ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.black))
             }
         }.launchIn(viewLifecycleOwner.lifecycleScope)
 

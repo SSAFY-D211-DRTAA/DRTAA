@@ -8,6 +8,7 @@
     <node pkg="drtaa" type="lidar_velodyne_cluster_viz.py" name="lidar_velodyne_cluster_viz"  />
 
     <include file="$(find velodyne_pointcloud)/launch/VLP16_points.launch"/>
-    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find drtaa)/rviz/drtaa_rviz.rviz" />
+    <!-- <node pkg="rviz" type="rviz" name="rviz" args="-d $(find drtaa)/rviz/drtaa_rviz.rviz" /> -->
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find drtaa)/rviz/lane_detection_rviz.rviz" />
     <node pkg="drtaa" type="acc_with_traffic_signal.py" name="pure_pursuit" output='screen'/>
 </launch>

@@ -28,6 +28,7 @@ public interface RentRepository extends JpaRepository<Rent, Long> {
             LocalDateTime rentStartTime,
             LocalDateTime rentEndTime
     );
+    Optional<Rent> findByUserAndRentStatusIn(User user, List<RentStatus> rentStatuses);
 
     List<Rent> findByUser(User user);
     List<Rent> findByUserAndRentStatusInOrderByRentStatusDesc(User user, List<RentStatus> rentStatuses);
@@ -47,5 +48,4 @@ public interface RentRepository extends JpaRepository<Rent, Long> {
             LocalDateTime rentEndTimeStart,
             LocalDateTime rentEndTimeEnd
     );
-
 }
