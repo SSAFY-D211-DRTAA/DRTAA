@@ -10,7 +10,6 @@ import com.drtaa.core_map.base.BaseMapFragment
 import com.drtaa.core_map.moveCameraTo
 import com.drtaa.core_ui.showSnackBar
 import com.drtaa.feature_car.databinding.FragmentCarTrackingBinding
-import com.drtaa.feature_car.viewmodel.CarStatus
 import com.drtaa.feature_car.viewmodel.CarViewModel
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.MapView
