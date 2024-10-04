@@ -5,6 +5,7 @@ import com.drtaa.core_data.repository.PlanRepository
 import com.drtaa.core_data.util.ResultWrapper
 import com.drtaa.core_data.util.safeApiCall
 import com.drtaa.core_model.plan.Plan
+import com.drtaa.core_model.plan.PlanItem
 import com.drtaa.core_model.plan.PlanSimple
 import com.drtaa.core_model.plan.RequestPlanName
 import com.drtaa.core_model.plan.ResponsePutPlan
@@ -96,6 +97,27 @@ class PlanRepositoryImpl @Inject constructor(
             is ResultWrapper.NetworkError -> {
                 emit(Result.failure(Exception("네트워크 에러")))
                 Timber.d("플랜 이름 수정 네트워크 에러")
+            }
+        }
+    }
+
+    override suspend fun getTodayPlanList(): Flow<Result<List<PlanItem>>> = flow {
+        when (
+            val response = safeApiCall { planDataSource.getTodayPlanList() }
+        ) {
+            is ResultWrapper.Success -> {
+                emit(Result.success(response.data))
+                Timber.d("오늘 일정 가져오기 성공")
+            }
+
+            is ResultWrapper.GenericError -> {
+                emit(Result.failure(Exception(response.message)))
+                Timber.d("오늘 일정 가져오기 성공")
+            }
+
+            is ResultWrapper.NetworkError -> {
+                emit(Result.failure(Exception("네트워크 에러")))
+                Timber.d("네트워크 에러")
             }
         }
     }

@@ -3,15 +3,18 @@
 
     <item
         android:id="@+id/nav_graph_home"
-        android:title="홈"/>
+        android:icon="@drawable/ic_home"
+        android:title="홈" />
     <item
         android:id="@+id/nav_graph_car"
-        android:title="차량내역"/>
+        android:icon="@drawable/ic_car"
+        android:title="차량내역" />
     <item
         android:id="@+id/nav_graph_tour"
+        android:icon="@drawable/ic_tour"
         android:title="관광" />
     <item
         android:id="@+id/nav_graph_my_page"
+        android:icon="@drawable/ic_tour"
         android:title="마이페이지" />
-
 </menu>
