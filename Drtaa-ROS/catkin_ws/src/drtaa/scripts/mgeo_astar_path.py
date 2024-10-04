@@ -209,7 +209,7 @@ class AStarPathPublisher:
 
     def destination_reached(self, current_position):
  
-        threshold_distance = 6.5  # 5 meters 
+        threshold_distance = 8.5  # 5 meters 
         current_pos_array = np.array([current_position.x, current_position.y])
         distance_to_goal = np.linalg.norm(np.array(self.goal_pos) - current_pos_array)
         # rospy.loginfo(f"Distance to goal: {distance_to_goal}")
@@ -236,30 +236,6 @@ class AStarPathPublisher:
 
         _, idx = self.kd_tree.query([position.x, position.y])
         return list(self.nodes.keys())[idx]
-
-    # def find_closest_node_in_direction(self, position, heading):
-    #     if not self.kd_tree:
-    #         self.build_kd_tree()
-        
-    #     # 현재 위치에서 가장 가까운 10개의 노드 찾기
-    #     distances, indices = self.kd_tree.query([position.x, position.y], k=10)
-        
-    #     best_node = None
-    #     best_score = float('inf')
-        
-    #     for i, idx in enumerate(indices):
-    #         node = list(self.nodes.values())[idx]
-    #         node_vector = np.array([node.point[0] - position.x, node.point[1] - position.y])
-    #         angle_diff = abs(atan2(node_vector[1], node_vector[0]) - heading)
-            
-    #         # 거리와 각도 차이를 고려한 점수 계산
-    #         score = distances[i] + angle_diff * 10  # 각도 차이에 가중치 부여
-            
-    #         if score < best_score:
-    #             best_score = score
-    #             best_node = node
-        
-    #     return best_node.idx if best_node else None
     
     def find_closest_node_in_direction(self, position, heading):
         if not self.kd_tree:
@@ -285,16 +261,6 @@ class AStarPathPublisher:
         
         return best_node.idx if best_node else None
     
-    # def update_path(self):
-    #     # 시작점과 목표점이 설정되면 경로 계산
-    #     if self.is_goal_pose and self.is_init_pose:
-                
-    #         self.global_path_msg = self.calc_astar_path_node(self.start_node, self.end_node)
-                    
-    #         if self.global_path_msg is not None:
-    #             rospy.loginfo("Global path calculated and fixed")
-    #             self.is_goal_pose = False
-    #             self.is_global_path_once_pub = False
 
     def find_multiple_start_nodes(self, position, num_candidates=5): # 시작 노드 후보 검색 
         if not self.kd_tree:
@@ -303,14 +269,37 @@ class AStarPathPublisher:
         distances, indices = self.kd_tree.query([position.x, position.y], k=num_candidates)
         return [list(self.nodes.keys())[idx] for idx in indices]
 
+    # def update_path(self):
+    #     if self.is_goal_pose and self.is_init_pose:
+    #         if self.global_path_msg is not None:
+    #             # 기존 경로가 있는 경우, 일부를 재사용
+    #             new_path = self.replan_path_with_existing(self.current_position, self.end_node)
+    #         else:
+    #             # 기존 경로가 없는 경우, 새로 계산
+    #             new_path = self.calc_astar_path_node(self.start_node, self.end_node)
+
+    #         if new_path is not None:
+    #             self.global_path_msg = new_path
+    #             rospy.loginfo("New global path calculated")
+    #             self.is_goal_pose = False
+    #             self.is_global_path_once_pub = False
+    #         else:
+    #             rospy.logerr("Failed to calculate new path")
+
     def update_path(self):
         if self.is_goal_pose and self.is_init_pose:
+            new_path = None
             if self.global_path_msg is not None:
-                # 기존 경로가 있는 경우, 일부를 재사용
+                # 기존 경로가 있는 경우, 일부를 재사용 시도
                 new_path = self.replan_path_with_existing(self.current_position, self.end_node)
-            else:
-                # 기존 경로가 없는 경우, 새로 계산
-                new_path = self.calc_astar_path_node(self.start_node, self.end_node)
+            
+            if new_path is None:
+                # 기존 경로 재사용 실패 또는 기존 경로가 없는 경우
+                start_candidates = self.find_multiple_start_nodes(self.current_position, num_candidates=5)
+                for start_node in start_candidates:
+                    new_path = self.calc_astar_path_node(start_node, self.end_node)
+                    if new_path is not None:
+                        break  # 유효한 경로를 찾으면 루프 종료
 
             if new_path is not None:
                 self.global_path_msg = new_path
@@ -318,7 +307,7 @@ class AStarPathPublisher:
                 self.is_goal_pose = False
                 self.is_global_path_once_pub = False
             else:
-                rospy.logerr("Failed to calculate new path")
+                rospy.logerr("Failed to calculate new path with all start node candidates")
 
     def find_closest_point_on_path(self, current_position):
         if self.global_path_msg is None:
