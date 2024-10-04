@@ -23,7 +23,7 @@ interface RentCarAPI {
     @PATCH("rent-car/parking")
     suspend fun getOffCar(
         @Body rentInfo: RequestCarStatus,
-    ): String
+    ): RentTravelInfo
 
     @PATCH("rent-car/driving")
     suspend fun getOnCar(

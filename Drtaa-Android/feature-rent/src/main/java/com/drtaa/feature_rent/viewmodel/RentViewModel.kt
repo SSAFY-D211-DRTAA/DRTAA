@@ -8,7 +8,6 @@ import com.drtaa.core_model.network.RequestDuplicatedSchedule
 import com.drtaa.core_model.rent.RentInfo
 import com.drtaa.core_model.rent.RentSchedule
 import com.drtaa.core_model.util.toLocalDateTime
-import com.naver.maps.geometry.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -50,14 +49,13 @@ class RentViewModel @Inject constructor(
 
     fun setRentStartLocation(search: Search) {
         viewModelScope.launch {
-            val jungryujang = Search(
+            _rentStartLocation.value = Search(
                 title = search.title,
                 category = search.category,
                 roadAddress = search.roadAddress,
-                lng = default_position.longitude,
-                lat = default_position.latitude
+                lng = search.lng,
+                lat = search.lat
             )
-            _rentStartLocation.value = jungryujang
         }
     }
 
@@ -165,10 +163,8 @@ class RentViewModel @Inject constructor(
     companion object {
         private const val MIN_PEOPLE = 1
         private const val MAX_PEOPLE = 8
-
         private const val PRICE_PER_HOUR = 20000
         private const val DISCOUNT_PER_DAY = 240000
-        val default_position = LatLng(37.57578754990568, 126.90027478459672)
         private const val ONE_DAY = 24
         private const val ONE_HOUR_TO_MINUTE = 60
     }

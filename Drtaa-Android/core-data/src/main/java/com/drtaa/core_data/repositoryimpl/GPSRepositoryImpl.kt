@@ -33,8 +33,8 @@ class GPSRepositoryImpl @Inject constructor(
         mqttManager.setupMqttClient()
     }
 
-    override fun publishGpsData(data: String) {
-        mqttManager.publishMessage(data)
+    override fun publishGpsData(data: String, topic: String) {
+        mqttManager.publishMessage(data, topic)
     }
 
     override fun disconnectMqtt() {

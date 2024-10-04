@@ -173,26 +173,28 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
 
     override fun onDestroy() {
         super.onDestroy()
-        carViewModel.stopPublish()
+        carViewModel.stopGPSPublish()
     }
 
     private fun observeStatus() {
         carViewModel.drivingStatus.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { drivingStatus ->
-                when (drivingStatus) {
-                    CarStatus.DRIVING -> {
-                        binding.btnTourQrcode.visibility = View.GONE
-                        binding.btnGetOffQrcode.visibility = View.VISIBLE
-                    }
+                drivingStatus?.let {
+                    when (it) {
+                        CarStatus.DRIVING -> {
+                            binding.btnTourQrcode.visibility = View.GONE
+                            binding.btnGetOffQrcode.visibility = View.VISIBLE
+                        }
 
-                    CarStatus.PARKING -> {
-                        binding.btnTourQrcode.visibility = View.VISIBLE
-                        binding.btnGetOffQrcode.visibility = View.GONE
-                    }
+                        CarStatus.CALLING -> {
+                            binding.btnTourQrcode.visibility = View.VISIBLE
+                            binding.btnGetOffQrcode.visibility = View.GONE
+                        }
 
-                    CarStatus.IDLE -> {
-                        binding.btnTourQrcode.visibility = View.VISIBLE
-                        binding.btnGetOffQrcode.visibility = View.GONE
+                        CarStatus.IDLE -> {
+                            binding.btnTourQrcode.visibility = View.VISIBLE
+                            binding.btnGetOffQrcode.visibility = View.GONE
+                        }
                     }
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)

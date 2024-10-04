@@ -41,7 +41,6 @@ fun MapView.ignoreParentScroll() {
  */
 fun NaverMap.setup(fusedLocationSource: FusedLocationSource) {
     locationSource = fusedLocationSource
-    locationTrackingMode = LocationTrackingMode.Follow
     minZoom = MIN_ZOOM // 최소 줌 레벨
     maxZoom = MAX_ZOOM // 최대 줌 레벨
     uiSettings.isZoomControlEnabled = false // Zoom 컨트롤러 사용유무
