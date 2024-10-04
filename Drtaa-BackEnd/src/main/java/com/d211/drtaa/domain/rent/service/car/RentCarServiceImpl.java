@@ -338,7 +338,7 @@ public class RentCarServiceImpl implements RentCarService {
         // 서버로 보낼 위도, 경도
         double latitude = currentPlace.getDatePlacesLat();
         double longitude = currentPlace.getDatePlacesLon();
-        log.info("이동 위도: {}, 경도: {}", latitude, longitude);
+        log.info("이동 위도: {}, 경도: {}, 목적지: {}", latitude, longitude, currentPlace.getDatePlacesName());
 
         // 이동할 목적지 서버로 전송
         try {
@@ -357,9 +357,11 @@ public class RentCarServiceImpl implements RentCarService {
                         JsonNode latNode = jsonNode.get("latitude");
                         JsonNode lonNode = jsonNode.get("longitude");
                         JsonNode rentCarId = jsonNode.get("rentCarId");
+                        JsonNode placeNameNode = jsonNode.get("destinationName");
                         log.info("latitude: {}", latNode);
                         log.info("longitude: {}", lonNode);
                         log.info("rentCarId: {}", rentCarId);
+                        log.info("placeName: {}", placeNameNode);
 
                     } catch (Exception e) {
                         log.error("Error processing received message: ", e);
@@ -368,7 +370,7 @@ public class RentCarServiceImpl implements RentCarService {
             }, webSocketConfig.getUrl()).get();
 
             // 상태와 렌트 탑승 위치 전송
-            MyMessage message = new MyMessage("vehicle_drive", latitude, longitude, rent.getRentCar().getRentCarId());
+            MyMessage message = new MyMessage("vehicle_drive", latitude, longitude, rent.getRentCar().getRentCarId(), currentPlace.getDatePlacesName());
             String jsonMessage = objectMapper.writeValueAsString(message);
             session.sendMessage(new TextMessage(jsonMessage));
             log.info("Sent message: {}", jsonMessage);
