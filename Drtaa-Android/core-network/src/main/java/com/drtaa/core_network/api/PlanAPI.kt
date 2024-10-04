@@ -1,6 +1,7 @@
 package com.drtaa.core_network.api
 
 import com.drtaa.core_model.plan.Plan
+import com.drtaa.core_model.plan.PlanItem
 import com.drtaa.core_model.plan.PlanSimple
 import com.drtaa.core_model.plan.RequestPlanName
 import com.drtaa.core_model.plan.ResponsePutPlan
@@ -28,4 +29,7 @@ interface PlanAPI {
     suspend fun updatePlanName(
         @Body planName: RequestPlanName
     ): String
+
+    @GET("travel/today")
+    suspend fun getTodayPlanList(): List<PlanItem>
 }

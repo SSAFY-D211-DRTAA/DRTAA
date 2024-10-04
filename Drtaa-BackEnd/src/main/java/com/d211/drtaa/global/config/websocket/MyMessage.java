@@ -16,6 +16,7 @@ public class MyMessage {
     private double latitude;
     private double longitude;
     private long rentCarId;
+    private String destinationName;
 
     public MyMessage(String action) {
         this.action = action;
@@ -23,6 +24,13 @@ public class MyMessage {
 
     public MyMessage(String action, long rentCarId) {
         this.action = action;
+        this.rentCarId = rentCarId;
+    }
+
+    public MyMessage(String action, double latitude, double longitude, long rentCarId) {
+        this.action = action;
+        this.longitude = longitude;
+        this.latitude = latitude;
         this.rentCarId = rentCarId;
     }
 }

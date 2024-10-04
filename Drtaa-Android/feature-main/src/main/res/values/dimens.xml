@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <dimen name="bottom_sheet_height_60dp">60dp</dimen>
     <dimen name="bottom_sheet_height_260dp">260dp</dimen>
     <dimen name="bottom_sheet_height_330dp">330dp</dimen>
     <dimen name="bottom_sheet_height_650dp">650dp</dimen>
     <dimen name="bottom_menu_height">?attr/actionBarSize</dimen>
+    <dimen name="design_bottom_navigation_height" tools:override="true">1000dp</dimen>
 </resources>
