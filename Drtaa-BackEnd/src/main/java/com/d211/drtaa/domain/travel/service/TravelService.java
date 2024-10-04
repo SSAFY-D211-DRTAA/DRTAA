@@ -5,10 +5,8 @@ import com.d211.drtaa.domain.travel.dto.request.PlaceAddRequestDTO;
 import com.d211.drtaa.domain.travel.dto.request.PlacesAddRequestDTO;
 import com.d211.drtaa.domain.travel.dto.request.TravelDetailRequestDTO;
 import com.d211.drtaa.domain.travel.dto.request.TravelNameRequestDTO;
-import com.d211.drtaa.domain.travel.dto.response.TravelDetailResponseDTO;
-import com.d211.drtaa.domain.travel.dto.response.TravelResponseDTO;
-import com.d211.drtaa.domain.travel.dto.response.TravelUpdateResponseDTO;
-import com.d211.drtaa.domain.travel.dto.response.WeatherResponseDTO;
+import com.d211.drtaa.domain.travel.dto.response.*;
+import org.springframework.security.core.Authentication;
 
 import java.util.List;
 
@@ -24,6 +22,9 @@ public interface TravelService {
 
     // travelId의 해당하는 여행 일정, 장소 상세 조회
     TravelDetailResponseDTO getTravel(Long travelId);
+
+    // 오늘 진행중인 여행 일정 조회
+    List<PlacesDetailResponseDTO> getTravelToday(String userProviderId);
 
     // travelId의 해당하는 여행 중 travelDatesId의 해당하는 일정에 장소 추가
     void createTravelDatesPlaces(PlacesAddRequestDTO placesAddRequestDTO);

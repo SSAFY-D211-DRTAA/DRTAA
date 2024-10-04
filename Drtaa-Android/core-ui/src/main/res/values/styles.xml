@@ -40,5 +40,19 @@
         <item name="android:textSize">18sp</item>
     </style>
 
+    <style name="btn_short_blue" parent="Widget.AppCompat.Button">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:fontFamily">@font/ptd_medium</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:background">@drawable/selector_short_btn_blue</item>
+    </style>
+
+    <style name="btn_stroke_blue" parent="Widget.AppCompat.Button">
+        <item name="android:textColor">@color/black</item>
+        <item name="android:fontFamily">@font/ptd_medium</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:background">@drawable/selector_stroke_blue</item>
+    </style>
+
 
 </resources>

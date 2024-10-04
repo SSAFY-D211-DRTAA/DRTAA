@@ -306,14 +306,6 @@ public class RentCarServiceImpl implements RentCarService {
         rentCarRepository.save(car);
 
         if(response[0] != null) {
-            // 알림 보낼 내용
-            String content = "차량이 요청 위치(" + requestPlace.getDatePlacesName() + ")로 이동중입니다.\n 조금만 기다려주세요 !!";
-
-            // 사용자에게 알림 전송
-            FcmMessage.FcmDTO fcmDTO = fcmUtil.makeFcmDTO("렌트 차량 위치", content);
-            log.info("Message: {}", content);
-            fcmUtil.singleFcmSend(rent.getUser(), fcmDTO);
-
             // 호출한 장소 그대로 반환
             response[0].setRentId(rent.getRentId());
             response[0].setTravelId(rentCarCallRequestDTO.getTravelId());
@@ -398,6 +390,14 @@ public class RentCarServiceImpl implements RentCarService {
                 .travelDatesId(rentCarManipulateRequestDTO.getTravelDatesId())
                 .datePlacesId(currentPlace.getDatePlacesId())
                 .build();
+
+        // 알림 보낼 내용
+        String content = "차량이 요청 위치(" + currentPlace.getDatePlacesName() + ")로 이동중입니다.";
+
+        // 사용자에게 알림 전송
+        FcmMessage.FcmDTO fcmDTO = fcmUtil.makeFcmDTO("렌트 차량 위치", content);
+        log.info("Message: {}", content);
+        fcmUtil.singleFcmSend(rent.getUser(), fcmDTO);
 
         return response;
     }
