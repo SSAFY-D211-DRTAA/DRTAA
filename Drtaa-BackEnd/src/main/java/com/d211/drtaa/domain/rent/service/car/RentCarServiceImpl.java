@@ -466,17 +466,21 @@ public class RentCarServiceImpl implements RentCarService {
            // 다음 날 첫번째 장소 응답 반환
            response.setTravelDatesId(nextDate.getTravelDatesId());
            response.setDatePlacesId(nextDayPlace.getDatePlacesId());
+
+           return response;
        }
+       // 찾은 장소가 여행 일정의 마지막 장소와 같지 않을 경우
+       else {
+           // 다음 순서 장소 찾기
+           DatePlaces nextPlace = datePlacesRepository.findByTravelDatesAndDatePlacesOrder(date, arrivedPlace.getDatePlacesOrder() + 1)
+                   .orElseThrow(() -> new TravelNotFoundException("다음 장소를 찾을 수 없습니다. 오늘 예정된 모든 여행지를 방문했습니다."));
+           log.info("다음 장소 id: {}", nextPlace.getDatePlacesId());
+           log.info("다음 장소 이름: {}", nextPlace.getDatePlacesName());
 
-        // 다음 순서 장소 찾기
-        DatePlaces nextPlace = datePlacesRepository.findByTravelDatesAndDatePlacesOrder(date, arrivedPlace.getDatePlacesOrder() + 1)
-                .orElseThrow(() -> new TravelNotFoundException("다음 장소를 찾을 수 없습니다. 오늘 예정된 모든 여행지를 방문했습니다."));
-        log.info("다음 장소 id: {}", nextPlace.getDatePlacesId());
-        log.info("다음 장소 이름: {}", nextPlace.getDatePlacesName());
-
-        // 다음 순서 장소 응답 반환
-        response.setTravelDatesId(date.getTravelDatesId());
-        response.setDatePlacesId(nextPlace.getDatePlacesId());
+           // 다음 순서 장소 응답 반환
+           response.setTravelDatesId(date.getTravelDatesId());
+           response.setDatePlacesId(nextPlace.getDatePlacesId());
+       }
 
         // 자율주행 서버로 하차 메시지 전송
         try {
