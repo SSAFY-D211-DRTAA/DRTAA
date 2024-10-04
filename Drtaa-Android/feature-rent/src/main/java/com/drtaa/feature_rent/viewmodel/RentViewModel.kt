@@ -167,7 +167,6 @@ class RentViewModel @Inject constructor(
     companion object {
         private const val MIN_PEOPLE = 1
         private const val MAX_PEOPLE = 8
-
         private const val PRICE_PER_HOUR = 20000
         private const val DISCOUNT_PER_DAY = 240000
         private const val ONE_DAY = 24

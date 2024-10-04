@@ -74,8 +74,8 @@ class CarViewModel @Inject constructor(
     val isFirst: SharedFlow<Boolean> = _isFirst.asSharedFlow()
     private val _isRecall = MutableSharedFlow<Boolean>()
     val isRecall: SharedFlow<Boolean> = _isRecall.asSharedFlow()
-    private val _drivingStatus = MutableStateFlow<CarStatus>(CarStatus.IDLE)
-    val drivingStatus: StateFlow<CarStatus> = _drivingStatus
+    private val _drivingStatus = MutableStateFlow<CarStatus?>(null)
+    val drivingStatus: StateFlow<CarStatus?> = _drivingStatus
     private val _trackingState = MutableStateFlow<Boolean>(false)
     val trackingState: StateFlow<Boolean> get() = _trackingState
 

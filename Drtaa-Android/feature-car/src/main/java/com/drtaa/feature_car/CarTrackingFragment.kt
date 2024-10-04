@@ -12,6 +12,7 @@ import com.drtaa.core_ui.showSnackBar
 import com.drtaa.feature_car.databinding.FragmentCarTrackingBinding
 import com.drtaa.feature_car.viewmodel.CarViewModel
 import com.naver.maps.geometry.LatLng
+import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.MapView
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.overlay.Marker
@@ -56,6 +57,7 @@ class CarTrackingFragment :
         observeMQTTOnMap(naverMap)
         observeCarTracking()
         carMarker.map = naverMap
+        naverMap.moveCameraTo(jungryujang.latitude, jungryujang.longitude)
         binding.btnCall.setOnClickListener {
             showLoading()
             // isInProgressed -> 재호출, isReserved -> 첫 호출
@@ -116,19 +118,21 @@ class CarTrackingFragment :
         viewModel.mqttConnectionStatus.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { status ->
                 Timber.tag("connect mqtt").d("$status")
-                if (status == 1){
-                    dismissLoading()
-                    viewModel.isPublising()?.let {
+                when (status) {
+                    1 -> {
+                        dismissLoading()
                         viewModel.startGPSPublish()
+                        showSnackBar("MQTT 연결 성공")
+                        viewModel.getRoute()
                     }
-                    showSnackBar("MQTT 연결 성공")
-                    viewModel.getRoute()
-                } else if (status == -1) {
-                    Timber.tag("mqtt").d("mqtt 연결 실패")
-                } else {
-                    dismissLoading()
-                    navigatePopBackStack()
-                    showSnackBar("다시 접속해 주세요")
+                    -1 -> {
+                        Timber.tag("mqtt").d("mqtt 연결 실패")
+                    }
+                    else -> {
+                        dismissLoading()
+                        navigatePopBackStack()
+                        showSnackBar("다시 접속해 주세요")
+                    }
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
 
@@ -197,6 +201,11 @@ class CarTrackingFragment :
         }
     }
 
+    override fun onDestroy() {
+        viewModel.stopGPSPublish()
+        super.onDestroy()
+    }
+
     override fun iniView() {
 //
     }
@@ -204,6 +213,7 @@ class CarTrackingFragment :
     companion object {
         private const val THRESHOLD = 10.0
         private const val ICON_SIZE = 100
+        val jungryujang = LatLng(37.57578754990568, 126.90027478459672)
         private val STARBUCKS = LatLng(37.576636819990284, 126.89879021208397)
 //        private val SANGAM_LATLNG = LatLng(37.57569116736151, 126.90039723462993)
     }

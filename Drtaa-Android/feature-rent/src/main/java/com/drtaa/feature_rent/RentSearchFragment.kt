@@ -76,6 +76,11 @@ class RentSearchFragment :
                 }
             }
         }
+        rentSearchViewModel.pinnedSearchItem.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach {
+            it?.let {
+                binding.layoutRentSearchBottomSheet.ivSearchLocation.callOnClick()
+            }
+        }.launchIn(viewLifecycleOwner.lifecycleScope)
         initObserve(naverMap)
     }
 
