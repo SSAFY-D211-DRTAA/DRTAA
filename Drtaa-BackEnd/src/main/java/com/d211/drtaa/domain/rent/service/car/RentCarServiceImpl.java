@@ -466,8 +466,6 @@ public class RentCarServiceImpl implements RentCarService {
            // 다음 날 첫번째 장소 응답 반환
            response.setTravelDatesId(nextDate.getTravelDatesId());
            response.setDatePlacesId(nextDayPlace.getDatePlacesId());
-
-           return response;
        }
        // 찾은 장소가 여행 일정의 마지막 장소와 같지 않을 경우
        else {
@@ -484,6 +482,7 @@ public class RentCarServiceImpl implements RentCarService {
 
         // 자율주행 서버로 하차 메시지 전송
         try {
+            log.info("자율주행 서버로 메시지 전송");
             StandardWebSocketClient client = new StandardWebSocketClient();
             WebSocketSession session = client.execute(new TextWebSocketHandler() {
                 @Override
@@ -512,12 +511,8 @@ public class RentCarServiceImpl implements RentCarService {
             throw new WebSocketDisConnectedException("WebSocket이 네트워크 연결을 거부했습니다.");
         }
 
-        // 렌트 차량 상태 변경
-        car.setRentCarDrivingStatus(RentDrivingStatus.parking);
-
         // 변경 상태 저장
         datePlacesRepository.save(arrivedPlace);
-        rentCarRepository.save(car);
 
         // Android에게 알림 보내기
         FcmMessage.FcmDTO fcmDTO = fcmUtil.makeFcmDTO("렌트 일정", "렌트 일정을 꼭 확인해주세요 !!\n마지막 장소 이후에는 다음날로 넘어가거나 반납이 안내됩니다.");
