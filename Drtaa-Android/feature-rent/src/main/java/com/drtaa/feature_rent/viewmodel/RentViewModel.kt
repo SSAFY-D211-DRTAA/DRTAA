@@ -2,9 +2,11 @@ package com.drtaa.feature_rent.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.drtaa.core_data.repository.NaverRepository
 import com.drtaa.core_data.repository.RentRepository
 import com.drtaa.core_model.map.Search
 import com.drtaa.core_model.network.RequestDuplicatedSchedule
+import com.drtaa.core_model.network.ResponseReverseGeocode
 import com.drtaa.core_model.rent.RentInfo
 import com.drtaa.core_model.rent.RentSchedule
 import com.drtaa.core_model.util.toLocalDateTime
@@ -22,6 +24,7 @@ import javax.inject.Inject
 @HiltViewModel
 class RentViewModel @Inject constructor(
     private val rentRepository: RentRepository,
+    private val naverRepository: NaverRepository,
 ) : ViewModel() {
     private val _rentStartLocation = MutableStateFlow<Search?>(null)
     val rentStartLocation: StateFlow<Search?> = _rentStartLocation
@@ -50,14 +53,13 @@ class RentViewModel @Inject constructor(
 
     fun setRentStartLocation(search: Search) {
         viewModelScope.launch {
-            val jungryujang = Search(
+            _rentStartLocation.value = Search(
                 title = search.title,
                 category = search.category,
                 roadAddress = search.roadAddress,
-                lng = default_position.longitude,
-                lat = default_position.latitude
+                lng = search.lng,
+                lat = search.lat
             )
-            _rentStartLocation.value = jungryujang
         }
     }
 
@@ -168,7 +170,6 @@ class RentViewModel @Inject constructor(
 
         private const val PRICE_PER_HOUR = 20000
         private const val DISCOUNT_PER_DAY = 240000
-        val default_position = LatLng(37.57578754990568, 126.90027478459672)
         private const val ONE_DAY = 24
         private const val ONE_HOUR_TO_MINUTE = 60
     }

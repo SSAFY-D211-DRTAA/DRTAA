@@ -19,13 +19,14 @@ import com.drtaa.feature_rent.viewmodel.RentSearchViewModel
 import com.drtaa.feature_rent.viewmodel.RentViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
-import com.naver.maps.map.LocationTrackingMode
+import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.MapView
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.util.FusedLocationSource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @AndroidEntryPoint
@@ -35,7 +36,7 @@ class RentSearchFragment :
     private val rentSearchViewModel: RentSearchViewModel by viewModels()
 
     override var mapView: MapView? = null
-
+    private var map: NaverMap? = null
     private lateinit var behavior: BottomSheetBehavior<ConstraintLayout>
     private lateinit var locationSource: FusedLocationSource
 
@@ -47,10 +48,34 @@ class RentSearchFragment :
     }
 
     override fun initOnMapReady(naverMap: NaverMap) {
+        map = naverMap
         naverMap.uiSettings.isLocationButtonEnabled = false
+        naverMap.moveCameraTo(jungryujang.latitude, jungryujang.longitude)
         naverMap.setCustomLocationButton(binding.layoutRentSearchBottomSheet.ivRentSearchCurrentLocation)
         locationSource = FusedLocationSource(this, LOCATION_PERMISSION_REQUEST_CODE)
-        naverMap.locationTrackingMode = LocationTrackingMode.Follow
+        naverMap.addOnCameraIdleListener {
+            val center = naverMap.cameraPosition.target
+            viewLifecycleOwner.lifecycleScope.launch {
+                rentSearchViewModel.getReverseGeocode(center.latitude, center.longitude)
+                rentSearchViewModel.reverseGeocode.collect { result ->
+                    result?.let {
+                        it.onSuccess { title ->
+                            binding.layoutRentSearchBottomSheet.etSearchLocation.setText(title)
+                            rentSearchViewModel.setPinnedSearchItem(
+                                Search(
+                                    title, "",
+                                    "",
+                                    center.longitude,
+                                    center.latitude
+                                )
+                            )
+                        }.onFailure {
+                            showSnackBar("주소를 가져오는데 실패 했습니다.")
+                        }
+                    }
+                }
+            }
+        }
         initObserve(naverMap)
     }
 
@@ -65,6 +90,7 @@ class RentSearchFragment :
         searchListAdapter.setItemClickListener(object : SearchListAdapter.ItemClickListener {
             override fun onItemClicked(search: Search) {
                 rentSearchViewModel.setSelectedSearchItem(search)
+                map?.moveCameraTo(search.lat, search.lng)
             }
         })
 
@@ -75,9 +101,8 @@ class RentSearchFragment :
         rentSearchViewModel.selectedSearchItem.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { selectedSearchItem ->
                 Timber.d("selectedSearchItem $selectedSearchItem")
-                selectedSearchItem ?.let {
+                selectedSearchItem?.let {
                     naverMap.setMarker(selectedSearchItem.lat, selectedSearchItem.lng)
-                    naverMap.moveCameraTo(selectedSearchItem.lat, selectedSearchItem.lng)
                     naverMap.setContentPadding(0, 0, 0, MAP_BOTTOM_CONTENT_PADDING)
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
@@ -180,6 +205,7 @@ class RentSearchFragment :
     }
 
     companion object {
+        val jungryujang = LatLng(37.57578754990568, 126.90027478459672)
         const val BOTTOM_SHEET_PEEK_HEIGHT = 500
         const val MAP_BOTTOM_CONTENT_PADDING = 100
         const val LOCATION_PERMISSION_REQUEST_CODE = 1000
