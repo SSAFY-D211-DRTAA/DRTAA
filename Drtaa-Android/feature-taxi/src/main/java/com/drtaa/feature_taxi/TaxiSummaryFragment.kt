@@ -137,12 +137,13 @@ class TaxiSummaryFragment :
         val action = TaxiSummaryFragmentDirections.actionTaxiSummaryFragmentToPaymentFragment(
             Payment(
                 "DRTAA 택시 이용",
-                "1",
+                "2",
                 listOf(
                     Payment.Product(
                         "DRTAA 택시",
                         "TAXI_CODE",
-                        taxiViewModel.routeInfo.value?.taxiFare ?: 0,
+//                        taxiViewModel.routeInfo.value?.taxiFare ?: 0,
+                        PADDING,
                         1
                     )
                 )

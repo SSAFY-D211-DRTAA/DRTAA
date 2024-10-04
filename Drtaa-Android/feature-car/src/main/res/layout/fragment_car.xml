@@ -51,7 +51,6 @@
                     android:layout_height="match_parent"
                     android:background="@drawable/card_reflection" />
 
-
             </FrameLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
