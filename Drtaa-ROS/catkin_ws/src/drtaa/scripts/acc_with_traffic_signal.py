@@ -8,7 +8,7 @@ import tf
 import rospy
 import rospkg
 from math import cos, sin, pi, sqrt, pow, atan2
-from geometry_msgs.msg import Point, PoseWithCovarianceStamped
+from geometry_msgs.msg import Point, PoseWithCovarianceStamped, PoseStamped
 from nav_msgs.msg import Odometry, Path
 from morai_msgs.msg import CtrlCmd, EgoVehicleStatus, ObjectStatusList, GetTrafficLightStatus
 from tf.transformations import euler_from_quaternion, quaternion_from_euler
@@ -42,7 +42,7 @@ class pure_pursuit:
     def __init__(self):
         rospy.init_node('pure_pursuit', anonymous=True)
 
-        rospy.Subscriber("/global_path_per", Path, self.global_path_callback)
+        rospy.Subscriber("/global_path", Path, self.global_path_callback)
         # rospy.Subscriber("/lattice_path", Path, self.path_callback)
         rospy.Subscriber("/local_path", Path, self.path_callback)
         # rospy.Subscriber("/lane_change_path", Path, self.path_callback)
@@ -60,8 +60,13 @@ class pure_pursuit:
 
         # 승객 하차 시에 우선 적으로 True로 설정 되어야함!!! -> 일단은 주차장으로 이동해야하는 상황
         rospy.Subscriber("/is_parking", Bool, self.parking_status_callback)  
+
+        rospy.Subscriber("/complete_drive", PoseStamped, self.complete_drive_callback)
         
         self.ctrl_cmd_pub = rospy.Publisher('/ctrl_cmd', CtrlCmd, queue_size=1) # 제어 메시지 발행
+       
+        rospy.Subscriber("is_roaming", Bool, self.roaming_callback)
+
 
         self.ctrl_cmd_msg = CtrlCmd()
         self.ctrl_cmd_msg.longlCmdType = 1
@@ -72,6 +77,7 @@ class pure_pursuit:
         self.is_global_path = False
         self.is_look_forward_point = False
         self.is_parking = False
+        self.is_complete_drive = False
 
         self.forward_point = Point()
         # self.current_position = Point()
@@ -85,20 +91,28 @@ class pure_pursuit:
         self.min_lfd = 5
         self.max_lfd = 15
         self.lfd_gain = 0.78
-        self.target_velocity = 35 
+        self.target_velocity = 35 # 70
         self.stop_line_threshold = 15  ## 정지선 감지 거리 
 
         self.nodes = self.load_nodes()
 
         self.pid = pidControl()
         self.adaptive_cruise_control = AdaptiveCruiseControl(velocity_gain=0.5, distance_gain=1, time_gap=0.8, vehicle_length=2.7)
-        self.vel_planning = velocityPlanning(self.target_velocity / 3.6, 0.5) # 0.15
+        self.vel_planning = velocityPlanning(self.target_velocity / 3.6, 0.3) # 0.15 0.5
         self.traffic_light_manager = TrafficLightManager()
 
         rate = rospy.Rate(20)  ## 30hz
 
         while not rospy.is_shutdown():
+
+            if self.is_complete_drive:
+                self.stop_vehicle()
+                rospy.loginfo("Drive completed. Stopping vehicle.")
+                rate.sleep()
+                continue
+            
             if self.is_path and self.is_odom and self.is_status and len(self.velocity_list) > 0: 
+
                 result = self.calc_vaild_obj([self.current_position.x, self.current_position.y, self.vehicle_yaw], self.object_data) # 주변 객체 정보 계산
                 global_npc_info, local_npc_info, global_ped_info, local_ped_info, global_obs_info, local_obs_info = result
 
@@ -119,12 +133,9 @@ class pure_pursuit:
 
                 if self.is_look_forward_point: # 전방 경로 상에 waypoint가 존재하는 경우
                     self.ctrl_cmd_msg.steering = steering
+
                 else: # 전방에 waypoint가 없는 경우 (경로 끝에 도달한 경우)
-                    self.ctrl_cmd_msg.accel = 0.0
-                    self.ctrl_cmd_msg.brake = 1.0  # 브레이크를 최대로 설정하여 차량 정지
-                    self.ctrl_cmd_pub.publish(self.ctrl_cmd_msg)
-                    
-                    continue
+                    self.stop_vehicle()
 
                 self.adaptive_cruise_control.check_object(self.path ,global_npc_info, local_npc_info
                                                                     ,global_ped_info, local_ped_info
@@ -178,12 +189,26 @@ class pure_pursuit:
             self.global_path = msg
             self.is_global_path = True
             self.velocity_list = self.vel_planning.curvedBaseVelocity(self.global_path, 50)
+            self.is_complete_drive = False
             rospy.loginfo("Global path updated and velocity list recalculated")
             self.previous_global_path = msg  # 이전 경로 업데이트
     
     def parking_status_callback(self, msg):
         self.is_parking = msg.data
         rospy.loginfo(f"Parking status updated: {self.is_parking}")
+
+    def complete_drive_callback(self, msg):
+        self.is_complete_drive = True
+
+    def roaming_callback(self, msg):
+        if msg.data:
+            self.is_complete_drive = False
+            
+    def stop_vehicle(self):
+        self.ctrl_cmd_msg.accel = 0.0
+        self.ctrl_cmd_msg.brake = 1.0
+        self.ctrl_cmd_msg.steering = 0.0
+        self.ctrl_cmd_pub.publish(self.ctrl_cmd_msg)
 
     def is_same_path(self, path1, path2):
         # 두 경로가 동일한지 비교하는 함수
