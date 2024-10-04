@@ -38,7 +38,7 @@ COMPLETE_DRIVE_TOPIC = "/complete_drive"
 MOVE_BASE_GOAL_TOPIC = "/move_base_simple/goal"
 COMMAND_STATUS_TOPIC = "/command_status"
 PASSENGER_DROP_OFF_TOPIC = "/passenger_dropoff" # 하차 시 전달 Topic
-
+PASSENGER_CALL_TOPIC = "/is_changing_line"
 GLOBAL_PATH_TOPIC = "/global_path"
 
 current_goal_index = 0
@@ -65,6 +65,7 @@ db_database = os.getenv('DB_DATABASE')
 
 car_id = None
 dst_name = None
+cmd_status = None
 
 # 설정 파일 로드
 def load_config() -> Dict[str, Union[str, float, int]]:
@@ -193,24 +194,6 @@ def publish_next_goal(ws: websocket.WebSocketApp) -> None:
         logger.info("모든 목표 위치에 도달했습니다.")
         current_goal_index = 0
 
-def publish_command_status(ws: WebSocketApp, status: str) -> None:
-    """
-    차량의 상태 명령 Topic을 발행합니다.
-
-    :param ws: WebSocket 연결
-    :param status: 상태
-    """
-
-    msg = {
-        "op": "publish",
-        "topic": COMMAND_STATUS_TOPIC,
-        "type": "std_msgs/String",
-        "msg": {
-            "data": status
-        }
-    }
-    ws.send(json.dumps(msg))
-
 def publish_passenger_dropoff(ws: WebSocketApp, status: bool) -> None:
     """
     승객 하차 Topic을 발행합니다.
@@ -222,6 +205,24 @@ def publish_passenger_dropoff(ws: WebSocketApp, status: bool) -> None:
     msg = {
         "op": "publish",
         "topic": PASSENGER_DROP_OFF_TOPIC,
+        "type": "std_msgs/Bool",
+        "msg": {
+            "data": status
+        }
+    }
+    ws.send(json.dumps(msg))
+    
+def publish_passenger_call(ws: WebSocketApp, status: bool) -> None:
+    """
+    승객 호출 Topic을 발행합니다.
+
+    :param ws: WebSocket 연결
+    :param status: 상태
+    """
+
+    msg = {
+        "op": "publish",
+        "topic": PASSENGER_CALL_TOPIC,
         "type": "std_msgs/Bool",
         "msg": {
             "data": status
@@ -383,7 +384,18 @@ def on_ros_bridge_message(ws: WebSocketApp, message: str) -> None:
                 path_data = convert_points_to_json(gps_coordinates)
 
                 send_to_ec2(path_data)
+                
+            elif data['topic'] == COMMAND_STATUS_TOPIC:
+                status_data = data['msg']
 
+                try:
+                    with open(f'{data_dir}/command_status_data.json', 'w') as f:
+                        json.dump(status_data, f)
+                except IOError as e:
+                    logger.error(f"Command Status 데이터를 파일에 저장하는 중 오류 발생: {e}")
+                
+                cmd_status = data['msg']['data']
+                
     except json.JSONDecodeError:
         logger.error("잘못된 JSON 형식의 메시지를 받았습니다.")
     except KeyError as e:
@@ -410,7 +422,7 @@ def on_ros_bridge_open(ws: WebSocketApp) -> None:
 
 
 def on_ec2_message(ws: WebSocketApp, message: str) -> None:
-    global car_id, dst_name
+    global car_id, dst_name, cmd_status
     logger.info(f"EC2로부터 메시지 수신: {message}")
     try:
         data: Dict[str, Any] = json.loads(message)
@@ -422,6 +434,9 @@ def on_ec2_message(ws: WebSocketApp, message: str) -> None:
         if action == 'vehicle_dispatch':
             db_api_client.update_rent_car_status(car_id=car_id, status=VehicleStatus.CALLING)
             publish_pose_from_gps(ros_bridge_ws, data['latitude'], data['longitude'])
+            
+            if cmd_status == "parked":
+                publish_passenger_call(ros_bridge_ws, True)
         elif action == 'vehicle_return':
             db_api_client.update_rent_car_status(car_id=car_id, status=VehicleStatus.IDLING)
             publish_pose_from_gps(ros_bridge_ws, config['lat_return'], config['lon_return'])
