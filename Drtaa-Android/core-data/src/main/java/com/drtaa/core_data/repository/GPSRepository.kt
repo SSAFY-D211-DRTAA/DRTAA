@@ -8,7 +8,7 @@ interface GPSRepository {
     fun observeMqttGPSMessages(): Flow<ResponseGPS>
     fun observeMqttPathMessages(): Flow<List<CarRoute>>
     suspend fun setupMqttConnection()
-    fun publishGpsData(data: String)
+    fun publishGpsData(data: String, topic: String)
     fun disconnectMqtt()
     fun observeConnectionStatus(): Flow<Int>
 }

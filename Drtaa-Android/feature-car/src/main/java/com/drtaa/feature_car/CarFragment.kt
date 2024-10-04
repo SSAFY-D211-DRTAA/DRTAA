@@ -173,7 +173,7 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
 
     override fun onDestroy() {
         super.onDestroy()
-        carViewModel.stopPublish()
+        carViewModel.stopGPSPublish()
     }
 
     private fun observeStatus() {

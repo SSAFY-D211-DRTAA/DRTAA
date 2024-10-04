@@ -115,9 +115,11 @@ class CarTrackingFragment :
         viewModel.mqttConnectionStatus.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { status ->
                 Timber.tag("connect mqtt").d("$status")
-                if (status == 1) {
+                if (status == 1){
                     dismissLoading()
-                    viewModel.startPublish()
+                    viewModel.isPublising()?.let {
+                        viewModel.startGPSPublish()
+                    }
                     showSnackBar("MQTT 연결 성공")
                     viewModel.getRoute()
                 } else if (status == -1) {

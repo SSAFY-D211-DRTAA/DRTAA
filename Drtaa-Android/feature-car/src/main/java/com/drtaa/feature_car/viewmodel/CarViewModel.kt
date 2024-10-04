@@ -91,7 +91,7 @@ class CarViewModel @Inject constructor(
         super.onCleared()
         Timber.tag("mqtt_viewmodel").d("onCleared")
         disconnectMQTT()
-        stopPublish()
+        stopGPSPublish()
     }
 
     private fun observeMqttConnectionStatus() {
@@ -117,24 +117,25 @@ class CarViewModel @Inject constructor(
         _trackingState.value = !_trackingState.value
     }
 
-    fun startPublish(
+    fun isPublising(): Boolean? = publishJob?.isActive
+
+    fun startGPSPublish(
         data: String =
             """
          {"action":"vehicle_gps"}
             """.trimIndent(),
-        intervalMillis: Long = DEFAULT_INTERVAL,
     ) {
         publishJob = mqttScope.launch {
             while (isActive) {
-                gpsRepository.publishGpsData(data)
-                delay(intervalMillis)
+                gpsRepository.publishGpsData(data, GPS_SUB)
+                delay(DEFAULT_INTERVAL)
             }
         }
         toggleTrackingState()
-        gpsRepository.publishGpsData(data)
+        gpsRepository.publishGpsData(data, GPS_SUB)
     }
 
-    fun stopPublish() {
+    fun stopGPSPublish() {
         publishJob?.cancel()
         publishJob = null
     }
@@ -146,9 +147,9 @@ class CarViewModel @Inject constructor(
                 val lat = it.msg.latitude
                 val lng = it.msg.longitude
                 Timber.tag("Car").d("check: $lat, $lng")
-                if(lat != null && lng != null){
+                if (lat != null && lng != null) {
                     _gpsData.emit(LatLng(lat, lng))
-                }else{
+                } else {
                     Timber.tag("Car").d("null들어왔슈 $it")
                 }
             }
@@ -309,7 +310,7 @@ class CarViewModel @Inject constructor(
                 rentRepository.completeRent(requestCompleteRent).collect { result ->
                     result.onSuccess {
                         Timber.tag("Car").d("성공")
-                        stopPublish()
+                        stopGPSPublish()
                         _currentRentDetail.value = null
                         _isReturn.value = true
                     }.onFailure {
@@ -386,5 +387,8 @@ class CarViewModel @Inject constructor(
 
     companion object {
         private const val DEFAULT_INTERVAL = 1000L
+        private const val GPS_SUB = "gps/data/v1/subscribe"
+        private const val PATH_SUB = "path/data/v1/subscribe"
+        private const val ORIENTATION_SUB = "orientation/data/v1/subscribe"
     }
 }
