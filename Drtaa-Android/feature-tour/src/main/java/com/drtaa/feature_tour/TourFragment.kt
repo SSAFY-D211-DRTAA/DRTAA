@@ -46,7 +46,6 @@ class TourFragment : BaseFragment<FragmentTourBinding>(R.layout.fragment_tour) {
 
     override fun onResume() {
         super.onResume()
-        Timber.d("isExpanded: ${tourViewModel.isExpanded}")
         if (tourViewModel.isExpanded) {
             expandPlan()
         }
@@ -72,7 +71,6 @@ class TourFragment : BaseFragment<FragmentTourBinding>(R.layout.fragment_tour) {
     }
 
     private fun foldPlan() {
-        Timber.d("isExpanded: 접힘")
         tourViewModel.setExpandedPlan(false)
         binding.apply {
             clPlan.visibility = View.GONE
@@ -84,7 +82,6 @@ class TourFragment : BaseFragment<FragmentTourBinding>(R.layout.fragment_tour) {
     }
 
     private fun expandPlan() {
-        Timber.d("isExpanded: 펼침")
         tourViewModel.setExpandedPlan(true)
         binding.apply {
             clPlan.visibility = View.VISIBLE

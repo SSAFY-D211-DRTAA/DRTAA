@@ -1,6 +1,9 @@
 package com.drtaa.feature_plan
 
+import android.view.Surface.ROTATION_270
+import android.view.Surface.ROTATION_90
 import android.view.View
+import android.widget.ImageView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -19,7 +22,8 @@ class PlanHistoryFragment :
 
     private val planHistoryViewModel: PlanHistoryViewModel by viewModels()
 
-    private val planHistoryListAdapter = PlanHistoryListAdapter()
+    private val planReservedListAdapter = PlanHistoryListAdapter()
+    private val planCompletedListAdapter = PlanHistoryListAdapter()
 
     override fun onResume() {
         super.onResume()
@@ -27,12 +31,49 @@ class PlanHistoryFragment :
     }
 
     override fun initView() {
-        initObserve()
         initRVAdapter()
+        initObserve()
+        initEvent()
+    }
+
+    private fun initEvent() {
+        binding.apply {
+            llPlanReserved.setOnClickListener {
+                if (clPlanReserved.visibility == View.GONE) {
+                    expandPlan(ivReservedExpand, clPlanReserved)
+                } else {
+                    foldPlan(ivReservedExpand, clPlanReserved)
+                }
+            }
+
+            llPlanCompleted.setOnClickListener {
+                if (clPlanCompleted.visibility == View.GONE) {
+                    expandPlan(ivCompletedExpand, clPlanCompleted)
+                } else {
+                    foldPlan(ivCompletedExpand, clPlanCompleted)
+                }
+            }
+        }
+    }
+
+    private fun foldPlan(imageBtn: ImageView, layout: View) {
+        layout.visibility = View.GONE
+        imageBtn.animate().apply {
+            duration = DURATION
+            rotation(ROTATION_90)
+        }
+    }
+
+    private fun expandPlan(imageBtn: ImageView, layout: View) {
+        layout.visibility = View.VISIBLE
+        imageBtn.animate().apply {
+            duration = DURATION
+            rotation(ROTATION_270)
+        }
     }
 
     private fun initRVAdapter() {
-        planHistoryListAdapter.setItemClickListener(object :
+        val clickListener = object :
             PlanHistoryListAdapter.ItemClickListener {
             override fun onItemClicked(travelId: Int, rentId: Int) {
                 navigateDestination(
@@ -42,30 +83,73 @@ class PlanHistoryFragment :
                     )
                 )
             }
-        })
-        binding.rvPlanHistory.adapter = planHistoryListAdapter
-        binding.rvPlanHistory.itemAnimator = null
+        }
+        planReservedListAdapter.setItemClickListener(clickListener)
+        planCompletedListAdapter.setItemClickListener(clickListener)
+
+        binding.rvPlanReservedHistory.adapter = planReservedListAdapter
+        binding.rvPlanCompletedHistory.adapter = planCompletedListAdapter
+
+        binding.rvPlanReservedHistory.itemAnimator = null
+        binding.rvPlanCompletedHistory.itemAnimator = null
     }
 
     private fun initObserve() {
         planHistoryViewModel.planList.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { planList ->
-                Timber.tag("search").d("success $planList")
+                Timber.d("planList : $planList")
                 if (planList == null) {
                     binding.tvErrorPlanHistory.visibility = View.VISIBLE
-                    binding.tvNoPlanHistory.visibility = View.GONE
-                    binding.rvPlanHistory.visibility = View.GONE
-                } else if (planList.isEmpty()) {
-                    binding.tvErrorPlanHistory.visibility = View.GONE
-                    binding.tvNoPlanHistory.visibility = View.VISIBLE
-                    binding.rvPlanHistory.visibility = View.GONE
+                    binding.clPlan.visibility = View.GONE
                 } else {
                     binding.tvErrorPlanHistory.visibility = View.GONE
-                    binding.tvNoPlanHistory.visibility = View.GONE
-                    binding.rvPlanHistory.visibility = View.VISIBLE
-
-                    planHistoryListAdapter.submitList(planList)
+                    binding.clPlan.visibility = View.VISIBLE
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+        planHistoryViewModel.planInProgress.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach { planInProgress ->
+                if (planInProgress == null) {
+                    binding.clPlanNoInProgress.visibility = View.VISIBLE
+                } else {
+                    binding.clPlanNoInProgress.visibility = View.GONE
+                }
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+        planHistoryViewModel.planReservedList.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach { reservedList ->
+                if (reservedList == null) return@onEach
+
+                if (reservedList.isEmpty()) {
+                    binding.clPlanNoReserved.visibility = View.VISIBLE
+                    binding.rvPlanReservedHistory.visibility = View.GONE
+                } else {
+                    binding.clPlanNoReserved.visibility = View.GONE
+                    binding.rvPlanReservedHistory.visibility = View.VISIBLE
+
+                    planReservedListAdapter.submitList(reservedList)
+                }
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+        planHistoryViewModel.planCompletedList.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach { completedList ->
+                if (completedList == null) return@onEach
+
+                if (completedList.isEmpty()) {
+                    binding.clPlanNoCompleted.visibility = View.VISIBLE
+                    binding.rvPlanCompletedHistory.visibility = View.GONE
+                } else {
+                    binding.clPlanNoCompleted.visibility = View.GONE
+                    binding.rvPlanCompletedHistory.visibility = View.VISIBLE
+
+                    planCompletedListAdapter.submitList(completedList)
+                }
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
+    }
+
+    companion object {
+        const val DURATION = 300L
+        const val ROTATION_90 = 90f
+        const val ROTATION_270 = 270f
     }
 }

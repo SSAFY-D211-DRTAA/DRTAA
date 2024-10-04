@@ -20,7 +20,7 @@
             android:layout_marginStart="25dp"
             android:layout_marginTop="30dp"
             android:text="DRTAA 이용"
-            android:textSize="26sp"
+            android:textSize="35sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
