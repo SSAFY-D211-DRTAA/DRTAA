@@ -103,24 +103,6 @@ class CarTrackingFragment :
     }
 
     private fun observeCarTracking() {
-        viewModel.drivingStatus.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach { status ->
-            status?.let {
-                Timber.tag("driving").d("$status")
-                binding.tvPin.visibility = when (it) {
-                    CarStatus.DRIVING -> {
-                        View.VISIBLE
-                    }
-
-                    CarStatus.CALLING -> {
-                        View.GONE
-                    }
-
-                    CarStatus.IDLE -> {
-                        View.VISIBLE
-                    }
-                }
-            }
-        }.launchIn(viewLifecycleOwner.lifecycleScope)
         viewModel.reverseGeocode.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { res ->
                 res?.let {
