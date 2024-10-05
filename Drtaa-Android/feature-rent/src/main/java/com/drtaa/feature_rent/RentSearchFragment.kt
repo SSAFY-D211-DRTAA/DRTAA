@@ -176,7 +176,7 @@ class RentSearchFragment :
         behavior.isHideable = false
 
         behavior.peekHeight = BOTTOM_SHEET_PEEK_HEIGHT
-        behavior.maxHeight = BOTTOM_SHEET_PEEK_HEIGHT * 3
+        behavior.maxHeight = BOTTOM_SHEET_PEEK_HEIGHT * THREE
 
         behavior.addBottomSheetCallback(object : BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
@@ -213,6 +213,7 @@ class RentSearchFragment :
         val jungryujang = LatLng(37.57578754990568, 126.90027478459672)
         const val BOTTOM_SHEET_PEEK_HEIGHT = 500
         const val MAP_BOTTOM_CONTENT_PADDING = 100
+        const val THREE = 3
         const val LOCATION_PERMISSION_REQUEST_CODE = 1000
     }
 }

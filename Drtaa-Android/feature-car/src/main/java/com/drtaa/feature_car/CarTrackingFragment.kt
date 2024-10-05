@@ -241,7 +241,7 @@ class CarTrackingFragment :
     }
 
     override fun onDestroy() {
-        with(viewModel){
+        with(viewModel) {
             stopGPSPublish()
             clearDestination()
             clearReverseGeocode()

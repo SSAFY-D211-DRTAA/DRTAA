@@ -38,16 +38,21 @@ class TourPagingSource(
             is ResultWrapper.Success -> {
                 val entity = result.data.items.item.map { it.toEntity() }
                 Timber.tag("tour_pager").d("${result.data}")
+                val maxLen = response.numOfRows * result.data.pageNo
                 LoadResult.Page(
                     data = entity,
                     prevKey = if (nextPage == 1) null else nextPage - 1,
-                    nextKey = if (response.totalCount <= response.numOfRows * result.data.pageNo
-                        || isNextExist(
+                    nextKey =
+                    if (response.totalCount <= maxLen || isNextExist(
                             response,
                             result,
                             nextPage
                         )
-                    ) null else nextPage + 1
+                    ) {
+                        null
+                    } else {
+                        nextPage + 1
+                    }
                 )
             }
 

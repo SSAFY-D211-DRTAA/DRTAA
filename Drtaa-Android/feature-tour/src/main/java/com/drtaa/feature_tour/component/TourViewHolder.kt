@@ -6,7 +6,6 @@ import com.drtaa.core_model.tour.TourItem
 import com.drtaa.core_ui.centerCrop
 import com.drtaa.feature_tour.R
 import com.drtaa.feature_tour.databinding.ItemTourBinding
-import timber.log.Timber
 
 class TourViewHolder(
     private val binding: ItemTourBinding,
