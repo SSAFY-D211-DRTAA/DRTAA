@@ -28,7 +28,7 @@ class TourViewHolder(
             if (data.firstimage.isNotBlank()) {
                 ivTour.centerCrop(data.firstimage, binding.root.context)
             } else {
-                ivTour.setImageResource(R.drawable.ic_tour_basic_image)
+                ivTour.setImageResource(com.drtaa.core_ui.R.drawable.ic_tour_basic_image)
             }
             itemView.setOnClickListener {
                 onTourClickListener(data)
