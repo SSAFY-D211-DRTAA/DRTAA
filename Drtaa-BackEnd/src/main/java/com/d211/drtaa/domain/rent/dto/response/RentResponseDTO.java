@@ -22,4 +22,6 @@ public class RentResponseDTO {
     private int rentTime;
     @Schema(description = "렌트 이용 시작 시간", example = "2024/01/01 00:00")
     private LocalDateTime rentStartTime;
+    @Schema(description = "여행 이름", example = "서울 여행")
+    private String travelName;
 }

@@ -87,6 +87,7 @@ public class RentServiceImpl implements RentService{
                     .rentHeadCount(rent.getRentHeadCount())
                     .rentTime(rent.getRentTime())
                     .rentStartTime(rent.getRentStartTime())
+                    .travelName(rent.getTravel().getTravelName())
                     .build();
 
             response.add(dto);
