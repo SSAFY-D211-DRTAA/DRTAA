@@ -10,6 +10,8 @@ import com.drtaa.core_model.util.toPlanItem
 import com.drtaa.core_ui.base.BaseFragment
 import com.drtaa.core_ui.component.LocationHelper
 import com.drtaa.core_ui.dpToPx
+import com.drtaa.core_ui.expandLayout
+import com.drtaa.core_ui.foldLayout
 import com.drtaa.feature_plan.adapter.PlanListAdapter
 import com.drtaa.feature_tour.component.TourAdapter
 import com.drtaa.feature_tour.databinding.FragmentTourBinding
@@ -44,14 +46,6 @@ class TourFragment : BaseFragment<FragmentTourBinding>(R.layout.fragment_tour) {
         )
     }
 
-    override fun onResume() {
-        super.onResume()
-        Timber.d("isExpanded: ${tourViewModel.isExpanded}")
-        if (tourViewModel.isExpanded) {
-            expandPlan()
-        }
-    }
-
     override fun initView() {
         initUI()
         getLocation()
@@ -63,34 +57,10 @@ class TourFragment : BaseFragment<FragmentTourBinding>(R.layout.fragment_tour) {
         binding.apply {
             llExpandPlan.setOnClickListener {
                 if (clPlan.visibility == View.GONE) {
-                    expandPlan()
+                    expandLayout(ivExpendPlan, clPlan)
                 } else {
-                    foldPlan()
+                    foldLayout(ivExpendPlan, clPlan)
                 }
-            }
-        }
-    }
-
-    private fun foldPlan() {
-        Timber.d("isExpanded: 접힘")
-        tourViewModel.setExpandedPlan(false)
-        binding.apply {
-            clPlan.visibility = View.GONE
-            ivExpendPlan.animate().apply {
-                duration = DURATION
-                rotation(ROTATION_90)
-            }
-        }
-    }
-
-    private fun expandPlan() {
-        Timber.d("isExpanded: 펼침")
-        tourViewModel.setExpandedPlan(true)
-        binding.apply {
-            clPlan.visibility = View.VISIBLE
-            ivExpendPlan.animate().apply {
-                duration = DURATION
-                rotation(ROTATION_270)
             }
         }
     }
@@ -176,8 +146,5 @@ class TourFragment : BaseFragment<FragmentTourBinding>(R.layout.fragment_tour) {
 
     companion object {
         const val MAX_HEIGHT = 250
-        const val DURATION = 300L
-        const val ROTATION_90 = 90f
-        const val ROTATION_270 = 270f
     }
 }
