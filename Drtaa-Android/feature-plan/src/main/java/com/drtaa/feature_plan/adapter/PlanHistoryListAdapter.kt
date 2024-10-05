@@ -27,6 +27,10 @@ class PlanHistoryListAdapter :
             binding.planSimple = planSimple
             binding.executePendingBindings()
 
+            binding.ivPlanStatus.setImageResource(
+                initImageStatus(planSimple)
+            )
+
             binding.root.setOnClickListener {
                 itemClickListener.onItemClicked(
                     travelId = planSimple.travelId,
@@ -34,6 +38,21 @@ class PlanHistoryListAdapter :
                 )
             }
         }
+
+        private fun initImageStatus(planSimple: PlanSimple) =
+            when (planSimple.rentStatus) {
+                "in_progress" -> {
+                    com.drtaa.core_ui.R.drawable.ic_in_progress
+                }
+
+                "reserved" -> {
+                    com.drtaa.core_ui.R.drawable.ic_reserved
+                }
+
+                else -> {
+                    com.drtaa.core_ui.R.drawable.ic_completed
+                }
+            }
     }
 
     interface ItemClickListener {

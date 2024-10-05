@@ -7,12 +7,16 @@
     <data>
 
         <variable
-            name="rentCar"
-            type="com.drtaa.core_model.rent.RentCar" />
+            name="rentDetail"
+            type="com.drtaa.core_model.rent.RentDetail" />
 
         <variable
-            name="rentInfo"
-            type="com.drtaa.core_model.rent.RentInfo" />
+            name="disCountPrice"
+            type="Integer" />
+
+        <variable
+            name="originalPrice"
+            type="Integer" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -61,24 +65,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@drawable/img_g80"
-                        app:setImgUrl="@{rentCar.rentCarImg}" />
+                        app:setImgUrl="@{rentDetail.rentCarImg}" />
 
                     <TextView
                         style="@style/ptd_regular"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@{rentCar.rentCarModel}"
+                        android:text="@{rentDetail.rentCarModel}"
                         tools:text="Genesis G80" />
-
-                    <TextView
-                        style="@style/ptd_regular"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="start"
-                        android:layout_marginTop="5dp"
-                        android:text="차량은 추후 변경될 수 있습니다."
-                        android:textColor="@color/gray_5858"
-                        android:textSize="12sp" />
                 </LinearLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -120,7 +114,7 @@
                         android:layout_marginTop="10dp"
                         app:layout_constraintStart_toEndOf="@+id/tv_summary_fare_total"
                         app:layout_constraintTop_toBottomOf="@+id/tv_summary_price_title"
-                        app:setTextTime="@{rentInfo.hours}"
+                        app:setTextTime="@{rentDetail.rentTime}"
                         tools:text="1" />
 
                     <TextView
@@ -140,7 +134,7 @@
                         app:layout_constraintBottom_toBottomOf="@+id/tv_summary_fare_total"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="@+id/tv_summary_fare_total"
-                        app:setTextPrice="@{rentInfo.price}"
+                        app:setTextPrice="@{originalPrice}"
                         tools:text="120,000원" />
 
                     <TextView
@@ -161,7 +155,7 @@
                         app:layout_constraintBottom_toBottomOf="@+id/tv_summary_discount"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="@+id/tv_summary_discount"
-                        app:setTextPrice="@{rentInfo.discount}"
+                        app:setTextPrice="@{disCountPrice}"
                         tools:text="-5,000원" />
 
                     <View
@@ -190,7 +184,7 @@
                         app:layout_constraintBottom_toBottomOf="@+id/tv_summary_total"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="@+id/tv_summary_total"
-                        app:setTextPrice="@{rentInfo.finalPrice}"
+                        app:setTextPrice="@{rentDetail.rentPrice}"
                         tools:text="115,000원" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -252,7 +246,7 @@
                                     style="@style/ptd_regular"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="@{rentInfo.startSchedule.toString()}"
+                                    android:text="@{rentDetail.rentScheduleToString(rentDetail.rentStartTime)}"
                                     tools:text="09.17(화) 09:00" />
                             </LinearLayout>
                         </LinearLayout>
@@ -286,7 +280,7 @@
                                     style="@style/ptd_regular"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="@{rentInfo.endSchedule.toString()}"
+                                    android:text="@{rentDetail.rentScheduleToString(rentDetail.rentEndTime)}"
                                     tools:text="09.17(화) 09:00" />
                             </LinearLayout>
                         </LinearLayout>
@@ -306,7 +300,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="5dp"
-                        android:text='@{rentInfo.people + "명"}'
+                        android:text='@{rentDetail.rentHeadCount + "명"}'
                         tools:text="2명" />
 
                     <TextView
@@ -335,19 +329,11 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="3dp"
-                            android:text="@{rentInfo.startLocation.title}"
+                            android:text="@{rentDetail.rentStartLocation}"
                             tools:text="강남역" />
                     </LinearLayout>
 
                 </LinearLayout>
-
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/btn_summary_pay"
-                    style="@style/btn_long_black"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginVertical="20dp"
-                    android:text="결제하기" />
             </LinearLayout>
         </ScrollView>
 
@@ -372,7 +358,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

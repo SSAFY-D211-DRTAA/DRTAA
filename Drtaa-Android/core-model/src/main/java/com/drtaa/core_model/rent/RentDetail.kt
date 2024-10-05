@@ -1,5 +1,9 @@
 package com.drtaa.core_model.rent
 
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Locale
+
 data class RentDetail(
     val rentId: Long? = null,
     val rentCarId: Int,
@@ -16,6 +20,14 @@ data class RentDetail(
     val rentPrice: Int,
     val rentStartTime: String,
     val rentStatus: String,
-    val rentTime: Int,
+    val rentTime: Double,
     val travelId: Long,
-)
+    val rentStartLocation: String = ""
+) {
+    fun rentScheduleToString(dateString: String): String {
+        val dateTime = LocalDateTime.parse(dateString)
+        val outputFormatter = DateTimeFormatter.ofPattern("MM.dd(E) HH:mm", Locale("ko", "KR"))
+
+        return dateTime.format(outputFormatter)
+    }
+}

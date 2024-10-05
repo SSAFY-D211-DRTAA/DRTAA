@@ -27,10 +27,29 @@ class RentHistoryAdapter :
             binding.rent = rentSimple
             binding.executePendingBindings()
 
+            binding.ivRentStatus.setImageResource(
+                initImageStatus(rentSimple)
+            )
+
             binding.root.setOnClickListener {
                 itemClickListener.onItemClicked(rentSimple)
             }
         }
+
+        private fun initImageStatus(rentSimple: RentSimple) =
+            when (rentSimple.rentStatus) {
+                "in_progress" -> {
+                    com.drtaa.core_ui.R.drawable.ic_in_progress
+                }
+
+                "reserved" -> {
+                    com.drtaa.core_ui.R.drawable.ic_reserved
+                }
+
+                else -> {
+                    com.drtaa.core_ui.R.drawable.ic_completed
+                }
+            }
     }
 
     interface ItemClickListener {

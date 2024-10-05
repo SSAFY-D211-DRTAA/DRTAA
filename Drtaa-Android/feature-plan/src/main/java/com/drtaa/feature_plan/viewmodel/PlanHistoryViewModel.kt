@@ -18,7 +18,17 @@ class PlanHistoryViewModel @Inject constructor(
     private val _planList = MutableStateFlow<List<PlanSimple>?>(null)
     val planList: StateFlow<List<PlanSimple>?> = _planList
 
+    private val _planReservedList = MutableStateFlow<List<PlanSimple>?>(null)
+    val planReservedList: StateFlow<List<PlanSimple>?> = _planReservedList
+
+    private val _planCompletedList = MutableStateFlow<List<PlanSimple>?>(null)
+    val planCompletedList: StateFlow<List<PlanSimple>?> = _planCompletedList
+
+    private val _planInProgress = MutableStateFlow<PlanSimple?>(null)
+    val planInProgress: StateFlow<PlanSimple?> = _planInProgress
+
     init {
+        initObserve()
         getPlanList()
     }
 
@@ -27,7 +37,7 @@ class PlanHistoryViewModel @Inject constructor(
             planRepository.getPlanList().collect { result ->
                 result.onSuccess { data ->
                     Timber.tag("search").d("success $data")
-                    _planList.value = descendingPlanList(data)
+                    _planList.value = data
                 }.onFailure {
                     Timber.tag("search").d("fail")
                     _planList.value = null
@@ -36,7 +46,21 @@ class PlanHistoryViewModel @Inject constructor(
         }
     }
 
-    private fun descendingPlanList(list: List<PlanSimple>): List<PlanSimple> {
-        return list.sortedByDescending { it.travelEndDate }
+    private fun initObserve() {
+        viewModelScope.launch {
+            _planList.collect { planList ->
+                if (planList == null) {
+                    _planReservedList.value = null
+                    _planCompletedList.value = null
+                    return@collect
+                }
+
+                _planInProgress.value = planList.find { it.rentStatus == "inProgress" }
+                _planReservedList.value = planList.filter { it.rentStatus == "reserved" }
+                    .sortedByDescending { it.travelEndDate }
+                _planCompletedList.value = planList.filter { it.rentStatus == "completed" }
+                    .sortedByDescending { it.travelEndDate }
+            }
+        }
     }
 }

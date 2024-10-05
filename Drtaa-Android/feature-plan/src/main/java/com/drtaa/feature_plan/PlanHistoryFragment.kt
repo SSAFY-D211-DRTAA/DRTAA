@@ -11,13 +11,14 @@ import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import com.drtaa.core_ui.DeepLinkConstants
 import com.drtaa.core_ui.base.BaseFragment
+import com.drtaa.core_ui.expandLayout
+import com.drtaa.core_ui.foldLayout
 import com.drtaa.feature_plan.adapter.PlanHistoryListAdapter
 import com.drtaa.feature_plan.databinding.FragmentPlanHistoryBinding
 import com.drtaa.feature_plan.viewmodel.PlanHistoryViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import timber.log.Timber
 
 @AndroidEntryPoint
 class PlanHistoryFragment :
@@ -25,7 +26,8 @@ class PlanHistoryFragment :
 
     private val planHistoryViewModel: PlanHistoryViewModel by viewModels()
 
-    private val planHistoryListAdapter = PlanHistoryListAdapter()
+    private val planReservedListAdapter = PlanHistoryListAdapter()
+    private val planCompletedListAdapter = PlanHistoryListAdapter()
 
     override fun onResume() {
         super.onResume()
@@ -33,13 +35,34 @@ class PlanHistoryFragment :
     }
 
     override fun initView() {
-        initObserve()
         initRVAdapter()
+        initObserve()
         setupBackPressHandler()
+        initEvent()
+    }
+
+    private fun initEvent() {
+        binding.apply {
+            llPlanReserved.setOnClickListener {
+                if (clPlanReserved.visibility == View.GONE) {
+                    expandLayout(ivReservedExpand, clPlanReserved)
+                } else {
+                    foldLayout(ivReservedExpand, clPlanReserved)
+                }
+            }
+
+            llPlanCompleted.setOnClickListener {
+                if (clPlanCompleted.visibility == View.GONE) {
+                    expandLayout(ivCompletedExpand, clPlanCompleted)
+                } else {
+                    foldLayout(ivCompletedExpand, clPlanCompleted)
+                }
+            }
+        }
     }
 
     private fun initRVAdapter() {
-        planHistoryListAdapter.setItemClickListener(object :
+        val clickListener = object :
             PlanHistoryListAdapter.ItemClickListener {
             override fun onItemClicked(travelId: Int, rentId: Int) {
                 navigateDestination(
@@ -49,29 +72,65 @@ class PlanHistoryFragment :
                     )
                 )
             }
-        })
-        binding.rvPlanHistory.adapter = planHistoryListAdapter
-        binding.rvPlanHistory.itemAnimator = null
+        }
+        planReservedListAdapter.setItemClickListener(clickListener)
+        planCompletedListAdapter.setItemClickListener(clickListener)
+
+        binding.rvPlanReservedHistory.adapter = planReservedListAdapter
+        binding.rvPlanCompletedHistory.adapter = planCompletedListAdapter
+
+        binding.rvPlanReservedHistory.itemAnimator = null
+        binding.rvPlanCompletedHistory.itemAnimator = null
     }
 
     private fun initObserve() {
         planHistoryViewModel.planList.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { planList ->
-                Timber.tag("search").d("success $planList")
                 if (planList == null) {
                     binding.tvErrorPlanHistory.visibility = View.VISIBLE
-                    binding.tvNoPlanHistory.visibility = View.GONE
-                    binding.rvPlanHistory.visibility = View.GONE
-                } else if (planList.isEmpty()) {
-                    binding.tvErrorPlanHistory.visibility = View.GONE
-                    binding.tvNoPlanHistory.visibility = View.VISIBLE
-                    binding.rvPlanHistory.visibility = View.GONE
+                    binding.clPlan.visibility = View.GONE
                 } else {
                     binding.tvErrorPlanHistory.visibility = View.GONE
-                    binding.tvNoPlanHistory.visibility = View.GONE
-                    binding.rvPlanHistory.visibility = View.VISIBLE
+                    binding.clPlan.visibility = View.VISIBLE
+                }
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
 
-                    planHistoryListAdapter.submitList(planList)
+        planHistoryViewModel.planInProgress.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach { planInProgress ->
+                if (planInProgress == null) {
+                    binding.clPlanNoInProgress.visibility = View.VISIBLE
+                } else {
+                    binding.clPlanNoInProgress.visibility = View.GONE
+                }
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+        planHistoryViewModel.planReservedList.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach { reservedList ->
+                if (reservedList == null) return@onEach
+
+                if (reservedList.isEmpty()) {
+                    binding.clPlanNoReserved.visibility = View.VISIBLE
+                    binding.rvPlanReservedHistory.visibility = View.GONE
+                } else {
+                    binding.clPlanNoReserved.visibility = View.GONE
+                    binding.rvPlanReservedHistory.visibility = View.VISIBLE
+
+                    planReservedListAdapter.submitList(reservedList)
+                }
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+        planHistoryViewModel.planCompletedList.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach { completedList ->
+                if (completedList == null) return@onEach
+
+                if (completedList.isEmpty()) {
+                    binding.clPlanNoCompleted.visibility = View.VISIBLE
+                    binding.rvPlanCompletedHistory.visibility = View.GONE
+                } else {
+                    binding.clPlanNoCompleted.visibility = View.GONE
+                    binding.rvPlanCompletedHistory.visibility = View.VISIBLE
+
+                    planCompletedListAdapter.submitList(completedList)
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
