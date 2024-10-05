@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.NavDirections
 import androidx.navigation.fragment.findNavController
 import com.drtaa.core_map.LOCATION_PERMISSION_REQUEST_CODE
+import com.drtaa.core_map.R
 import com.drtaa.core_map.moveCameraBounds
 import com.drtaa.core_map.setup
 import com.drtaa.core_ui.component.LoadingDialog
@@ -21,6 +22,7 @@ import com.naver.maps.map.MapView
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.overlay.Marker
+import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.util.FusedLocationSource
 
 abstract class BaseMapFragment<T : ViewDataBinding>(private val layoutResId: Int) :
@@ -93,9 +95,12 @@ abstract class BaseMapFragment<T : ViewDataBinding>(private val layoutResId: Int
      * 단일 마커 설정
      */
     fun NaverMap.setMarker(lat: Double, lng: Double) {
-        marker.map = null
-        marker.position = LatLng(lat, lng)
-        marker.map = this
+        marker.apply {
+            map = null
+            icon = OverlayImage.fromResource(com.drtaa.core_ui.R.drawable.ic_center_marker)
+            position = LatLng(lat, lng)
+            map = this@setMarker
+        }
     }
 
     /**
