@@ -37,8 +37,8 @@ class CarTrackingFragment :
 
     private var positionMarker: Marker = Marker().apply {
         icon = OverlayImage.fromResource(com.drtaa.core_ui.R.drawable.ic_center_marker)
-        width = 80
-        height = 80
+        width = ICON_SIZE
+        height = ICON_SIZE
     }
 
     private val pathOverlay by lazy {
@@ -241,9 +241,11 @@ class CarTrackingFragment :
     }
 
     override fun onDestroy() {
-        viewModel.stopGPSPublish()
-        viewModel.clearDestination()
-        viewModel.clearReverseGeocode()
+        with(viewModel){
+            stopGPSPublish()
+            clearDestination()
+            clearReverseGeocode()
+        }
         super.onDestroy()
     }
 
@@ -252,7 +254,7 @@ class CarTrackingFragment :
     }
 
     companion object {
-        private const val THRESHOLD = 10.0
+        private const val THRESHOLD = 20.0 // 너무 좌표가 튀어서 일단 크게 잡는다
         private const val ICON_SIZE = 100
         val jungryujang = LatLng(37.57578754990568, 126.90027478459672)
 //        private val STARBUCKS = LatLng(37.576636819990284, 126.89879021208397)

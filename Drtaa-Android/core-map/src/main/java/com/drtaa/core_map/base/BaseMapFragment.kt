@@ -96,10 +96,11 @@ abstract class BaseMapFragment<T : ViewDataBinding>(private val layoutResId: Int
      */
     fun NaverMap.setMarker(lat: Double, lng: Double) {
         marker.apply {
-            map = null
             icon = OverlayImage.fromResource(com.drtaa.core_ui.R.drawable.ic_center_marker)
             position = LatLng(lat, lng)
             map = this@setMarker
+            width = ICON_SIZE
+            height = ICON_SIZE
         }
     }
 
@@ -107,9 +108,13 @@ abstract class BaseMapFragment<T : ViewDataBinding>(private val layoutResId: Int
      * 마커 리스트 추가
      */
     fun NaverMap.addMarker(lat: Double, lng: Double) {
-        val marker = Marker()
-        marker.position = LatLng(lat, lng)
-        marker.map = this
+        val marker = Marker().apply {
+            position = LatLng(lat, lng)
+            icon = OverlayImage.fromResource(com.drtaa.core_ui.R.drawable.ic_center_marker)
+            map = this@addMarker
+            width = ICON_SIZE
+            height = ICON_SIZE
+        }
 
         _markerList.add(marker)
     }
@@ -188,5 +193,9 @@ abstract class BaseMapFragment<T : ViewDataBinding>(private val layoutResId: Int
     override fun onLowMemory() {
         super.onLowMemory()
         mapView?.onLowMemory()
+    }
+
+    companion object {
+        const val ICON_SIZE = 100
     }
 }
