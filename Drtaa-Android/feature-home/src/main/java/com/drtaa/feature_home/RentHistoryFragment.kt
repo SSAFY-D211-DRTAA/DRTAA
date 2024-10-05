@@ -8,7 +8,6 @@ import com.drtaa.core_model.rent.RentSimple
 import com.drtaa.core_ui.base.BaseFragment
 import com.drtaa.core_ui.expandLayout
 import com.drtaa.core_ui.foldLayout
-import com.drtaa.core_ui.showSnackBar
 import com.drtaa.feature_home.adapter.RentHistoryAdapter
 import com.drtaa.feature_home.databinding.FragmentRentHistoryBinding
 import com.drtaa.feature_home.viewmodel.RentHistoryViewModel
@@ -111,7 +110,11 @@ class RentHistoryFragment :
     private fun initRVAdapter() {
         val clickListener = object : RentHistoryAdapter.ItemClickListener {
             override fun onItemClicked(rentSimple: RentSimple) {
-                showSnackBar("${rentSimple.rentId} 클릭이용")
+                val action =
+                    RentHistoryFragmentDirections.actionRentHistoryFragmentToRentHistorySummaryFragment(
+                        rentId = rentSimple.rentId.toLong()
+                    )
+                navigateDestination(action)
             }
         }
         rentReservedListAdapter.setItemClickListener(clickListener)
