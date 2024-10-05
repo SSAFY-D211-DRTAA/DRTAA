@@ -6,6 +6,8 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.drtaa.core_model.rent.RentSimple
 import com.drtaa.core_ui.base.BaseFragment
+import com.drtaa.core_ui.expandLayout
+import com.drtaa.core_ui.foldLayout
 import com.drtaa.core_ui.showSnackBar
 import com.drtaa.feature_home.adapter.RentHistoryAdapter
 import com.drtaa.feature_home.databinding.FragmentRentHistoryBinding
@@ -20,31 +22,105 @@ class RentHistoryFragment :
 
     private val rentHistoryViewModel: RentHistoryViewModel by viewModels()
 
-    private val rentHistoryAdapter = RentHistoryAdapter()
+    private val rentReservedListAdapter = RentHistoryAdapter()
+    private val rentCompletedListAdapter = RentHistoryAdapter()
+
+    override fun onResume() {
+        super.onResume()
+        rentHistoryViewModel.getRentList()
+    }
 
     override fun initView() {
-        initRV()
+        initRVAdapter()
         initObserve()
+        initEvent()
+    }
+
+    private fun initEvent() {
+        binding.apply {
+            llRentReserved.setOnClickListener {
+                if (clRentReserved.visibility == View.GONE) {
+                    expandLayout(ivReservedExpand, clRentReserved)
+                } else {
+                    foldLayout(ivReservedExpand, clRentReserved)
+                }
+            }
+
+            llRentCompleted.setOnClickListener {
+                if (clRentCompleted.visibility == View.GONE) {
+                    expandLayout(ivCompletedExpand, clRentCompleted)
+                } else {
+                    foldLayout(ivCompletedExpand, clRentCompleted)
+                }
+            }
+        }
     }
 
     private fun initObserve() {
-        rentHistoryViewModel.rentHistory.flowWithLifecycle(viewLifecycleOwner.lifecycle)
-            .onEach { rentHistory ->
-                rentHistoryAdapter.submitList(rentHistory)
-                if (rentHistory.isEmpty()) {
-                    binding.tvNoRentHistory.visibility = View.VISIBLE
+        rentHistoryViewModel.rentList.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach { rentList ->
+                if (rentList == null) {
+                    binding.tvErrorRentHistory.visibility = View.VISIBLE
+                    binding.clRent.visibility = View.GONE
                 } else {
-                    binding.rvRentHistory.visibility = View.VISIBLE
+                    binding.tvErrorRentHistory.visibility = View.GONE
+                    binding.clRent.visibility = View.VISIBLE
+                }
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+        rentHistoryViewModel.rentInProgress.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach { rentInProgress ->
+                if (rentInProgress == null) {
+                    binding.clRentNoInProgress.visibility = View.VISIBLE
+                } else {
+                    binding.clRentNoInProgress.visibility = View.GONE
+                }
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+        rentHistoryViewModel.rentReservedList.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach { reservedList ->
+                if (reservedList == null) return@onEach
+
+                if (reservedList.isEmpty()) {
+                    binding.clRentNoReserved.visibility = View.VISIBLE
+                    binding.rvRentReservedHistory.visibility = View.GONE
+                } else {
+                    binding.clRentNoReserved.visibility = View.GONE
+                    binding.rvRentReservedHistory.visibility = View.VISIBLE
+
+                    rentReservedListAdapter.submitList(reservedList)
+                }
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+        rentHistoryViewModel.rentCompletedList.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach { completedList ->
+                if (completedList == null) return@onEach
+
+                if (completedList.isEmpty()) {
+                    binding.clRentNoCompleted.visibility = View.VISIBLE
+                    binding.rvRentCompletedHistory.visibility = View.GONE
+                } else {
+                    binding.clRentNoCompleted.visibility = View.GONE
+                    binding.rvRentCompletedHistory.visibility = View.VISIBLE
+
+                    rentCompletedListAdapter.submitList(completedList)
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
-    private fun initRV() {
-        rentHistoryAdapter.setItemClickListener(object : RentHistoryAdapter.ItemClickListener {
+    private fun initRVAdapter() {
+        val clickListener = object : RentHistoryAdapter.ItemClickListener {
             override fun onItemClicked(rentSimple: RentSimple) {
                 showSnackBar("${rentSimple.rentId} 클릭이용")
             }
-        })
-        binding.rvRentHistory.adapter = rentHistoryAdapter
+        }
+        rentReservedListAdapter.setItemClickListener(clickListener)
+        rentCompletedListAdapter.setItemClickListener(clickListener)
+
+        binding.rvRentReservedHistory.adapter = rentReservedListAdapter
+        binding.rvRentCompletedHistory.adapter = rentCompletedListAdapter
+
+        binding.rvRentReservedHistory.itemAnimator = null
+        binding.rvRentCompletedHistory.itemAnimator = null
     }
 }

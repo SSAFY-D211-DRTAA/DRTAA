@@ -122,7 +122,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:padding="5dp"
-                        android:rotation="90"
+                        android:rotation="270"
                         android:src="@drawable/ic_next" />
                 </LinearLayout>
 
@@ -207,7 +207,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:padding="5dp"
-                        android:rotation="90"
+                        android:rotation="270"
                         android:src="@drawable/ic_next" />
                 </LinearLayout>
 

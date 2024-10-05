@@ -1,10 +1,7 @@
 package com.drtaa.feature_plan
 
-import android.view.Surface.ROTATION_270
-import android.view.Surface.ROTATION_90
 import android.net.Uri
 import android.view.View
-import android.widget.ImageView
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
@@ -14,13 +11,14 @@ import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import com.drtaa.core_ui.DeepLinkConstants
 import com.drtaa.core_ui.base.BaseFragment
+import com.drtaa.core_ui.expandLayout
+import com.drtaa.core_ui.foldLayout
 import com.drtaa.feature_plan.adapter.PlanHistoryListAdapter
 import com.drtaa.feature_plan.databinding.FragmentPlanHistoryBinding
 import com.drtaa.feature_plan.viewmodel.PlanHistoryViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import timber.log.Timber
 
 @AndroidEntryPoint
 class PlanHistoryFragment :
@@ -39,7 +37,6 @@ class PlanHistoryFragment :
     override fun initView() {
         initRVAdapter()
         initObserve()
-        initRVAdapter()
         setupBackPressHandler()
         initEvent()
     }
@@ -48,35 +45,19 @@ class PlanHistoryFragment :
         binding.apply {
             llPlanReserved.setOnClickListener {
                 if (clPlanReserved.visibility == View.GONE) {
-                    expandPlan(ivReservedExpand, clPlanReserved)
+                    expandLayout(ivReservedExpand, clPlanReserved)
                 } else {
-                    foldPlan(ivReservedExpand, clPlanReserved)
+                    foldLayout(ivReservedExpand, clPlanReserved)
                 }
             }
 
             llPlanCompleted.setOnClickListener {
                 if (clPlanCompleted.visibility == View.GONE) {
-                    expandPlan(ivCompletedExpand, clPlanCompleted)
+                    expandLayout(ivCompletedExpand, clPlanCompleted)
                 } else {
-                    foldPlan(ivCompletedExpand, clPlanCompleted)
+                    foldLayout(ivCompletedExpand, clPlanCompleted)
                 }
             }
-        }
-    }
-
-    private fun foldPlan(imageBtn: ImageView, layout: View) {
-        layout.visibility = View.GONE
-        imageBtn.animate().apply {
-            duration = DURATION
-            rotation(ROTATION_90)
-        }
-    }
-
-    private fun expandPlan(imageBtn: ImageView, layout: View) {
-        layout.visibility = View.VISIBLE
-        imageBtn.animate().apply {
-            duration = DURATION
-            rotation(ROTATION_270)
         }
     }
 
@@ -105,7 +86,6 @@ class PlanHistoryFragment :
     private fun initObserve() {
         planHistoryViewModel.planList.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { planList ->
-                Timber.d("planList : $planList")
                 if (planList == null) {
                     binding.tvErrorPlanHistory.visibility = View.VISIBLE
                     binding.clPlan.visibility = View.GONE
@@ -171,11 +151,5 @@ class PlanHistoryFragment :
                 .setPopUpTo(findNavController().graph.startDestinationId, true)
                 .build()
         )
-    }
-
-    companion object {
-        const val DURATION = 300L
-        const val ROTATION_90 = 90f
-        const val ROTATION_270 = 270f
     }
 }

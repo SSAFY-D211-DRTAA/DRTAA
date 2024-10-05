@@ -27,9 +27,6 @@ class TourViewModel @Inject constructor(
     private val _planList = MutableStateFlow<List<PlanItem>?>(emptyList())
     val planList: StateFlow<List<PlanItem>?> = _planList
 
-    private var _isExpanded = false
-    val isExpanded: Boolean = _isExpanded
-
     init {
         getPlanList()
     }
@@ -44,10 +41,6 @@ class TourViewModel @Inject constructor(
                 }
             }
         }
-    }
-
-    fun setExpandedPlan(isExpanded: Boolean) {
-        _isExpanded = isExpanded
     }
 
     fun getLocationBasedList(mapX: String, mapY: String, radius: String) {

@@ -55,15 +55,11 @@ class PlanHistoryViewModel @Inject constructor(
                     return@collect
                 }
 
-                Timber.tag("플랜 히스토리 뷰모델").d("planList $planList")
                 _planInProgress.value = planList.find { it.rentStatus == "inProgress" }
                 _planReservedList.value = planList.filter { it.rentStatus == "reserved" }
                     .sortedByDescending { it.travelEndDate }
                 _planCompletedList.value = planList.filter { it.rentStatus == "completed" }
                     .sortedByDescending { it.travelEndDate }
-
-                Timber.tag("플랜 히스토리 뷰모델").d("reserved ${_planReservedList.value}")
-                Timber.tag("플랜 히스토리 뷰모델").d("completed ${_planCompletedList.value}")
             }
         }
     }
