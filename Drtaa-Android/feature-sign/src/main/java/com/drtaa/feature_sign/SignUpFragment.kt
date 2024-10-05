@@ -1,9 +1,12 @@
 package com.drtaa.feature_sign
 
+import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Color
 import android.net.Uri
 import android.os.Environment
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
@@ -13,6 +16,7 @@ import com.drtaa.core_ui.checkValidPassword
 import com.drtaa.core_ui.showSnackBar
 import com.drtaa.feature_sign.databinding.FragmentSignUpBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import java.io.File
@@ -122,59 +126,84 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>(R.layout.fragment_sig
     }
 
     private fun initObserver() {
-        signUpFragmentViewModel.isSignUpSuccess.flowWithLifecycle(viewLifecycleOwner.lifecycle)
-            .onEach { isSignUpSuccess ->
-                if (isSignUpSuccess) {
-                    navigatePopBackStack()
-                } else {
-                    showSnackBar("회원가입 실패")
+        observeSignUpSuccess()
+        observeDuplicatedId()
+        observeProfileImageUri()
+        observePasswordValidation()
+        observePasswordConfirmation()
+        observeNicknameValidation()
+        observeSignUpPossibility()
+    }
+
+    private fun observeSignUpSuccess() {
+        signUpFragmentViewModel.isSignUpSuccess.observeWithLifecycle { isSignUpSuccess ->
+            if (isSignUpSuccess) navigatePopBackStack() else showSnackBar("회원가입 실패")
+        }
+    }
+
+    private fun observeDuplicatedId() {
+        signUpFragmentViewModel.isDuplicatedId.observeWithLifecycle { isDuplicatedId ->
+            updateIdHelpText(isDuplicatedId)
+            signUpFragmentViewModel.setIsPossibleSignUp()
+        }
+    }
+
+    private fun observeProfileImageUri() {
+        signUpFragmentViewModel.profileImageUri.observeWithLifecycle { imageUri ->
+            binding.ivSignUpProfile.setImageURI(imageUri)
+        }
+    }
+
+    private fun observePasswordValidation() {
+        signUpFragmentViewModel.isValidPw.observeWithLifecycle { isValidPw ->
+            binding.tvSignUpPwHelp.text = if (isValidPw == false) "비밀번호 형식을 확인해주세요." else ""
+            signUpFragmentViewModel.setIsPossibleSignUp()
+        }
+    }
+
+    private fun observePasswordConfirmation() {
+        signUpFragmentViewModel.isEqualPw.observeWithLifecycle { isEqualPw ->
+            binding.tvSignUpChkPwHelp.text = if (isEqualPw == false) "비밀번호가 일치하지 않습니다." else ""
+            signUpFragmentViewModel.setIsPossibleSignUp()
+        }
+    }
+
+    private fun observeNicknameValidation() {
+        signUpFragmentViewModel.isEmptyNickname.observeWithLifecycle { isEmptyNickname ->
+            binding.tvSignUpNicknameHelp.text = if (isEmptyNickname) "닉네임을 설정해주세요." else ""
+        }
+    }
+
+    private fun observeSignUpPossibility() {
+        signUpFragmentViewModel.isPossibleSignUp.observeWithLifecycle { isPossibleSignUp ->
+            binding.btnSignUp.isEnabled = isPossibleSignUp
+        }
+    }
+
+    @SuppressLint("ResourceType")
+    private fun updateIdHelpText(isDuplicatedId: Boolean?) {
+        binding.tvSignUpIdHelp.apply {
+            when (isDuplicatedId) {
+                null -> {
+                    text = ""
+                    setTextColor(ContextCompat.getColor(context, Color.BLACK))
                 }
-            }.launchIn(viewLifecycleOwner.lifecycleScope)
-
-        signUpFragmentViewModel.isDuplicatedId.flowWithLifecycle(viewLifecycleOwner.lifecycle)
-            .onEach { isDuplicatedId ->
-                binding.tvSignUpIdHelp.text = when (isDuplicatedId) {
-                    null -> ""
-                    true -> "이미 사용중인 아이디입니다."
-                    false -> "사용 가능한 아이디입니다."
+                true -> {
+                    text = "이미 사용중인 아이디입니다."
+                    setTextColor(ContextCompat.getColor(context, Color.RED))
                 }
-                signUpFragmentViewModel.setIsPossibleSignUp()
-            }.launchIn(viewLifecycleOwner.lifecycleScope)
-
-        signUpFragmentViewModel.profileImageUri.flowWithLifecycle(viewLifecycleOwner.lifecycle)
-            .onEach { imageUri ->
-                binding.ivSignUpProfile.setImageURI(imageUri)
-            }.launchIn(viewLifecycleOwner.lifecycleScope)
-
-        signUpFragmentViewModel.isValidPw.flowWithLifecycle(viewLifecycleOwner.lifecycle)
-            .onEach { isValidPw ->
-                binding.tvSignUpPwHelp.text = when (isValidPw) {
-                    null -> ""
-                    true -> ""
-                    false -> "비밀번호 형식을 확인해주세요."
+                false -> {
+                    text = "사용 가능한 아이디입니다."
+                    setTextColor(ContextCompat.getColor(context, Color.BLUE))
                 }
-                signUpFragmentViewModel.setIsPossibleSignUp()
-            }.launchIn(viewLifecycleOwner.lifecycleScope)
+            }
+        }
+    }
 
-        signUpFragmentViewModel.isEqualPw.flowWithLifecycle(viewLifecycleOwner.lifecycle)
-            .onEach { isEqualPw ->
-                binding.tvSignUpChkPwHelp.text = when (isEqualPw) {
-                    null -> ""
-                    true -> ""
-                    false -> "비밀번호가 일치하지 않습니다."
-                }
-                signUpFragmentViewModel.setIsPossibleSignUp()
-            }.launchIn(viewLifecycleOwner.lifecycleScope)
-
-        signUpFragmentViewModel.isEmptyNickname.flowWithLifecycle(viewLifecycleOwner.lifecycle)
-            .onEach { isEmptyNickname ->
-                binding.tvSignUpNicknameHelp.text = if (isEmptyNickname) "닉네임을 설정해주세요." else ""
-            }.launchIn(viewLifecycleOwner.lifecycleScope)
-
-        signUpFragmentViewModel.isPossibleSignUp.flowWithLifecycle(viewLifecycleOwner.lifecycle)
-            .onEach { isPossibleSignUp ->
-                binding.btnSignUp.isEnabled = isPossibleSignUp
-            }.launchIn(viewLifecycleOwner.lifecycleScope)
+    private fun <T> Flow<T>.observeWithLifecycle(action: (T) -> Unit) {
+        flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach(action)
+            .launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
     companion object {

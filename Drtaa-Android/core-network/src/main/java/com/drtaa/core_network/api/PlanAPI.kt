@@ -1,8 +1,10 @@
 package com.drtaa.core_network.api
 
 import com.drtaa.core_model.plan.Plan
+import com.drtaa.core_model.plan.PlanItem
 import com.drtaa.core_model.plan.PlanSimple
 import com.drtaa.core_model.plan.RequestPlanName
+import com.drtaa.core_model.plan.ResponsePutPlan
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.PATCH
@@ -13,7 +15,7 @@ interface PlanAPI {
     @PUT("travel")
     suspend fun putPlan(
         @Body plan: Plan
-    ): String
+    ): ResponsePutPlan
 
     @GET("travel")
     suspend fun getPlanList(): List<PlanSimple>
@@ -27,4 +29,7 @@ interface PlanAPI {
     suspend fun updatePlanName(
         @Body planName: RequestPlanName
     ): String
+
+    @GET("travel/today")
+    suspend fun getTodayPlanList(): List<PlanItem>
 }

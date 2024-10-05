@@ -83,11 +83,13 @@ public class RentServiceImpl implements RentService{
         for(Rent rent: rents) {
             RentResponseDTO dto = RentResponseDTO.builder()
                     .rentId(rent.getRentId())
-                    .rentStatus(rent.getRentStatus())
-                    .rentHeadCount(rent.getRentHeadCount())
-                    .rentTime(rent.getRentTime())
-                    .rentStartTime(rent.getRentStartTime())
                     .travelName(rent.getTravel().getTravelName())
+                    .rentStatus(rent.getRentStatus())
+                    .rentTime(rent.getRentTime())
+                    .rentHeadCount(rent.getRentHeadCount())
+                    .rentPrice(rent.getRentPrice())
+                    .rentStartTime(rent.getRentStartTime().toLocalDate())
+                    .rentEndTime(rent.getRentEndTime().toLocalDate())
                     .build();
 
             response.add(dto);
@@ -110,9 +112,12 @@ public class RentServiceImpl implements RentService{
             RentResponseDTO dto = RentResponseDTO.builder()
                     .rentId(rent.getRentId())
                     .rentStatus(rent.getRentStatus())
-                    .rentHeadCount(rent.getRentHeadCount())
                     .rentTime(rent.getRentTime())
-                    .rentStartTime(rent.getRentStartTime())
+                    .rentTime(rent.getRentTime())
+                    .rentHeadCount(rent.getRentHeadCount())
+                    .rentPrice(rent.getRentPrice())
+                    .rentStartTime(rent.getRentStartTime().toLocalDate())
+                    .rentEndTime(rent.getRentEndTime().toLocalDate())
                     .build();
 
             response.add(dto);
@@ -135,9 +140,12 @@ public class RentServiceImpl implements RentService{
             RentResponseDTO dto = RentResponseDTO.builder()
                     .rentId(rent.getRentId())
                     .rentStatus(rent.getRentStatus())
-                    .rentHeadCount(rent.getRentHeadCount())
                     .rentTime(rent.getRentTime())
-                    .rentStartTime(rent.getRentStartTime())
+                    .rentTime(rent.getRentTime())
+                    .rentHeadCount(rent.getRentHeadCount())
+                    .rentPrice(rent.getRentPrice())
+                    .rentStartTime(rent.getRentStartTime().toLocalDate())
+                    .rentEndTime(rent.getRentEndTime().toLocalDate())
                     .build();
 
             response.add(dto);
@@ -463,7 +471,7 @@ public class RentServiceImpl implements RentService{
             }, webSocketConfig.getUrl()).get();
 
             // 상태와 렌트 탑승 위치 전송
-            MyMessage message = new MyMessage("viehcle_return", rent.getRentCar().getRentCarId());
+            MyMessage message = new MyMessage("vehicle_return", rent.getRentCar().getRentCarId());
             String jsonMessage = objectMapper.writeValueAsString(message);
             session.sendMessage(new TextMessage(jsonMessage));
             log.info("Sent message: {}", jsonMessage);

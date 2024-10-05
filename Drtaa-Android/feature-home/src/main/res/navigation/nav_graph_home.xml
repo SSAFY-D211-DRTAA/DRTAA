@@ -10,6 +10,7 @@
         android:name="com.drtaa.feature_home.HomeFragment"
         android:label="HomeFragment"
         tools:layout="@layout/fragment_home">
+        <deepLink app:uri="drtaa://app/home" />
         <action
             android:id="@+id/action_home_to_rent"
             app:destination="@id/nav_graph_rent" />
@@ -27,7 +28,8 @@
         android:id="@+id/rentHistoryFragment"
         android:name="com.drtaa.feature_home.RentHistoryFragment"
         android:label="RentHistoryFragment"
-        tools:layout="@layout/item_rent_history" />
+        tools:layout="@layout/item_rent_history">
+    </fragment>
 
     <include app:graph="@navigation/nav_graph_rent" />
     <include app:graph="@navigation/nav_graph_plan" />

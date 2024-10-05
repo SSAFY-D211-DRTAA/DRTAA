@@ -18,7 +18,7 @@ class local_path_pub:
 
         # Subscribers
         rospy.Subscriber('/odom', Odometry, self.odom_callback)
-        rospy.Subscriber('/global_path_per', Path, self.global_path_callback)
+        rospy.Subscriber('/global_path', Path, self.global_path_callback)
 
         # Publishers
         self.local_path_pub = rospy.Publisher('/local_path', Path, queue_size=1)
@@ -35,7 +35,7 @@ class local_path_pub:
         self.smoothing_factor = 0.5
         self.global_path_msg = None  # Added initialization for global_path_msg
 
-        rate = rospy.Rate(15)  # 20hz
+        rate = rospy.Rate(20)  # 20hz
         while not rospy.is_shutdown():
             self.update_local_path()
             rate.sleep()

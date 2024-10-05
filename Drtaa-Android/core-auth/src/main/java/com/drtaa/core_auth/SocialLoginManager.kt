@@ -1,4 +1,4 @@
-package com.drtaa.feature_sign.util
+package com.drtaa.core_auth
 
 import android.content.Context
 import android.content.Intent

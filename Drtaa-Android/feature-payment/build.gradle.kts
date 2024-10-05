@@ -48,4 +48,7 @@ android {
 dependencies {
     implementation (libs.bootpay)
     implementation (libs.gson)
+    implementation (libs.lottie)
+
+    implementation(project(":feature-plan"))
 }

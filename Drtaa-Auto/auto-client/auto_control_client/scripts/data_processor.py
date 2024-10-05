@@ -7,9 +7,9 @@ def process_data(file_path: str, epsilon: float) -> Dict:
     original_points = [(pose["pose"]["position"]["x"], pose["pose"]["position"]["y"]) for pose in global_path_data["poses"]]
     optimized_path = simplify_curve(original_points, epsilon)
     
-    # print(f"{file_path}:")
-    # print(f"  원본 데이터 포인트 수: {len(original_points)}")
-    # print(f"  최적화된 데이터 포인트 수: {len(optimized_path)}")
+    print(f"{file_path}:")
+    print(f"  원본 데이터 포인트 수: {len(original_points)}")
+    print(f"  최적화된 데이터 포인트 수: {len(optimized_path)}")
     
     return {
         'original': original_points,
