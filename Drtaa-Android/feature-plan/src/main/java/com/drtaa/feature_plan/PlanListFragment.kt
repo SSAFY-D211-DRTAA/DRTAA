@@ -272,9 +272,18 @@ class PlanListFragment :
                 if (dayPlan == null) return@onEach
 
                 naverMap.clearMarkerList()
-                dayPlan.placesDetail.forEach { place ->
-                    naverMap.addMarker(place.datePlacesLat, place.datePlacesLon)
+//                dayPlan.placesDetail.forEach { place ->
+//                    naverMap.addMarker(place.datePlacesLat, place.datePlacesLon)
+//                }
+                dayPlan.placesDetail.forEachIndexed { index, place ->
+                    naverMap.addMarker(
+                        place.datePlacesLat,
+                        place.datePlacesLon,
+                        index + 1,
+                        place.datePlacesName
+                    )
                 }
+
                 naverMap.adjustCamera()
             }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
