@@ -166,6 +166,12 @@ public class RentServiceImpl implements RentService{
         RentCarSchedule carSchedule = rentCarScheduleRepository.findByRentRentId(rent.getRentId())
                 .orElseThrow(() -> new RentCarScheduleNotFoundException("해당 rentId의 맞는 렌트 차량 스케줄을 찾을 수 없습니다."));
 
+        // 렌트 첫 날 일정 가져오기
+        TravelDates firstDate = travelDatesRepository.findFirstByTravel(travel);
+
+        // 첫날 첫 장소 가져오기
+        DatePlaces firstPlace = datePlacesRepository.findFirstByTravelDates(firstDate);
+
         RentDetailResponseDTO response = RentDetailResponseDTO.builder()
                 // rent
                 .rentId(rent.getRentId())
@@ -187,6 +193,7 @@ public class RentServiceImpl implements RentService{
                 .rentCarScheduleId(carSchedule.getRentCarScheduleId())
                 // travel
                 .travelId(travel.getTravelId())
+                .datePlacesName(firstPlace.getDatePlacesName())
                 .build();
 
         return response;

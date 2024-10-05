@@ -15,8 +15,9 @@ public interface DatePlacesRepository extends JpaRepository<DatePlaces, Long> {
     Optional<DatePlaces> findByDatePlacesId(Long datePlacesId);
     Optional<DatePlaces> findFirstByTravelDatesOrderByDatePlacesOrderDesc(TravelDates date);
     Optional<DatePlaces> findByTravelDatesAndDatePlacesOrder(TravelDates date, int datePlacesOrder);
-    DatePlaces findFirstByTravelDatesOrderByDatePlacesOrderAsc(TravelDates travelDates);
     Optional<DatePlaces> findFirstByTravelAndDatePlacesIsExpiredFalseOrderByDatePlacesIdAsc(Travel travel);
+    DatePlaces findFirstByTravelDatesOrderByDatePlacesOrderAsc(TravelDates travelDates);
+    DatePlaces findFirstByTravelDates(TravelDates travelDates);
     List<DatePlaces> findByTravelDates(TravelDates travelDates);
     List<DatePlaces> findByTravelDatesAndDatePlacesOrderGreaterThan(TravelDates date, int datePlacesOrder);
     List<DatePlaces> findByTravelDatesAndDatePlacesIsExpiredFalse(TravelDates date);

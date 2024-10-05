@@ -51,5 +51,6 @@ public class RentDetailResponseDTO {
     // travel
     @Schema(description = "여행 고유 번호", example = "1")
     private Long travelId;
-
+    @Schema(description = "일정 장소 이름", example = "디지털미디어시티역")
+    private String datePlacesName;
 }
