@@ -22,7 +22,7 @@ data class RentDetail(
     val rentStatus: String,
     val rentTime: Double,
     val travelId: Long,
-    val rentStartLocation: String = ""
+    val datePlacesName: String = ""
 ) {
     fun rentScheduleToString(dateString: String): String {
         val dateTime = LocalDateTime.parse(dateString)
