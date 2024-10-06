@@ -3,7 +3,6 @@ package com.drtaa.feature_mypage.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.drtaa.core_data.repository.PaymentRepository
-import com.drtaa.core_model.pay.PaymentCompletionInfo
 import com.drtaa.core_model.pay.ResponsePayment
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -9,7 +9,7 @@ import com.drtaa.core_ui.base.BaseDiffUtil
 import com.drtaa.feature_mypage.databinding.ItemPaymentListBinding
 
 class PaymentListAdapter :
-    ListAdapter<ResponsePayment, PaymentListAdapter.PaymentListViewHolder>(BaseDiffUtil<ResponsePayment>()){
+    ListAdapter<ResponsePayment, PaymentListAdapter.PaymentListViewHolder>(BaseDiffUtil<ResponsePayment>()) {
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -29,7 +29,5 @@ class PaymentListAdapter :
                     binding.completion = item
                     binding.executePendingBindings()
                 }
-
     }
-
 }
