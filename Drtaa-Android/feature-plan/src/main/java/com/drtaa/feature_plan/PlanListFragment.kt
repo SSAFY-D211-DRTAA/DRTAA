@@ -134,7 +134,8 @@ class PlanListFragment :
                 if (plan == null) return@onEach
 
                 binding.tvPlanTitle.text = plan.travelName
-
+                binding.tvPlanDate.text =
+                    "${(plan.travelStartDate + " ~ " + plan.travelEndDate).replace('-', '.')}"
                 if (planViewModel.isViewPagerLoaded) return@onEach
                 initViewPager()
                 initDatePickerDialog()
