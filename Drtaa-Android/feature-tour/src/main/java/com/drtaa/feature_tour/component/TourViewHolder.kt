@@ -4,6 +4,7 @@ import android.view.View
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.drtaa.core_model.tour.TourItem
 import com.drtaa.core_ui.centerCrop
+import com.drtaa.feature_tour.R
 import com.drtaa.feature_tour.databinding.ItemTourBinding
 
 class TourViewHolder(
@@ -24,11 +25,10 @@ class TourViewHolder(
             }
 
             tvTourAddr.text = data.addr1
-            if (data.firstimage.isNotEmpty()) {
-                ivTour.visibility = View.VISIBLE
+            if (data.firstimage.isNotBlank()) {
                 ivTour.centerCrop(data.firstimage, binding.root.context)
             } else {
-                ivTour.visibility = View.GONE
+                ivTour.setImageResource(com.drtaa.core_ui.R.drawable.ic_tour_basic_image)
             }
             itemView.setOnClickListener {
                 onTourClickListener(data)

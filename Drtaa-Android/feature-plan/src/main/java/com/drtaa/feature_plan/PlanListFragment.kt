@@ -134,7 +134,8 @@ class PlanListFragment :
                 if (plan == null) return@onEach
 
                 binding.tvPlanTitle.text = plan.travelName
-
+                binding.tvPlanDate.text =
+                    "${(plan.travelStartDate + " ~ " + plan.travelEndDate).replace('-', '.')}"
                 if (planViewModel.isViewPagerLoaded) return@onEach
                 initViewPager()
                 initDatePickerDialog()
@@ -272,9 +273,18 @@ class PlanListFragment :
                 if (dayPlan == null) return@onEach
 
                 naverMap.clearMarkerList()
-                dayPlan.placesDetail.forEach { place ->
-                    naverMap.addMarker(place.datePlacesLat, place.datePlacesLon)
+//                dayPlan.placesDetail.forEach { place ->
+//                    naverMap.addMarker(place.datePlacesLat, place.datePlacesLon)
+//                }
+                dayPlan.placesDetail.forEachIndexed { index, place ->
+                    naverMap.addMarker(
+                        place.datePlacesLat,
+                        place.datePlacesLon,
+                        index + 1,
+                        place.datePlacesName
+                    )
                 }
+
                 naverMap.adjustCamera()
             }.launchIn(viewLifecycleOwner.lifecycleScope)
     }

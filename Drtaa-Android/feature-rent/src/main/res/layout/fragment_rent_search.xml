@@ -15,6 +15,7 @@
             android:id="@+id/mv_map"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+
             <ImageView
                 android:id="@+id/imageView"
                 android:layout_width="40dp"
@@ -27,7 +28,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/cl_rent_search_bottom_sheet"
             android:layout_width="match_parent"
-            android:layout_height="700dp"
+            android:layout_height="match_parent"
             android:clickable="true"
             app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 

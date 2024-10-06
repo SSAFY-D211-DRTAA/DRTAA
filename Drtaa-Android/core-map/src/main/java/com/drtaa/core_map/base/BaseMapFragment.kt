@@ -1,6 +1,10 @@
 package com.drtaa.core_map.base
 
+import android.graphics.Typeface
 import android.os.Bundle
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.StyleSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,7 +24,9 @@ import com.naver.maps.geometry.LatLngBounds
 import com.naver.maps.map.MapView
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
+import com.naver.maps.map.overlay.InfoWindow
 import com.naver.maps.map.overlay.Marker
+import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.util.FusedLocationSource
 
 abstract class BaseMapFragment<T : ViewDataBinding>(private val layoutResId: Int) :
@@ -93,18 +99,42 @@ abstract class BaseMapFragment<T : ViewDataBinding>(private val layoutResId: Int
      * 단일 마커 설정
      */
     fun NaverMap.setMarker(lat: Double, lng: Double) {
-        marker.map = null
-        marker.position = LatLng(lat, lng)
-        marker.map = this
+        marker.apply {
+            icon = OverlayImage.fromResource(com.drtaa.core_ui.R.drawable.ic_center_marker)
+            position = LatLng(lat, lng)
+            map = this@setMarker
+            width = ICON_SIZE
+            height = ICON_SIZE
+        }
     }
 
     /**
      * 마커 리스트 추가
      */
-    fun NaverMap.addMarker(lat: Double, lng: Double) {
-        val marker = Marker()
-        marker.position = LatLng(lat, lng)
-        marker.map = this
+    fun NaverMap.addMarker(lat: Double, lng: Double, index: Int, caption: String) {
+        val marker = Marker().apply {
+            position = LatLng(lat, lng)
+            icon = OverlayImage.fromResource(com.drtaa.core_ui.R.drawable.ic_center_marker)
+            map = this@addMarker
+            captionText = caption
+            width = ICON_SIZE
+            height = ICON_SIZE
+        }
+
+        InfoWindow().apply {
+            adapter = object : InfoWindow.DefaultTextAdapter(requireActivity()) {
+                override fun getText(infoWindow: InfoWindow): CharSequence {
+                    val boldText = SpannableString("${index}번째 일정").apply {
+                        setSpan(
+                            StyleSpan(Typeface.BOLD), 0, length,
+                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                        )
+                    }
+                    return boldText
+                }
+            }
+            open(marker)
+        }
 
         _markerList.add(marker)
     }
@@ -183,5 +213,9 @@ abstract class BaseMapFragment<T : ViewDataBinding>(private val layoutResId: Int
     override fun onLowMemory() {
         super.onLowMemory()
         mapView?.onLowMemory()
+    }
+
+    companion object {
+        const val ICON_SIZE = 100
     }
 }

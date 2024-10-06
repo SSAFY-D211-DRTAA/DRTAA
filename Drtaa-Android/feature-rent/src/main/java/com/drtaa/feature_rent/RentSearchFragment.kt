@@ -107,7 +107,7 @@ class RentSearchFragment :
             .onEach { selectedSearchItem ->
                 Timber.d("selectedSearchItem $selectedSearchItem")
                 selectedSearchItem?.let {
-                    naverMap.setMarker(selectedSearchItem.lat, selectedSearchItem.lng)
+//                    naverMap.setMarker(selectedSearchItem.lat, selectedSearchItem.lng)
                     naverMap.setContentPadding(0, 0, 0, MAP_BOTTOM_CONTENT_PADDING)
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
@@ -129,7 +129,7 @@ class RentSearchFragment :
                             View.VISIBLE
                     }
                 }.onFailure {
-                    showSnackBar("오류가 발생했습니다. 다시 시도해주세요.")
+//                    showSnackBar("오류가 발생했습니다. 다시 시도해주세요.")
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
@@ -172,11 +172,11 @@ class RentSearchFragment :
         binding.layoutRentSearchBottomSheet.btnSearchSelect.visibility = View.GONE
 
         behavior = BottomSheetBehavior.from(binding.clRentSearchBottomSheet)
-        behavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        behavior.state = BottomSheetBehavior.STATE_EXPANDED
         behavior.isHideable = false
 
         behavior.peekHeight = BOTTOM_SHEET_PEEK_HEIGHT
-        behavior.maxHeight = BOTTOM_SHEET_PEEK_HEIGHT * 2
+        behavior.maxHeight = BOTTOM_SHEET_PEEK_HEIGHT * THREE
 
         behavior.addBottomSheetCallback(object : BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
@@ -213,6 +213,7 @@ class RentSearchFragment :
         val jungryujang = LatLng(37.57578754990568, 126.90027478459672)
         const val BOTTOM_SHEET_PEEK_HEIGHT = 500
         const val MAP_BOTTOM_CONTENT_PADDING = 100
+        const val THREE = 3
         const val LOCATION_PERMISSION_REQUEST_CODE = 1000
     }
 }
