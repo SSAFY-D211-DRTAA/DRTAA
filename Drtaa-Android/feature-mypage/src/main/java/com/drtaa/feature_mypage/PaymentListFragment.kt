@@ -1,18 +1,16 @@
 package com.drtaa.feature_mypage
 
-import android.os.Bundle
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.drtaa.core_ui.base.BaseFragment
 import com.drtaa.feature_mypage.adaper.PaymentListAdapter
 import com.drtaa.feature_mypage.databinding.FragmentPaymentListBinding
 import com.drtaa.feature_mypage.viewmodel.PaymentListViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import timber.log.Timber
 
 @AndroidEntryPoint
 class PaymentListFragment : BaseFragment<FragmentPaymentListBinding>(R.layout.fragment_payment_list) {
@@ -37,11 +35,11 @@ class PaymentListFragment : BaseFragment<FragmentPaymentListBinding>(R.layout.fr
 
     private fun initObserve() {
         paymentListViewModel.paymentList.flowWithLifecycle(viewLifecycleOwner.lifecycle)
-            .onEach {  paymentInfo ->
-                paymentInfo?.let {
-                    paymentListAdapter.submitList(it)
+            .onEach { paymentList ->
+                Timber.d("로그 찍힘??")
+                paymentList.let {
+                    paymentListAdapter.submitList(paymentList)
                 }
-            }
-
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
 }

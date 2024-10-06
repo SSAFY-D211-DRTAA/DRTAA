@@ -6,7 +6,7 @@
     <data>
         <variable
             name="completion"
-            type="com.drtaa.core_model.data.PaymentCompletionInfo" />
+            type="com.drtaa.core_model.pay.ResponsePayment" />
 
     </data>
 
@@ -21,6 +21,8 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginTop="20dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_payment_list_title"
             tools:listitem="@layout/item_payment_list" />
 

@@ -4,12 +4,12 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.drtaa.core_model.data.PaymentCompletionInfo
+import com.drtaa.core_model.pay.ResponsePayment
 import com.drtaa.core_ui.base.BaseDiffUtil
 import com.drtaa.feature_mypage.databinding.ItemPaymentListBinding
 
 class PaymentListAdapter :
-    ListAdapter<PaymentCompletionInfo, PaymentListAdapter.PaymentListViewHolder>(BaseDiffUtil<PaymentCompletionInfo>()){
+    ListAdapter<ResponsePayment, PaymentListAdapter.PaymentListViewHolder>(BaseDiffUtil<ResponsePayment>()){
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -25,7 +25,7 @@ class PaymentListAdapter :
 
     inner class PaymentListViewHolder(private val binding: ItemPaymentListBinding) :
             RecyclerView.ViewHolder(binding.root) {
-                fun bind(item: PaymentCompletionInfo) {
+                fun bind(item: ResponsePayment) {
                     binding.completion = item
                     binding.executePendingBindings()
                 }

@@ -96,7 +96,6 @@ class MyPageFragment : BaseFragment<FragmentMyPageBinding>(R.layout.fragment_my_
             llMypageItem2.apply {
                 findViewById<TextView>(R.id.tv_mypage_item_title).text = "결제 내역"
                 setOnClickListener {
-                    showSnackBar("2클릭")
                     findNavController().navigate(R.id.action_myPageFragment_to_paymentListFragment)
                 }
             }

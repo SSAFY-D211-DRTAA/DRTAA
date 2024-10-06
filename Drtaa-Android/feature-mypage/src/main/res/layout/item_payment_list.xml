@@ -5,8 +5,7 @@
     <data>
         <variable
             name="completion"
-            type="com.drtaa.core_model.data.PaymentCompletionInfo" />
-
+            type="com.drtaa.core_model.pay.ResponsePayment" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -40,7 +39,8 @@
                     app:layout_constraintEnd_toEndOf="@+id/tv_payment_list_price"
                     app:layout_constraintStart_toEndOf="@+id/tv_payment_list_type_value"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/ic_rent_payment" />
+                    app:srcCompat="@drawable/ic_rent_payment"
+                    app:paymentImage="@{completion.orderId}"/>
 
                 <TextView
                     android:id="@+id/tv_payment_product"
@@ -50,6 +50,7 @@
                     android:layout_marginStart="20dp"
                     android:layout_marginTop="20dp"
                     android:text="DRTAA 택시"
+                    app:paymentProduct="@{completion.orderId}"
                     android:textSize="20sp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -71,6 +72,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="네이버페이"
+                    app:paymentMethod="@{completion.paymentMethod}"
                     android:textColor="#00ef91"
                     app:layout_constraintBottom_toBottomOf="@+id/tv_payment_list_type"
                     app:layout_constraintStart_toEndOf="@+id/tv_payment_list_type"
@@ -93,6 +95,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="2024-10-15"
+                    app:rentTime="@{completion.rentStartTime}"
                     app:layout_constraintBottom_toBottomOf="@+id/tv_payment_list_start"
                     app:layout_constraintStart_toEndOf="@+id/tv_payment_list_start"
                     app:layout_constraintTop_toTopOf="@+id/tv_payment_list_start" />
@@ -114,6 +117,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="2024-10-15"
+                    app:rentTime="@{completion.rentEndTime}"
                     app:layout_constraintBottom_toBottomOf="@+id/tv_payment_end"
                     app:layout_constraintStart_toEndOf="@+id/tv_payment_end"
                     app:layout_constraintTop_toTopOf="@+id/tv_payment_end" />
@@ -136,6 +140,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="4000원"
+                    app:setTextPrice="@{completion.price}"
                     android:textSize="16sp"
                     app:layout_constraintBottom_toBottomOf="@+id/tv_payment_end_value"
                     app:layout_constraintEnd_toEndOf="@+id/tv_payment_list_price" />

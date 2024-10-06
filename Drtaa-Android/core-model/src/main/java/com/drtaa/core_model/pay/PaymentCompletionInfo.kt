@@ -1,4 +1,4 @@
-package com.drtaa.core_model.data
+package com.drtaa.core_model.pay
 
 import com.drtaa.core_model.network.RequestPayment
 import com.drtaa.core_model.util.Time.HOUR_TO_MILLIS
@@ -36,24 +36,5 @@ data class PaymentCompletionInfo(
             rentStartTime = rentStartTime.toLocalDateTime.format(dateFormatter),
             rentEndTime = rentEndTime.toLocalDateTime.format(dateFormatter)
         )
-    }
-
-    companion object {
-        private val dateFormatter = DateTimeFormatter.ISO_DATE_TIME
-
-        fun fromMap(map: Map<String, Any?>): PaymentCompletionInfo {
-            return PaymentCompletionInfo(
-                receiptId = map["receiptId"] as String,
-                orderId = map["orderId"] as String,
-                price = (map["price"] as Number).toInt(),
-                userId = map["userId"] as? String ?: "",
-                paymentMethod = map["paymentMethod"] as String,
-                purchasedAt = (map["purchasedAt"] as? Date) ?: Date.from(LocalDateTime.parse(map["purchasedAt"] as String, dateFormatter).atZone(ZoneId.systemDefault()).toInstant()),
-                carId = (map["carId"] as Number).toInt(),
-                headCount = (map["headCount"] as Number).toInt(),
-                rentStartTime = (map["rentStartTime"] as? Date) ?: Date.from(LocalDateTime.parse(map["rentStartTime"] as String, dateFormatter).atZone(ZoneId.systemDefault()).toInstant()),
-                rentEndTime = (map["rentEndTime"] as? Date) ?: Date.from(LocalDateTime.parse(map["rentEndTime"] as String, dateFormatter).atZone(ZoneId.systemDefault()).toInstant())
-            )
-        }
     }
 }
