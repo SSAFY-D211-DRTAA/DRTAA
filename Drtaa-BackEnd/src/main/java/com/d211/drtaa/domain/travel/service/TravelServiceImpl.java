@@ -259,15 +259,22 @@ public class TravelServiceImpl implements TravelService {
         TravelDates dates = travelDatesRepository.findByTravelDatesId(placesAddRequestDTO.getTravelDatesId())
                 .orElseThrow(() -> new TravelNotFoundException("해당 travelDatesId의 맞는 일정을 찾을 수 없습니다."));
 
+        // 추가 전 마지막 장소 순서 알기
+        DatePlaces lastPlace = datePlacesRepository.findFirstByTravelDatesOrderByDatePlacesOrderDesc(dates)
+                .orElseThrow(() -> new TravelNotFoundException("해당 travelDates의 마지막 장소를 찾을 수 없습니다."));
+
         // 일정 장소 생성
         DatePlaces places = DatePlaces.builder()
+                .travel(dates.getTravel())
                 .travelDates(dates)
+                .datePlacesOrder(lastPlace.getDatePlacesOrder() + 1) // 마지막 장소 뒤 순서
                 .datePlacesName(placesAddRequestDTO.getDatePlacesName())
                 .datePlacesCategory(placesAddRequestDTO.getDatePlacesCategory())
                 .datePlacesAddress(placesAddRequestDTO.getDatePlacesAddress())
                 .datePlacesLat(placesAddRequestDTO.getDatePlacesLat())
                 .datePlacesLon(placesAddRequestDTO.getDatePlacesLon())
                 .datePlacesIsVisited(false)
+                .datePlacesIsExpired(false)
                 .build();
 
         // 생성한 일정 장소 저장
