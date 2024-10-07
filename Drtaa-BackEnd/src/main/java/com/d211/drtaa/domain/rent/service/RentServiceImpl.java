@@ -245,16 +245,23 @@ public class RentServiceImpl implements RentService{
         User user = userRepository.findByUserProviderId(userProviderId)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 userProviderId의 맞는 회원을 찾을 수 없습니다."));
 
-        // 사용자의 진행중인 렌트 찾기
-        Rent rent = rentRepository.findByUserAndRentStatusIn(user, Collections.singletonList(RentStatus.in_progress))
-                .orElseThrow(() -> new RentNotFoundException("해당 사용자의 진행중인 렌트가 없습니다."));
+        // 응답
+        RentStatusResponseDTO response = RentStatusResponseDTO.builder().build();
 
-        RentStatusResponseDTO response = RentStatusResponseDTO.builder()
-                .rentStatus(rent.getRentStatus())
-                .rentCarDrivingStatus(rent.getRentCar().getRentCarDrivingStatus())
-                .build();
+        try {
+            // 오늘 날짜 기준 사용자의 렌트 찾기
+            LocalDateTime startDate = LocalDateTime.now().plusDays(0).withHour(0).withMinute(0).withSecond(0);
+            LocalDateTime endDate = LocalDateTime.now().plusDays(0).withHour(23).withMinute(59).withSecond(59);
+            Rent rent = rentRepository.findByUserAndRentStartTimeBetween(user, startDate, endDate)
+                    .orElseThrow(() -> new RentNotFoundException("오늘 날짜 기준 사용자의 렌트가 없습니다."));
 
-        return response;
+            response.setRentStatus(rent.getRentStatus());
+            response.setRentCarDrivingStatus(rent.getRentCar().getRentCarDrivingStatus());
+
+            return response;
+        } catch (RentNotFoundException e) {
+            return response;
+        }
     }
 
     @Override
