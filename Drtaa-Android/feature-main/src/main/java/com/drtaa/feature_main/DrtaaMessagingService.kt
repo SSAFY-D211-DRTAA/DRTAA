@@ -40,9 +40,9 @@ class DrtaaMessagingService : FirebaseMessagingService() {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 putExtra("recommend", request)
             }
-
+            val uniqueRequestCode = System.currentTimeMillis().toInt()
             val pIntent: PendingIntent =
-                PendingIntent.getActivity(this, 0, mainIntent, PendingIntent.FLAG_IMMUTABLE)
+                PendingIntent.getActivity(this, uniqueRequestCode, mainIntent, PendingIntent.FLAG_IMMUTABLE)
 
             val builder = NotificationCompat.Builder(this, MainActivity.CHANNEL_ID)
                 .setSmallIcon(R.mipmap.ic_launcher) // 반드시 작은 아이콘을 설정
@@ -57,7 +57,7 @@ class DrtaaMessagingService : FirebaseMessagingService() {
 
             notificationManager.notify(MainActivity.NOTIFICATION_ID, builder.build())
 
-            Timber.tag("fcm").d("place  recomm $request")
+            Timber.tag("fcm").d("place recomm $request")
         }
 
         message.notification?.let { msg ->
