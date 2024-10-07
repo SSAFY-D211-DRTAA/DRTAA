@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
@@ -235,9 +236,11 @@
             android:layout_marginTop="20dp"
             android:text="남은시간 : ㅇㅇ분"
             android:textSize="18sp"
+            android:visibility="invisible"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/cv_tour_card" />
+            app:layout_constraintTop_toBottomOf="@+id/cv_tour_card"
+            tools:visibility="visible" />
 
 
         <androidx.appcompat.widget.AppCompatButton
@@ -247,8 +250,11 @@
             android:layout_height="45dp"
             android:layout_marginTop="20dp"
             android:text="연장하기"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="@id/cv_tour_card"
-            app:layout_constraintTop_toBottomOf="@+id/tv_tour_remain_time" />
+            app:layout_constraintTop_toBottomOf="@+id/tv_tour_remain_time"
+            tools:visibility="visible" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_get_off_qrcode"
@@ -264,8 +270,11 @@
             android:id="@+id/btn_tour_qrcode"
             android:layout_width="150dp"
             android:layout_height="45dp"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="@id/cv_tour_card"
             app:layout_constraintTop_toTopOf="@+id/btn_tour_extend"
+            app:srcCompat="@drawable/ic_qr_btn"
+            tools:visibility="visible" />
             app:srcCompat="@drawable/ic_qr_btn" />
 
         <TextView

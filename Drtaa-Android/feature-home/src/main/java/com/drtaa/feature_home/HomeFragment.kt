@@ -3,6 +3,7 @@ package com.drtaa.feature_home
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.bumptech.glide.Glide
 import com.drtaa.core_ui.base.BaseFragment
 import com.drtaa.feature_home.databinding.FragmentHomeBinding
 import com.drtaa.feature_home.viewmodel.HomeViewModel
@@ -16,6 +17,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
     private val homeViewModel: HomeViewModel by viewModels()
 
     override fun initView() {
+        Glide.with(this).load(R.raw.car_loading).into(binding.ivHomeCarDriving)
         initObserve()
         initEvent()
     }
@@ -35,15 +37,11 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
     }
 
     private fun initEvent() {
-        binding.btnHomeCarRent.setOnClickListener {
+        binding.cvHomeRent.setOnClickListener {
             navigateDestination(R.id.action_home_to_rent)
         }
 
-        binding.btnHomeRentHistory.setOnClickListener {
-            navigateDestination(R.id.action_homeFragment_to_rentHistoryFragment)
-        }
-
-        binding.btnHomeTaxi.setOnClickListener {
+        binding.cvHomeTaxi.setOnClickListener {
             navigateDestination(R.id.action_homeFragment_to_taxiFragment)
         }
 
