@@ -5,6 +5,9 @@
 
     <data>
 
+        <variable
+            name="planSimple"
+            type="com.drtaa.core_model.plan.PlanSimple" />
     </data>
 
     <ScrollView
@@ -63,38 +66,120 @@
                     android:layout_marginVertical="10dp"
                     android:text="진행 중"
                     android:textSize="24sp"
-                    app:layout_constraintBottom_toTopOf="@+id/cl_plan_no_in_progress"
+                    app:layout_constraintBottom_toTopOf="@+id/cl_plan_in_progress"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/cl_plan_no_in_progress"
+                    android:id="@+id/cl_plan_in_progress"
                     android:layout_width="match_parent"
-                    android:layout_height="150dp"
+                    android:layout_height="wrap_content"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tv_plan_in_progress">
 
-                    <ImageView
-                        android:id="@+id/iv_in_progress_empty"
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/cv_plan_in_progress"
                         android:layout_width="match_parent"
-                        android:layout_height="120dp"
-                        android:scaleType="fitEnd"
-                        android:src="@drawable/ic_empty_in_progress"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        tools:layout_editor_absoluteX="0dp" />
-
-                    <TextView
-                        android:id="@+id/tv_in_progress_help"
-                        style="@style/jua"
-                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginTop="40dp"
-                        android:text="진행 중인 여행이 없습니다!"
-                        android:textColor="@color/gray_5858"
-                        android:textSize="20dp"
+                        android:layout_marginHorizontal="3dp"
+                        android:layout_marginTop="13dp"
+                        android:layout_marginBottom="7dp"
+                        android:visibility="gone"
+                        app:cardCornerRadius="30dp"
+                        app:cardElevation="3dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:strokeColor="@color/white"
+                        tools:visibility="visible">
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:paddingStart="30dp"
+                            android:paddingEnd="20dp">
+
+                            <TextView
+                                android:id="@+id/tv_plan_title"
+                                style="@style/jua"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="20dp"
+                                android:text="@{planSimple.travelName}"
+                                android:textSize="18sp"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"
+                                tools:text="여행 제목이 들어가요" />
+
+                            <ImageView
+                                android:id="@+id/iv_plan_schedule"
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:layout_marginTop="3dp"
+                                android:layout_marginBottom="20dp"
+                                android:src="@drawable/ic_calendar_3d"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toBottomOf="@id/tv_plan_title" />
+
+                            <TextView
+                                android:id="@+id/tv_plan_start_date"
+                                style="@style/ptd_regular"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="3dp"
+                                android:text='@{planSimple.travelStartDate + "~" + planSimple.travelEndDate}'
+                                android:textSize="13sp"
+                                app:layout_constraintBottom_toBottomOf="@id/iv_plan_schedule"
+                                app:layout_constraintStart_toEndOf="@+id/iv_plan_schedule"
+                                app:layout_constraintTop_toTopOf="@id/iv_plan_schedule"
+                                tools:text="2024-10-02~2024-10-04" />
+
+                            <ImageView
+                                android:id="@+id/iv_plan_status"
+                                android:layout_width="60dp"
+                                android:layout_height="60dp"
+                                android:layout_marginBottom="10dp"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                tools:src="@drawable/ic_in_progress" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+                    </androidx.cardview.widget.CardView>
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/cl_plan_no_in_progress"
+                        android:layout_width="match_parent"
+                        android:layout_height="150dp"
+                        android:visibility="gone"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:visibility="gone">
+
+                        <ImageView
+                            android:id="@+id/iv_in_progress_empty"
+                            android:layout_width="match_parent"
+                            android:layout_height="120dp"
+                            android:scaleType="fitEnd"
+                            android:src="@drawable/ic_empty_in_progress"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            tools:layout_editor_absoluteX="0dp" />
+
+                        <TextView
+                            android:id="@+id/tv_in_progress_help"
+                            style="@style/jua"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:layout_marginTop="40dp"
+                            android:text="진행 중인 여행이 없습니다!"
+                            android:textColor="@color/gray_5858"
+                            android:textSize="20dp"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <LinearLayout
@@ -106,7 +191,7 @@
                     android:orientation="horizontal"
                     app:layout_constraintBottom_toTopOf="@+id/cl_plan_reserved"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/cl_plan_no_in_progress">
+                    app:layout_constraintTop_toBottomOf="@id/cl_plan_in_progress">
 
                     <TextView
                         android:id="@+id/tv_plan_reserved"

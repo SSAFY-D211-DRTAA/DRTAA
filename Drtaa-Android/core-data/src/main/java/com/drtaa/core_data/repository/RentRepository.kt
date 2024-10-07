@@ -9,6 +9,7 @@ import com.drtaa.core_model.network.RequestRentExtend
 import com.drtaa.core_model.network.ResponseRentStateAll
 import com.drtaa.core_model.rent.RentDetail
 import com.drtaa.core_model.rent.RentSimple
+import com.drtaa.core_model.rent.RentStatus
 import kotlinx.coroutines.flow.Flow
 
 interface RentRepository {
@@ -27,4 +28,5 @@ interface RentRepository {
 
     // history
     suspend fun getRentHistory(): Flow<Result<List<RentSimple>>>
+    suspend fun getRentStatus(): Flow<Result<RentStatus>>
 }

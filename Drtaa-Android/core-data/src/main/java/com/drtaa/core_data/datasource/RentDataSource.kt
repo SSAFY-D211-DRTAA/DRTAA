@@ -9,6 +9,7 @@ import com.drtaa.core_model.network.RequestRentExtend
 import com.drtaa.core_model.network.ResponseRentStateAll
 import com.drtaa.core_model.rent.RentDetail
 import com.drtaa.core_model.rent.RentSimple
+import com.drtaa.core_model.rent.RentStatus
 
 interface RentDataSource {
     // rent
@@ -26,4 +27,5 @@ interface RentDataSource {
 
     // history
     suspend fun getRentHistory(): List<RentSimple>
+    suspend fun getRentStatus(): RentStatus
 }

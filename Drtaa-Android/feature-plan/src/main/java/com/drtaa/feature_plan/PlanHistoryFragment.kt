@@ -84,6 +84,15 @@ class PlanHistoryFragment :
                     foldLayout(ivCompletedExpand, clPlanCompleted)
                 }
             }
+
+            cvPlanInProgress.setOnClickListener {
+                planHistoryViewModel.planInProgress.value?.let {
+                    moveToPlanListFragment(
+                        it.travelId,
+                        it.rentId
+                    )
+                }
+            }
         }
     }
 
@@ -98,6 +107,7 @@ class PlanHistoryFragment :
                         recommend = null
                     )
                 )
+                moveToPlanListFragment(travelId, rentId)
             }
         }
         planReservedListAdapter.setItemClickListener(clickListener)
@@ -110,6 +120,15 @@ class PlanHistoryFragment :
         binding.rvPlanCompletedHistory.itemAnimator = null
     }
 
+    private fun moveToPlanListFragment(travelId: Int, rentId: Int) {
+        navigateDestination(
+            PlanHistoryFragmentDirections.actionPlanHistoryFragmentToPlanListFragment(
+                travelId = travelId,
+                rentId = rentId
+            )
+        )
+    }
+
     private fun initObserve() {
         planHistoryViewModel.planList.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { planList ->
@@ -117,7 +136,6 @@ class PlanHistoryFragment :
                     binding.tvErrorPlanHistory.visibility = View.VISIBLE
                     binding.clPlan.visibility = View.GONE
                 } else {
-
                     binding.tvErrorPlanHistory.visibility = View.GONE
                     binding.clPlan.visibility = View.VISIBLE
                 }
@@ -125,11 +143,14 @@ class PlanHistoryFragment :
 
         planHistoryViewModel.planInProgress.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { planInProgress ->
-                Timber.tag("plan").d("$planInProgress")
                 if (planInProgress == null) {
+                    binding.cvPlanInProgress.visibility = View.GONE
                     binding.clPlanNoInProgress.visibility = View.VISIBLE
                 } else {
+                    binding.cvPlanInProgress.visibility = View.VISIBLE
                     binding.clPlanNoInProgress.visibility = View.GONE
+
+                    binding.planSimple = planInProgress
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
 

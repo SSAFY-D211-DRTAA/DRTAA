@@ -52,6 +52,12 @@ class RentHistoryFragment :
                     foldLayout(ivCompletedExpand, clRentCompleted)
                 }
             }
+
+            cvRentInProgress.setOnClickListener {
+                rentHistoryViewModel.rentInProgress.value?.let {
+                    moveToSummaryFragment(it.rentId.toLong())
+                }
+            }
         }
     }
 
@@ -70,9 +76,13 @@ class RentHistoryFragment :
         rentHistoryViewModel.rentInProgress.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { rentInProgress ->
                 if (rentInProgress == null) {
+                    binding.cvRentInProgress.visibility = View.GONE
                     binding.clRentNoInProgress.visibility = View.VISIBLE
                 } else {
+                    binding.cvRentInProgress.visibility = View.VISIBLE
                     binding.clRentNoInProgress.visibility = View.GONE
+
+                    binding.rent = rentInProgress
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
 
@@ -110,11 +120,7 @@ class RentHistoryFragment :
     private fun initRVAdapter() {
         val clickListener = object : RentHistoryAdapter.ItemClickListener {
             override fun onItemClicked(rentSimple: RentSimple) {
-                val action =
-                    RentHistoryFragmentDirections.actionRentHistoryFragmentToRentHistorySummaryFragment(
-                        rentId = rentSimple.rentId.toLong()
-                    )
-                navigateDestination(action)
+                moveToSummaryFragment(rentSimple.rentId.toLong())
             }
         }
         rentReservedListAdapter.setItemClickListener(clickListener)
@@ -125,5 +131,13 @@ class RentHistoryFragment :
 
         binding.rvRentReservedHistory.itemAnimator = null
         binding.rvRentCompletedHistory.itemAnimator = null
+    }
+
+    private fun moveToSummaryFragment(rentId: Long) {
+        val action =
+            RentHistoryFragmentDirections.actionRentHistoryFragmentToRentHistorySummaryFragment(
+                rentId = rentId
+            )
+        navigateDestination(action)
     }
 }

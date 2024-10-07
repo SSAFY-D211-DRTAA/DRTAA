@@ -10,6 +10,7 @@ import com.drtaa.core_model.network.RequestRentExtend
 import com.drtaa.core_model.network.ResponseRentStateAll
 import com.drtaa.core_model.rent.RentDetail
 import com.drtaa.core_model.rent.RentSimple
+import com.drtaa.core_model.rent.RentStatus
 import com.drtaa.core_network.api.RentAPI
 import javax.inject.Inject
 
@@ -63,5 +64,9 @@ class RentDataSourceImpl @Inject constructor(
 
     override suspend fun getAllRentState(): List<ResponseRentStateAll> {
         return rentAPI.getAllRentState()
+    }
+
+    override suspend fun getRentStatus(): RentStatus {
+        return rentAPI.getRentStatus()
     }
 }
