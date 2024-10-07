@@ -25,6 +25,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
     override fun onResume() {
         super.onResume()
         homeViewModel.refreshUserData()
+        homeViewModel.getRentStatus()
     }
 
     private fun initObserve() {
@@ -33,6 +34,11 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
                 if (result == null) return@onEach
                 binding.socialUser = result
                 Timber.d("지금 현재 유저는?? $result")
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+        homeViewModel.rentStatus.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach { rentStatus ->
+                binding.tvHomeRentStatus.text = rentStatus
             }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
@@ -45,8 +51,12 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
             navigateDestination(R.id.action_homeFragment_to_taxiFragment)
         }
 
-        binding.btnHomePlan.setOnClickListener {
+        binding.cvHomePlan.setOnClickListener {
             navigateDestination(R.id.action_homeFragment_to_nav_graph_plan)
+        }
+
+        binding.cvHomeRentHistory.setOnClickListener {
+            navigateDestination(R.id.action_homeFragment_to_rentHistoryFragment)
         }
     }
 }

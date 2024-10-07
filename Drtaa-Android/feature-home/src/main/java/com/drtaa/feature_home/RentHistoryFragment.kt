@@ -70,9 +70,13 @@ class RentHistoryFragment :
         rentHistoryViewModel.rentInProgress.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { rentInProgress ->
                 if (rentInProgress == null) {
+                    binding.cvRentInProgress.visibility = View.GONE
                     binding.clRentNoInProgress.visibility = View.VISIBLE
                 } else {
+                    binding.cvRentInProgress.visibility = View.VISIBLE
                     binding.clRentNoInProgress.visibility = View.GONE
+
+                    binding.rent = rentInProgress
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
 

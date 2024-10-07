@@ -16,3 +16,15 @@ enum class Pay(val type: String) {
     CLOSED("closed"),
     CANCELED("canceled")
 }
+
+enum class Status(val status: String) {
+    IN_PROGRESS("in_progress"),
+    RESERVED("reserved"),
+    COMPLETED("completed"),
+    IDLING("idling"),
+    CALLING("calling"),
+    DRIVING("driving"),
+    PARKING("parking"),
+    WAITING("waiting"),
+    CHARGING("charging")
+}

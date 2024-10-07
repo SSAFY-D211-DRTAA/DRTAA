@@ -98,9 +98,13 @@ class PlanHistoryFragment :
         planHistoryViewModel.planInProgress.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { planInProgress ->
                 if (planInProgress == null) {
+                    binding.cvPlanInProgress.visibility = View.GONE
                     binding.clPlanNoInProgress.visibility = View.VISIBLE
                 } else {
+                    binding.cvPlanInProgress.visibility = View.VISIBLE
                     binding.clPlanNoInProgress.visibility = View.GONE
+
+                    binding.planSimple = planInProgress
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
 
