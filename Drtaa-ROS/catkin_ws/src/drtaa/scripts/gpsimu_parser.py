@@ -39,7 +39,7 @@ class GPSIMUParser:
         self.odom_msg.header.frame_id = 'odom'
         self.odom_msg.child_frame_id = '/base_link'
 
-        rate = rospy.Rate(10) # 30hz
+        rate = rospy.Rate(20) # 30hz
         while not rospy.is_shutdown():
             if self.is_imu and self.is_gps:
                 self.convertLL2UTM()
