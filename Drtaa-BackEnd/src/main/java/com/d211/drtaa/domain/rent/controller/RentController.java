@@ -100,10 +100,8 @@ public class RentController {
             RentDetailResponseDTO response = rentService.getCurrentRent(authentication.getName());
 
             return ResponseEntity.ok(response); //200
-        } catch(UsernameNotFoundException e) {
+        } catch(UsernameNotFoundException | RentNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
-        } catch(RentNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(e.getMessage()); // 204
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
         }
@@ -116,8 +114,10 @@ public class RentController {
             RentStatusResponseDTO response = rentService.getRentStatusAndRentCarStatus(authentication.getName());
 
             return ResponseEntity.ok(response); // 200
-        } catch(UsernameNotFoundException | RentNotFoundException e) {
+        } catch(UsernameNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
+        } catch(RentNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(e.getMessage()); // 204
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
         }
