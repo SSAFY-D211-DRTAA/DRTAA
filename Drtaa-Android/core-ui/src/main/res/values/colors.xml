@@ -14,4 +14,11 @@
 
     <color name="blue">#CC3F6EE7</color>
     <color name="red">#CCF84E4E</color>
+
+    <color name="naver_green">#00C73C</color>
+    <color name="toss_blue">#0064FF</color>
+    <color name="kakao_yellow">#FEE500</color>
+    <color name="default_text_color">#000000</color>
+
+    <color name="sky_blue">#0574E2</color>
 </resources>

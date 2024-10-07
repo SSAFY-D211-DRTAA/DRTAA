@@ -7,5 +7,16 @@
     <fragment
         android:id="@+id/myPageFragment"
         android:name="com.drtaa.feature_mypage.MyPageFragment"
-        android:label="MyPageFragment" />
+        android:label="MyPageFragment">
+        <action
+            android:id="@+id/action_myPageFragment_to_paymentListFragment"
+            app:destination="@id/paymentListFragment"
+        />
+    </fragment>
+
+    <fragment
+        android:id="@+id/paymentListFragment"
+        android:name="com.drtaa.feature_mypage.PaymentListFragment"
+        android:label="PaymentListFragment" />
+
 </navigation>
