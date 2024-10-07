@@ -40,23 +40,18 @@ class PlanHistoryFragment :
         } else {
             arguments?.getParcelable<Search>("recommend")
         }
-        searchRequest?.let {
+        searchRequest?.let { recommend ->
             // Dialog띄우기
             val dialog = TwoButtonMessageDialog(
                 requireContext(),
-                "추천받은 장소를 일정에 추가할까요?\n${it.title}\n${it.roadAddress}"
+                "추천받은 장소를 일정에 추가할까요?\n${recommend.title}\n${recommend.roadAddress}"
             ) {
-                // 진행중인 rentId, travelId 가지고 navigate하기
                 planHistoryViewModel.planInProgress.value?.let { progress ->
-                    PlanHistoryFragmentDirections.actionPlanHistoryFragmentToPlanListFragment(
-                        travelId = progress.travelId,
-                        rentId = progress.rentId,
-                        recommend = it
-                    )
+                    moveToPlanListFragment(progress.travelId, progress.rentId, recommend)
                 }
             }
             dialog.show()
-            Timber.tag("plan").d("$it")
+            Timber.tag("plan").d("$recommend")
         }
     }
 
@@ -87,10 +82,7 @@ class PlanHistoryFragment :
 
             cvPlanInProgress.setOnClickListener {
                 planHistoryViewModel.planInProgress.value?.let {
-                    moveToPlanListFragment(
-                        it.travelId,
-                        it.rentId
-                    )
+                    moveToPlanListFragment(it.travelId, it.rentId)
                 }
             }
         }
@@ -100,13 +92,6 @@ class PlanHistoryFragment :
         val clickListener = object :
             PlanHistoryListAdapter.ItemClickListener {
             override fun onItemClicked(travelId: Int, rentId: Int) {
-                navigateDestination(
-                    PlanHistoryFragmentDirections.actionPlanHistoryFragmentToPlanListFragment(
-                        travelId = travelId,
-                        rentId = rentId,
-                        recommend = null
-                    )
-                )
                 moveToPlanListFragment(travelId, rentId)
             }
         }
@@ -120,11 +105,12 @@ class PlanHistoryFragment :
         binding.rvPlanCompletedHistory.itemAnimator = null
     }
 
-    private fun moveToPlanListFragment(travelId: Int, rentId: Int) {
+    private fun moveToPlanListFragment(travelId: Int, rentId: Int, recommend: Search? = null) {
         navigateDestination(
             PlanHistoryFragmentDirections.actionPlanHistoryFragmentToPlanListFragment(
                 travelId = travelId,
-                rentId = rentId
+                rentId = rentId,
+                recommend = recommend
             )
         )
     }

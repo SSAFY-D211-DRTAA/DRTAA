@@ -116,6 +116,7 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
                 // 진행 중인 렌트 없고 예약은 있을 경우
                 dismissLoading()
                 binding.apply {
+                    tvTourRemainTime.visibility = View.GONE
                     clCarBottomTextGotoUse.visibility = View.VISIBLE
                     btnTrackingCar.isClickable = false
                     clCarBottomText.visibility = View.GONE
@@ -133,6 +134,7 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
                 // 진행 중인 렌트 없고 예약도 없을 경우
                 dismissLoading()
                 binding.apply {
+                    tvTourRemainTime.visibility = View.GONE
                     clCarBottomTextGotoUse.isClickable = false
                     clCarBottomTextGotoUse.visibility = View.VISIBLE
                     btnTrackingCar.isClickable = false
@@ -161,7 +163,7 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
             animeCarNorent.visibility = View.GONE
             clCarBottomText.visibility = View.VISIBLE
             btnTrackingCar.isClickable = true
-
+            tvTourRemainTime.visibility = View.VISIBLE
             if (!isToday(currentRentDetail.rentEndTime)) {
                 tvRentEnd.visibility = View.VISIBLE
             }
