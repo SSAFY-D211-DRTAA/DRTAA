@@ -36,10 +36,7 @@ class PaymentListFragment : BaseFragment<FragmentPaymentListBinding>(R.layout.fr
     private fun initObserve() {
         paymentListViewModel.paymentList.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { paymentList ->
-                Timber.d("로그 찍힘??")
-                paymentList.let {
                     paymentListAdapter.submitList(paymentList)
-                }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
 }

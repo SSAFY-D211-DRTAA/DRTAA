@@ -28,7 +28,7 @@ class PaymentListViewModel @Inject constructor(
             paymentRepository.getUserPayments().collect { result ->
                 result.onSuccess { paymentList ->
                     Timber.d("받은 리스트는요: $paymentList")
-                    _paymentList.value = paymentList
+                    _paymentList.value = paymentList.toList()
                     Timber.d("받은 밸류: ${_paymentList.value}")
                 }.onFailure { error ->
                     Timber.e(error, "결제 내역 조회 오류")

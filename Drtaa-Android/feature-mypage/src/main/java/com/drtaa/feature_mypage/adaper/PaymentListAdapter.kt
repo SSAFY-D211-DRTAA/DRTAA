@@ -23,7 +23,7 @@ class PaymentListAdapter :
         holder.bind(getItem(position))
     }
 
-    inner class PaymentListViewHolder(private val binding: ItemPaymentListBinding) :
+     class PaymentListViewHolder(private val binding: ItemPaymentListBinding) :
             RecyclerView.ViewHolder(binding.root) {
                 fun bind(item: ResponsePayment) {
                     binding.completion = item
