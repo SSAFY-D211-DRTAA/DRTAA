@@ -7,6 +7,7 @@ import com.d211.drtaa.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -29,6 +30,7 @@ public interface RentRepository extends JpaRepository<Rent, Long> {
             LocalDateTime rentEndTime
     );
     Optional<Rent> findByUserAndRentStatusIn(User user, List<RentStatus> rentStatuses);
+    Optional<Rent> findByUserAndRentStartTimeBetween(User user, LocalDateTime startDate, LocalDateTime endDate);
 
     List<Rent> findByUser(User user);
     List<Rent> findByUserAndRentStatusInOrderByRentStatusDesc(User user, List<RentStatus> rentStatuses);
@@ -48,4 +50,5 @@ public interface RentRepository extends JpaRepository<Rent, Long> {
             LocalDateTime rentEndTimeStart,
             LocalDateTime rentEndTimeEnd
     );
+
 }
