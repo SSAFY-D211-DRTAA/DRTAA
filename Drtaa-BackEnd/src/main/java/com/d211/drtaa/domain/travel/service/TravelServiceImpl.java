@@ -159,7 +159,7 @@ public class TravelServiceImpl implements TravelService {
 
         // 각 일정에 대해 일정 장소 리스트를 찾고, DTO로 변환
         List<DatesDetailResponseDTO> datesDtoList = datesList.stream().map(date -> {
-            List<DatePlaces> placesList = datePlacesRepository.findByTravelDates(date);
+            List<DatePlaces> placesList = datePlacesRepository.findByTravelDatesOrderByDatePlacesOrderAsc(date);
 
             // 일정 장소 DTO 리스트 생성
             List<PlacesDetailResponseDTO> placesDtoList = placesList.stream().map(places ->
