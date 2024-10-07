@@ -54,8 +54,8 @@ class PlanViewModel @Inject constructor(
     private val _isEditSuccess = MutableStateFlow<Boolean?>(null)
     val isEditSuccess: StateFlow<Boolean?> = _isEditSuccess
 
-    private val _isAddSuccess = MutableSharedFlow<Boolean>()
-    val isAddSuccess: SharedFlow<Boolean> = _isAddSuccess
+    private val _isAddSuccess = MutableStateFlow<Boolean?>(null)
+    val isAddSuccess: StateFlow<Boolean?> = _isAddSuccess
 
     init {
         observePlan()
@@ -141,15 +141,15 @@ class PlanViewModel @Inject constructor(
                 travelDatesId = planDetail.travelDatesId,
                 datePlacesName = search.title,
                 datePlacesCategory = search.category,
-                datePlaceAddress = search.roadAddress,
+                datePlacesAddress = search.roadAddress,
                 datePlacesLat = search.lat,
                 datePlacesLon = search.lng
             )).collect { result ->
                 result.onSuccess {
-                    _isAddSuccess.emit(true)
+                    _isAddSuccess.value = true
                     Timber.d("addLastPlan 성공")
                 }.onFailure {
-                    _isAddSuccess.emit(false)
+                    _isAddSuccess.value = false
                     Timber.d("addLastPlan 실패")
                 }
             }

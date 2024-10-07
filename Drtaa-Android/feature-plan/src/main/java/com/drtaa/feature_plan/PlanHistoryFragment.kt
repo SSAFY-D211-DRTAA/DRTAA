@@ -53,7 +53,6 @@ class PlanHistoryFragment :
                     planHistoryViewModel.planInProgress.value?.let { progress ->
                         moveToPlanListFragment(progress.travelId, progress.rentId, recommend)
                     }
-                    isDialogShown = false
                 }
 
                 dialog.show()

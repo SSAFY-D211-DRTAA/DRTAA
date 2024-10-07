@@ -5,7 +5,7 @@ data class LastPlan(
     val travelDatesId: Int,
     val datePlacesName: String,
     val datePlacesCategory: String,
-    val datePlaceAddress: String,
+    val datePlacesAddress: String,
     val datePlacesLat: Double,
     val datePlacesLon: Double
 )
