@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.bumptech.glide.Glide
 import com.drtaa.core_model.util.Social
 import com.drtaa.core_ui.base.BaseFragment
 import com.drtaa.core_ui.showSnackBar
@@ -25,6 +26,7 @@ class SignInFragment : BaseFragment<FragmentSignInBinding>(R.layout.fragment_sig
     lateinit var socialLoginManager: SocialLoginManager
 
     override fun initView() {
+        Glide.with(this).load(R.raw.car_loading).into(binding.ivLoginCar)
         showLoading()
         autoSignIn()
         initEvent()

@@ -30,6 +30,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @AndroidEntryPoint
 class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
@@ -158,7 +161,10 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
             animeCarNorent.visibility = View.GONE
             clCarBottomText.visibility = View.VISIBLE
             btnTrackingCar.isClickable = true
-            tvRentEnd.visibility = View.VISIBLE
+
+            if (!isToday(currentRentDetail.rentEndTime)) {
+                tvRentEnd.visibility = View.VISIBLE
+            }
             tvTourRemainTime.text =
                 "남은시간 : ${currentRentDetail.rentTime * MIN} 분"
             currentRentDetail.rentCarImg?.let {
@@ -178,12 +184,34 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
         }
     }
 
+    private fun isToday(rentEndTime: String): Boolean {
+        // rentEndTime 문자열을 LocalDateTime으로 파싱
+        val formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
+        val rentEndDateTime = LocalDateTime.parse(rentEndTime, formatter)
+        val rentEndDate = rentEndDateTime.toLocalDate()
+        val today = LocalDate.now()
+        Timber.tag("today").d("$today  || $rentEndDate")
+        // 날짜 비교
+        return if (rentEndDate.isEqual(today)) {
+            println("rentEndTime의 날짜가 오늘과 같습니다.")
+            true
+        } else {
+            println("rentEndTime의 날짜가 오늘과 다릅니다.")
+            false
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         carViewModel.stopGPSPublish()
     }
 
     private fun observeStatus() {
+        carViewModel.rentCompleteToday.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach {
+            if(it){
+                binding.tvRentEnd.text = "오늘 일정이 더 없어요"
+            }
+        }.launchIn(viewLifecycleOwner.lifecycleScope)
         carViewModel.drivingStatus.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { drivingStatus ->
                 drivingStatus?.let {

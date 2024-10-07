@@ -284,18 +284,21 @@ class CarViewModel @Inject constructor(
 
     fun requestRentCompleteToday(rentId: Long) {
         viewModelScope.launch {
+            val request = RequestCarStatus(
+                rentId.toInt(),
+                _rentTravelInfo.value?.travelId ?: -1,
+                _rentTravelInfo.value?.travelDatesId ?: -1,
+                _rentTravelInfo.value?.datePlacesId ?: -1
+            )
             rentRepository.completeTodayRent(
-                RequestCarStatus(
-                    rentId.toInt(),
-                    _rentTravelInfo.value?.travelId ?: -1,
-                    _rentTravelInfo.value?.travelDatesId ?: -1,
-                    _rentTravelInfo.value?.datePlacesId ?: -1
-                )
+                request
             ).collect {
                 it.onSuccess {
+                    Timber.tag("today").d("오늘 렌트 끝내기 완료 $request")
                     _rentCompleteToday.emit(true)
                 }
                 it.onFailure {
+                    Timber.tag("today").d("오늘 렌트 끝내기 실패 $request")
                     _rentCompleteToday.emit(false)
                 }
             }

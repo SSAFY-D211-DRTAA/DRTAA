@@ -86,12 +86,6 @@ class CarTrackingFragment :
             viewModel.setDestination(latLng)
         }
 
-        binding.btnReturn.text = if (viewModel.isReserved.value && !viewModel.isInProgress.value) {
-            "렌트\n환불"
-        } else {
-            "차량\n반납"
-        }
-
         binding.btnTracking.setOnClickListener {
             viewModel.toggleTrackingState()
         }
