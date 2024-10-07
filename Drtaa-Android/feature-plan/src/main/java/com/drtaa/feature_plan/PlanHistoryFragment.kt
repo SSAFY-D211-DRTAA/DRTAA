@@ -31,31 +31,40 @@ class PlanHistoryFragment :
     private val planHistoryViewModel: PlanHistoryViewModel by viewModels()
     private val planReservedListAdapter = PlanHistoryListAdapter()
     private val planCompletedListAdapter = PlanHistoryListAdapter()
+    private var isDialogShown = false
 
     override fun onResume() {
         super.onResume()
         planHistoryViewModel.getPlanList()
-        val searchRequest = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            arguments?.getParcelable<Search>("recommend", Search::class.java)
-        } else {
-            arguments?.getParcelable<Search>("recommend")
-        }
-        searchRequest?.let { recommend ->
-            // Dialog띄우기
-            val dialog = TwoButtonMessageDialog(
-                requireContext(),
-                "추천받은 장소를 일정에 추가할까요?\n${recommend.title}\n${recommend.roadAddress}"
-            ) {
-                planHistoryViewModel.planInProgress.value?.let { progress ->
-                    moveToPlanListFragment(progress.travelId, progress.rentId, recommend)
-                }
+        if (!isDialogShown) {  // Dialog가 표시 중이 아니면
+            val searchRequest = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                arguments?.getParcelable<Search>("recommend", Search::class.java)
+            } else {
+                arguments?.getParcelable<Search>("recommend")
             }
-            dialog.show()
-            Timber.tag("plan").d("$recommend")
+
+            searchRequest?.let { recommend ->
+                val dialog = TwoButtonMessageDialog(
+                    requireContext(),
+                    "추천받은 장소를 일정에 추가할까요? 일정 마지막에 추가되며, " +
+                            "필요시 순서를 바꿔주세요!" +
+                            "\n${recommend.title}\n${recommend.roadAddress}"
+                ) {
+                    planHistoryViewModel.planInProgress.value?.let { progress ->
+                        moveToPlanListFragment(progress.travelId, progress.rentId, recommend)
+                    }
+                    isDialogShown = false
+                }
+
+                dialog.show()
+                isDialogShown = true
+                Timber.tag("plan").d("$recommend")
+            }
         }
     }
 
     override fun initView() {
+        showLoading()
         initRVAdapter()
         initObserve()
         setupBackPressHandler()
@@ -122,6 +131,7 @@ class PlanHistoryFragment :
                     binding.tvErrorPlanHistory.visibility = View.VISIBLE
                     binding.clPlan.visibility = View.GONE
                 } else {
+                    dismissLoading()
                     binding.tvErrorPlanHistory.visibility = View.GONE
                     binding.clPlan.visibility = View.VISIBLE
                 }
@@ -133,6 +143,7 @@ class PlanHistoryFragment :
                     binding.cvPlanInProgress.visibility = View.GONE
                     binding.clPlanNoInProgress.visibility = View.VISIBLE
                 } else {
+                    dismissLoading()
                     binding.cvPlanInProgress.visibility = View.VISIBLE
                     binding.clPlanNoInProgress.visibility = View.GONE
 

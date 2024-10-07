@@ -7,13 +7,16 @@ import com.drtaa.core_data.repository.RentCarRepository
 import com.drtaa.core_model.map.Search
 import com.drtaa.core_model.network.RequestCarStatus
 import com.drtaa.core_model.plan.DayPlan
+import com.drtaa.core_model.plan.LastPlan
 import com.drtaa.core_model.plan.Plan
 import com.drtaa.core_model.plan.PlanItem
 import com.drtaa.core_model.plan.RequestPlanName
 import com.drtaa.core_model.plan.ResponsePutPlan
 import com.drtaa.core_model.util.toPlanItem
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
@@ -50,6 +53,9 @@ class PlanViewModel @Inject constructor(
 
     private val _isEditSuccess = MutableStateFlow<Boolean?>(null)
     val isEditSuccess: StateFlow<Boolean?> = _isEditSuccess
+
+    private val _isAddSuccess = MutableSharedFlow<Boolean>()
+    val isAddSuccess: SharedFlow<Boolean> = _isAddSuccess
 
     init {
         observePlan()
@@ -125,6 +131,29 @@ class PlanViewModel @Inject constructor(
 
         val tempNewPlan = currentPlan.copy(datesDetail = updatedDatesDetail)
         putNewPlan(tempNewPlan)
+    }
+
+    fun addLastPlan(search: Search) {
+        viewModelScope.launch {
+            val planDetail = _dayPlan.value ?: return@launch
+            planRepository.addPlanAtLast(LastPlan(
+                travelId = planDetail.travelId,
+                travelDatesId = planDetail.travelDatesId,
+                datePlacesName = search.title,
+                datePlacesCategory = search.category,
+                datePlaceAddress = search.roadAddress,
+                datePlacesLat = search.lat,
+                datePlacesLon = search.lng
+            )).collect { result ->
+                result.onSuccess {
+                    _isAddSuccess.emit(true)
+                    Timber.d("addLastPlan 성공")
+                }.onFailure {
+                    _isAddSuccess.emit(false)
+                    Timber.d("addLastPlan 실패")
+                }
+            }
+        }
     }
 
     fun updateDate(

@@ -1,6 +1,7 @@
 package com.drtaa.core_data.datasourceimpl
 
 import com.drtaa.core_data.datasource.PlanDataSource
+import com.drtaa.core_model.plan.LastPlan
 import com.drtaa.core_model.plan.Plan
 import com.drtaa.core_model.plan.PlanItem
 import com.drtaa.core_model.plan.PlanSimple
@@ -30,5 +31,9 @@ class PlanDataSourceImpl @Inject constructor(
 
     override suspend fun getTodayPlanList(): List<PlanItem> {
         return planAPI.getTodayPlanList()
+    }
+
+    override suspend fun addPlanAtLast(plan: LastPlan): String {
+        return planAPI.addPlanAtLast(plan)
     }
 }

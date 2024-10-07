@@ -4,6 +4,7 @@ import com.drtaa.core_data.datasource.PlanDataSource
 import com.drtaa.core_data.repository.PlanRepository
 import com.drtaa.core_data.util.ResultWrapper
 import com.drtaa.core_data.util.safeApiCall
+import com.drtaa.core_model.plan.LastPlan
 import com.drtaa.core_model.plan.Plan
 import com.drtaa.core_model.plan.PlanItem
 import com.drtaa.core_model.plan.PlanSimple
@@ -121,4 +122,20 @@ class PlanRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    override suspend fun addPlanAtLast(plan: LastPlan): Flow<Result<String>> = flow {
+        when(val response = safeApiCall { planDataSource.addPlanAtLast(plan) }){
+            is ResultWrapper.GenericError -> {
+                emit(Result.failure(Exception(response.message)))
+            }
+            is ResultWrapper.NetworkError -> {
+                emit(Result.failure(Exception("네트워크 에러")))
+            }
+            is ResultWrapper.Success -> {
+                emit(Result.success(response.data))
+            }
+        }
+    }
+
+
 }
