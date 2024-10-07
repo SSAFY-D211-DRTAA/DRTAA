@@ -100,7 +100,6 @@ class TaxiSummaryFragment :
     }
 
     private fun drawRoute(routePoints: List<LatLng>) {
-        Timber.d("경로 그리기...중..")
         pathOverlay?.map = null
         pathOverlay = ArrowheadPathOverlay().apply {
             coords = routePoints
@@ -142,7 +141,6 @@ class TaxiSummaryFragment :
                     Payment.Product(
                         "DRTAA 택시",
                         "TAXI_CODE",
-//                        taxiViewModel.routeInfo.value?.taxiFare ?: 0,
                         PADDING,
                         1
                     )

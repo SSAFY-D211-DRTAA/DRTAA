@@ -23,7 +23,6 @@ class PaymentViewModel @Inject constructor(
         currentUser()
     }
 
-    // datastore에서 저장된 user 가져오기
     private fun currentUser() {
         viewModelScope.launch {
             signRepository.getUserData().collect { result ->

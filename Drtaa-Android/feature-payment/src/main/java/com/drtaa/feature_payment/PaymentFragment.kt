@@ -51,7 +51,6 @@ class PaymentFragment : BaseDialogFragment<FragmentPaymentBinding>(R.layout.frag
         val items = ArrayList<BootItem>().apply {
             add(
                 BootItem().setName(product.name).setId(product.id).setQty(product.quantity)
-//                    .setPrice(product.price.toDouble() - SALE)
                     .setPrice(Defalut_Price)
             )
         }
@@ -119,7 +118,6 @@ class PaymentFragment : BaseDialogFragment<FragmentPaymentBinding>(R.layout.frag
                         )
                         val action = PaymentFragmentDirections.actionPaymentFragmentToPaymentDoneFragment(args.payment)
                         findNavController().navigate(action)
-                        Timber.d("나 실행되긴 하는겨?")
                     }
                 }
             }).requestPayment()

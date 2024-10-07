@@ -146,7 +146,7 @@ class CarTrackingFragment :
                 showSnackBar("요청 장소로 호출하겠습니다")
             } else {
                 dismissLoading()
-                showSnackBar("렌트카 호출 실패!!!")
+                showSnackBar("렌트카 호출 실패..")
             }
         }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
