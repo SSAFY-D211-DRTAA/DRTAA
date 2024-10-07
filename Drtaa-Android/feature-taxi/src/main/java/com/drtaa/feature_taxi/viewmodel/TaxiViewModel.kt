@@ -119,7 +119,7 @@ class TaxiViewModel @Inject constructor(
                 TaxiInfo(
                     carInfo = null,
                     minutes = routeInfo.value?.totalTime!!,
-                    price = 100, // price 넣어야함
+                    price = 100,
                     startLocation = _taxiStartLocation.value!!,
                     endLocation = _taxiEndLocation.value!!,
                     startSchedule = RentSchedule(

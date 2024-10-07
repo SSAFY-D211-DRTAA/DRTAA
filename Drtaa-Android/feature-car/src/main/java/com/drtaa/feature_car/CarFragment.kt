@@ -112,7 +112,6 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
             if (it) {
                 // 진행 중인 렌트 없고 예약은 있을 경우
                 dismissLoading()
-                showSnackBar("예약한 차량이 있습니다")
                 binding.apply {
                     clCarBottomTextGotoUse.visibility = View.VISIBLE
                     btnTrackingCar.isClickable = false
@@ -321,7 +320,6 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
             val qrRentId = parts[1].trim().toLong()
 
             if (qrRentId != null) {
-                showSnackBar("차량 ID: $qrCarId, 렌트 ID: $qrRentId")
                 Timber.tag("qr").d("차량 ID: $qrCarId, 렌트 ID: $qrRentId")
                 checkRentReservation(qrRentId, qrCarId)
             } else {

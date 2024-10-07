@@ -40,20 +40,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
         initLocationPermission()
         initFCM()
         initNotificationChannel(CHANNEL_ID, CHANNEL_NAME)
-        initObserve()
-    }
-
-    private fun initObserve() {
-        lifecycleScope.launch {
-//            eventBus.events.collect { event ->
-//                when (event) {
-//                    is Event.LogoutEvent -> {
-//                        //로그인 화면으로 이동
-//                        startActivity(Intent(this@MainActivity, SignActivity::class.java))
-//                    }
-//                }
-//            }
-        }
     }
 
     private fun initFCM() {
@@ -138,9 +124,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
         binding.apply {
             bottomNavigationBar.background = null
             bottomNavigationBar.setupWithNavController(navController)
-            bottomNavigationBar.setOnItemReselectedListener {
-                // 바텀메뉴 선택 시
-            }
             setBottomNavHide()
         }
     }
