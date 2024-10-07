@@ -21,6 +21,7 @@ public interface DatePlacesRepository extends JpaRepository<DatePlaces, Long> {
     List<DatePlaces> findByTravelDates(TravelDates travelDates);
     List<DatePlaces> findByTravelDatesAndDatePlacesOrderGreaterThan(TravelDates date, int datePlacesOrder);
     List<DatePlaces> findByTravelDatesAndDatePlacesIsExpiredFalse(TravelDates date);
+    List<DatePlaces> findByTravelDatesOrderByDatePlacesOrderAsc(TravelDates date);
 
     // delete
     void deleteAllByTravelAndTravelDates(Travel travel, TravelDates dates);
