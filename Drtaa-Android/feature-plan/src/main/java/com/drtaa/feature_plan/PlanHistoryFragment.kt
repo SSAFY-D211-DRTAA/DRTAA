@@ -58,6 +58,15 @@ class PlanHistoryFragment :
                     foldLayout(ivCompletedExpand, clPlanCompleted)
                 }
             }
+
+            cvPlanInProgress.setOnClickListener {
+                planHistoryViewModel.planInProgress.value?.let {
+                    moveToPlanListFragment(
+                        it.travelId,
+                        it.rentId
+                    )
+                }
+            }
         }
     }
 
@@ -65,12 +74,7 @@ class PlanHistoryFragment :
         val clickListener = object :
             PlanHistoryListAdapter.ItemClickListener {
             override fun onItemClicked(travelId: Int, rentId: Int) {
-                navigateDestination(
-                    PlanHistoryFragmentDirections.actionPlanHistoryFragmentToPlanListFragment(
-                        travelId = travelId,
-                        rentId = rentId
-                    )
-                )
+                moveToPlanListFragment(travelId, rentId)
             }
         }
         planReservedListAdapter.setItemClickListener(clickListener)
@@ -81,6 +85,15 @@ class PlanHistoryFragment :
 
         binding.rvPlanReservedHistory.itemAnimator = null
         binding.rvPlanCompletedHistory.itemAnimator = null
+    }
+
+    private fun moveToPlanListFragment(travelId: Int, rentId: Int) {
+        navigateDestination(
+            PlanHistoryFragmentDirections.actionPlanHistoryFragmentToPlanListFragment(
+                travelId = travelId,
+                rentId = rentId
+            )
+        )
     }
 
     private fun initObserve() {
