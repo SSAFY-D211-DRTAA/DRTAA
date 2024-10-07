@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
+
         <variable
             name="rentDetail"
             type="com.drtaa.core_model.rent.RentDetail" />
@@ -10,7 +11,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
         <TextView
             android:id="@+id/tv_tour_title"
@@ -60,7 +61,7 @@
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/constraintLayout2"
                     android:layout_width="match_parent"
-                    android:layout_height="300dp"
+                    android:layout_height="280dp"
                     android:background="#3c3b3f"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -245,9 +246,7 @@
             android:layout_width="150dp"
             android:layout_height="45dp"
             android:layout_marginTop="20dp"
-            android:layout_marginBottom="16dp"
             android:text="연장하기"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="@id/cv_tour_card"
             app:layout_constraintTop_toBottomOf="@+id/tv_tour_remain_time" />
 
@@ -268,6 +267,17 @@
             app:layout_constraintEnd_toEndOf="@id/cv_tour_card"
             app:layout_constraintTop_toTopOf="@+id/btn_tour_extend"
             app:srcCompat="@drawable/ic_qr_btn" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <TextView
+            style="@style/btn_short_black"
+            android:id="@+id/tv_rent_end"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="오늘 렌트 끝내기"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btn_tour_extend" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

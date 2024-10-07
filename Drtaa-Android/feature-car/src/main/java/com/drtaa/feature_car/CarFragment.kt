@@ -78,6 +78,11 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
                     carViewModel.getOffCar(rentId = it.rentId!!)
                 }
             }
+            tvRentEnd.setOnClickListener {
+                carViewModel.currentRentDetail.value?.let {
+                    carViewModel.requestRentCompleteToday(it.rentId!!)
+                }
+            }
         }
     }
 
@@ -114,6 +119,7 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
                     clCarBottomText.visibility = View.GONE
                     animeCarNorent.visibility = View.VISIBLE
                     toggleCarOption(false)
+                    tvRentEnd.visibility = View.GONE
                     tvReservedState.text = "예약한 차량이 있습니다"
                     tvTourRemainTime.text = "현재 이용중인 차량이 없습니다."
                 }
@@ -129,6 +135,7 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
                     clCarBottomTextGotoUse.visibility = View.VISIBLE
                     btnTrackingCar.isClickable = false
                     clCarBottomText.visibility = View.GONE
+                    tvRentEnd.visibility = View.GONE
                     animeCarNorent.visibility = View.VISIBLE
                     toggleCarOption(false)
                     tvReservedState.text = "예약한 차량이 없습니다"
@@ -152,6 +159,7 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
             animeCarNorent.visibility = View.GONE
             clCarBottomText.visibility = View.VISIBLE
             btnTrackingCar.isClickable = true
+            tvRentEnd.visibility = View.VISIBLE
             tvTourRemainTime.text =
                 "남은시간 : ${currentRentDetail.rentTime * MIN} 분"
             currentRentDetail.rentCarImg?.let {

@@ -2,6 +2,7 @@ package com.drtaa.core_data.datasourceimpl
 
 import com.drtaa.core_data.datasource.RentDataSource
 import com.drtaa.core_model.network.RequestCallRent
+import com.drtaa.core_model.network.RequestCarStatus
 import com.drtaa.core_model.network.RequestChangeRent
 import com.drtaa.core_model.network.RequestCompleteRent
 import com.drtaa.core_model.network.RequestDuplicatedSchedule
@@ -54,6 +55,10 @@ class RentDataSourceImpl @Inject constructor(
 
     override suspend fun checkDuplicatedRent(rentSchedule: RequestDuplicatedSchedule): Boolean {
         return rentAPI.checkDuplicatedRent(rentSchedule)
+    }
+
+    override suspend fun completeTodayRent(rentInfo: RequestCarStatus): String {
+        return rentAPI.completeTodayRent(rentInfo)
     }
 
     override suspend fun getAllRentState(): List<ResponseRentStateAll> {

@@ -1,6 +1,7 @@
 package com.drtaa.core_network.api
 
 import com.drtaa.core_model.network.RequestCallRent
+import com.drtaa.core_model.network.RequestCarStatus
 import com.drtaa.core_model.network.RequestChangeRent
 import com.drtaa.core_model.network.RequestCompleteRent
 import com.drtaa.core_model.network.RequestDuplicatedSchedule
@@ -52,6 +53,9 @@ interface RentAPI {
 
     @GET("rent/status/active")
     suspend fun getAllRentState(): List<ResponseRentStateAll>
+
+    @PATCH("rent/today")
+    suspend fun completeTodayRent(@Body requestCarChange: RequestCarStatus): String
 
     // history
     @GET("rent")

@@ -72,6 +72,8 @@ class CarViewModel @Inject constructor(
     val reservationRent: StateFlow<ResponseRentStateAll?> = _reservationRent
     private val _rentTravelInfo = MutableStateFlow<RequestCarStatus?>(null)
     val rentTravelInfo: StateFlow<RequestCarStatus?> = _rentTravelInfo
+    private val _rentCompleteToday = MutableSharedFlow<Boolean>()
+    val rentCompleteToday: SharedFlow<Boolean> = _rentCompleteToday.asSharedFlow()
 
     // CAR TRACKING FRAGMENT
     private val _isReturn = MutableStateFlow<Boolean>(false)
@@ -275,6 +277,26 @@ class CarViewModel @Inject constructor(
                 it.onSuccess { data ->
                     _rentTravelInfo.value = data
                     Timber.tag("Car").d("여행 정보 조회 성공 $data")
+                }
+            }
+        }
+    }
+
+    fun requestRentCompleteToday(rentId: Long) {
+        viewModelScope.launch {
+            rentRepository.completeTodayRent(
+                RequestCarStatus(
+                    rentId.toInt(),
+                    _rentTravelInfo.value?.travelId ?: -1,
+                    _rentTravelInfo.value?.travelDatesId ?: -1,
+                    _rentTravelInfo.value?.datePlacesId ?: -1
+                )
+            ).collect {
+                it.onSuccess {
+                    _rentCompleteToday.emit(true)
+                }
+                it.onFailure {
+                    _rentCompleteToday.emit(false)
                 }
             }
         }

@@ -1,6 +1,7 @@
 package com.drtaa.core_data.repository
 
 import com.drtaa.core_model.network.RequestCallRent
+import com.drtaa.core_model.network.RequestCarStatus
 import com.drtaa.core_model.network.RequestChangeRent
 import com.drtaa.core_model.network.RequestCompleteRent
 import com.drtaa.core_model.network.RequestDuplicatedSchedule
@@ -21,6 +22,7 @@ interface RentRepository {
     suspend fun getRentDetail(rentId: Long): Flow<Result<RentDetail>>
     suspend fun getReservedRentState(): Flow<Result<ResponseRentStateAll>>
     suspend fun getCurrentRent(): Flow<Result<RentDetail>>
+    suspend fun completeTodayRent(rentInfo: RequestCarStatus): Flow<Result<String>>
     suspend fun checkDuplicatedRent(rentSchedule: RequestDuplicatedSchedule): Flow<Result<Boolean>>
 
     // history
