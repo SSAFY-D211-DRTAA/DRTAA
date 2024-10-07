@@ -5,6 +5,7 @@ import com.drtaa.core_data.repository.RentRepository
 import com.drtaa.core_data.util.ResultWrapper
 import com.drtaa.core_data.util.safeApiCall
 import com.drtaa.core_model.network.RequestCallRent
+import com.drtaa.core_model.network.RequestCarStatus
 import com.drtaa.core_model.network.RequestChangeRent
 import com.drtaa.core_model.network.RequestCompleteRent
 import com.drtaa.core_model.network.RequestDuplicatedSchedule
@@ -205,6 +206,28 @@ class RentRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    override suspend fun completeTodayRent(rentInfo: RequestCarStatus): Flow<Result<String>> =
+        flow {
+            when (
+                val response = safeApiCall { rentDataSource.completeTodayRent(rentInfo) }
+            ) {
+                is ResultWrapper.GenericError -> {
+                    emit(Result.failure(Exception(response.message)))
+                    Timber.d("오늘 렌트 완료 실패: ${response.message}")
+                }
+
+                ResultWrapper.NetworkError -> {
+                    emit(Result.failure(Exception("네트워크 에러")))
+                    Timber.d("오늘 렌트 완료 네트워크 에러")
+                }
+
+                is ResultWrapper.Success -> {
+                    emit(Result.success(response.data))
+                    Timber.d("오늘 렌트 완료 성공")
+                }
+            }
+        }
 
     override suspend fun getReservedRentState(): Flow<Result<ResponseRentStateAll>> = flow {
         when (

@@ -60,7 +60,9 @@ class RentSearchFragment :
                 rentSearchViewModel.reverseGeocode.collect { result ->
                     result?.let {
                         it.onSuccess { title ->
-                            binding.layoutRentSearchBottomSheet.etSearchLocation.setText(title)
+                            if ("주소를 찾을 수 없습니다." != title) {
+                                binding.layoutRentSearchBottomSheet.etSearchLocation.setText(title)
+                            }
                             rentSearchViewModel.setPinnedSearchItem(
                                 Search(
                                     title, "",
@@ -76,11 +78,12 @@ class RentSearchFragment :
                 }
             }
         }
-        rentSearchViewModel.pinnedSearchItem.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach {
-            it?.let {
-                binding.layoutRentSearchBottomSheet.ivSearchLocation.callOnClick()
-            }
-        }.launchIn(viewLifecycleOwner.lifecycleScope)
+        rentSearchViewModel.pinnedSearchItem.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach {
+                it?.let {
+                    binding.layoutRentSearchBottomSheet.ivSearchLocation.callOnClick()
+                }
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
         initObserve(naverMap)
     }
 
@@ -173,7 +176,7 @@ class RentSearchFragment :
         behavior.isHideable = false
 
         behavior.peekHeight = BOTTOM_SHEET_PEEK_HEIGHT
-        behavior.maxHeight = BOTTOM_SHEET_PEEK_HEIGHT * THREE
+        behavior.maxHeight = BOTTOM_SHEET_PEEK_HEIGHT * 2
 
         behavior.addBottomSheetCallback(object : BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {

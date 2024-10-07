@@ -29,14 +29,14 @@
 
         <EditText
             android:id="@+id/et_sign_in_id"
-            android:hint="예) drtaa@drtaa.co.kr"
-            android:textColorHint="@color/gray_a3a3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
+            android:hint="예) drtaa@drtaa.co.kr"
             android:inputType="text"
             android:maxLines="1"
+            android:textColorHint="@color/gray_a3a3"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_sign_in_id" />
@@ -68,10 +68,10 @@
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_sign_in"
             style="@style/btn_short_blue"
-            android:backgroundTint="#A0BAFE"
             android:layout_width="300dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
+            android:backgroundTint="#A0BAFE"
             android:text="로그인"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -112,13 +112,21 @@
         <ImageView
             android:id="@+id/imageView7"
             android:layout_width="300dp"
-            android:layout_height="wrap_content"
+            android:layout_height="120dp"
             android:layout_marginTop="70dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/img_logo_drt" />
+            app:srcCompat="@drawable/ic_login" />
 
-
+        <ImageView
+            android:id="@+id/iv_login_car"
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:layout_marginStart="60dp"
+            android:layout_marginTop="14dp"
+            android:src="@drawable/ic_car_marker"
+            app:layout_constraintStart_toStartOf="@id/imageView7"
+            app:layout_constraintTop_toTopOf="@id/imageView7" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
