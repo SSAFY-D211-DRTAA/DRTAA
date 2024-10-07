@@ -5,6 +5,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
+import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.core.view.isVisible
 import androidx.lifecycle.flowWithLifecycle
@@ -12,6 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
+import com.drtaa.core_model.map.Search
 import com.drtaa.core_ui.base.BaseActivity
 import com.drtaa.core_ui.component.LocationHelper
 import com.drtaa.core_ui.showToast
@@ -34,6 +36,19 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
     lateinit var locationHelper: LocationHelper
     private lateinit var navController: NavController
     private val viewModel: MainViewModel by viewModels()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val searchRequest = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getParcelableExtra<Search>("recommend", Search::class.java)
+        } else {
+            intent.getParcelableExtra<Search>("recommend")
+        }
+
+        searchRequest?.let {
+            Timber.tag("추천").d("추천 Request: $searchRequest")
+        }
+    }
 
     override fun init() {
         initBottomNavBar()

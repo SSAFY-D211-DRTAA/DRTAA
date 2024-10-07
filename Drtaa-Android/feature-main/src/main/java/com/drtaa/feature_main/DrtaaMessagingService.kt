@@ -39,11 +39,7 @@ class DrtaaMessagingService : FirebaseMessagingService() {
 
             val mainIntent = Intent(this, MainActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                putExtra("datePlacesName", datePlacesName)
-                putExtra("datePlacesCategory", datePlacesCategory)
-                putExtra("datePlacesAddress", datePlacesAddress)
-                putExtra("datePlacesLat", datePlacesLat)
-                putExtra("datePlacesLon", datePlacesLon)
+                putExtra("recommend", request)
             }
 
             val pIntent: PendingIntent =
