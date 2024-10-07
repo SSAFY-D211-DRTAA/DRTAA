@@ -58,6 +58,10 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
             .addOnFailureListener { task ->
                 Timber.tag("fcm").d("FCM토큰 얻기 실패 $task")
             }
+
+        FirebaseMessaging.getInstance().subscribeToTopic("1").addOnSuccessListener {
+            Timber.tag("fcm").d("participantsMeetingDetailTable: success subscribed")
+        }
     }
 
     private fun initLocationPermission() {

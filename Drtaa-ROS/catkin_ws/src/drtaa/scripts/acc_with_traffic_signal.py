@@ -10,7 +10,8 @@ import rospkg
 from math import cos, sin, pi, sqrt, pow, atan2
 from geometry_msgs.msg import Point, PoseWithCovarianceStamped, PoseStamped
 from nav_msgs.msg import Odometry, Path
-from morai_msgs.msg import CtrlCmd, EgoVehicleStatus, ObjectStatusList, GetTrafficLightStatus
+from morai_msgs.msg import CtrlCmd, EgoVehicleStatus, ObjectStatusList, GetTrafficLightStatus, EventInfo
+from morai_msgs.srv import MoraiEventCmdSrv
 from tf.transformations import euler_from_quaternion, quaternion_from_euler
 from std_msgs.msg import Bool, String
 
@@ -58,14 +59,17 @@ class pure_pursuit:
         # 좌회전 여부 확인
         rospy.Subscriber("/is_left_turn", Bool, self.turning_left_callback)
 
-        # 승객 하차 시에 우선 적으로 True로 설정 되어야함!!! -> 일단은 주차장으로 이동해야하는 상황
-        rospy.Subscriber("/is_parking", Bool, self.parking_status_callback)  
-
+        # 목적지 도착  여부
         rospy.Subscriber("/complete_drive", PoseStamped, self.complete_drive_callback)
-        
-        self.ctrl_cmd_pub = rospy.Publisher('/ctrl_cmd', CtrlCmd, queue_size=1) # 제어 메시지 발행
-       
+
+        # 배회 모드 전환 여부 
         rospy.Subscriber("is_roaming", Bool, self.roaming_callback)
+        
+        rospy.Subscriber('/command_status', String, self.command_status_callback)  # 차량 상태
+
+        self.ctrl_cmd_pub = rospy.Publisher('/ctrl_cmd', CtrlCmd, queue_size=1) # 제어 메시지 발행
+        self.event_cmd_client = rospy.ServiceProxy('/Service_MoraiEventCmd', MoraiEventCmdSrv)
+       
 
 
         self.ctrl_cmd_msg = CtrlCmd()
@@ -76,7 +80,6 @@ class pure_pursuit:
         self.is_status = False
         self.is_global_path = False
         self.is_look_forward_point = False
-        self.is_parking = False
         self.is_complete_drive = False
 
         self.forward_point = Point()
@@ -85,6 +88,7 @@ class pure_pursuit:
         self.velocity_list = [] 
         self.previous_global_path = None  # 이전 경로 저장 변수 추가
         self.local_path_point = None
+        self.vehicle_status = None
  
         self.vehicle_length = 2.7
         self.lfd = 8
@@ -97,7 +101,8 @@ class pure_pursuit:
         self.nodes = self.load_nodes()
 
         self.pid = pidControl()
-        self.adaptive_cruise_control = AdaptiveCruiseControl(velocity_gain=0.5, distance_gain=1, time_gap=0.8, vehicle_length=2.7)
+        self.adaptive_cruise_control = AdaptiveCruiseControl(velocity_gain=0.5, distance_gain=1, time_gap=0.8, vehicle_length=2.7) # 0.5 1 0.8
+        
         self.vel_planning = velocityPlanning(self.target_velocity / 3.6, 0.3) # 0.15 0.5
         self.traffic_light_manager = TrafficLightManager()
 
@@ -115,6 +120,8 @@ class pure_pursuit:
 
                 result = self.calc_vaild_obj([self.current_position.x, self.current_position.y, self.vehicle_yaw], self.object_data) # 주변 객체 정보 계산
                 global_npc_info, local_npc_info, global_ped_info, local_ped_info, global_obs_info, local_obs_info = result
+                self.local_npc_info = local_npc_info
+                # rospy.loginfo(f"NPC: {local_npc_info}")
 
                 self.current_waypoint = self.get_current_waypoint([self.current_position.x, self.current_position.y], self.global_path) # 현재 위치에서 가장 가까운 경로 상의 waypoint 인덱스
                 #self.target_velocity = self.velocity_list[self.current_waypoint] * 3.6 # 현재 waypoint에 대한 목표 속도
@@ -136,6 +143,8 @@ class pure_pursuit:
 
                 else: # 전방에 waypoint가 없는 경우 (경로 끝에 도달한 경우)
                     self.stop_vehicle()
+                    rate.sleep()
+                    continue
 
                 self.adaptive_cruise_control.check_object(self.path ,global_npc_info, local_npc_info
                                                                     ,global_ped_info, local_ped_info
@@ -145,10 +154,9 @@ class pure_pursuit:
                                                                                     self.status_msg.velocity.x, self.target_velocity/3.6) # ACC를 통한 속도 제어
 
                 if(self.acc_velocity < 0):  # 비상 정지
-                    self.ctrl_cmd_msg.accel = 0.0
-                    self.ctrl_cmd_msg.brake = 1.0
-                    self.ctrl_cmd_pub.publish(self.ctrl_cmd_msg)
-                    rospy.logwarn("Emergency stop initiated!")
+                    self.stop_vehicle()
+                    rospy.logwarn("Emergency stop condition met!")
+                    rate.sleep()
                     continue
 
                 # ACC와 조향각 기반 속도 제한 중 더 낮은 값 선택
@@ -192,10 +200,27 @@ class pure_pursuit:
             self.is_complete_drive = False
             rospy.loginfo("Global path updated and velocity list recalculated")
             self.previous_global_path = msg  # 이전 경로 업데이트
-    
-    def parking_status_callback(self, msg):
-        self.is_parking = msg.data
-        rospy.loginfo(f"Parking status updated: {self.is_parking}")
+
+            # if self.vehicle_status == "pickup_after_parked":
+            #     front_vehicle_distance = self.get_front_vehicle_distance()
+        
+            #     if front_vehicle_distance < 5.0:
+            #         rospy.loginfo("Distance to front vehicle is less than 5 meters. Initiating reverse.")
+            #         self.change_gear(2)  # Change gear to reverse
+            #         self.move_backward_until_safe()
+            #         self.change_gear(4)  # Change gear back to drive
+            
+        if self.vehicle_status == "pickup_after_parked":
+            rospy.loginfo("Vehicle is in pickup_after_parked state. Checking distance to front vehicle.")
+            
+            # Check distance to front vehicle
+            front_vehicle_distance = self.get_front_vehicle_distance()
+            
+            if front_vehicle_distance is not None and front_vehicle_distance < 5.0:
+                rospy.loginfo("Distance to front vehicle is less than 5 meters. Initiating reverse.")
+                self.change_gear(2)  # Change gear to reverse
+                self.move_backward_until_safe()
+                self.change_gear(4)  # Change gear back to drive
 
     def complete_drive_callback(self, msg):
         self.is_complete_drive = True
@@ -203,12 +228,75 @@ class pure_pursuit:
     def roaming_callback(self, msg):
         if msg.data:
             self.is_complete_drive = False
+    
+    def command_status_callback(self, msg):
+        self.vehicle_status = msg.data
+        if self.vehicle_status == "parked":
+            self.change_gear(1)
+        else:
+            self.change_gear(4)
+
+    def change_gear(self, gear_value):
+        rospy.wait_for_service('/Service_MoraiEventCmd')
+        try:
+            event_info = EventInfo()
+            event_info.option = 2  # gear option
+            event_info.gear = gear_value
+            self.event_cmd_client(event_info)
+            # rospy.loginfo(f"Gear changed to {gear_value}")
+        except rospy.ServiceException as e:
+            rospy.logerr(f"Service call failed: {e}")
+
+    def get_front_vehicle_distance(self):
+        min_distance = float('inf')
+
+        for obj in self.local_npc_info:  # Assuming local_npc_info contains objects in local frame
+            if obj[0] == 1:  # Assuming type 1 is NPC vehicle
+                if obj[1] > 0:  # Check if the object is in front of the vehicle
+                    distance = sqrt(obj[1]**2 + obj[2]**2)  # Calculate Euclidean distance
+                    if distance < min_distance:
+                        min_distance = distance
+
+        return min_distance if min_distance != float('inf') else None
+
+    def move_backward_until_safe(self):
+        while True:
+            front_vehicle_distance = self.get_front_vehicle_distance()
             
-    def stop_vehicle(self):
+            if front_vehicle_distance is None:
+                rospy.loginfo("No front vehicle detected. No need to reverse.")
+                break  # Exit if there is no front vehicle
+            
+            rospy.loginfo(f"Current distance to front vehicle: {front_vehicle_distance:.2f} meters")
+            
+            # Calculate safe following distance using ACC logic
+            ego_vel = self.status_msg.velocity.x / 3.6  # Convert from km/h to m/s
+            dis_safe = ego_vel * self.adaptive_cruise_control.time_gap + 8
+
+            if front_vehicle_distance >= dis_safe:
+                rospy.loginfo("Safe distance achieved. Stopping reverse.")
+                break
+            
+            # Reverse logic
+            self.ctrl_cmd_msg.accel = 0.5  # Negative acceleration for reversing
+            self.ctrl_cmd_msg.brake = 0.0
+            self.ctrl_cmd_pub.publish(self.ctrl_cmd_msg)
+            
+            rospy.sleep(0.1)  # Small sleep interval for continuous checking
+        
+        # Stop reversing
         self.ctrl_cmd_msg.accel = 0.0
-        self.ctrl_cmd_msg.brake = 1.0
-        self.ctrl_cmd_msg.steering = 0.0
-        self.ctrl_cmd_pub.publish(self.ctrl_cmd_msg)
+        self.ctrl_cmd_msg.brake = 1.0  # Apply brake to stop
+        self.ctrl_cmd_pub.publish(self.ctrl_cmd_msg) 
+
+    def stop_vehicle(self):
+        for _ in range(10):  # 여러 번 반복하여 확실히 정지
+            self.ctrl_cmd_msg.accel = 0.0
+            self.ctrl_cmd_msg.brake = 1.0
+            self.ctrl_cmd_msg.steering = 0.0
+            self.ctrl_cmd_pub.publish(self.ctrl_cmd_msg)
+            rospy.sleep(0.1)
+        rospy.logwarn("Emergency stop completed!")
 
     def is_same_path(self, path1, path2):
         # 두 경로가 동일한지 비교하는 함수
@@ -422,6 +510,7 @@ class pidControl:
         self.p_gain = 0.3
         self.i_gain = 0.00
         self.d_gain = 0.03
+        
         self.prev_error = 0
         self.i_control = 0
         self.controlTime = 0.02
@@ -477,9 +566,25 @@ class AdaptiveCruiseControl:
         self.object_type = None
         self.object_distance = 0
         self.object_velocity = 0
-        self.emergency_distance = 3  # 비상 정지 거리 (미터)
+        self.emergency_distance = 5  # 비상 정지 거리 (미터)
+
+        self.prediction_time = 2.0  # 2초 후의 위치 예측
+        self.max_deceleration = -5.0  # 최대 감속도 (m/s^2)
+
         
         # self.check_object_pub = rospy.Publisher('/check_object', Bool, queue_size=1)
+        rospy.Subscriber("/odom", Odometry, self.odom_callback)
+
+    def predict_future_position(self, current_position, current_velocity, time_horizon):
+        future_x = current_position[0] + current_velocity * time_horizon
+        future_y = current_position[1]  # 측면 이동은 고려하지 않음
+        return [future_x, future_y]
+
+    def odom_callback(self, msg):
+        self.ego_velocity = msg.twist.twist.linear.x
+        self.ego_position = msg.pose.pose.position
+        ego_quaternion = (msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w)
+        _, _, self.ego_yaw = euler_from_quaternion(ego_quaternion)
 
     def check_object(self, ref_path, global_npc_info, local_npc_info, global_ped_info, local_ped_info, global_obs_info, local_obs_info):
         # 주행 경로 상의 장애물 유무 확인
@@ -527,30 +632,46 @@ class AdaptiveCruiseControl:
 
         # rospy.loginfo(f"ACC: NPC detected={self.npc_vehicle[0]}, Pedestrian detected={self.Person[0]}, Obstacle detected={self.object[0]}")
 
+    def get_closest_vehicle(self, local_npc_info):
+        closest_vehicle = None
+        min_distance = float('inf')
+        
+        for vehicle in local_npc_info:
+            # 차량의 x, y 좌표를 이용해 거리 계산
+            distance = sqrt(vehicle[1]**2 + vehicle[2]**2)
+            if distance < min_distance:
+                min_distance = distance
+                closest_vehicle = vehicle
+        
+        return closest_vehicle
+
     
     def get_target_velocity(self, local_npc_info, local_ped_info, local_obs_info, ego_vel, target_vel): 
         #TODO: (9) 장애물과의 속도와 거리 차이를 이용하여 ACC 를 진행 목표 속도를 설정
         out_vel =  target_vel
-        default_space = 8
+        default_space = 6
         time_gap = self.time_gap
         v_gain = self.velocity_gain
         x_errgain = self.distance_gain
         dis_rel = float('inf')  # 초기값 설정
 
         try:
-            # self.check_object_pub.publish(False)
             if self.npc_vehicle[0] and len(local_npc_info) != 0: #ACC ON_vehicle   
-                front_vehicle = [local_npc_info[self.npc_vehicle[1]][1], local_npc_info[self.npc_vehicle[1]][2], local_npc_info[self.npc_vehicle[1]][3]]
+                closest_npc = self.get_closest_vehicle(local_npc_info)
+
+                if closest_npc:
+                    front_vehicle = closest_npc
+                    dis_safe = ego_vel* time_gap + default_space
+                    dis_rel = sqrt(front_vehicle[1]**2 + front_vehicle[2]**2)
+                    vel_rel = (front_vehicle[3]) - ego_vel               
+                    acceleration = vel_rel * v_gain - x_errgain * (dis_safe - dis_rel)
                 
-                dis_safe = ego_vel * time_gap + default_space
-                dis_rel = sqrt(pow(front_vehicle[0],2) + pow(front_vehicle[1],2))            
-                vel_rel=((front_vehicle[2] / 3.6) - ego_vel)                        
-                acceleration = vel_rel * v_gain - x_errgain * (dis_safe - dis_rel)
-
-                # self.check_object_pub.publish(True)
-
-                rospy.loginfo(f"NPC_Vehicle: {front_vehicle}, dis_rel: {dis_rel}, vel_rel: {vel_rel}, acceleration: {acceleration}")
-                out_vel = ego_vel + acceleration      
+                    rospy.loginfo(f"NPC_Vehicle: {front_vehicle}, dis_rel: {dis_rel}, vel_rel: {vel_rel}, acceleration: {acceleration}")
+                    out_vel = ego_vel + acceleration 
+                    
+                    # 비상 정지 로직
+                    if dis_rel <= self.emergency_distance:
+                        return -1     
 
             if self.Person[0] and len(local_ped_info) != 0: #ACC ON_Pedestrian
                 Pedestrian = [local_ped_info[self.Person[1]][1], local_ped_info[self.Person[1]][2], local_ped_info[self.Person[1]][3]]
@@ -562,6 +683,11 @@ class AdaptiveCruiseControl:
 
                 rospy.loginfo(f"Pedestrian: {Pedestrian}, dis_rel: {dis_rel}, vel_rel: {vel_rel}, acceleration: {acceleration}")
                 out_vel = ego_vel + acceleration
+            
+            # 비상 정지 로직
+            if dis_rel <= self.emergency_distance:
+              
+                return -1
     
             if self.object[0] and len(local_obs_info) != 0: #ACC ON_obstacle     
                 Obstacle = [local_obs_info[self.object[1]][1], local_obs_info[self.object[1]][2], local_obs_info[self.object[1]][3]]
@@ -580,10 +706,12 @@ class AdaptiveCruiseControl:
                 return -1
 
             return out_vel * 3.6    
+            
         
         except Exception as e:
             rospy.logerr(f"Error in ACC: {e}")
-            return 0
+            return 0    
+        
         
 if __name__ == '__main__':
     try:
