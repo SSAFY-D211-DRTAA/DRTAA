@@ -10,7 +10,6 @@ import com.drtaa.feature_mypage.viewmodel.PaymentListViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import timber.log.Timber
 
 @AndroidEntryPoint
 class PaymentListFragment : BaseFragment<FragmentPaymentListBinding>(R.layout.fragment_payment_list) {
