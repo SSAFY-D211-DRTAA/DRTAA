@@ -22,7 +22,7 @@
                 android:id="@+id/ll_expand_plan"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/black"
+                android:background="@color/blue_a0ba"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:paddingHorizontal="20dp"

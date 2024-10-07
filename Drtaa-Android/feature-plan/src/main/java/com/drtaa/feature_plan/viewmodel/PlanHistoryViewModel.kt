@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.drtaa.core_data.repository.PlanRepository
 import com.drtaa.core_model.plan.PlanSimple
+import com.drtaa.core_model.util.Status
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -55,11 +56,13 @@ class PlanHistoryViewModel @Inject constructor(
                     return@collect
                 }
 
-                _planInProgress.value = planList.find { it.rentStatus == "inProgress" }
-                _planReservedList.value = planList.filter { it.rentStatus == "reserved" }
-                    .sortedByDescending { it.travelEndDate }
-                _planCompletedList.value = planList.filter { it.rentStatus == "completed" }
-                    .sortedByDescending { it.travelEndDate }
+                _planInProgress.value = planList.find { it.rentStatus == Status.IN_PROGRESS.status }
+                _planReservedList.value =
+                    planList.filter { it.rentStatus == Status.RESERVED.status }
+                        .sortedByDescending { it.travelEndDate }
+                _planCompletedList.value =
+                    planList.filter { it.rentStatus == Status.COMPLETED.status }
+                        .sortedByDescending { it.travelEndDate }
             }
         }
     }

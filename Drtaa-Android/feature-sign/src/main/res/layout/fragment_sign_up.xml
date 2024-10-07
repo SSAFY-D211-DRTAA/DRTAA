@@ -14,16 +14,18 @@
         android:background="@color/white"
         tools:context=".SignUpFragment">
 
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/cv_sign_up_profile"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_marginTop="20dp"
+            android:backgroundTint="@color/white"
             app:cardCornerRadius="100dp"
             app:cardElevation="0dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_sign_up_title">
+            app:layout_constraintTop_toBottomOf="@+id/tv_sign_up_title"
+            app:strokeColor="@color/gray_5858">
 
             <ImageView
                 android:id="@+id/iv_sign_up_profile"
@@ -32,7 +34,7 @@
                 android:layout_gravity="center"
                 android:scaleType="centerCrop"
                 android:src="@drawable/ic_add" />
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
         <TextView
             android:id="@+id/tv_sign_up_id"
@@ -41,8 +43,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="25dp"
             android:layout_marginTop="10dp"
-            android:textSize="18sp"
             android:text="아이디"
+            android:textSize="18sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView" />
 
@@ -67,16 +69,16 @@
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_sign_up_id_chk_duplicated"
+            style="@style/btn_long_blue"
             android:layout_width="70dp"
             android:layout_height="40dp"
             android:layout_marginStart="5dp"
             android:layout_marginEnd="20dp"
-            android:text="중복확인"
-            android:textSize="13sp"
             android:fontFamily="@font/ptd_light"
             android:gravity="center"
-            style="@style/btn_long_blue"
+            android:text="중복확인"
             android:textColor="@color/white"
+            android:textSize="13sp"
             app:layout_constraintBottom_toBottomOf="@+id/et_sign_up_id"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/et_sign_up_id"
@@ -89,8 +91,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="25dp"
             android:layout_marginTop="10dp"
-            android:textSize="18sp"
             android:text="비밀번호"
+            android:textSize="18sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_sign_up_id_help" />
 
@@ -121,8 +123,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="25dp"
             android:layout_marginTop="10dp"
-            android:textSize="18sp"
             android:text="비밀번호 재입력"
+            android:textSize="18sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_sign_up_pw_help" />
 
@@ -153,8 +155,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="25dp"
             android:layout_marginTop="10dp"
-            android:textSize="18sp"
             android:text="닉네임"
+            android:textSize="18sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_sign_up_chk_pw_help" />
 
@@ -182,15 +184,15 @@
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_sign_up"
+            style="@style/ptd_regular"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:background="@color/black"
             android:enabled="false"
-            android:text="회원가입"
-            style="@style/ptd_regular"
             android:gravity="center"
-            android:textSize="20sp"
+            android:text="회원가입"
             android:textColor="@color/white"
+            android:textSize="20sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
@@ -209,7 +211,7 @@
 
         <TextView
             android:id="@+id/tv_sign_up_title"
-            style="@style/ptd_light"
+            style="@style/ptd_extra_bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="25dp"

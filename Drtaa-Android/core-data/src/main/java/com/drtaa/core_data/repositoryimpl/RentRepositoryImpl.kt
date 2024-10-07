@@ -13,6 +13,7 @@ import com.drtaa.core_model.network.RequestRentExtend
 import com.drtaa.core_model.network.ResponseRentStateAll
 import com.drtaa.core_model.rent.RentDetail
 import com.drtaa.core_model.rent.RentSimple
+import com.drtaa.core_model.rent.RentStatus
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import timber.log.Timber
@@ -277,4 +278,25 @@ class RentRepositoryImpl @Inject constructor(
                 }
             }
         }
+
+    override suspend fun getRentStatus(): Flow<Result<RentStatus>> = flow {
+        when (
+            val response = safeApiCall { rentDataSource.getRentStatus() }
+        ) {
+            is ResultWrapper.Success -> {
+                emit(Result.success(response.data))
+                Timber.d("렌트 상태 조회 성공")
+            }
+
+            is ResultWrapper.GenericError -> {
+                emit(Result.failure(Exception(response.message)))
+                Timber.d("렌트 상태 조회 실패: ${response.message}")
+            }
+
+            is ResultWrapper.NetworkError -> {
+                emit(Result.failure(Exception("네트워크 에러")))
+                Timber.d("렌트 상태 조회 네트워크 에러")
+            }
+        }
+    }
 }
