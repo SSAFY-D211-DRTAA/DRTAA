@@ -9,7 +9,7 @@ data class Search(
     val roadAddress: String,
     val lng: Double,
     val lat: Double
-): Parcelable {
+) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readString() ?: "",
         parcel.readString() ?: "",

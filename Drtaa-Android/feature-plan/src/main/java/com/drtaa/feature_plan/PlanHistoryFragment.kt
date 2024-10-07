@@ -36,7 +36,7 @@ class PlanHistoryFragment :
     override fun onResume() {
         super.onResume()
         planHistoryViewModel.getPlanList()
-        if (!isDialogShown) {  // Dialog가 표시 중이 아니면
+        if (!isDialogShown) {
             val searchRequest = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 arguments?.getParcelable<Search>("recommend", Search::class.java)
             } else {

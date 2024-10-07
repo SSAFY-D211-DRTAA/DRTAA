@@ -14,9 +14,7 @@ import com.drtaa.core_model.plan.RequestPlanName
 import com.drtaa.core_model.plan.ResponsePutPlan
 import com.drtaa.core_model.util.toPlanItem
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
@@ -136,15 +134,17 @@ class PlanViewModel @Inject constructor(
     fun addLastPlan(search: Search) {
         viewModelScope.launch {
             val planDetail = _dayPlan.value ?: return@launch
-            planRepository.addPlanAtLast(LastPlan(
-                travelId = planDetail.travelId,
-                travelDatesId = planDetail.travelDatesId,
-                datePlacesName = search.title,
-                datePlacesCategory = search.category,
-                datePlacesAddress = search.roadAddress,
-                datePlacesLat = search.lat,
-                datePlacesLon = search.lng
-            )).collect { result ->
+            planRepository.addPlanAtLast(
+                LastPlan(
+                    travelId = planDetail.travelId,
+                    travelDatesId = planDetail.travelDatesId,
+                    datePlacesName = search.title,
+                    datePlacesCategory = search.category,
+                    datePlacesAddress = search.roadAddress,
+                    datePlacesLat = search.lat,
+                    datePlacesLon = search.lng
+                )
+            ).collect { result ->
                 result.onSuccess {
                     _isAddSuccess.value = true
                     Timber.d("addLastPlan 성공")

@@ -4,7 +4,6 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import androidx.core.app.NotificationCompat
 import com.drtaa.core_model.map.Search
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -60,7 +59,6 @@ class DrtaaMessagingService : FirebaseMessagingService() {
 
             Timber.tag("fcm").d("place  recomm $request")
         }
-
 
         message.notification?.let { msg ->
             val title = msg.title

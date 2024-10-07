@@ -58,7 +58,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
 
         searchRequest?.let {
             val bundle = Bundle().apply {
-                putParcelable("recommend", searchRequest)  // 검색 요청 데이터를 Bundle에 추가
+                putParcelable("recommend", searchRequest)
             }
             Timber.tag("추천").d("추천 Request: $searchRequest")
             navController.navigate(com.drtaa.feature_plan.R.id.nav_graph_plan, bundle)

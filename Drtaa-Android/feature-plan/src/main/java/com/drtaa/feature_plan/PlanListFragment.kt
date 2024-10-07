@@ -133,7 +133,7 @@ class PlanListFragment :
             .onEach { plan ->
                 if (plan == null) return@onEach
                 args.recommend?.let {
-                    if (planViewModel.isAddSuccess.value != true){
+                    if (planViewModel.isAddSuccess.value != true) {
                         Timber.tag("plan").d("일정 추가를 해줘요 recommend: $it")
                         showLoading()
                         planViewModel.addLastPlan(it)
