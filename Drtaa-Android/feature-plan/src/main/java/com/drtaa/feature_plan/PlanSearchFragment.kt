@@ -183,7 +183,7 @@ class PlanSearchFragment :
             }
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
-//                Timber.d("드래그 중")
+                // 슬라이드
             }
         })
     }

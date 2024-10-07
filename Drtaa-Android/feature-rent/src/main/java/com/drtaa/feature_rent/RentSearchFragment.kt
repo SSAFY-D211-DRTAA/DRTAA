@@ -107,7 +107,6 @@ class RentSearchFragment :
             .onEach { selectedSearchItem ->
                 Timber.d("selectedSearchItem $selectedSearchItem")
                 selectedSearchItem?.let {
-//                    naverMap.setMarker(selectedSearchItem.lat, selectedSearchItem.lng)
                     naverMap.setContentPadding(0, 0, 0, MAP_BOTTOM_CONTENT_PADDING)
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
@@ -128,8 +127,6 @@ class RentSearchFragment :
                         binding.layoutRentSearchBottomSheet.btnSearchSelect.visibility =
                             View.VISIBLE
                     }
-                }.onFailure {
-//                    showSnackBar("오류가 발생했습니다. 다시 시도해주세요.")
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
@@ -204,7 +201,7 @@ class RentSearchFragment :
             }
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
-//                Timber.d("드래그 중")
+                // Timber.d("드래그 중")
             }
         })
     }

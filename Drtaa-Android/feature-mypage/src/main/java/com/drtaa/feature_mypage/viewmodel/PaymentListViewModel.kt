@@ -27,7 +27,6 @@ class PaymentListViewModel @Inject constructor(
         viewModelScope.launch {
             paymentRepository.getUserPayments().collect { result ->
                 result.onSuccess { paymentList ->
-                    Timber.d("받은 리스트는요: $paymentList")
                     _paymentList.value = paymentList.toList()
                     Timber.d("받은 밸류: ${_paymentList.value}")
                 }.onFailure { error ->
