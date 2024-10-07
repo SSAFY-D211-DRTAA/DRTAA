@@ -1,6 +1,7 @@
 package com.drtaa.feature_plan
 
 import android.net.Uri
+import android.os.Build
 import android.view.View
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
@@ -9,8 +10,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
+import com.drtaa.core_model.map.Search
 import com.drtaa.core_ui.DeepLinkConstants
 import com.drtaa.core_ui.base.BaseFragment
+import com.drtaa.core_ui.component.TwoButtonMessageDialog
 import com.drtaa.core_ui.expandLayout
 import com.drtaa.core_ui.foldLayout
 import com.drtaa.feature_plan.adapter.PlanHistoryListAdapter
@@ -19,19 +22,42 @@ import com.drtaa.feature_plan.viewmodel.PlanHistoryViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import timber.log.Timber
 
 @AndroidEntryPoint
 class PlanHistoryFragment :
     BaseFragment<FragmentPlanHistoryBinding>(R.layout.fragment_plan_history) {
 
     private val planHistoryViewModel: PlanHistoryViewModel by viewModels()
-
     private val planReservedListAdapter = PlanHistoryListAdapter()
     private val planCompletedListAdapter = PlanHistoryListAdapter()
 
     override fun onResume() {
         super.onResume()
         planHistoryViewModel.getPlanList()
+        val searchRequest = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            arguments?.getParcelable<Search>("recommend", Search::class.java)
+        } else {
+            arguments?.getParcelable<Search>("recommend")
+        }
+        searchRequest?.let {
+            // Dialog띄우기
+            val dialog = TwoButtonMessageDialog(
+                requireContext(),
+                "추천받은 장소를 일정에 추가할까요?\n${it.title}\n${it.roadAddress}"
+            ) {
+                // 진행중인 rentId, travelId 가지고 navigate하기
+                planHistoryViewModel.planInProgress.value?.let { progress ->
+                    PlanHistoryFragmentDirections.actionPlanHistoryFragmentToPlanListFragment(
+                        travelId = progress.travelId,
+                        rentId = progress.rentId,
+                        recommend = it
+                    )
+                }
+            }
+            dialog.show()
+            Timber.tag("plan").d("$it")
+        }
     }
 
     override fun initView() {
@@ -68,7 +94,8 @@ class PlanHistoryFragment :
                 navigateDestination(
                     PlanHistoryFragmentDirections.actionPlanHistoryFragmentToPlanListFragment(
                         travelId = travelId,
-                        rentId = rentId
+                        rentId = rentId,
+                        recommend = null
                     )
                 )
             }
@@ -90,6 +117,7 @@ class PlanHistoryFragment :
                     binding.tvErrorPlanHistory.visibility = View.VISIBLE
                     binding.clPlan.visibility = View.GONE
                 } else {
+
                     binding.tvErrorPlanHistory.visibility = View.GONE
                     binding.clPlan.visibility = View.VISIBLE
                 }
@@ -97,6 +125,7 @@ class PlanHistoryFragment :
 
         planHistoryViewModel.planInProgress.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { planInProgress ->
+                Timber.tag("plan").d("$planInProgress")
                 if (planInProgress == null) {
                     binding.clPlanNoInProgress.visibility = View.VISIBLE
                 } else {

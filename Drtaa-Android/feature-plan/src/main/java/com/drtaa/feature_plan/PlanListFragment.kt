@@ -97,6 +97,10 @@ class PlanListFragment :
     }
 
     private fun initData() {
+        args.recommend?.let {
+            // 일정 추가를 해준다.
+            Timber.tag("plan").d("일정 추가를 해줘요 recommend: $it")
+        }
         planViewModel.setInfo(args.travelId, args.rentId)
         planViewModel.getPlan()
     }

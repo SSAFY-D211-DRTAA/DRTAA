@@ -39,15 +39,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val searchRequest = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableExtra<Search>("recommend", Search::class.java)
-        } else {
-            intent.getParcelableExtra<Search>("recommend")
-        }
-
-        searchRequest?.let {
-            Timber.tag("추천").d("추천 Request: $searchRequest")
-        }
+        initFCMMessage()
     }
 
     override fun init() {
@@ -55,6 +47,22 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
         initLocationPermission()
         initFCM()
         initNotificationChannel(CHANNEL_ID, CHANNEL_NAME)
+    }
+
+    private fun initFCMMessage() {
+        val searchRequest = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getParcelableExtra<Search>("recommend", Search::class.java)
+        } else {
+            intent.getParcelableExtra<Search>("recommend")
+        }
+
+        searchRequest?.let {
+            val bundle = Bundle().apply {
+                putParcelable("recommend", searchRequest)  // 검색 요청 데이터를 Bundle에 추가
+            }
+            Timber.tag("추천").d("추천 Request: $searchRequest")
+            navController.navigate(com.drtaa.feature_plan.R.id.nav_graph_plan, bundle)
+        }
     }
 
     private fun initFCM() {
