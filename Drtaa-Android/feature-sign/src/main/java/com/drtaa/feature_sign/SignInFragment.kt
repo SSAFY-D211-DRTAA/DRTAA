@@ -36,11 +36,6 @@ class SignInFragment : BaseFragment<FragmentSignInBinding>(R.layout.fragment_sig
     }
 
     private fun initEvent() {
-        binding.btnSignInMoveToMain.setOnClickListener {
-            startActivity(Intent(requireContext(), MainActivity::class.java))
-            requireActivity().finish()
-        }
-
         binding.btnSignInNaver.setOnClickListener {
             socialLoginManager.login(Social.NAVER.type, requireActivity())
         }
