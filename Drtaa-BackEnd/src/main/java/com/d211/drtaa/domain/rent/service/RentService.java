@@ -4,6 +4,7 @@ import com.d211.drtaa.domain.rent.dto.request.*;
 import com.d211.drtaa.domain.rent.dto.response.RentCarManipulateResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentDetailResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentResponseDTO;
+import com.d211.drtaa.domain.rent.dto.response.RentStatusResponseDTO;
 
 import java.util.List;
 
@@ -22,6 +23,9 @@ public interface RentService {
 
     // 현재 진행중인 렌트 조회
     RentDetailResponseDTO getCurrentRent(String userProviderId);
+
+    // 렌트 상태 & 렌트 차량 상태 조회
+    RentStatusResponseDTO getRentStatusAndRentCarStatus(String userProviderId);
 
     // 시작, 종료 날짜의 렌트가 존재하는지 확인
     boolean chkRent(String userProviderId, RentCheckRequestDTO rentCheckRequestDTO);

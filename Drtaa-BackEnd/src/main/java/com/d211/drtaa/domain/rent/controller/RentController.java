@@ -1,10 +1,7 @@
 package com.d211.drtaa.domain.rent.controller;
 
 import com.d211.drtaa.domain.rent.dto.request.*;
-import com.d211.drtaa.domain.rent.dto.response.RentCarLocationResponseDTO;
-import com.d211.drtaa.domain.rent.dto.response.RentCarManipulateResponseDTO;
-import com.d211.drtaa.domain.rent.dto.response.RentDetailResponseDTO;
-import com.d211.drtaa.domain.rent.dto.response.RentResponseDTO;
+import com.d211.drtaa.domain.rent.dto.response.*;
 import com.d211.drtaa.domain.rent.service.RentService;
 import com.d211.drtaa.global.exception.rent.NoAvailableRentCarException;
 import com.d211.drtaa.global.exception.rent.RentCarNotFoundException;
@@ -103,7 +100,23 @@ public class RentController {
             RentDetailResponseDTO response = rentService.getCurrentRent(authentication.getName());
 
             return ResponseEntity.ok(response); //200
+        } catch(UsernameNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
         } catch(RentNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(e.getMessage()); // 204
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
+        }
+    }
+
+    @GetMapping("/status")
+    @Operation(summary = "렌트 상태와 렌트 차량 상태 확인", description = "회원의 현재 진행중인 렌트 상태와 렌트 차량 상태 확인")
+    public ResponseEntity getRentStatusAndRentCarStatus(Authentication authentication) {
+        try {
+            RentStatusResponseDTO response = rentService.getRentStatusAndRentCarStatus(authentication.getName());
+
+            return ResponseEntity.ok(response); // 200
+        } catch(UsernameNotFoundException | RentNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400

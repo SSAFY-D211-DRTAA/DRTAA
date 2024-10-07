@@ -4,6 +4,7 @@ import com.d211.drtaa.domain.rent.dto.request.*;
 import com.d211.drtaa.domain.rent.dto.response.RentCarManipulateResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentDetailResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentResponseDTO;
+import com.d211.drtaa.domain.rent.dto.response.RentStatusResponseDTO;
 import com.d211.drtaa.domain.rent.entity.Rent;
 import com.d211.drtaa.domain.rent.entity.RentStatus;
 import com.d211.drtaa.domain.rent.entity.car.RentCar;
@@ -50,6 +51,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -232,6 +234,24 @@ public class RentServiceImpl implements RentService{
                 .rentCarScheduleId(carSchedule.getRentCarScheduleId())
                 // travel
                 .travelId(travel.getTravelId())
+                .build();
+
+        return response;
+    }
+
+    @Override
+    public RentStatusResponseDTO getRentStatusAndRentCarStatus(String userProviderId) {
+        // 사용자 찾기
+        User user = userRepository.findByUserProviderId(userProviderId)
+                .orElseThrow(() -> new UsernameNotFoundException("해당 userProviderId의 맞는 회원을 찾을 수 없습니다."));
+
+        // 사용자의 진행중인 렌트 찾기
+        Rent rent = rentRepository.findByUserAndRentStatusIn(user, Collections.singletonList(RentStatus.in_progress))
+                .orElseThrow(() -> new RentNotFoundException("해당 사용자의 진행중인 렌트가 없습니다."));
+
+        RentStatusResponseDTO response = RentStatusResponseDTO.builder()
+                .rentStatus(rent.getRentStatus())
+                .rentCarDrivingStatus(rent.getRentCar().getRentCarDrivingStatus())
                 .build();
 
         return response;
