@@ -60,7 +60,7 @@ class RentSearchFragment :
                 rentSearchViewModel.reverseGeocode.collect { result ->
                     result?.let {
                         it.onSuccess { title ->
-                            if ("주소를 찾을 수 없습니다." != title){
+                            if ("주소를 찾을 수 없습니다." != title) {
                                 binding.layoutRentSearchBottomSheet.etSearchLocation.setText(title)
                             }
                             rentSearchViewModel.setPinnedSearchItem(
@@ -78,11 +78,12 @@ class RentSearchFragment :
                 }
             }
         }
-        rentSearchViewModel.pinnedSearchItem.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach {
-            it?.let {
-                binding.layoutRentSearchBottomSheet.ivSearchLocation.callOnClick()
-            }
-        }.launchIn(viewLifecycleOwner.lifecycleScope)
+        rentSearchViewModel.pinnedSearchItem.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach {
+                it?.let {
+                    binding.layoutRentSearchBottomSheet.ivSearchLocation.callOnClick()
+                }
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
         initObserve(naverMap)
     }
 

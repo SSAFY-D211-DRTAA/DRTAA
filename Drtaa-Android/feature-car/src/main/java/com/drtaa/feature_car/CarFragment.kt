@@ -208,7 +208,7 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
 
     private fun observeStatus() {
         carViewModel.rentCompleteToday.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach {
-            if(it){
+            if (it) {
                 binding.tvRentEnd.text = "오늘 일정이 더 없어요"
             }
         }.launchIn(viewLifecycleOwner.lifecycleScope)
