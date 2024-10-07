@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
+import com.drtaa.core_model.map.Search
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import dagger.hilt.android.AndroidEntryPoint
@@ -23,6 +24,23 @@ class DrtaaMessagingService : FirebaseMessagingService() {
         message.notification?.let { msg ->
             val title = msg.title
             val body = msg.body
+            message.data.let {
+                val datePlacesName = it["datePlacesName"]
+                val test = it["test"]
+                val datePlacesCategory = it["datePlacesCategory"]
+                val datePlacesAddress = it["datePlacesAddress"]
+                val datePlacesLat = it["datePlacesLat"]?.toDouble()
+                val datePlacesLon = it["datePlacesLon"]?.toDouble()
+
+                val request = Search(
+                    title = datePlacesName.toString(),
+                    category = datePlacesCategory.toString(),
+                    roadAddress = datePlacesAddress.toString(),
+                    lng = datePlacesLat ?: 0.0,
+                    lat = datePlacesLon ?: 0.0
+                )
+                Timber.tag("fcm").d("place $test  recomm $request")
+            }
 
             val mainIntent = Intent(this, MainActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
