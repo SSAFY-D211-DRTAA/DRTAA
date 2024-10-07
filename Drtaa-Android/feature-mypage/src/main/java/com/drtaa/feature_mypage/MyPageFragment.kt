@@ -9,6 +9,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.drtaa.core_auth.SocialLoginManager
 import com.drtaa.core_ui.base.BaseFragment
 import com.drtaa.core_ui.component.TwoButtonMessageDialog
@@ -93,9 +94,9 @@ class MyPageFragment : BaseFragment<FragmentMyPageBinding>(R.layout.fragment_my_
                 }
             }
             llMypageItem2.apply {
-                findViewById<TextView>(R.id.tv_mypage_item_title).text = "머하죠?"
+                findViewById<TextView>(R.id.tv_mypage_item_title).text = "결제 내역"
                 setOnClickListener {
-                    showSnackBar("2클릭")
+                    findNavController().navigate(R.id.action_myPageFragment_to_paymentListFragment)
                 }
             }
             llMypageItem3.apply {

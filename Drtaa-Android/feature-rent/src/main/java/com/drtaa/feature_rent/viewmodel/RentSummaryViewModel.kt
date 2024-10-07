@@ -6,7 +6,7 @@ import com.drtaa.core_data.repository.PaymentRepository
 import com.drtaa.core_data.repository.RentCarRepository
 import com.drtaa.core_data.repository.RentRepository
 import com.drtaa.core_data.repository.SignRepository
-import com.drtaa.core_model.data.PaymentCompletionInfo
+import com.drtaa.core_model.pay.PaymentCompletionInfo
 import com.drtaa.core_model.map.Search
 import com.drtaa.core_model.network.RequestCallRent
 import com.drtaa.core_model.network.RequestUnassignedCar

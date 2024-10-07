@@ -4,8 +4,9 @@ import com.drtaa.core_data.datasource.PaymentDataSource
 import com.drtaa.core_data.repository.PaymentRepository
 import com.drtaa.core_data.util.ResultWrapper
 import com.drtaa.core_data.util.safeApiCall
-import com.drtaa.core_model.data.PaymentCompletionInfo
+import com.drtaa.core_model.pay.PaymentCompletionInfo
 import com.drtaa.core_model.network.RequestPayment
+import com.drtaa.core_model.pay.ResponsePayment
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import timber.log.Timber
@@ -54,7 +55,7 @@ class PaymentRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun getUserPayments(): Flow<Result<List<PaymentCompletionInfo>>> =
+    override suspend fun getUserPayments(): Flow<Result<List<ResponsePayment>>> =
         flow {
             when (val response = safeApiCall { paymentDataSource.getUserPayments() }) {
                 is ResultWrapper.Success -> {
