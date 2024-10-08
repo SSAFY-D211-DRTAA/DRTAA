@@ -32,8 +32,8 @@ class DrtaaMessagingService : FirebaseMessagingService() {
                 title = datePlacesName.toString(),
                 category = datePlacesCategory.toString(),
                 roadAddress = datePlacesAddress.toString(),
-                lng = datePlacesLat ?: 0.0,
-                lat = datePlacesLon ?: 0.0
+                lng = datePlacesLon ?: 0.0,
+                lat = datePlacesLat ?: 0.0
             )
 
             val mainIntent = Intent(this, MainActivity::class.java).apply {

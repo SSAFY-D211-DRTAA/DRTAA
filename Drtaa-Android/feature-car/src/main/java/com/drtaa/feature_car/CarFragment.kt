@@ -107,7 +107,6 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
                 dismissLoading()
                 toggleCarOption(true)
                 carViewModel.getCarDrivingStatus()
-                showSnackBar("이용 중인 차량이 있습니다")
             }
         }.launchIn(viewLifecycleOwner.lifecycleScope)
 

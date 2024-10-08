@@ -153,7 +153,7 @@ class CarTrackingFragment :
                     1 -> {
                         dismissLoading()
                         viewModel.startGPSPublish()
-                        showSnackBar("MQTT 연결 성공")
+                        showSnackBar("차량과 연결 되었습니다.")
                         viewModel.getRoute()
                     }
 
