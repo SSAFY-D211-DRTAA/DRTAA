@@ -39,7 +39,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
 
         homeViewModel.rentStatus.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { rentStatus ->
-                if(rentStatus == "null"){
+                if (rentStatus == "null") {
                     binding.cvHomeRentStatus.visibility = View.GONE
                 }
                 binding.tvHomeRentStatus.text = rentStatus
