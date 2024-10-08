@@ -40,10 +40,13 @@ class LocalPathPublisher:
         self.lane_change_progress = 0
         self.lane_change_distance = 5.0
         self.vehicle_status = None
+        self.prev_vehicle_status = None
         self.kdtree = None
         self.global_path_points = None
         self.global_path_update_threshold = 10
-        self.max_distance_from_path = 10.0
+        self.max_distance_from_path = 50.0
+        self.lane_change_path = None
+        self.has_changed_lane = False
 
         rate = rospy.Rate(20)  # 20hz
         while not rospy.is_shutdown():
@@ -79,11 +82,14 @@ class LocalPathPublisher:
             if distance > self.global_path_update_threshold:
                 self.prev_current_waypoint = new_closest
                 rospy.loginfo(f"Global path significantly changed. Distance: {distance:.2f}m. Resetting prev_current_waypoint to {self.prev_current_waypoint}")
+                self.new_path_received = True
             else:
                 rospy.loginfo(f"Global path updated but not significantly changed. Distance: {distance:.2f}m. Keeping current waypoint.")
+                self.new_path_received = False
         else:
             self.prev_current_waypoint = self.find_closest_waypoint(self.x, self.y, new_global_path.poses)
             rospy.loginfo(f"Initial global path received. Setting prev_current_waypoint to {self.prev_current_waypoint}")
+            self.new_path_received = True
 
         # Update global path and KD-Tree
         self.global_path_msg = new_global_path
@@ -97,15 +103,27 @@ class LocalPathPublisher:
             self.kdtree = None
 
         # Immediately update the local path
+        if self.vehicle_status in ["move_to_drop_off", "pickup"]:
+            self.is_changing_lane = True
+            self.lane_change_progress = 0
+
         self.update_local_path()
 
     def command_status_callback(self, msg):
+        self.prev_vehicle_status = self.vehicle_status
         self.vehicle_status = msg.data
 
-    def change_lane_callback(self, msg):
-        self.is_changing_lane = msg.data
-        if self.is_changing_lane:
+        if self.vehicle_status == "parked" and self.new_path_received:
+            self.is_changing_lane = True
             self.lane_change_progress = 0
+            rospy.loginfo("Initiating lane change due to passenger call.")
+   
+    def change_lane_callback(self, msg):
+        if msg.data:
+            self.is_changing_lane = True
+            self.lane_change_progress = 0
+        else:
+            self.is_changing_lane = False
 
     def update_local_path(self):
         if not self.is_odom or not self.is_path or self.global_path_msg is None or len(self.global_path_msg.poses) == 0:
@@ -129,12 +147,22 @@ class LocalPathPublisher:
 
             smoothed_waypoint = int(self.smoothing_factor * self.prev_current_waypoint + 
                                     (1 - self.smoothing_factor) * current_waypoint)
+            
+            if self.is_changing_lane:
+                self.lane_change_progress += 1
+                local_path_msg.poses = self.generate_lane_change_path(smoothed_waypoint)
+                rospy.loginfo(f"Lane change path generated with {len(local_path_msg.poses)} poses. Progress: {self.lane_change_progress}")
 
-            if smoothed_waypoint + self.local_path_size < len(self.global_path_msg.poses):
-                local_path_msg.poses = self.global_path_msg.poses[smoothed_waypoint:smoothed_waypoint + self.local_path_size]
+                if self.lane_change_progress >= 70:
+                    self.is_changing_lane = False
+                    self.lane_change_progress = 0
             else:
-                local_path_msg.poses = self.global_path_msg.poses[smoothed_waypoint:]
 
+                if smoothed_waypoint + self.local_path_size < len(self.global_path_msg.poses):
+                    local_path_msg.poses = self.global_path_msg.poses[smoothed_waypoint:smoothed_waypoint + self.local_path_size]
+                else:
+                    local_path_msg.poses = self.global_path_msg.poses[smoothed_waypoint:]
+            
             # Update previous waypoint for next iteration
             self.prev_current_waypoint = smoothed_waypoint
 
@@ -150,29 +178,28 @@ class LocalPathPublisher:
 
     def generate_lane_change_path(self, start_index):
         lane_change_path = []
-        path_length = 30  # 차선 변경 경로의 길이 (미터)
+        sharp_turn_angle = np.pi / 4  # Adjust angle for more sharpness (e.g., 45 degrees)
+        total_length = 10  # Shorten the path length for a quicker turn
 
-        for i in range(path_length):
-            original_pose = self.global_path_msg.poses[start_index + i].pose
+        for i in range(total_length):
+            original_pose = self.global_path_msg.poses[min(start_index + i, len(self.global_path_msg.poses) - 1)].pose
             new_pose = PoseStamped()
-            new_pose.header = self.global_path_msg.poses[start_index + i].header
+            new_pose.header = self.global_path_msg.poses[min(start_index + i, len(self.global_path_msg.poses) - 1)].header
 
-            t = i / path_length
-            lateral_offset = self.lane_change_distance * (10 * t**3 - 15 * t**4 + 6 * t**5)
+            # Calculate the lateral offset for a sharp left turn
+            lateral_offset = self.lane_change_distance * (1 - (i / total_length))  # Linear decrease
 
-            new_pose.pose.position.x = original_pose.position.x - lateral_offset * np.sin(self.heading)
-            new_pose.pose.position.y = original_pose.position.y + lateral_offset * np.cos(self.heading)
+            # Apply sharp turn by modifying the position
+            new_pose.pose.position.x = original_pose.position.x - lateral_offset * np.sin(self.heading + sharp_turn_angle)
+            new_pose.pose.position.y = original_pose.position.y + lateral_offset * np.cos(self.heading + sharp_turn_angle)
             new_pose.pose.position.z = original_pose.position.z
             new_pose.pose.orientation = original_pose.orientation
 
             lane_change_path.append(new_pose)
 
-        for i in range(path_length, path_length + 20):
-            idx = min(start_index + i, len(self.global_path_msg.poses) - 1)
-            lane_change_path.append(self.global_path_msg.poses[idx])
-
         return lane_change_path
 
+    
     def find_closest_waypoint(self, x, y, poses, start_index=0):
         if self.kdtree is None:
             rospy.logwarn("KDTree is not initialized. Using linear search.")
@@ -193,7 +220,7 @@ class LocalPathPublisher:
             
             # if -np.pi/2 <= angle_difference <= np.pi/2 and abs(index - self.prev_current_waypoint) < 50:
             #     return index
-            if np.any(-np.pi/2 <= angle_difference) and np.any(angle_difference <= np.pi/2):
+            if np.any(-np.pi/4 <= angle_difference) and np.any(angle_difference <= np.pi/4):
                 return index
             
             index = (index + 1) % len(poses)
@@ -233,7 +260,7 @@ class LocalPathPublisher:
             angle_difference = (angle_to_waypoint - self.heading + np.pi) % (2 * np.pi) - np.pi
 
             # 각도 차이가 허용 범위 내에 있으면 해당 인덱스 반환
-            if np.any(-np.pi/2 <= angle_difference) and np.any(angle_difference <= np.pi/2):
+            if np.any(-np.pi/4 <= angle_difference) and np.any(angle_difference <= np.pi/4):
                 return original_index
 
             # 조건을 만족하지 않으면 다음 점 확인

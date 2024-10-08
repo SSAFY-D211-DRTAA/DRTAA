@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
-import json
+import os, time, json
 import numpy as np
 import tf
 import rospy
@@ -10,8 +9,8 @@ import rospkg
 from math import cos, sin, pi, sqrt, pow, atan2
 from geometry_msgs.msg import Point, PoseWithCovarianceStamped, PoseStamped
 from nav_msgs.msg import Odometry, Path
-from morai_msgs.msg import CtrlCmd, EgoVehicleStatus, ObjectStatusList, GetTrafficLightStatus, EventInfo
-from morai_msgs.srv import MoraiEventCmdSrv
+from morai_msgs.msg import CtrlCmd, EgoVehicleStatus, ObjectStatusList, GetTrafficLightStatus, EventInfo, Lamps
+from morai_msgs.srv import MoraiEventCmdSrv, MoraiEventCmdSrvRequest
 from tf.transformations import euler_from_quaternion, quaternion_from_euler
 from std_msgs.msg import Bool, String
 
@@ -67,8 +66,11 @@ class pure_pursuit:
         
         rospy.Subscriber('/command_status', String, self.command_status_callback)  # 차량 상태
 
+        rospy.Subscriber("/is_changing_lane", Bool, self.changing_lane_callback)
+
         self.ctrl_cmd_pub = rospy.Publisher('/ctrl_cmd', CtrlCmd, queue_size=1) # 제어 메시지 발행
         self.event_cmd_client = rospy.ServiceProxy('/Service_MoraiEventCmd', MoraiEventCmdSrv)
+        self.lamp_pub = rospy.Publisher('/lamps', Lamps, queue_size=1)
        
 
 
@@ -81,6 +83,7 @@ class pure_pursuit:
         self.is_global_path = False
         self.is_look_forward_point = False
         self.is_complete_drive = False
+        self.is_changing_lane = False
 
         self.forward_point = Point()
         # self.current_position = Point()
@@ -89,6 +92,7 @@ class pure_pursuit:
         self.previous_global_path = None  # 이전 경로 저장 변수 추가
         self.local_path_point = None
         self.vehicle_status = None
+        self.previous_vehicle_status = None
  
         self.vehicle_length = 2.7
         self.lfd = 8
@@ -200,30 +204,19 @@ class pure_pursuit:
             self.is_complete_drive = False
             rospy.loginfo("Global path updated and velocity list recalculated")
             self.previous_global_path = msg  # 이전 경로 업데이트
+            self.set_lamp(turn_signal=0, emergency_signal=0)  # 비상등 및 방향지시등 초기화
 
-            # if self.vehicle_status == "pickup_after_parked":
-            #     front_vehicle_distance = self.get_front_vehicle_distance()
+    def changing_lane_callback(self, msg):
+        if msg.data:
+            self.is_changing_lane = True
+            self.set_lamp(turn_signal=1, emergency_signal=0)
+        else:  
+            self.is_changing_lane = False
+            self.set_lamp(turn_signal=0, emergency_signal=0)
         
-            #     if front_vehicle_distance < 5.0:
-            #         rospy.loginfo("Distance to front vehicle is less than 5 meters. Initiating reverse.")
-            #         self.change_gear(2)  # Change gear to reverse
-            #         self.move_backward_until_safe()
-            #         self.change_gear(4)  # Change gear back to drive
-            
-        if self.vehicle_status == "pickup_after_parked":
-            rospy.loginfo("Vehicle is in pickup_after_parked state. Checking distance to front vehicle.")
-            
-            # Check distance to front vehicle
-            front_vehicle_distance = self.get_front_vehicle_distance()
-            
-            if front_vehicle_distance is not None and front_vehicle_distance < 5.0:
-                rospy.loginfo("Distance to front vehicle is less than 5 meters. Initiating reverse.")
-                self.change_gear(2)  # Change gear to reverse
-                self.move_backward_until_safe()
-                self.change_gear(4)  # Change gear back to drive
-
     def complete_drive_callback(self, msg):
         self.is_complete_drive = True
+        self.set_lamp(turn_signal=0, emergency_signal=1) # 목적지 도착 시 비상등 켜기 
 
     def roaming_callback(self, msg):
         if msg.data:
@@ -246,6 +239,14 @@ class pure_pursuit:
             # rospy.loginfo(f"Gear changed to {gear_value}")
         except rospy.ServiceException as e:
             rospy.logerr(f"Service call failed: {e}")
+
+    def set_lamp(self, turn_signal=0, emergency_signal=0):
+        
+        lamp = Lamps()
+        lamp.turnSignal = turn_signal
+        lamp.emergencySignal = emergency_signal
+
+        self.lamp_pub.publish(lamp)
 
     def get_front_vehicle_distance(self):
         min_distance = float('inf')
@@ -314,6 +315,11 @@ class pure_pursuit:
 
     def turning_left_callback(self, msg):
         self.is_turning_left = msg.data # Bool은 data로 값을 가져옴!!
+
+        if self.is_turning_left:
+            self.set_lamp(turn_signal=1, emergency_signal=0)
+        else:   
+            self.set_lamp(turn_signal=0, emergency_signal=0)
         # rospy.loginfo(f"Left turn signal: {self.is_turning_left}")
     
     def command_callback(self, msg):
@@ -324,16 +330,9 @@ class pure_pursuit:
         node_set_path = os.path.join(current_path, 'lib', 'mgeo_data', 'R_KR_PR_Sangam_NoBuildings', 'node_set.json')
         with open(node_set_path, 'r') as file:
             return json.load(file)
-    
-    # def extract_stop_lines(self): # 정지선 정보 추출
-    #     self.stop_lines = [node for node in self.nodes if node['on_stop_line']]
 
     def calculate_distance(self, point1, point2):
         return sqrt((point1.x - point2[0])**2 + (point1.y - point2[1])**2)
-
-    # def update_nearest_stop_line(self): # 가장 가까운 정지선 정보 업데이트
-    #     self.nearest_stop_line = min(self.stop_lines, key=lambda node: 
-    #         self.calculate_distance(self.current_position, node['point']))
 
     def detect_stop_line(self): # 정지선 감지
         for node in self.nodes:
@@ -461,6 +460,7 @@ class pure_pursuit:
     def calc_pure_pursuit(self):
         try:
             is_near_stop_line, distance_to_stop_line = self.detect_stop_line()
+
             if is_near_stop_line:
                 self.lfd = max(self.min_lfd, min(distance_to_stop_line, self.lfd))
             else:
