@@ -41,6 +41,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             rentRepository.getRentStatus().collect { result ->
                 result.onSuccess { status ->
+                    Timber.tag("RentStatus").d("RentStatus: $status")
                     _rentStatus.value = when (status.rentStatus) {
                         Status.RESERVED.status -> "이용 예정 차량이 있습니다\n차량을 호출해 보세요!"
                         Status.IN_PROGRESS.status -> {
@@ -54,8 +55,8 @@ class HomeViewModel @Inject constructor(
                                 else -> ""
                             }
                         }
-
-                        else -> "이용 예정인 차량이 없습니다\n렌트를 예약해 보세요!"
+                        // 이때는 오류난 거라서 카드뷰 자체를 숨기게 했음
+                        else -> "null"
                     }
                 }.onFailure {
                     _rentStatus.value = "오류가 발생했습니다.\n다시 시도해주세요!"
