@@ -130,14 +130,12 @@ class CarTrackingFragment :
         viewModel.isFirst.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach {
             if (it) {
                 dismissLoading()
-                showSnackBar("첫 렌트 요청 장소로 호출합니다")
             }
         }.launchIn(viewLifecycleOwner.lifecycleScope)
 
         viewModel.isRecall.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach {
             if (it) {
                 dismissLoading()
-                showSnackBar("요청 장소로 호출하겠습니다")
             } else {
                 dismissLoading()
                 showSnackBar("렌트카 호출 실패..")
@@ -153,7 +151,6 @@ class CarTrackingFragment :
                     1 -> {
                         dismissLoading()
                         viewModel.startGPSPublish()
-                        showSnackBar("차량과 연결 되었습니다.")
                         viewModel.getRoute()
                     }
 
@@ -189,7 +186,6 @@ class CarTrackingFragment :
                     position = LatLng(it.latitude, it.longitude)
                     naverMap.moveCameraTo(position.latitude, position.longitude)
                     if (!viewModel.trackingState.value) viewModel.toggleTrackingState()
-                    showSnackBar("차량을 호출합니다")
                 }
             }
         }.launchIn(viewLifecycleOwner.lifecycleScope)
