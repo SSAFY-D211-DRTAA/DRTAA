@@ -88,9 +88,9 @@ class MyPageFragment : BaseFragment<FragmentMyPageBinding>(R.layout.fragment_my_
     private fun setupMyPageItems() {
         with(binding) {
             llMypageItem1.apply {
-                findViewById<TextView>(R.id.tv_mypage_item_title).text = "내 정보"
+                findViewById<TextView>(R.id.tv_mypage_item_title).text = "프로필 정보"
                 setOnClickListener {
-                    showSnackBar("1클릭")
+                    findNavController().navigate(R.id.action_myPageFragment_to_profileFragment)
                 }
             }
             llMypageItem2.apply {
@@ -100,9 +100,9 @@ class MyPageFragment : BaseFragment<FragmentMyPageBinding>(R.layout.fragment_my_
                 }
             }
             llMypageItem3.apply {
-                findViewById<TextView>(R.id.tv_mypage_item_title).text = "알림설정?"
+                findViewById<TextView>(R.id.tv_mypage_item_title).text = "렌트 관리"
                 setOnClickListener {
-                    showSnackBar("3클릭")
+                    findNavController().navigate(R.id.action_myPageFragment_to_rentHistoryFragment)
                 }
             }
             llMypageItem4.apply {
