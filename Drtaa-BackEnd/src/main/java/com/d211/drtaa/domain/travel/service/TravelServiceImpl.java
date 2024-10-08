@@ -36,6 +36,7 @@ import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -210,16 +211,18 @@ public class TravelServiceImpl implements TravelService {
                     .orElseThrow(() -> new UsernameNotFoundException("해당 userProvider에 맞는 사용자를 찾을 수 없습니다."));
 
             // 현재 날짜
-            LocalDate now = LocalDate.now();
-            log.info("현재 날짜: {}", now);
+            LocalDateTime today = LocalDate.now().atStartOfDay();  // 오늘 날짜의 시작 시간
 
             // 사용자의 진행중인 렌트 찾기
             List<RentStatus> statuses = Arrays.asList(RentStatus.in_progress, RentStatus.reserved);
-            Rent rent = rentRepository.findRentByStatusAndToday(now, statuses)
+            Rent rent = rentRepository.findRentByStatusAndToday(today, statuses)
                     .orElseThrow(() -> new RentNotFoundException("해당 사용자의 진행중인 렌트가 없습니다."));
 
             // 진행중인 여행 찾기
             Travel travel = rent.getTravel();
+
+            // 현재 날짜
+            LocalDate now = today.toLocalDate();
 
             // 현재 날짜에 해당하는 여행 일정 찾기
             TravelDates todayDate = travelDatesRepository.findByTravelAndTravelDatesDate(travel, now)
