@@ -1,4 +1,4 @@
-package com.drtaa.feature_home
+package com.drtaa.feature_mypage
 
 import android.view.View
 import androidx.fragment.app.viewModels
@@ -6,8 +6,8 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import com.drtaa.core_ui.base.BaseFragment
-import com.drtaa.feature_home.databinding.FragmentRentHistorySummaryBinding
-import com.drtaa.feature_home.viewmodel.RentHistorySummaryViewModel
+import com.drtaa.feature_mypage.databinding.FragmentRentHistorySummaryBinding
+import com.drtaa.feature_mypage.viewmodel.RentHistorySummaryViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach

@@ -1,4 +1,4 @@
-package com.drtaa.feature_home.viewmodel
+package com.drtaa.feature_mypage.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

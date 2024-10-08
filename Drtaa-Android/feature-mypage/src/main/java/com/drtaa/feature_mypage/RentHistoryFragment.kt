@@ -1,4 +1,4 @@
-package com.drtaa.feature_home
+package com.drtaa.feature_mypage
 
 import android.view.View
 import androidx.fragment.app.viewModels
@@ -8,9 +8,9 @@ import com.drtaa.core_model.rent.RentSimple
 import com.drtaa.core_ui.base.BaseFragment
 import com.drtaa.core_ui.expandLayout
 import com.drtaa.core_ui.foldLayout
-import com.drtaa.feature_home.adapter.RentHistoryAdapter
-import com.drtaa.feature_home.databinding.FragmentRentHistoryBinding
-import com.drtaa.feature_home.viewmodel.RentHistoryViewModel
+import com.drtaa.feature_mypage.adaper.RentHistoryAdapter
+import com.drtaa.feature_mypage.databinding.FragmentRentHistoryBinding
+import com.drtaa.feature_mypage.viewmodel.RentHistoryViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
