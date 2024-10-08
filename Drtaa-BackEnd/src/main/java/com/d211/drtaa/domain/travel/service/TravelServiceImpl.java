@@ -211,11 +211,11 @@ public class TravelServiceImpl implements TravelService {
                     .orElseThrow(() -> new UsernameNotFoundException("해당 userProvider에 맞는 사용자를 찾을 수 없습니다."));
 
             // 현재 날짜
-            LocalDateTime today = LocalDate.now().atStartOfDay();  // 오늘 날짜의 시작 시간
+            LocalDateTime today = LocalDateTime.now();
 
             // 사용자의 진행중인 렌트 찾기
             List<RentStatus> statuses = Arrays.asList(RentStatus.in_progress, RentStatus.reserved);
-            Rent rent = rentRepository.findRentByStatusAndToday(today, statuses)
+            Rent rent = rentRepository.findRentByUserAndStatusAndToday(user, today, statuses)
                     .orElseThrow(() -> new RentNotFoundException("해당 사용자의 진행중인 렌트가 없습니다."));
 
             // 진행중인 여행 찾기
