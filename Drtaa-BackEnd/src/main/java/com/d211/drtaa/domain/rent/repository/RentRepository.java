@@ -35,7 +35,7 @@ public interface RentRepository extends JpaRepository<Rent, Long> {
     Optional<Rent> findByUserAndRentStartTimeBetween(User user, LocalDateTime startDate, LocalDateTime endDate);
     @Query("SELECT r FROM Rent r WHERE r.rentStatus IN (:statuses) " +
             "AND :today BETWEEN r.rentStartTime AND r.rentEndTime")
-    Optional<Rent> findRentByStatusAndToday(@Param("today") LocalDate today,
+    Optional<Rent> findRentByStatusAndToday(@Param("today") LocalDateTime today,
                                             @Param("statuses") List<RentStatus> statuses);
 
     List<Rent> findByUser(User user);
