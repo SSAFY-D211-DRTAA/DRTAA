@@ -1,11 +1,12 @@
 package com.d211.drtaa.domain.travel.service;
 
+import com.d211.drtaa.domain.rent.dto.response.RentCarManipulateResponseDTO;
+import com.d211.drtaa.domain.travel.dto.request.PlaceAddRequestDTO;
 import com.d211.drtaa.domain.travel.dto.request.PlacesAddRequestDTO;
 import com.d211.drtaa.domain.travel.dto.request.TravelDetailRequestDTO;
 import com.d211.drtaa.domain.travel.dto.request.TravelNameRequestDTO;
-import com.d211.drtaa.domain.travel.dto.response.TravelDetailResponseDTO;
-import com.d211.drtaa.domain.travel.dto.response.TravelResponseDTO;
-import com.d211.drtaa.domain.travel.dto.response.WeatherResponseDTO;
+import com.d211.drtaa.domain.travel.dto.response.*;
+import org.springframework.security.core.Authentication;
 
 import java.util.List;
 
@@ -22,14 +23,20 @@ public interface TravelService {
     // travelId의 해당하는 여행 일정, 장소 상세 조회
     TravelDetailResponseDTO getTravel(Long travelId);
 
+    // 오늘 진행중인 여행 일정 조회
+    List<PlacesDetailResponseDTO> getTravelToday(String userProviderId);
+
     // travelId의 해당하는 여행 중 travelDatesId의 해당하는 일정에 장소 추가
     void createTravelDatesPlaces(PlacesAddRequestDTO placesAddRequestDTO);
+
+    // 여행 일정 장소 이전 또는 이후에 추가
+    RentCarManipulateResponseDTO addTravelDatesPlace(PlaceAddRequestDTO placeAddRequestDTO);
 
     // travelId의 해당하는 여행 이름 변경
     void updateTravelName(TravelNameRequestDTO travelNameRequestDTO);
 
     // travelId의 해당하고 travelDatesId의 해당하는 여행 장소들 변경
-    void updateTravelDatesPlaces(TravelDetailRequestDTO travelDetailRequestDTO);
+    TravelUpdateResponseDTO updateTravelDatesPlaces(TravelDetailRequestDTO travelDetailRequestDTO);
 
     // datePlaceLat과 datePlacesLon에 맞는 일주일치 날씨 조회
     List<WeatherResponseDTO> getWeather(double datePlacesLat, double datePlacesLon) throws Exception;

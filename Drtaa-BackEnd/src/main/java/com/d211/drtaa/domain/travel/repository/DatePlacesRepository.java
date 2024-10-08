@@ -8,13 +8,22 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface DatePlacesRepository extends JpaRepository<DatePlaces, Long> {
     // find
-    @Query(value = "SELECT * FROM date_places WHERE travel_dates_id = :travelDatesId", nativeQuery = true)
-    List<DatePlaces> findByTravelDatesId(@Param("travelDatesId") Long travelDatesId);
+    Optional<DatePlaces> findByDatePlacesId(Long datePlacesId);
+    Optional<DatePlaces> findFirstByTravelDatesOrderByDatePlacesOrderDesc(TravelDates date);
+    Optional<DatePlaces> findByTravelDatesAndDatePlacesOrder(TravelDates date, int datePlacesOrder);
+    Optional<DatePlaces> findFirstByTravelAndDatePlacesIsExpiredFalseOrderByDatePlacesIdAsc(Travel travel);
+    DatePlaces findFirstByTravelDatesOrderByDatePlacesOrderAsc(TravelDates travelDates);
+    DatePlaces findFirstByTravelDates(TravelDates travelDates);
+    List<DatePlaces> findByTravelDates(TravelDates travelDates);
+    List<DatePlaces> findByTravelDatesAndDatePlacesOrderGreaterThan(TravelDates date, int datePlacesOrder);
+    List<DatePlaces> findByTravelDatesAndDatePlacesIsExpiredFalse(TravelDates date);
+    List<DatePlaces> findByTravelDatesOrderByDatePlacesOrderAsc(TravelDates date);
 
     // delete
-    void deleteAllByTravelDates(TravelDates dates);
     void deleteAllByTravelAndTravelDates(Travel travel, TravelDates dates);
+
 }

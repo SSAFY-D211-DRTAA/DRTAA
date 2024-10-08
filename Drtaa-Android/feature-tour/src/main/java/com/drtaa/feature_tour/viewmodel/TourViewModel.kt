@@ -4,7 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.drtaa.core_data.repository.PlanRepository
 import com.drtaa.core_data.repository.TourRepository
+import com.drtaa.core_model.plan.PlanItem
 import com.drtaa.core_model.tour.TourItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,19 +17,46 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TourViewModel @Inject constructor(
-    private val tourRepository: TourRepository
+    private val tourRepository: TourRepository,
+    private val planRepository: PlanRepository
 ) : ViewModel() {
     private val _pagedTour = MutableStateFlow<PagingData<TourItem>>(PagingData.empty())
     val pagedTour: StateFlow<PagingData<TourItem>>
         get() = _pagedTour
 
+    private val _planList = MutableStateFlow<List<PlanItem>?>(emptyList())
+    val planList: StateFlow<List<PlanItem>?> = _planList
+
+    init {
+        getPlanList()
+    }
+
+    private fun getPlanList() {
+        viewModelScope.launch {
+            planRepository.getTodayPlanList().collect { result ->
+                result.onSuccess { planList ->
+                    _planList.value = planList
+                }.onFailure {
+                    _planList.value = null
+                }
+            }
+        }
+    }
+
     fun getLocationBasedList(mapX: String, mapY: String, radius: String) {
         viewModelScope.launch {
-            tourRepository.getLocationBasedList(mapX, mapY, radius).cachedIn(viewModelScope)
+            val result = "$mapX $mapY"
+            tourRepository.getLocationBasedList(DEFAULT_LNG, DEFAULT_LAT, radius)
+                .cachedIn(viewModelScope)
                 .collect {
-                    Timber.tag("pager").d("")
+                    Timber.tag("pager").d("$result")
                     _pagedTour.value = it
                 }
         }
+    }
+
+    companion object {
+        const val DEFAULT_LAT = "37.5749543"
+        const val DEFAULT_LNG = "126.886716"
     }
 }

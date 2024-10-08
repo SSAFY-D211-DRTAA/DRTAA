@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.drtaa.core_data.repository.SignRepository
+import com.drtaa.core_data.repository.TokenRepository
 import com.drtaa.core_model.sign.SocialUser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -18,7 +19,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MyPageViewModel @Inject constructor(
-    private val signRepository: SignRepository
+    private val signRepository: SignRepository,
+    private val tokenRepository: TokenRepository,
 ) : ViewModel() {
 
     private val _currentUser = MutableStateFlow<SocialUser?>(null)
@@ -32,6 +34,9 @@ class MyPageViewModel @Inject constructor(
 
     private val _profileImageFile = MutableStateFlow<File?>(null)
     private val profileImageFile: StateFlow<File?> = _profileImageFile
+
+    private val _logoutState = MutableSharedFlow<Boolean>()
+    val logoutState: SharedFlow<Boolean> = _logoutState
 
     init {
         getUserData()
@@ -72,6 +77,19 @@ class MyPageViewModel @Inject constructor(
                         _updateResult.emit(false)
                         Timber.d("유저 이미지 업데이트 실패")
                     }
+                }
+            }
+        }
+    }
+
+    fun logout() {
+        viewModelScope.launch {
+            signRepository.clearUserData()
+            tokenRepository.clearToken().collect {
+                it.onSuccess {
+                    _logoutState.emit(true)
+                }.onFailure {
+                    _logoutState.emit(false)
                 }
             }
         }

@@ -3,9 +3,15 @@ package com.drtaa.feature_plan.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.drtaa.core_data.repository.PlanRepository
+import com.drtaa.core_data.repository.RentCarRepository
 import com.drtaa.core_model.map.Search
+import com.drtaa.core_model.network.RequestCarStatus
+import com.drtaa.core_model.plan.DayPlan
+import com.drtaa.core_model.plan.LastPlan
 import com.drtaa.core_model.plan.Plan
+import com.drtaa.core_model.plan.PlanItem
 import com.drtaa.core_model.plan.RequestPlanName
+import com.drtaa.core_model.plan.ResponsePutPlan
 import com.drtaa.core_model.util.toPlanItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,22 +20,28 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 @HiltViewModel
 class PlanViewModel @Inject constructor(
-    private val planRepository: PlanRepository
+    private val planRepository: PlanRepository,
+    private val rentCarRepository: RentCarRepository
 ) : ViewModel() {
     private var travelId: Int = 0
+    private var rentId: Int = 0
+    var isNewPlanPage = true
+    var isViewPagerLoaded = false
 
     private val _plan = MutableStateFlow<Plan?>(null)
     val plan: StateFlow<Plan?> = _plan
 
-    private val _dayPlanList = MutableStateFlow<List<Plan.DayPlan>?>(null)
-    val dayPlanList: StateFlow<List<Plan.DayPlan>?> = _dayPlanList
+    private val _dayPlanList = MutableStateFlow<List<DayPlan>?>(null)
+    val dayPlanList: StateFlow<List<DayPlan>?> = _dayPlanList
 
-    private val _dayPlan = MutableStateFlow<Plan.DayPlan?>(null)
-    val dayPlan: StateFlow<Plan.DayPlan?> = _dayPlan
+    private val _dayPlan = MutableStateFlow<DayPlan?>(null)
+    val dayPlan: StateFlow<DayPlan?> = _dayPlan
 
     private val _dayIdx = MutableStateFlow(0)
     val dayIdx: StateFlow<Int> = _dayIdx
@@ -40,14 +52,16 @@ class PlanViewModel @Inject constructor(
     private val _isEditSuccess = MutableStateFlow<Boolean?>(null)
     val isEditSuccess: StateFlow<Boolean?> = _isEditSuccess
 
-    var isViewPagerLoaded = false
+    private val _isAddSuccess = MutableStateFlow<Boolean?>(null)
+    val isAddSuccess: StateFlow<Boolean?> = _isAddSuccess
 
     init {
         observePlan()
     }
 
-    fun setTravelId(travelId: Int) {
+    fun setInfo(travelId: Int, rentId: Int) {
         this.travelId = travelId
+        this.rentId = rentId
     }
 
     fun getPlan() {
@@ -117,10 +131,35 @@ class PlanViewModel @Inject constructor(
         putNewPlan(tempNewPlan)
     }
 
+    fun addLastPlan(search: Search) {
+        viewModelScope.launch {
+            val planDetail = _dayPlan.value ?: return@launch
+            planRepository.addPlanAtLast(
+                LastPlan(
+                    travelId = planDetail.travelId,
+                    travelDatesId = planDetail.travelDatesId,
+                    datePlacesName = search.title,
+                    datePlacesCategory = search.category,
+                    datePlacesAddress = search.roadAddress,
+                    datePlacesLat = search.lat,
+                    datePlacesLon = search.lng
+                )
+            ).collect { result ->
+                result.onSuccess {
+                    _isAddSuccess.value = true
+                    Timber.d("addLastPlan 성공")
+                }.onFailure {
+                    _isAddSuccess.value = false
+                    Timber.d("addLastPlan 실패")
+                }
+            }
+        }
+    }
+
     fun updateDate(
         dayIdxFrom: Int,
         dayIdxTo: Int,
-        movePlanList: List<Plan.DayPlan.PlanItem>
+        movePlanList: List<PlanItem>
     ) {
         val currentPlan = _plan.value ?: return
 
@@ -156,7 +195,7 @@ class PlanViewModel @Inject constructor(
         putNewPlan(tempNewPlan)
     }
 
-    fun updatePlan(dayIdx: Int, newPlanList: List<Plan.DayPlan.PlanItem>) {
+    fun updatePlan(dayIdx: Int, newPlanList: List<PlanItem>) {
         val currentPlan = _plan.value ?: return
 
         val updatedDatesDetail = currentPlan.datesDetail.mapIndexed { index, dayPlan ->
@@ -175,7 +214,7 @@ class PlanViewModel @Inject constructor(
         putNewPlan(tempNewPlan)
     }
 
-    fun deletePlan(dayIdx: Int, deletedPlanList: List<Plan.DayPlan.PlanItem>) {
+    fun deletePlan(dayIdx: Int, deletedPlanList: List<PlanItem>) {
         val currentPlan = _plan.value ?: return
 
         val updatedDatesDetail = currentPlan.datesDetail.mapIndexed { index, dayPlan ->
@@ -202,7 +241,9 @@ class PlanViewModel @Inject constructor(
         Timber.tag("NEW_PLAN").d("$plan")
         viewModelScope.launch {
             planRepository.putPlan(plan).collect { response ->
-                response.onSuccess {
+                response.onSuccess { data ->
+                    setNextCallingData(data)
+
                     _plan.value = plan
                     _isEditSuccess.value = true
                     Timber.tag("NEW_PLAN").d("${_plan.value}")
@@ -223,11 +264,26 @@ class PlanViewModel @Inject constructor(
                 )
             ).collect { result ->
                 result.onSuccess {
+                    _plan.value = _plan.value?.copy(travelName = newName)
                     _isEditSuccess.value = true
                 }.onFailure {
                     _isEditSuccess.value = false
                 }
             }
+        }
+    }
+
+    private suspend fun setNextCallingData(nextCalling: ResponsePutPlan) {
+        val today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+        if (nextCalling.travelDatesDate == today) {
+            rentCarRepository.setCarWithTravelInfo(
+                RequestCarStatus(
+                    rentId = rentId,
+                    travelId = nextCalling.travelId,
+                    travelDatesId = nextCalling.travelDatesId,
+                    datePlacesId = nextCalling.datePlacesId
+                )
+            )
         }
     }
 

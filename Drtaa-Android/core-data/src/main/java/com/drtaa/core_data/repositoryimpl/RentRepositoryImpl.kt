@@ -5,6 +5,7 @@ import com.drtaa.core_data.repository.RentRepository
 import com.drtaa.core_data.util.ResultWrapper
 import com.drtaa.core_data.util.safeApiCall
 import com.drtaa.core_model.network.RequestCallRent
+import com.drtaa.core_model.network.RequestCarStatus
 import com.drtaa.core_model.network.RequestChangeRent
 import com.drtaa.core_model.network.RequestCompleteRent
 import com.drtaa.core_model.network.RequestDuplicatedSchedule
@@ -12,6 +13,7 @@ import com.drtaa.core_model.network.RequestRentExtend
 import com.drtaa.core_model.network.ResponseRentStateAll
 import com.drtaa.core_model.rent.RentDetail
 import com.drtaa.core_model.rent.RentSimple
+import com.drtaa.core_model.rent.RentStatus
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import timber.log.Timber
@@ -206,16 +208,39 @@ class RentRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getAllRentState(): Flow<Result<Long>> = flow {
+    override suspend fun completeTodayRent(rentInfo: RequestCarStatus): Flow<Result<String>> =
+        flow {
+            when (
+                val response = safeApiCall { rentDataSource.completeTodayRent(rentInfo) }
+            ) {
+                is ResultWrapper.GenericError -> {
+                    emit(Result.failure(Exception(response.message)))
+                    Timber.d("오늘 렌트 완료 실패: ${response.message}")
+                }
+
+                ResultWrapper.NetworkError -> {
+                    emit(Result.failure(Exception("네트워크 에러")))
+                    Timber.d("오늘 렌트 완료 네트워크 에러")
+                }
+
+                is ResultWrapper.Success -> {
+                    emit(Result.success(response.data))
+                    Timber.d("오늘 렌트 완료 성공")
+                }
+            }
+        }
+
+    override suspend fun getReservedRentState(): Flow<Result<ResponseRentStateAll>> = flow {
         when (
             val response = safeApiCall { rentDataSource.getAllRentState() }
         ) {
             is ResultWrapper.Success -> {
-                val result = response.data.firstOrNull()
-                if (result == null) {
+                val result = response.data
+                if (result.isEmpty()) {
                     emit(Result.failure(Exception("예약 내역 없음")))
                 } else {
-                    emit(Result.success(result.rentId ?: 1))
+                    // 가장 가까운 예약내역 긁어옴
+                    emit(Result.success(result.first()))
                 }
                 Timber.d("전체 렌트/내역 조회 성공 ${response.data}")
             }
@@ -253,4 +278,25 @@ class RentRepositoryImpl @Inject constructor(
                 }
             }
         }
+
+    override suspend fun getRentStatus(): Flow<Result<RentStatus>> = flow {
+        when (
+            val response = safeApiCall { rentDataSource.getRentStatus() }
+        ) {
+            is ResultWrapper.Success -> {
+                emit(Result.success(response.data))
+                Timber.d("렌트 상태 조회 성공")
+            }
+
+            is ResultWrapper.GenericError -> {
+                emit(Result.failure(Exception(response.message)))
+                Timber.d("렌트 상태 조회 실패: ${response.message}")
+            }
+
+            is ResultWrapper.NetworkError -> {
+                emit(Result.failure(Exception("네트워크 에러")))
+                Timber.d("렌트 상태 조회 네트워크 에러")
+            }
+        }
+    }
 }

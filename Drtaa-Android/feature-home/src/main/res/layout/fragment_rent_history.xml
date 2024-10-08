@@ -5,41 +5,418 @@
 
     <data>
 
+        <variable
+            name="rent"
+            type="com.drtaa.core_model.rent.RentSimple" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingHorizontal="20dp"
-        android:paddingVertical="30dp"
-        android:background="@color/gray_eeee">
+        android:layout_height="wrap_content"
+        android:overScrollMode="never">
 
-        <TextView
-            android:id="@+id/tv_no_rent_history"
-            style="@style/ptd_regular"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="렌트 이용기록이 없습니다."
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_rent_history"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:overScrollMode="never"
-            android:scrollbars="none"
-            android:visibility="gone"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:listitem="@layout/item_rent_history"
-            tools:visibility="visible" />
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:paddingHorizontal="20dp"
+            android:paddingVertical="30dp">
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <TextView
+                android:id="@+id/tv_rent_history_title"
+                style="@style/ptd_extra_bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:text="렌트 이용 기록"
+                android:textSize="35sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_error_rent_history"
+                style="@style/jua"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="일정 목록을 불러올 수 없습니다.\n 다시 시도해주세요."
+                android:textAlignment="center"
+                android:textSize="16sp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_rent_history_title" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cl_rent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_rent_history_title"
+                tools:visibility="visible">
+
+                <TextView
+                    android:id="@+id/tv_rent_in_progress"
+                    style="@style/ptd_bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="10dp"
+                    android:text="진행 중"
+                    android:textSize="24sp"
+                    app:layout_constraintBottom_toTopOf="@+id/cl_rent_in_progress"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/cl_rent_in_progress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tv_rent_in_progress">
+
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/cv_rent_in_progress"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="3dp"
+                        android:layout_marginTop="13dp"
+                        android:layout_marginBottom="7dp"
+                        android:visibility="gone"
+                        app:cardCornerRadius="30dp"
+                        app:cardElevation="3dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:strokeColor="@color/white"
+                        tools:visibility="visible">
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:paddingStart="30dp"
+                            android:paddingEnd="20dp">
+
+                            <TextView
+                                android:id="@+id/tv_rent_title"
+                                style="@style/jua"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="20dp"
+                                android:text="@{rent.travelName}"
+                                android:textSize="18sp"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"
+                                tools:text="여행 제목 들어가용" />
+
+                            <ImageView
+                                android:id="@+id/iv_rent_schedule"
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:layout_marginTop="3dp"
+                                android:src="@drawable/ic_calendar_3d"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toBottomOf="@id/tv_rent_title" />
+
+                            <TextView
+                                android:id="@+id/tv_rent_schedule"
+                                style="@style/ptd_regular"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="3dp"
+                                android:text='@{rent.rentStartTime + "~" + rent.rentEndTime}'
+                                android:textSize="13sp"
+                                app:layout_constraintBottom_toBottomOf="@id/iv_rent_schedule"
+                                app:layout_constraintStart_toEndOf="@+id/iv_rent_schedule"
+                                app:layout_constraintTop_toTopOf="@id/iv_rent_schedule"
+                                tools:text="2024-10-02~2024-10-04" />
+
+                            <ImageView
+                                android:id="@+id/iv_rent_head_count"
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:src="@drawable/ic_user_3d"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toBottomOf="@id/iv_rent_schedule" />
+
+                            <TextView
+                                android:id="@+id/tv_rent_head_count"
+                                style="@style/ptd_regular"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="3dp"
+                                android:text='@{rent.rentHeadCount + "명"}'
+                                android:textSize="13sp"
+                                app:layout_constraintBottom_toBottomOf="@id/iv_rent_head_count"
+                                app:layout_constraintStart_toEndOf="@+id/iv_rent_head_count"
+                                app:layout_constraintTop_toTopOf="@id/iv_rent_head_count"
+                                tools:text="2명" />
+
+                            <ImageView
+                                android:id="@+id/iv_rent_time"
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:layout_marginStart="8dp"
+                                android:src="@drawable/ic_clock_3d"
+                                app:layout_constraintBottom_toBottomOf="@id/iv_rent_head_count"
+                                app:layout_constraintStart_toEndOf="@+id/tv_rent_head_count"
+                                app:layout_constraintTop_toTopOf="@id/iv_rent_head_count" />
+
+                            <TextView
+                                android:id="@+id/tv_rent_time"
+                                style="@style/ptd_regular"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="3dp"
+                                android:text='@{rent.rentTime + "시간"}'
+                                android:textSize="13sp"
+                                app:layout_constraintBottom_toBottomOf="@id/iv_rent_head_count"
+                                app:layout_constraintStart_toEndOf="@+id/iv_rent_time"
+                                app:layout_constraintTop_toTopOf="@id/iv_rent_head_count"
+                                tools:text="24시간" />
+
+                            <ImageView
+                                android:id="@+id/iv_rent_price"
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:layout_marginBottom="20dp"
+                                android:src="@drawable/ic_money"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toBottomOf="@id/iv_rent_head_count" />
+
+                            <TextView
+                                android:id="@+id/tv_rent_price"
+                                style="@style/ptd_regular"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="3dp"
+                                android:textSize="13sp"
+                                app:layout_constraintBottom_toBottomOf="@id/iv_rent_price"
+                                app:layout_constraintStart_toEndOf="@+id/iv_rent_price"
+                                app:layout_constraintTop_toTopOf="@id/iv_rent_price"
+                                app:setTextPrice="@{rent.rentPrice}"
+                                tools:text="2400000" />
+
+                            <ImageView
+                                android:id="@+id/iv_rent_status"
+                                android:layout_width="60dp"
+                                android:layout_height="60dp"
+                                android:layout_marginBottom="20dp"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+                    </androidx.cardview.widget.CardView>
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/cl_rent_no_in_progress"
+                        android:layout_width="match_parent"
+                        android:layout_height="150dp"
+                        android:visibility="gone"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:visibility="gone">
+
+                        <ImageView
+                            android:id="@+id/iv_in_progress_empty"
+                            android:layout_width="match_parent"
+                            android:layout_height="120dp"
+                            android:scaleType="fitEnd"
+                            android:src="@drawable/ic_empty_in_progress"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            tools:layout_editor_absoluteX="0dp" />
+
+                        <TextView
+                            android:id="@+id/tv_in_progress_help"
+                            style="@style/jua"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:layout_marginTop="40dp"
+                            android:text="진행 중인 여행이 없습니다!"
+                            android:textColor="@color/gray_5858"
+                            android:textSize="20dp"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <LinearLayout
+                    android:id="@+id/ll_rent_reserved"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="10dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    app:layout_constraintBottom_toTopOf="@+id/cl_rent_reserved"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/cl_rent_in_progress">
+
+                    <TextView
+                        android:id="@+id/tv_rent_reserved"
+                        style="@style/ptd_bold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="예약 중"
+                        android:textSize="24sp" />
+
+                    <ImageView
+                        android:id="@+id/iv_reserved_expand"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="5dp"
+                        android:rotation="270"
+                        android:src="@drawable/ic_next" />
+                </LinearLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/cl_rent_reserved"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintBottom_toTopOf="@+id/ll_rent_completed"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/ll_rent_reserved"
+                    app:layout_constraintVertical_weight="1">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_rent_reserved_history"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:overScrollMode="never"
+                        android:scrollbars="none"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:itemCount="3"
+                        tools:listitem="@layout/item_rent_history"
+                        tools:visibility="gone" />
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/cl_rent_no_reserved"
+                        android:layout_width="match_parent"
+                        android:layout_height="150dp"
+                        android:visibility="gone"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:visibility="visible">
+
+                        <ImageView
+                            android:id="@+id/iv_reserved_empty"
+                            android:layout_width="match_parent"
+                            android:layout_height="140dp"
+                            android:scaleType="fitEnd"
+                            android:src="@drawable/ic_empty_reserved"
+                            app:layout_constraintBottom_toBottomOf="parent" />
+
+                        <TextView
+                            android:id="@+id/tv_reserved_help"
+                            style="@style/jua"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:layout_marginTop="40dp"
+                            android:text="예약 중인 여행이 없습니다!"
+                            android:textColor="@color/gray_5858"
+                            android:textSize="20dp"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <LinearLayout
+                    android:id="@+id/ll_rent_completed"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="10dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    app:layout_constraintBottom_toTopOf="@+id/cl_rent_completed"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/cl_rent_reserved">
+
+                    <TextView
+                        android:id="@+id/tv_rent_completed"
+                        style="@style/ptd_bold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="완료"
+                        android:textSize="24sp" />
+
+                    <ImageView
+                        android:id="@+id/iv_completed_expand"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="5dp"
+                        android:rotation="270"
+                        android:src="@drawable/ic_next" />
+                </LinearLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/cl_rent_completed"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/ll_rent_completed"
+                    app:layout_constraintVertical_weight="1">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_rent_completed_history"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:overScrollMode="never"
+                        android:scrollbars="none"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:itemCount="3"
+                        tools:listitem="@layout/item_rent_history"
+                        tools:visibility="gone" />
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/cl_rent_no_completed"
+                        android:layout_width="match_parent"
+                        android:layout_height="150dp"
+                        android:visibility="gone"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:visibility="visible">
+
+                        <ImageView
+                            android:id="@+id/iv_completed_empty"
+                            android:layout_width="match_parent"
+                            android:layout_height="140dp"
+                            android:scaleType="fitEnd"
+                            android:src="@drawable/ic_empty_completed"
+                            app:layout_constraintBottom_toBottomOf="parent" />
+
+                        <TextView
+                            android:id="@+id/tv_completed_help"
+                            style="@style/jua"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:layout_marginTop="40dp"
+                            android:text="완료된 여행이 없습니다!"
+                            android:textColor="@color/gray_5858"
+                            android:textSize="20dp"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
 
 </layout>

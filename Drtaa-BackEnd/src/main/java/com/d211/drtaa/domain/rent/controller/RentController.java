@@ -1,13 +1,14 @@
 package com.d211.drtaa.domain.rent.controller;
 
 import com.d211.drtaa.domain.rent.dto.request.*;
-import com.d211.drtaa.domain.rent.dto.response.RentCarLocationResponseDTO;
-import com.d211.drtaa.domain.rent.dto.response.RentDetailResponseDTO;
-import com.d211.drtaa.domain.rent.dto.response.RentResponseDTO;
+import com.d211.drtaa.domain.rent.dto.response.*;
 import com.d211.drtaa.domain.rent.service.RentService;
 import com.d211.drtaa.global.exception.rent.NoAvailableRentCarException;
 import com.d211.drtaa.global.exception.rent.RentCarNotFoundException;
 import com.d211.drtaa.global.exception.rent.RentNotFoundException;
+import com.d211.drtaa.global.exception.travel.TravelAllPlacesVisitedException;
+import com.d211.drtaa.global.exception.travel.TravelNotFoundException;
+import com.d211.drtaa.global.exception.websocket.WebSocketDisConnectedException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -63,7 +64,7 @@ public class RentController {
     }
 
     @GetMapping("/status/active")
-    @Operation(summary = "진행중 & 예약된 렌트 조회", description = "해당 회원의 진행중인 렌트 한개와 예약된 렌트 전체 조회")
+    @Operation(summary = "예약된 렌트 조회", description = "해당 회원의 예약된 렌트 전체 조회")
     public ResponseEntity getActiveRent(Authentication authentication) {
         try {
             List<RentResponseDTO> response = rentService.getActiveRent(authentication.getName());
@@ -99,7 +100,21 @@ public class RentController {
             RentDetailResponseDTO response = rentService.getCurrentRent(authentication.getName());
 
             return ResponseEntity.ok(response); //200
-        } catch(RentNotFoundException e) {
+        } catch(UsernameNotFoundException | RentNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
+        }
+    }
+
+    @GetMapping("/status")
+    @Operation(summary = "렌트 상태와 렌트 차량 상태 확인", description = "회원의 현재 진행중인 렌트 상태와 렌트 차량 상태 확인")
+    public ResponseEntity getRentStatusAndRentCarStatus(Authentication authentication) {
+        try {
+            RentStatusResponseDTO response = rentService.getRentStatusAndRentCarStatus(authentication.getName());
+
+            return ResponseEntity.ok(response); // 200
+        } catch(UsernameNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
@@ -199,6 +214,22 @@ public class RentController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
         } catch (Exception e) {
             log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
+        }
+    }
+
+    @PatchMapping("/today")
+    @Operation(summary = "오늘 렌트 끝내기", description = "오늘에 해당하는 렌트 장소 만료 처리")
+    public ResponseEntity todayRentIsDone(@RequestBody RentCarManipulateRequestDTO rentCarManipulateRequestDTO) {
+        try {
+            RentCarManipulateResponseDTO response = rentService.todayRentIsDone(rentCarManipulateRequestDTO);
+
+            return ResponseEntity.ok(response);
+        } catch (RentNotFoundException | TravelNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
+        } catch (TravelAllPlacesVisitedException e) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(e.getMessage()); // 204
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400
         }
     }

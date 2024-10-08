@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="rentDetail"
             type="com.drtaa.core_model.rent.RentDetail" />
@@ -10,7 +12,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
         <TextView
             android:id="@+id/tv_tour_title"
@@ -19,8 +21,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="25dp"
             android:layout_marginTop="30dp"
-            android:text="대여 현황"
-            android:textSize="26sp"
+            android:text="DRTAA 이용"
+            android:textSize="35sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -51,7 +53,6 @@
                     android:layout_height="match_parent"
                     android:background="@drawable/card_reflection" />
 
-
             </FrameLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -61,7 +62,7 @@
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/constraintLayout2"
                     android:layout_width="match_parent"
-                    android:layout_height="300dp"
+                    android:layout_height="280dp"
                     android:background="#3c3b3f"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -235,9 +236,11 @@
             android:layout_marginTop="20dp"
             android:text="남은시간 : ㅇㅇ분"
             android:textSize="18sp"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/cv_tour_card" />
+            app:layout_constraintTop_toBottomOf="@+id/cv_tour_card"
+            tools:visibility="visible" />
 
 
         <androidx.appcompat.widget.AppCompatButton
@@ -246,11 +249,11 @@
             android:layout_width="150dp"
             android:layout_height="45dp"
             android:layout_marginTop="20dp"
-            android:layout_marginBottom="16dp"
             android:text="연장하기"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:visibility="gone"
             app:layout_constraintStart_toStartOf="@id/cv_tour_card"
-            app:layout_constraintTop_toBottomOf="@+id/tv_tour_remain_time" />
+            app:layout_constraintTop_toBottomOf="@+id/tv_tour_remain_time"
+            tools:visibility="visible" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_get_off_qrcode"
@@ -266,9 +269,23 @@
             android:id="@+id/btn_tour_qrcode"
             android:layout_width="150dp"
             android:layout_height="45dp"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="@id/cv_tour_card"
             app:layout_constraintTop_toTopOf="@+id/btn_tour_extend"
+            app:srcCompat="@drawable/ic_qr_btn"
+            tools:visibility="visible" />
             app:srcCompat="@drawable/ic_qr_btn" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <TextView
+            style="@style/btn_short_black"
+            android:id="@+id/tv_rent_end"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="오늘 일정 끝내기"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btn_tour_extend" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

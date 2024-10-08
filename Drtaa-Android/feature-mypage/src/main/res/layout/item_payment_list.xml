@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="completion"
+            type="com.drtaa.core_model.pay.ResponsePayment" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="10dp"
+            app:cardCornerRadius="40dp"
+            android:elevation="20dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:id="@+id/imageView"
+                    android:layout_width="130dp"
+                    android:layout_height="130dp"
+                    android:alpha="0.3"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="@+id/tv_payment_list_price"
+                    app:layout_constraintStart_toEndOf="@+id/tv_payment_list_type_value"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/ic_rent_payment"
+                    app:paymentImage="@{completion.orderId}"/>
+
+                <TextView
+                    android:id="@+id/tv_payment_product"
+                    style="@style/jua"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    android:text="DRTAA 택시"
+                    app:paymentProduct="@{completion.orderId}"
+                    android:textSize="20sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tv_payment_list_type"
+                    style="@style/ptd_regular"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="결제방식 : "
+                    android:textSize="14sp"
+                    app:layout_constraintStart_toStartOf="@+id/tv_payment_product"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_payment_product" />
+
+                <TextView
+                    android:id="@+id/tv_payment_list_type_value"
+                    style="@style/ptd_semi_bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="네이버페이"
+                    app:paymentMethod="@{completion.paymentMethod}"
+                    android:textColor="#00ef91"
+                    app:layout_constraintBottom_toBottomOf="@+id/tv_payment_list_type"
+                    app:layout_constraintStart_toEndOf="@+id/tv_payment_list_type"
+                    app:layout_constraintTop_toTopOf="@+id/tv_payment_list_type" />
+
+                <TextView
+                    android:id="@+id/tv_payment_list_start"
+                    style="@style/ptd_regular"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="이용 시각 : "
+                    android:textSize="14sp"
+                    app:layout_constraintStart_toStartOf="@+id/tv_payment_list_type"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_payment_list_type" />
+
+                <TextView
+                    android:id="@+id/tv_payment_list_start_value"
+                    style="@style/ptd_semi_bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="2024-10-15"
+                    app:rentTime="@{completion.rentStartTime}"
+                    app:layout_constraintBottom_toBottomOf="@+id/tv_payment_list_start"
+                    app:layout_constraintStart_toEndOf="@+id/tv_payment_list_start"
+                    app:layout_constraintTop_toTopOf="@+id/tv_payment_list_start" />
+
+                <TextView
+                    android:id="@+id/tv_payment_end"
+                    style="@style/ptd_regular"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:text="종료 시각 : "
+                    android:textSize="14sp"
+                    app:layout_constraintStart_toStartOf="@+id/tv_payment_list_start"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_payment_list_start" />
+
+                <TextView
+                    android:id="@+id/tv_payment_end_value"
+                    style="@style/ptd_semi_bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="2024-10-15"
+                    app:rentTime="@{completion.rentEndTime}"
+                    app:layout_constraintBottom_toBottomOf="@+id/tv_payment_end"
+                    app:layout_constraintStart_toEndOf="@+id/tv_payment_end"
+                    app:layout_constraintTop_toTopOf="@+id/tv_payment_end" />
+
+                <TextView
+                    android:id="@+id/tv_payment_list_price"
+                    style="@style/ptd_bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="20dp"
+                    android:text="결제 가격"
+                    android:textColor="@color/sky_blue"
+                    android:textSize="19sp"
+                    app:layout_constraintBottom_toTopOf="@+id/tv_payment_list_price_value"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+                <TextView
+                    android:id="@+id/tv_payment_list_price_value"
+                    style="@style/ptd_semi_bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="4000원"
+                    app:setTextPrice="@{completion.price}"
+                    android:textSize="16sp"
+                    app:layout_constraintBottom_toBottomOf="@+id/tv_payment_end_value"
+                    app:layout_constraintEnd_toEndOf="@+id/tv_payment_list_price" />
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.cardview.widget.CardView>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

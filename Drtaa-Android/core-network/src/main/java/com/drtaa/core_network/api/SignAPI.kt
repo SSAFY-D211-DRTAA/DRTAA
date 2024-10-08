@@ -14,6 +14,7 @@ import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Part
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface SignAPI {
     @Multipart
@@ -51,4 +52,9 @@ interface SignAPI {
 
     @GET("user/info")
     suspend fun getUserInfo(): ResponseUserInfo
+
+    @POST("user/jwt-token")
+    suspend fun getNewAccessToken(
+        @Query("userRefreshToken") refreshToken: String
+    ): ResponseLogin
 }

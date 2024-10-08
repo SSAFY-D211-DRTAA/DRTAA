@@ -4,9 +4,12 @@ import com.d211.drtaa.domain.rent.entity.Rent;
 import com.d211.drtaa.domain.rent.entity.RentStatus;
 import com.d211.drtaa.domain.travel.entity.Travel;
 import com.d211.drtaa.domain.user.entity.User;
+import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import javax.swing.text.html.Option;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +31,12 @@ public interface RentRepository extends JpaRepository<Rent, Long> {
             LocalDateTime rentStartTime,
             LocalDateTime rentEndTime
     );
+    Optional<Rent> findByUserAndRentStatusIn(User user, List<RentStatus> rentStatuses);
+    Optional<Rent> findByUserAndRentStartTimeBetween(User user, LocalDateTime startDate, LocalDateTime endDate);
+    @Query("SELECT r FROM Rent r WHERE r.rentStatus IN (:statuses) " +
+            "AND :today BETWEEN r.rentStartTime AND r.rentEndTime")
+    Optional<Rent> findRentByStatusAndToday(@Param("today") LocalDateTime today,
+                                            @Param("statuses") List<RentStatus> statuses);
 
     List<Rent> findByUser(User user);
     List<Rent> findByUserAndRentStatusInOrderByRentStatusDesc(User user, List<RentStatus> rentStatuses);
@@ -36,6 +45,7 @@ public interface RentRepository extends JpaRepository<Rent, Long> {
             "WHERE r.user = :user AND r.rentStatus = 'completed'")
     List<Rent> findByUserAndRentStatusCompleted(User user);
     List<Rent> findByRentEndTimeBetween(LocalDateTime startDate, LocalDateTime endDate);
+    List<Rent> findByUserAndRentStatus(User user, RentStatus rentStatus);
 
     // exists
     boolean existsByUserAndRentStatusAndRentStartTimeBetweenAndRentEndTimeBetween(

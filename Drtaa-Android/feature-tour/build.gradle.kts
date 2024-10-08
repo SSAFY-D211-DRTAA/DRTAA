@@ -41,5 +41,6 @@ android {
 
 dependencies {
     implementation(libs.androidx.paging.runtime.ktx)
-
+    implementation(project(":feature-travel"))
+    implementation(project(":feature-plan"))
 }

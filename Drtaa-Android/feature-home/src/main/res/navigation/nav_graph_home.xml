@@ -10,12 +10,16 @@
         android:name="com.drtaa.feature_home.HomeFragment"
         android:label="HomeFragment"
         tools:layout="@layout/fragment_home">
+        <deepLink app:uri="drtaa://app/home" />
         <action
             android:id="@+id/action_home_to_rent"
             app:destination="@id/nav_graph_rent" />
         <action
             android:id="@+id/action_homeFragment_to_rentHistoryFragment"
             app:destination="@id/rentHistoryFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_taxiFragment"
+            app:destination="@id/nav_graph_taxi" />
         <action
             android:id="@+id/action_homeFragment_to_nav_graph_plan"
             app:destination="@id/nav_graph_plan" />
@@ -24,8 +28,22 @@
         android:id="@+id/rentHistoryFragment"
         android:name="com.drtaa.feature_home.RentHistoryFragment"
         android:label="RentHistoryFragment"
-        tools:layout="@layout/item_rent_history" />
+        tools:layout="@layout/fragment_rent_history">
+        <action
+            android:id="@+id/action_rentHistoryFragment_to_rentHistorySummaryFragment"
+            app:destination="@id/rentHistorySummaryFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/rentHistorySummaryFragment"
+        android:name="com.drtaa.feature_home.RentHistorySummaryFragment"
+        android:label="RentHistorySummaryFragment"
+        tools:layout="@layout/fragment_rent_history_summary">
+        <argument
+            android:name="rentId"
+            app:argType="long" />
+    </fragment>
+
     <include app:graph="@navigation/nav_graph_rent" />
     <include app:graph="@navigation/nav_graph_plan" />
-
+    <include app:graph="@navigation/nav_graph_taxi" />
 </navigation>

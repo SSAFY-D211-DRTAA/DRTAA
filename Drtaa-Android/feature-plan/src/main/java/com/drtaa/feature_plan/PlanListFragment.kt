@@ -10,8 +10,10 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView
 import com.drtaa.core_map.base.BaseMapFragment
 import com.drtaa.core_map.setCustomLocationButton
-import com.drtaa.core_model.plan.Plan
+import com.drtaa.core_model.plan.DayPlan
+import com.drtaa.core_model.plan.PlanItem
 import com.drtaa.core_model.util.toDate
+import com.drtaa.core_ui.component.OneButtonMessageDialog
 import com.drtaa.core_ui.component.TwoButtonMessageDialog
 import com.drtaa.core_ui.component.TwoButtonTypingDialog
 import com.drtaa.core_ui.showSnackBar
@@ -24,6 +26,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
+import java.time.LocalDate
 
 @AndroidEntryPoint
 class PlanListFragment :
@@ -34,7 +37,7 @@ class PlanListFragment :
     private val planViewModel: PlanViewModel by hiltNavGraphViewModels(R.id.nav_graph_plan)
     private lateinit var viewPagerAdapter: PlanViewPagerAdapter
 
-    private val editPlanList = arrayListOf<ArrayList<Plan.DayPlan.PlanItem>>()
+    private val editPlanList = arrayListOf<ArrayList<PlanItem>>()
 
     private var fragmentList = listOf<DayPlanFragment>()
 
@@ -44,6 +47,11 @@ class PlanListFragment :
 
     override fun onResume() {
         super.onResume()
+
+        if (planViewModel.isNewPlanPage) {
+            initData()
+            planViewModel.isNewPlanPage = false
+        }
 
         planViewModel.plan.value?.let {
             if (!planViewModel.isViewPagerLoaded) {
@@ -56,6 +64,7 @@ class PlanListFragment :
         super.onDestroyView()
         planViewModel.setEditMode(false)
         planViewModel.isViewPagerLoaded = false
+        planViewModel.isNewPlanPage = true
     }
 
     override fun initMapView() {
@@ -76,10 +85,9 @@ class PlanListFragment :
     }
 
     override fun iniView() {
-        initData()
-
         initEvent()
         initObserve()
+        initEditObserve()
 
         planViewModel.plan.value?.let {
             binding.tvPlanTitle.text = it.travelName
@@ -89,10 +97,8 @@ class PlanListFragment :
     }
 
     private fun initData() {
-        planViewModel.setTravelId(args.travelId)
-        if (planViewModel.plan.value == null) {
-            planViewModel.getPlan()
-        }
+        planViewModel.setInfo(args.travelId, args.rentId)
+        planViewModel.getPlan()
     }
 
     private fun initDatePickerDialog() {
@@ -123,29 +129,36 @@ class PlanListFragment :
     }
 
     private fun initObserve() {
-        planViewModel.isEditMode.flowWithLifecycle(viewLifecycleOwner.lifecycle)
-            .onEach { isEditMode ->
-                binding.tvEditPlan.isVisible = !isEditMode
-                binding.tvEditFinish.isVisible = isEditMode
-
-                if (!isEditMode) {
-                    binding.clEditBottomSheet.visibility = View.GONE
-                }
-            }.launchIn(viewLifecycleOwner.lifecycleScope)
-
         planViewModel.plan.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { plan ->
                 if (plan == null) return@onEach
-
+                args.recommend?.let {
+                    if (planViewModel.isAddSuccess.value != true) {
+                        Timber.tag("plan").d("일정 추가를 해줘요 recommend: $it")
+                        showLoading()
+                        planViewModel.addLastPlan(it)
+                    }
+                }
                 binding.tvPlanTitle.text = plan.travelName
-
+                binding.tvPlanDate.text =
+                    "${(plan.travelStartDate + " ~ " + plan.travelEndDate).replace('-', '.')}"
                 if (planViewModel.isViewPagerLoaded) return@onEach
                 initViewPager()
                 initDatePickerDialog()
                 planViewModel.isViewPagerLoaded = true
-                Timber.d("plan: $plan")
             }.launchIn(viewLifecycleOwner.lifecycleScope)
-
+        planViewModel.isAddSuccess.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach {
+            it?.let {
+                if (it) {
+                    dismissLoading()
+                    planViewModel.getPlan()
+                    showSnackBar("일정이 추가되었습니다.")
+                } else {
+                    dismissLoading()
+                    showSnackBar("일정 추가에 실패했습니다.")
+                }
+            }
+        }.launchIn(viewLifecycleOwner.lifecycleScope)
         planViewModel.isEditSuccess.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { isEditSuccess ->
                 if (isEditSuccess == null) return@onEach
@@ -157,6 +170,47 @@ class PlanListFragment :
                 }
                 planViewModel.setIsEditSuccess(null)
             }.launchIn(viewLifecycleOwner.lifecycleScope)
+    }
+
+    private fun initEditObserve() {
+        planViewModel.isEditMode.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach { isEditMode ->
+                binding.tvEditPlan.isVisible = !isEditMode
+                binding.tvEditFinish.isVisible = isEditMode
+
+                if (!isEditMode) {
+                    binding.clEditBottomSheet.visibility = View.GONE
+                }
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+        planViewModel.dayPlan.flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach { dayPlan ->
+                if (dayPlan == null) return@onEach
+
+                updateDayPlanText(dayPlan)
+
+                val targetDate = LocalDate.parse(dayPlan.travelDatesDate)
+                val today = LocalDate.now()
+                if ((today > targetDate) or dayPlan.travelDatesIsExpired) {
+                    setEditable(false)
+                } else {
+                    setEditable(true)
+                }
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
+    }
+
+    private fun setEditable(isEditable: Boolean) {
+        binding.apply {
+            if (isEditable) {
+                tvEditPlan.isVisible = !planViewModel.isEditMode.value
+                tvEditFinish.isVisible = planViewModel.isEditMode.value
+                ivAddPlan.isVisible = true
+            } else {
+                tvEditPlan.isVisible = false
+                tvEditFinish.isVisible = false
+                ivAddPlan.isVisible = false
+            }
+        }
     }
 
     private fun initEvent() {
@@ -188,6 +242,17 @@ class PlanListFragment :
         binding.btnDeletePlan.setOnClickListener {
             if (editPlanList[binding.vpPlanDay.currentItem].isEmpty()) {
                 showSnackBar("삭제할 일정이 없습니다.")
+                return@setOnClickListener
+            }
+
+            val afterDeleteListSize = planViewModel.dayPlan.value?.let { dayPlan ->
+                editPlanList[binding.vpPlanDay.currentItem].size - dayPlan.placesDetail.size
+            }
+            if (afterDeleteListSize == 0) {
+                OneButtonMessageDialog(
+                    context = requireActivity(),
+                    message = "일정은 최소 하나 이상 남아있어야 합니다.",
+                ).show()
                 return@setOnClickListener
             }
 
@@ -225,9 +290,16 @@ class PlanListFragment :
                 if (dayPlan == null) return@onEach
 
                 naverMap.clearMarkerList()
-                dayPlan.placesDetail.forEach { place ->
-                    naverMap.addMarker(place.datePlacesLat, place.datePlacesLon)
+
+                dayPlan.placesDetail.forEachIndexed { index, place ->
+                    naverMap.addMarker(
+                        place.datePlacesLat,
+                        place.datePlacesLon,
+                        index + 1,
+                        place.datePlacesName
+                    )
                 }
+
                 naverMap.adjustCamera()
             }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
@@ -245,6 +317,9 @@ class PlanListFragment :
                             if (planViewModel.isEditMode.value) {
                                 editPlan(planItem)
                             }
+                        },
+                        onPlanClickListener = { planItem ->
+                            moveToTravel(planItem)
                         }
                     )
                 }
@@ -269,12 +344,20 @@ class PlanListFragment :
         }
     }
 
-    private fun getRVAdapterList(): List<Plan.DayPlan.PlanItem> {
+    private fun moveToTravel(planItem: PlanItem) {
+        navigateDestination(
+            PlanListFragmentDirections.actionFragmentPlanToNavGraphTravel(
+                planItem = planItem
+            )
+        )
+    }
+
+    private fun getRVAdapterList(): List<PlanItem> {
         val dayIdx = binding.vpPlanDay.currentItem
         return fragmentList[dayIdx].planListAdapter.currentList
     }
 
-    private fun editPlan(planItem: Plan.DayPlan.PlanItem) {
+    private fun editPlan(planItem: PlanItem) {
         val dayIdx = binding.vpPlanDay.currentItem
 
         binding.clEditBottomSheet.visibility = View.VISIBLE
@@ -310,7 +393,7 @@ class PlanListFragment :
         }
     }
 
-    private fun updateDayPlanText(dayPlan: Plan.DayPlan) {
+    private fun updateDayPlanText(dayPlan: DayPlan) {
         binding.tvPlanDay.text =
             "Day ${binding.vpPlanDay.currentItem + 1} ${dayPlan.travelDatesDate.toDate()}"
     }

@@ -5,6 +5,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
+import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.core.view.isVisible
 import androidx.lifecycle.flowWithLifecycle
@@ -12,6 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
+import com.drtaa.core_model.map.Search
 import com.drtaa.core_ui.base.BaseActivity
 import com.drtaa.core_ui.component.LocationHelper
 import com.drtaa.core_ui.showToast
@@ -34,11 +36,33 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
     lateinit var locationHelper: LocationHelper
     private lateinit var navController: NavController
     private val viewModel: MainViewModel by viewModels()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        initFCMMessage()
+    }
+
     override fun init() {
         initBottomNavBar()
         initLocationPermission()
         initFCM()
         initNotificationChannel(CHANNEL_ID, CHANNEL_NAME)
+    }
+
+    private fun initFCMMessage() {
+        val searchRequest = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getParcelableExtra<Search>("recommend", Search::class.java)
+        } else {
+            intent.getParcelableExtra<Search>("recommend")
+        }
+
+        searchRequest?.let {
+            val bundle = Bundle().apply {
+                putParcelable("recommend", searchRequest)
+            }
+            Timber.tag("추천").d("추천 Request: $searchRequest")
+            navController.navigate(com.drtaa.feature_plan.R.id.nav_graph_plan, bundle)
+        }
     }
 
     private fun initFCM() {
@@ -57,6 +81,10 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
             .addOnFailureListener { task ->
                 Timber.tag("fcm").d("FCM토큰 얻기 실패 $task")
             }
+
+        FirebaseMessaging.getInstance().subscribeToTopic("1").addOnSuccessListener {
+            Timber.tag("fcm").d("participantsMeetingDetailTable: success subscribed")
+        }
     }
 
     private fun initLocationPermission() {
@@ -123,9 +151,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
         binding.apply {
             bottomNavigationBar.background = null
             bottomNavigationBar.setupWithNavController(navController)
-            bottomNavigationBar.setOnItemReselectedListener {
-                // 바텀메뉴 선택 시
-            }
             setBottomNavHide()
         }
     }

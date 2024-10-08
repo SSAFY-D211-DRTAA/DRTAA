@@ -1,6 +1,7 @@
 package com.drtaa.feature_mypage
 
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.os.Environment
 import android.widget.TextView
@@ -8,7 +9,10 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import com.drtaa.core_auth.SocialLoginManager
 import com.drtaa.core_ui.base.BaseFragment
+import com.drtaa.core_ui.component.TwoButtonMessageDialog
 import com.drtaa.core_ui.showSnackBar
 import com.drtaa.feature_mypage.databinding.FragmentMyPageBinding
 import com.drtaa.feature_mypage.viewmodel.MyPageViewModel
@@ -19,10 +23,14 @@ import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
 import java.security.SecureRandom
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MyPageFragment : BaseFragment<FragmentMyPageBinding>(R.layout.fragment_my_page) {
     private val myPageViewModel: MyPageViewModel by viewModels()
+
+    @Inject
+    lateinit var socialLoginManager: SocialLoginManager
 
     private val getContent =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
@@ -33,7 +41,6 @@ class MyPageFragment : BaseFragment<FragmentMyPageBinding>(R.layout.fragment_my_
         }
 
     override fun initView() {
-        //인잇
         setupMyPageItems()
         initObserve()
         initEvent()
@@ -43,6 +50,12 @@ class MyPageFragment : BaseFragment<FragmentMyPageBinding>(R.layout.fragment_my_
     }
 
     private fun initObserve() {
+        myPageViewModel.logoutState.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach {
+            if (it) {
+                dismissLoading()
+                restartApp()
+            }
+        }.launchIn(viewLifecycleOwner.lifecycleScope)
         myPageViewModel.currentUser.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { result ->
                 if (result == null) return@onEach
@@ -81,9 +94,9 @@ class MyPageFragment : BaseFragment<FragmentMyPageBinding>(R.layout.fragment_my_
                 }
             }
             llMypageItem2.apply {
-                findViewById<TextView>(R.id.tv_mypage_item_title).text = "머하죠?"
+                findViewById<TextView>(R.id.tv_mypage_item_title).text = "결제 내역"
                 setOnClickListener {
-                    showSnackBar("2클릭")
+                    findNavController().navigate(R.id.action_myPageFragment_to_paymentListFragment)
                 }
             }
             llMypageItem3.apply {
@@ -93,12 +106,31 @@ class MyPageFragment : BaseFragment<FragmentMyPageBinding>(R.layout.fragment_my_
                 }
             }
             llMypageItem4.apply {
-                findViewById<TextView>(R.id.tv_mypage_item_title).text = "내 정보?"
+                findViewById<TextView>(R.id.tv_mypage_item_title).text = "로그아웃"
                 setOnClickListener {
-                    showSnackBar("4클릭")
+                    TwoButtonMessageDialog(
+                        context = requireActivity(),
+                        message = "로그아웃 하시겠습니까?",
+                        onCheckClick = {
+                            socialLoginManager.logout("Naver", requireActivity())
+                            myPageViewModel.logout()
+                            showLoading()
+                        }
+                    ).show()
                 }
             }
         }
+    }
+
+    private fun restartApp() {
+        val intent =
+            requireContext().packageManager.getLaunchIntentForPackage(requireContext().packageName)
+        intent?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+
+        // 현재 액티비티 종료 후 바로 새로운 액티비티 실행
+        requireActivity().startActivity(intent)
+        requireActivity().finish()
+        Runtime.getRuntime().exit(0) // 앱 프로세스 종료
     }
 
     private fun handleImage(imageUri: Uri) {

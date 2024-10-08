@@ -24,6 +24,7 @@ from utils.logger import setup_logger
 from scripts.curve_simplification import simplify_curve
 from scripts.gps_converter import GPSConverter
 from scripts.convert_json import convert_points_to_json
+# from scripts.path_calculator import haversine
 
 logger = setup_logger(__name__)
 
@@ -31,10 +32,13 @@ logger = setup_logger(__name__)
 CONFIG_FILE_PATH = 'config.json'
 GPS_TOPIC = "/gps"
 IMU_TOPIC = "/imu"
+ODOM_TOPIC = "/odom"
 COMPLETE_DRIVE_TOPIC = "/complete_drive"
+
 MOVE_BASE_GOAL_TOPIC = "/move_base_simple/goal"
 COMMAND_STATUS_TOPIC = "/command_status"
-
+PASSENGER_DROP_OFF_TOPIC = "/passenger_dropoff" # 하차 시 전달 Topic
+PASSENGER_CALL_TOPIC = "/is_changing_line"
 GLOBAL_PATH_TOPIC = "/global_path"
 
 current_goal_index = 0
@@ -58,6 +62,10 @@ db_port = int(os.getenv('DB_PORT'))
 db_user = os.getenv('DB_USER')
 db_password = os.getenv('DB_PASSWD')
 db_database = os.getenv('DB_DATABASE')
+
+car_id = None
+dst_name = None
+cmd_status = None
 
 # 설정 파일 로드
 def load_config() -> Dict[str, Union[str, float, int]]:
@@ -186,9 +194,9 @@ def publish_next_goal(ws: websocket.WebSocketApp) -> None:
         logger.info("모든 목표 위치에 도달했습니다.")
         current_goal_index = 0
 
-def publish_command_status(ws: WebSocketApp, status: str) -> None:
+def publish_passenger_dropoff(ws: WebSocketApp, status: bool) -> None:
     """
-    GPS 좌표를 이용하여 로봇의 목표 위치를 발행합니다.
+    승객 하차 Topic을 발행합니다.
 
     :param ws: WebSocket 연결
     :param status: 상태
@@ -196,8 +204,26 @@ def publish_command_status(ws: WebSocketApp, status: str) -> None:
 
     msg = {
         "op": "publish",
-        "topic": COMMAND_STATUS_TOPIC,
-        "type": "std_msgs/String",
+        "topic": PASSENGER_DROP_OFF_TOPIC,
+        "type": "std_msgs/Bool",
+        "msg": {
+            "data": status
+        }
+    }
+    ws.send(json.dumps(msg))
+    
+def publish_passenger_call(ws: WebSocketApp, status: bool) -> None:
+    """
+    승객 호출 Topic을 발행합니다.
+
+    :param ws: WebSocket 연결
+    :param status: 상태
+    """
+
+    msg = {
+        "op": "publish",
+        "topic": PASSENGER_CALL_TOPIC,
+        "type": "std_msgs/Bool",
         "msg": {
             "data": status
         }
@@ -246,7 +272,7 @@ rent_car_api_client: RentCarAPI = None
 db_api_client: DBClient = None
 
 def on_ros_bridge_message(ws: WebSocketApp, message: str) -> None:
-    global gps_count_index, imu_count_index
+    global car_id, dst_name, gps_count_index, imu_count_index
     try:
         data: Dict[str, Any] = json.loads(message)
         if data['op'] == 'publish':
@@ -305,7 +331,17 @@ def on_ros_bridge_message(ws: WebSocketApp, message: str) -> None:
                     except IOError as e:
                         logger.error(f"Orientation 데이터를 파일에 저장하는 중 오류 발생: {e}")
                     send_to_ec2(orientation_data)
-
+            elif data['topic'] == ODOM_TOPIC:
+                msg_data = data['msg']
+                odom_data = {
+                    "tag": "odom",
+                    "msg": msg_data
+                }
+                try:
+                    with open(f'{data_dir}/odom_data.json', 'w') as f:
+                        json.dump(odom_data, f)
+                except IOError as e:
+                    logger.error(f"Odom 데이터를 파일에 저장하는 중 오류 발생: {e}")
             elif data['topic'] == COMPLETE_DRIVE_TOPIC:
                 logger.info("도착지에 도착했습니다.")
                 msg_data = data['msg']
@@ -320,7 +356,12 @@ def on_ros_bridge_message(ws: WebSocketApp, message: str) -> None:
                     logger.error(f"완료 데이터를 파일에 저장하는 중 오류 발생: {e}")
 
                 send_to_ec2(complete_data)
-                rent_car_api_client.send_arrival_info(rent_car_id=1, expected_minutes=0, arrived=True)
+                
+                if dst_name is None or dst_name == "undefined":
+                    contents = f"차량이 목적지에 도착했습니다."
+                else:
+                    contents = f"{dst_name}에 도착했습니다."
+                rent_car_api_client.send_arrival_info(rent_car_id=car_id, contents=contents)
 
             elif data['topic'] == GLOBAL_PATH_TOPIC:
                 path_data = data['msg']
@@ -343,7 +384,18 @@ def on_ros_bridge_message(ws: WebSocketApp, message: str) -> None:
                 path_data = convert_points_to_json(gps_coordinates)
 
                 send_to_ec2(path_data)
+                
+            elif data['topic'] == COMMAND_STATUS_TOPIC:
+                status_data = data['msg']
 
+                try:
+                    with open(f'{data_dir}/command_status_data.json', 'w') as f:
+                        json.dump(status_data, f)
+                except IOError as e:
+                    logger.error(f"Command Status 데이터를 파일에 저장하는 중 오류 발생: {e}")
+                
+                cmd_status = data['msg']['data']
+                
     except json.JSONDecodeError:
         logger.error("잘못된 JSON 형식의 메시지를 받았습니다.")
     except KeyError as e:
@@ -362,35 +414,38 @@ def on_ros_bridge_open(ws: WebSocketApp) -> None:
 
     subscribe(ws, GPS_TOPIC, "morai_msgs/GPSMessage") # GPS
     subscribe(ws, IMU_TOPIC, "sensor_msgs/Imu") # IMU
+    subscribe(ws, ODOM_TOPIC, "nav_msgs/Odometry") # ODOM
+    
     subscribe(ws, COMPLETE_DRIVE_TOPIC, "geometry_msgs/PoseStamped")
     subscribe(ws, GLOBAL_PATH_TOPIC, "nav_msgs/Path")
     subscribe(ws, COMMAND_STATUS_TOPIC, "std_msgs/String")
 
 
 def on_ec2_message(ws: WebSocketApp, message: str) -> None:
+    global car_id, dst_name, cmd_status
     logger.info(f"EC2로부터 메시지 수신: {message}")
     try:
         data: Dict[str, Any] = json.loads(message)
 
         action = data.get('action', 'default')
         car_id = data.get('rentCarId', 1)
+        dst_name = data.get('destinationName', 'undefined')
 
         if action == 'vehicle_dispatch':
-            publish_command_status(ros_bridge_ws, 'dispatch')
             db_api_client.update_rent_car_status(car_id=car_id, status=VehicleStatus.CALLING)
             publish_pose_from_gps(ros_bridge_ws, data['latitude'], data['longitude'])
+            
+            if cmd_status == "parked":
+                publish_passenger_call(ros_bridge_ws, True)
         elif action == 'vehicle_return':
-            publish_command_status(ros_bridge_ws, 'return')
             db_api_client.update_rent_car_status(car_id=car_id, status=VehicleStatus.IDLING)
             publish_pose_from_gps(ros_bridge_ws, config['lat_return'], config['lon_return'])
         elif action == 'vehicle_drive':
-            publish_command_status(ros_bridge_ws, 'drive')
             db_api_client.update_rent_car_status(car_id=car_id, status=VehicleStatus.DRIVING)
             publish_pose_from_gps(ros_bridge_ws, data['latitude'], data['longitude'])
         elif action == 'vehicle_wait':
-            publish_command_status(ros_bridge_ws, 'wait')
             db_api_client.update_rent_car_status(car_id=car_id, status=VehicleStatus.WAITING)
-            publish_next_goal(ros_bridge_ws)
+            publish_passenger_dropoff(ros_bridge_ws, True)
         elif action == 'default':
             pass
             
@@ -437,6 +492,8 @@ def signal_handler(sig: int, frame: Any) -> None:
     if ros_bridge_ws:
         unsubscribe(ros_bridge_ws, GPS_TOPIC)
         unsubscribe(ros_bridge_ws, IMU_TOPIC)
+        unsubscribe(ros_bridge_ws, ODOM_TOPIC)
+        
         unsubscribe(ros_bridge_ws, COMPLETE_DRIVE_TOPIC)
         unsubscribe(ros_bridge_ws, GLOBAL_PATH_TOPIC)
         unsubscribe(ros_bridge_ws, COMMAND_STATUS_TOPIC)

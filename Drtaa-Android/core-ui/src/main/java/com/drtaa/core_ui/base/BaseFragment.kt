@@ -68,6 +68,7 @@ abstract class BaseFragment<T : ViewDataBinding>(private val layoutResId: Int) :
     }
 
     override fun onDestroyView() {
+        dismissLoading()
         super.onDestroyView()
         _binding = null
     }

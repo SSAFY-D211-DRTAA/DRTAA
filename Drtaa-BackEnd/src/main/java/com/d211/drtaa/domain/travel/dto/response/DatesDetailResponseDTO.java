@@ -19,6 +19,8 @@ public class DatesDetailResponseDTO {
     private Long travelDatesId;
     @Schema(description = "여행 일정 날짜", example = "2024/01/01")
     private LocalDate travelDatesDate;
+    @Schema(description = "여행 일정 만료 여부", example = "false")
+    private Boolean travelDatesIsExpired;
 
     private List<PlacesDetailResponseDTO> placesDetail = new ArrayList<>();
 }

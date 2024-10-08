@@ -93,6 +93,7 @@ class MqttManager @Inject constructor() {
         client.subscribeWith()
             .addSubscription(mqtt5Subscription(GPS_PUB))
             .addSubscription(mqtt5Subscription(PATH_PUB))
+            .addSubscription(mqtt5Subscription(ORIENTATION_PUB))
             .callback { publish: Mqtt5Publish ->
                 Timber.tag(TAG).d("$publish")
                 val topic = publish.topic.toString()
@@ -101,6 +102,17 @@ class MqttManager @Inject constructor() {
                     _connectionStatus.emit(1)
                     when (topic) {
                         GPS_PUB -> {
+                            kotlin.runCatching {
+                                gson.fromJson(message, ResponseGPS::class.java)
+                            }.onSuccess { parsedMessage ->
+                                _receivedGPSMessages.emit(parsedMessage)
+                                Timber.tag(TAG).d("GPS 데이터 수신: $parsedMessage")
+                            }.onFailure { e ->
+                                Timber.tag(TAG).e(e, "GPS 메시지 파싱 실패")
+                            }
+                        }
+
+                        ORIENTATION_PUB -> {
                             kotlin.runCatching {
                                 gson.fromJson(message, ResponseGPS::class.java)
                             }.onSuccess { parsedMessage ->
@@ -139,13 +151,13 @@ class MqttManager @Inject constructor() {
         .qos(MqttQos.AT_LEAST_ONCE)
         .build()
 
-    fun publishMessage(message: String) {
+    fun publishMessage(message: String, topic: String) {
         if (!isConnected) {
             Timber.tag(TAG).w("MQTT가 연결되어 있지 않습니다. 메시지를 보낼 수 없습니다.")
             return
         }
         client.publishWith()
-            .topic(GPS_SUB)
+            .topic(topic)
             .qos(MqttQos.EXACTLY_ONCE)
             .payload(message.toByteArray())
             .send()
@@ -173,9 +185,9 @@ class MqttManager @Inject constructor() {
         private const val MAX_TRY = 10
         private const val MAX_RECONNECT_DELAY = 20000L // 최대 30초
         private const val INITIAL_RECONNECT_DELAY = 1000L // 초기 1초
-        private const val GPS_SUB = "gps/data/v1/subscribe"
         private const val GPS_PUB = "gps/data/v1/publish"
-//        private const val PATH_SUB = "path/data/v1/subscribe"
+
         private const val PATH_PUB = "path/data/v1/publish"
+        private const val ORIENTATION_PUB = "orientation/data/v1/publish"
     }
 }

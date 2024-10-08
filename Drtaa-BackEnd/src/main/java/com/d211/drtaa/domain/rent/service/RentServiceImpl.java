@@ -1,8 +1,10 @@
 package com.d211.drtaa.domain.rent.service;
 
 import com.d211.drtaa.domain.rent.dto.request.*;
+import com.d211.drtaa.domain.rent.dto.response.RentCarManipulateResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentDetailResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentResponseDTO;
+import com.d211.drtaa.domain.rent.dto.response.RentStatusResponseDTO;
 import com.d211.drtaa.domain.rent.entity.Rent;
 import com.d211.drtaa.domain.rent.entity.RentStatus;
 import com.d211.drtaa.domain.rent.entity.car.RentCar;
@@ -26,6 +28,8 @@ import com.d211.drtaa.global.config.websocket.WebSocketConfig;
 import com.d211.drtaa.global.exception.rent.RentCarNotFoundException;
 import com.d211.drtaa.global.exception.rent.RentCarScheduleNotFoundException;
 import com.d211.drtaa.global.exception.rent.RentNotFoundException;
+import com.d211.drtaa.global.exception.travel.TravelAllPlacesVisitedException;
+import com.d211.drtaa.global.exception.travel.TravelNotFoundException;
 import com.d211.drtaa.global.exception.websocket.WebSocketDisConnectedException;
 import com.d211.drtaa.global.util.fcm.FcmMessage;
 import com.d211.drtaa.global.util.fcm.FcmUtil;
@@ -47,6 +51,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -80,10 +85,13 @@ public class RentServiceImpl implements RentService{
         for(Rent rent: rents) {
             RentResponseDTO dto = RentResponseDTO.builder()
                     .rentId(rent.getRentId())
+                    .travelName(rent.getTravel().getTravelName())
                     .rentStatus(rent.getRentStatus())
-                    .rentHeadCount(rent.getRentHeadCount())
                     .rentTime(rent.getRentTime())
-                    .rentStartTime(rent.getRentStartTime())
+                    .rentHeadCount(rent.getRentHeadCount())
+                    .rentPrice(rent.getRentPrice())
+                    .rentStartTime(rent.getRentStartTime().toLocalDate())
+                    .rentEndTime(rent.getRentEndTime().toLocalDate())
                     .build();
 
             response.add(dto);
@@ -106,9 +114,12 @@ public class RentServiceImpl implements RentService{
             RentResponseDTO dto = RentResponseDTO.builder()
                     .rentId(rent.getRentId())
                     .rentStatus(rent.getRentStatus())
-                    .rentHeadCount(rent.getRentHeadCount())
                     .rentTime(rent.getRentTime())
-                    .rentStartTime(rent.getRentStartTime())
+                    .rentTime(rent.getRentTime())
+                    .rentHeadCount(rent.getRentHeadCount())
+                    .rentPrice(rent.getRentPrice())
+                    .rentStartTime(rent.getRentStartTime().toLocalDate())
+                    .rentEndTime(rent.getRentEndTime().toLocalDate())
                     .build();
 
             response.add(dto);
@@ -123,18 +134,20 @@ public class RentServiceImpl implements RentService{
         User user = userRepository.findByUserProviderId(userProviderId)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 userProviderId의 맞는 회원을 찾을 수 없습니다."));
 
-        // 사용자의 진행중 & 예약중인 렌트 찾기
-        List<Rent> rents = rentRepository.findByUserAndRentStatusInOrderByRentStatusDesc(
-                user, Arrays.asList(RentStatus.in_progress, RentStatus.reserved));
+        // 사용자의 예약중인 렌트 찾기
+        List<Rent> rents = rentRepository.findByUserAndRentStatus(user, RentStatus.reserved);
 
         List<RentResponseDTO> response = new ArrayList<>();
         for(Rent rent: rents) {
             RentResponseDTO dto = RentResponseDTO.builder()
                     .rentId(rent.getRentId())
                     .rentStatus(rent.getRentStatus())
-                    .rentHeadCount(rent.getRentHeadCount())
                     .rentTime(rent.getRentTime())
-                    .rentStartTime(rent.getRentStartTime())
+                    .rentTime(rent.getRentTime())
+                    .rentHeadCount(rent.getRentHeadCount())
+                    .rentPrice(rent.getRentPrice())
+                    .rentStartTime(rent.getRentStartTime().toLocalDate())
+                    .rentEndTime(rent.getRentEndTime().toLocalDate())
                     .build();
 
             response.add(dto);
@@ -154,6 +167,12 @@ public class RentServiceImpl implements RentService{
         // 렌트 차량 스케즐 가져오기
         RentCarSchedule carSchedule = rentCarScheduleRepository.findByRentRentId(rent.getRentId())
                 .orElseThrow(() -> new RentCarScheduleNotFoundException("해당 rentId의 맞는 렌트 차량 스케줄을 찾을 수 없습니다."));
+
+        // 렌트 첫 날 일정 가져오기
+        TravelDates firstDate = travelDatesRepository.findFirstByTravel(travel);
+
+        // 첫날 첫 장소 가져오기
+        DatePlaces firstPlace = datePlacesRepository.findFirstByTravelDates(firstDate);
 
         RentDetailResponseDTO response = RentDetailResponseDTO.builder()
                 // rent
@@ -176,6 +195,7 @@ public class RentServiceImpl implements RentService{
                 .rentCarScheduleId(carSchedule.getRentCarScheduleId())
                 // travel
                 .travelId(travel.getTravelId())
+                .datePlacesName(firstPlace.getDatePlacesName())
                 .build();
 
         return response;
@@ -217,6 +237,31 @@ public class RentServiceImpl implements RentService{
                 .build();
 
         return response;
+    }
+
+    @Override
+    public RentStatusResponseDTO getRentStatusAndRentCarStatus(String userProviderId) {
+        // 사용자 찾기
+        User user = userRepository.findByUserProviderId(userProviderId)
+                .orElseThrow(() -> new UsernameNotFoundException("해당 userProviderId의 맞는 회원을 찾을 수 없습니다."));
+
+        // 응답
+        RentStatusResponseDTO response = RentStatusResponseDTO.builder().build();
+
+        try {
+            // 오늘 날짜 기준 사용자의 렌트 찾기
+            LocalDateTime startDate = LocalDateTime.now().plusDays(0).withHour(0).withMinute(0).withSecond(0);
+            LocalDateTime endDate = LocalDateTime.now().plusDays(0).withHour(23).withMinute(59).withSecond(59);
+            Rent rent = rentRepository.findByUserAndRentStartTimeBetween(user, startDate, endDate)
+                    .orElseThrow(() -> new RentNotFoundException("오늘 날짜 기준 사용자의 렌트가 없습니다."));
+
+            response.setRentStatus(rent.getRentStatus());
+            response.setRentCarDrivingStatus(rent.getRentCar().getRentCarDrivingStatus());
+
+            return response;
+        } catch (RentNotFoundException e) {
+            return response;
+        }
     }
 
     @Override
@@ -299,34 +344,32 @@ public class RentServiceImpl implements RentService{
             TravelDates travelDates = TravelDates.builder()
                     .travel(travel)
                     .travelDatesDate(startDate)
+                    .travelDatesIsExpired(false)
                     .build();
 
             // 여행별 일정 저장
             travelDatesRepository.save(travelDates);
 
+            // 각 일정 별 첫번째 장소(탑승 장소) 추가하기
+            DatePlaces dptPlace = DatePlaces.builder()
+                    .travel(travel)
+                    .travelDates(travelDates)  // 현재 일정에 대한 장소 추가
+                    .datePlacesOrder(1)
+                    .datePlacesName(rentCreateRequestDTO.getDatePlacesName())
+                    .datePlacesCategory(rentCreateRequestDTO.getDatePlacesCategory())
+                    .datePlacesAddress(rentCreateRequestDTO.getDatePlacesAddress())
+                    .datePlacesLat(rentCreateRequestDTO.getRentDptLat())
+                    .datePlacesLon(rentCreateRequestDTO.getRentDptLon())
+                    .datePlacesIsVisited(false)
+                    .datePlacesIsExpired(false)
+                    .build();
+
+            // 추가한 장소 저장
+            datePlacesRepository.save(dptPlace);
+
             // 다음날로 이동
             startDate = startDate.plusDays(1);
         }
-
-        // 첫 번째 일정 찾기
-        TravelDates firstTravelDate = travelDatesRepository.findFirstByTravelOrderByTravelDatesDateAsc(travel)
-                .orElseThrow(() -> new RuntimeException("여행 일정이 존재하지 않습니다."));
-
-        // 여행 별 일정의 첫번째 일정에 탑승 장소 추가하기
-        DatePlaces dptPlace = DatePlaces.builder()
-                .travel(travel)
-                .travelDates(firstTravelDate)
-                .datePlacesOrder(1)
-                .datePlacesName(rentCreateRequestDTO.getDatePlacesName())
-                .datePlacesCategory(rentCreateRequestDTO.getDatePlacesCategory())
-                .datePlacesAddress(rentCreateRequestDTO.getDatePlacesAddress())
-                .datePlacesLat(rentCreateRequestDTO.getRentDptLat())
-                .datePlacesLon(rentCreateRequestDTO.getRentDptLon())
-                .datePlacesIsVisited(false)
-                .build();
-
-        // 추가한 장소 저장
-        datePlacesRepository.save(dptPlace);
 
         // 렌트 생성
         Rent rent = Rent.builder()
@@ -428,19 +471,19 @@ public class RentServiceImpl implements RentService{
 
         // 상태 변경
         rent.setRentStatus(RentStatus.completed); // 완료
+        car.setRentCarDrivingStatus(RentDrivingStatus.idling); // 무상태
         carSchedule.setRentCarScheduleIsDone(true); // 완료
-        
+
         // 렌트 기록 생성
         RentHistory history = RentHistory.builder()
                 .user(rent.getUser())
                 .rent(rent)
                 .build();
 
-        // 생성된 기록 저장
-        rentHistoryRepository.save(history);
-
         // 변경 상태 저장
+        rentHistoryRepository.save(history);
         rentRepository.save(rent);
+        rentCarRepository.save(car);
         rentCarScheduleRepository.save(carSchedule);
 
         // 자율주행 서버로 반납 상태 전송
@@ -510,5 +553,53 @@ public class RentServiceImpl implements RentService{
 
         // 변경 상태 저장
         rentRepository.save(rent);
+    }
+
+    @Override
+    public RentCarManipulateResponseDTO todayRentIsDone(RentCarManipulateRequestDTO rentCarManipulateRequestDTO) {
+        // rentId에 해당하는 렌트 찾기
+        Rent rent = rentRepository.findByRentId(rentCarManipulateRequestDTO.getRentId())
+                .orElseThrow(() -> new RentNotFoundException("해당 rentId의 맞는 렌트를 찾을 수 없습니다."));
+
+        // 해당 렌트에 맞는 여행 = travelId에 해당하는 여행
+        Travel travel = rent.getTravel();
+
+        // travelDatesId에 해당하는 일정 찾기
+        TravelDates date = travelDatesRepository.findByTravelDatesId(rentCarManipulateRequestDTO.getTravelDatesId())
+                .orElseThrow(() -> new TravelNotFoundException("해당 travelDatesId에 맞는 일정을 찾을 수 없습니다."));
+
+        // 일정 만료 처리
+        date.setTravelDatesIsExpired(true);
+
+        // 변경 상태 저장
+        travelDatesRepository.save(date);
+
+        // 해당 일정에 맞는 장소들 isExpired false인 것들 찾기
+        List<DatePlaces> expirePlaces = datePlacesRepository.findByTravelDatesAndDatePlacesIsExpiredFalse(date);
+
+        // 장소들 모두 isExpired true 처리
+        for(DatePlaces place : expirePlaces) {
+            place.setDatePlacesIsExpired(true);
+
+            // 변경 상태 저장
+            datePlacesRepository.save(place);
+        }
+
+        // 다음 날 일정 찾기
+        TravelDates nextDate = travelDatesRepository.findByTravelDatesId(date.getTravelDatesId() + 1)
+                .orElseThrow(() -> new TravelAllPlacesVisitedException("해당 travelDatesId의 다음날 일정을 찾을 수 없습니다. 렌트 일정이 완료되었습니다."));
+
+        // 다음날 첫번째 여행지 찾기
+        DatePlaces nextDayPlace = datePlacesRepository.findByTravelDatesAndDatePlacesOrder(nextDate, 1)
+                .orElseThrow(() -> new TravelNotFoundException("다음 날의 첫번째 장소를 찾을 수 없습니다. 다음날 장소를 추가해주세요."));
+
+        // 응답 생성
+        RentCarManipulateResponseDTO response = RentCarManipulateResponseDTO.builder()
+                .travelId(travel.getTravelId())
+                .travelDatesId(nextDate.getTravelDatesId())
+                .datePlacesId(nextDayPlace.getDatePlacesId())
+                .build();
+
+        return response;
     }
 }

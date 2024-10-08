@@ -4,12 +4,13 @@ import android.content.Intent
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.bumptech.glide.Glide
 import com.drtaa.core_model.util.Social
 import com.drtaa.core_ui.base.BaseFragment
 import com.drtaa.core_ui.showSnackBar
 import com.drtaa.feature_main.MainActivity
 import com.drtaa.feature_sign.databinding.FragmentSignInBinding
-import com.drtaa.feature_sign.util.SocialLoginManager
+import com.drtaa.core_auth.SocialLoginManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -25,16 +26,18 @@ class SignInFragment : BaseFragment<FragmentSignInBinding>(R.layout.fragment_sig
     lateinit var socialLoginManager: SocialLoginManager
 
     override fun initView() {
+        Glide.with(this).load(R.raw.car_loading).into(binding.ivLoginCar)
+        showLoading()
+        autoSignIn()
         initEvent()
         initObserver()
     }
 
-    private fun initEvent() {
-        binding.btnSignInMoveToMain.setOnClickListener {
-            startActivity(Intent(requireContext(), MainActivity::class.java))
-            requireActivity().finish()
-        }
+    private fun autoSignIn() {
+        signViewModel.getTokens()
+    }
 
+    private fun initEvent() {
         binding.btnSignInNaver.setOnClickListener {
             socialLoginManager.login(Social.NAVER.type, requireActivity())
         }
@@ -73,6 +76,7 @@ class SignInFragment : BaseFragment<FragmentSignInBinding>(R.layout.fragment_sig
                     startActivity(Intent(requireContext(), MainActivity::class.java))
                     requireActivity().finish()
                 }.onFailure {
+                    dismissLoading()
                     showSnackBar("로그인에 실패하였습니다.")
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
