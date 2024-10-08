@@ -126,6 +126,7 @@
             android:id="@+id/rv_tour"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
             android:overScrollMode="never"
             android:scrollbars="none"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
@@ -134,5 +135,16 @@
             tools:listitem="@layout/item_tour"
             tools:visibility="visible" />
 
+        <TextView
+            android:id="@+id/tv_tour_error"
+            style="@style/jua"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="30dp"
+            android:text="오류가 발생했습니다\n다시 시도해주세요!"
+            android:textAlignment="center"
+            android:textSize="18sp"
+            android:visibility="gone" />
     </LinearLayout>
 </layout>

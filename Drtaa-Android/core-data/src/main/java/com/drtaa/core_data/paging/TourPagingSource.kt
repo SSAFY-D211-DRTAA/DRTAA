@@ -26,19 +26,24 @@ class TourPagingSource(
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, TourItem> {
         val nextPage = params.key ?: 1
-        val response = tourDataSource.getLocationBasedList(
-            numOfRows = params.loadSize,
-            pageNo = nextPage,
-            mapX = mapX,
-            mapY = mapY,
-            radius = radius
-        ).response.body
 
-        return when (val result = safeApiCall { response }) {
+        return when (
+            val result = safeApiCall {
+                tourDataSource.getLocationBasedList(
+                    numOfRows = params.loadSize,
+                    pageNo = nextPage,
+                    mapX = mapX,
+                    mapY = mapY,
+                    radius = radius
+                ).response.body
+            }
+        ) {
             is ResultWrapper.Success -> {
-                val entity = result.data.items.item.map { it.toEntity() }
-                Timber.tag("tour_pager").d("${result.data}")
-                val maxLen = response.numOfRows * result.data.pageNo
+                val response = result.data
+
+                val entity = response.items.item.map { it.toEntity() }
+                Timber.tag("tour_pager").d("$response")
+                val maxLen = response.numOfRows * response.pageNo
                 LoadResult.Page(
                     data = entity,
                     prevKey = if (nextPage == 1) null else nextPage - 1,
