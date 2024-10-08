@@ -20,8 +20,8 @@ class TourViewModel @Inject constructor(
     private val tourRepository: TourRepository,
     private val planRepository: PlanRepository
 ) : ViewModel() {
-    private val _pagedTour = MutableStateFlow<PagingData<TourItem>>(PagingData.empty())
-    val pagedTour: StateFlow<PagingData<TourItem>>
+    private val _pagedTour = MutableStateFlow<PagingData<TourItem>?>(PagingData.empty())
+    val pagedTour: StateFlow<PagingData<TourItem>?>
         get() = _pagedTour
 
     private val _planList = MutableStateFlow<List<PlanItem>?>(emptyList())
@@ -31,7 +31,7 @@ class TourViewModel @Inject constructor(
         getPlanList()
     }
 
-    private fun getPlanList() {
+    fun getPlanList() {
         viewModelScope.launch {
             planRepository.getTodayPlanList().collect { result ->
                 result.onSuccess { planList ->
@@ -45,12 +45,19 @@ class TourViewModel @Inject constructor(
 
     fun getLocationBasedList(mapX: String, mapY: String, radius: String) {
         viewModelScope.launch {
-            val result = "$mapX $mapY"
+            val location = "$mapX $mapY"
             tourRepository.getLocationBasedList(DEFAULT_LNG, DEFAULT_LAT, radius)
-                .cachedIn(viewModelScope)
-                .collect {
-                    Timber.tag("pager").d("$result")
-                    _pagedTour.value = it
+                .collect { result ->
+                    result.onSuccess { pagingDataFlow ->
+                        pagingDataFlow
+                            .cachedIn(viewModelScope)
+                            .collect {
+                                Timber.tag("pager").d(location)
+                                _pagedTour.value = it
+                            }
+                    }.onFailure {
+                        _pagedTour.value = null
+                    }
                 }
         }
     }

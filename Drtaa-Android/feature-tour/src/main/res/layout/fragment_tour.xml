@@ -132,7 +132,17 @@
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
             app:layout_constraintBottom_toBottomOf="parent"
             tools:listitem="@layout/item_tour"
-            tools:visibility="visible" />
+            tools:visibility="gone" />
 
+        <TextView
+            android:id="@+id/tv_tour_error"
+            style="@style/jua"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="30dp"
+            android:text="오류가 발생했습니다\n다시 시도해주세요!"
+            android:textAlignment="center"
+            android:textSize="18sp" />
     </LinearLayout>
 </layout>
