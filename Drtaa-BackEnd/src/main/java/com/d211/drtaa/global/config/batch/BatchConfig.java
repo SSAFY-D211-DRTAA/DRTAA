@@ -1,8 +1,14 @@
 package com.d211.drtaa.global.config.batch;
 
+import com.d211.drtaa.domain.rent.dto.request.RentStatusRequestDTO;
 import com.d211.drtaa.domain.rent.entity.Rent;
+import com.d211.drtaa.domain.rent.entity.RentStatus;
+import com.d211.drtaa.domain.rent.entity.car.RentCarSchedule;
 import com.d211.drtaa.domain.rent.repository.RentRepository;
+import com.d211.drtaa.domain.rent.repository.car.RentCarScheduleRepository;
+import com.d211.drtaa.domain.rent.service.RentService;
 import com.d211.drtaa.domain.user.entity.User;
+import com.d211.drtaa.global.exception.rent.RentCarScheduleNotFoundException;
 import com.d211.drtaa.global.util.fcm.FcmMessage;
 import com.d211.drtaa.global.util.fcm.FcmUtil;
 import lombok.RequiredArgsConstructor;
@@ -17,10 +23,12 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -30,6 +38,8 @@ public class BatchConfig {
 
     private final RentRepository rentRepository; // Rent 테이블을 위한 레포지토리
     private final FcmUtil fcmUtil; // FCM 알림 서비스
+    private final RentService rentService;
+    private final RentCarScheduleRepository rentCarScheduleRepository;
 
     // 렌트 예약 하루, 3일 전 알림
     @Bean
@@ -176,6 +186,56 @@ public class BatchConfig {
                 log.info("사용자명: {}에게 종료 알림 전송 완료", rent.getUser().getUserNickname());
             }
 
+            return RepeatStatus.FINISHED;
+        });
+    }
+
+    // 지난 일정 모두 completed로 변경
+    @Bean
+    public Job rentChangeStatusToCompletedJob(JobRepository jobRepository, Step rentChangeStatusToCompletedStep) {
+        log.info("rentChangeStatusToCompletedJob");
+
+        return new JobBuilder("rentChangeStatusToCompletedJob", jobRepository)
+                .incrementer(new RunIdIncrementer())
+                .start(rentChangeStatusToCompletedStep)
+                .build();
+    }
+
+    @Bean
+    public Step rentChangeStatusToCompletedStep(JobRepository jobRepository, Tasklet rentChangeStatusToCompletedTasklet, PlatformTransactionManager transactionManager) {
+        log.info("rentChangeStatusToCompletedStep");
+
+        return new StepBuilder("rentChangeStatusToCompletedStep", jobRepository)
+                .tasklet(rentChangeStatusToCompletedTasklet, transactionManager)
+                .build();
+    }
+
+    @Bean
+    public Tasklet rentChangeStatusToCompletedTasklet() {
+        return ((contribution, chunkContext) -> {
+            log.info(">>>>> Tasklet(지난 일정 모두 completed로 변경)");
+
+            // 현재 시간
+            LocalDateTime now = LocalDateTime.now();
+            log.info("현재 시간: {}", now);
+
+            // 종료 시간이 지났고 상태가 'in_progress' 또는 'reserved'인 렌트들을 조회
+            List<Rent> rentsToUpdate = rentRepository.findAllByRentEndTimeBeforeAndRentStatusIn(now,
+                    Arrays.asList(RentStatus.in_progress, RentStatus.reserved));
+
+            // 상태를 'completed'로 변경
+            for (Rent rent : rentsToUpdate) {
+                log.info("completed로 변경되는 rentId: {}", rent.getRentId());
+
+                // 해당 렌트에 맞는 렌트 차량 스케줄 찾기
+                RentCarSchedule rentCarSchedule = rentCarScheduleRepository.findByRent(rent)
+                        .orElseThrow(() -> new RentCarScheduleNotFoundException("해당 렌트에 맞는 렌트 차량 스케쥴이 없습니다."));
+                
+                // 렌트 종료 서비스 메소드에 파라미터 전송
+                rentService.rentStatusCompleted(rent, rentCarSchedule);
+            }
+
+            // 태스크렛 실행 완료 상태 반환
             return RepeatStatus.FINISHED;
         });
     }

@@ -5,6 +5,8 @@ import com.d211.drtaa.domain.rent.dto.response.RentCarManipulateResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentDetailResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentResponseDTO;
 import com.d211.drtaa.domain.rent.dto.response.RentStatusResponseDTO;
+import com.d211.drtaa.domain.rent.entity.Rent;
+import com.d211.drtaa.domain.rent.entity.car.RentCarSchedule;
 
 import java.util.List;
 
@@ -38,6 +40,7 @@ public interface RentService {
 
     // rentId의 렌트 상태: 반납
     void rentStatusCompleted(RentStatusRequestDTO requestDTO);
+    void rentStatusCompleted(Rent rent, RentCarSchedule rentCarSchedule);
 
     // rentId의 렌트 상태: 취소
     void rentStatusCanceld(RentStatusRequestDTO requestDTO);

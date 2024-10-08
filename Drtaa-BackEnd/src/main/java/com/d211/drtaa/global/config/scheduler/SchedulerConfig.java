@@ -17,6 +17,7 @@ public class SchedulerConfig {
     private final JobLauncher jobLauncher;
     private final Job rentReservationNotificationJob;
     private final Job rentStartOrEndNotificationJob;
+    private final Job rentChangeStatusToCompletedJob;
 
 //    @Scheduled(cron = "0 0/10 * * * *") // 매 10분마다 실행
 //    public void checkEvery10Minutes() throws Exception {
@@ -55,6 +56,22 @@ public class SchedulerConfig {
         } catch (Exception e) {
             // 예외 처리
             log.error("Rent Start or End Notification Job execution failed", e);
+        }
+    }
+
+    @Scheduled(cron = "0 0 0 * * *") // 매일 오전 12시에 실행
+    public void rentChangeStatusToCompletedJob() {
+        log.info("매일 오전 12시에 시작되는 Job");
+        try {
+            log.info("Rent Changes Status to Completed Job Started");
+            JobParameters jobParameters = new JobParametersBuilder()
+                    .addLong("time", System.currentTimeMillis())
+                    .toJobParameters();
+
+            jobLauncher.run(rentChangeStatusToCompletedJob, jobParameters);
+        } catch (Exception e) {
+            // 예외 처리
+            log.error("Rent Changes Status to Completed Job failed", e);
         }
     }
 }

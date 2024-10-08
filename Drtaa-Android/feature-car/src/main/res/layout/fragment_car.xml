@@ -236,7 +236,7 @@
             android:layout_marginTop="20dp"
             android:text="남은시간 : ㅇㅇ분"
             android:textSize="18sp"
-            android:visibility="invisible"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/cv_tour_card"
@@ -251,7 +251,6 @@
             android:layout_marginTop="20dp"
             android:text="연장하기"
             android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="@id/cv_tour_card"
             app:layout_constraintTop_toBottomOf="@+id/tv_tour_remain_time"
             tools:visibility="visible" />
