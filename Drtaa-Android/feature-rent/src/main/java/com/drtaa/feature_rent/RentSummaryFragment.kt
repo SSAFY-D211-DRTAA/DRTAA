@@ -134,7 +134,6 @@ class RentSummaryFragment :
                     ?.getStateFlow(Pay.SUCCESS.type, Pair(false, ""))
                     ?.collectLatest { (success, paymentData) ->
                         if (success) {
-                            showSnackBar("결제에 성공했습니다")
                             Timber.tag("bootpay").d("rent에용 ${Pay.SUCCESS.type}: $paymentData")
                             rentSummaryViewModel.processBootpayPayment(
                                 paymentData,
