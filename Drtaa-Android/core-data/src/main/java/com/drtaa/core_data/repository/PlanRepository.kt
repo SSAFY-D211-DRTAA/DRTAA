@@ -1,5 +1,6 @@
 package com.drtaa.core_data.repository
 
+import com.drtaa.core_model.plan.LastPlan
 import com.drtaa.core_model.plan.Plan
 import com.drtaa.core_model.plan.PlanItem
 import com.drtaa.core_model.plan.PlanSimple
@@ -13,4 +14,5 @@ interface PlanRepository {
     suspend fun getPlanDetail(travelId: Int): Flow<Result<Plan>>
     suspend fun updatePlanName(planName: RequestPlanName): Flow<Result<String>>
     suspend fun getTodayPlanList(): Flow<Result<List<PlanItem>>>
+    suspend fun addPlanAtLast(plan: LastPlan): Flow<Result<String>>
 }

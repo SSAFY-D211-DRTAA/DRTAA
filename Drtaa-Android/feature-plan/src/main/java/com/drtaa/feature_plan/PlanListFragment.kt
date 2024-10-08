@@ -132,7 +132,13 @@ class PlanListFragment :
         planViewModel.plan.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { plan ->
                 if (plan == null) return@onEach
-
+                args.recommend?.let {
+                    if (planViewModel.isAddSuccess.value != true) {
+                        Timber.tag("plan").d("일정 추가를 해줘요 recommend: $it")
+                        showLoading()
+                        planViewModel.addLastPlan(it)
+                    }
+                }
                 binding.tvPlanTitle.text = plan.travelName
                 binding.tvPlanDate.text =
                     "${(plan.travelStartDate + " ~ " + plan.travelEndDate).replace('-', '.')}"
@@ -141,7 +147,18 @@ class PlanListFragment :
                 initDatePickerDialog()
                 planViewModel.isViewPagerLoaded = true
             }.launchIn(viewLifecycleOwner.lifecycleScope)
-
+        planViewModel.isAddSuccess.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach {
+            it?.let {
+                if (it) {
+                    dismissLoading()
+                    planViewModel.getPlan()
+                    showSnackBar("일정이 추가되었습니다.")
+                } else {
+                    dismissLoading()
+                    showSnackBar("일정 추가에 실패했습니다.")
+                }
+            }
+        }.launchIn(viewLifecycleOwner.lifecycleScope)
         planViewModel.isEditSuccess.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { isEditSuccess ->
                 if (isEditSuccess == null) return@onEach

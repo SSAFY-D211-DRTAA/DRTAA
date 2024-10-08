@@ -56,7 +56,7 @@ class PlanHistoryViewModel @Inject constructor(
                     return@collect
                 }
 
-                _planInProgress.value = planList.find { it.rentStatus == Status.IN_PROGRESS.status }
+                _planInProgress.value = planList.lastOrNull { it.rentStatus == Status.IN_PROGRESS.status }
                 _planReservedList.value =
                     planList.filter { it.rentStatus == Status.RESERVED.status }
                         .sortedByDescending { it.travelEndDate }

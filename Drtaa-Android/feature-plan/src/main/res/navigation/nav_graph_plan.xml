@@ -5,7 +5,7 @@
     android:id="@+id/nav_graph_plan"
     app:startDestination="@id/planHistoryFragment">
 
-    <include app:graph="@navigation/nav_graph_travel"/>
+    <include app:graph="@navigation/nav_graph_travel" />
     <action
         android:id="@+id/action_fragment_plan_to_nav_graph_travel"
         app:destination="@id/nav_graph_travel">
@@ -25,6 +25,10 @@
         <argument
             android:name="rentId"
             app:argType="integer" />
+        <argument
+            android:name="recommend"
+            app:argType="com.drtaa.core_model.map.Search"
+            app:nullable="true" />
         <action
             android:id="@+id/action_planListFragment_to_planSearchFragment"
             app:destination="@id/planSearchFragment" />
@@ -49,6 +53,10 @@
         android:label="PlanHistoryFragment"
         tools:layout="@layout/fragment_plan_history">
         <deepLink app:uri="drtaa://app/plan/history" />
+        <argument
+            android:name="recommend"
+            app:argType="com.drtaa.core_model.map.Search"
+            app:nullable="true" />
         <action
             android:id="@+id/action_planHistoryFragment_to_planListFragment"
             app:destination="@id/planListFragment" />
