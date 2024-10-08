@@ -1,6 +1,5 @@
 package com.drtaa.feature_home
 
-import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
