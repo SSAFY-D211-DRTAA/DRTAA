@@ -19,6 +19,11 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>(R.layout.fragment_p
         initObserver()
     }
 
+    override fun onResume() {
+        super.onResume()
+        profileViewModel.getUserData()
+    }
+
     private fun initObserver() {
         profileViewModel.currentUser.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { result ->

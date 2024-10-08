@@ -19,11 +19,7 @@ class ProfileViewModel @Inject constructor(
     private val _currentUser = MutableStateFlow<SocialUser?>(null)
     val currentUser: StateFlow<SocialUser?> = _currentUser
 
-    init {
-        getUserData()
-    }
-
-    private fun getUserData() {
+    fun getUserData() {
         viewModelScope.launch {
             signRepository.getUserData().collect { result ->
                 result.onSuccess { user ->
