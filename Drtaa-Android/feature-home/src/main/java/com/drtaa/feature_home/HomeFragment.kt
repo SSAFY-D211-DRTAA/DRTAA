@@ -1,6 +1,5 @@
 package com.drtaa.feature_home
 
-import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -39,9 +38,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
 
         homeViewModel.rentStatus.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { rentStatus ->
-                if (rentStatus == "null") {
-                    binding.cvHomeRentStatus.visibility = View.GONE
-                }
                 binding.tvHomeRentStatus.text = rentStatus
             }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
@@ -57,10 +53,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
 
         binding.cvHomePlan.setOnClickListener {
             navigateDestination(R.id.action_homeFragment_to_nav_graph_plan)
-        }
-
-        binding.cvHomeRentHistory.setOnClickListener {
-            navigateDestination(R.id.action_homeFragment_to_rentHistoryFragment)
         }
     }
 }

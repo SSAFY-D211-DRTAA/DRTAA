@@ -21,7 +21,8 @@ enum class Page(val hideBottomNav: Boolean) {
     CAR_TRACKING(true),
     TRAVEL(true),
     PAYMENT(true),
-    PAYMENT_LIST(true)
+    PAYMENT_LIST(true),
+    PROFILE(true)
     ;
 
     companion object {
@@ -37,8 +38,8 @@ enum class Page(val hideBottomNav: Boolean) {
             RENT -> com.drtaa.feature_rent.R.id.rentFragment
             RENT_SEARCH -> com.drtaa.feature_rent.R.id.rentSearchFragment
             RENT_SUMMARY -> com.drtaa.feature_rent.R.id.rentSummaryFragment
-            RENT_HISTORY -> R.id.rentHistoryFragment
-            RENT_HISTORY_SUMMARY -> R.id.rentHistorySummaryFragment
+            RENT_HISTORY -> com.drtaa.feature_mypage.R.id.rentHistoryFragment
+            RENT_HISTORY_SUMMARY -> com.drtaa.feature_mypage.R.id.rentHistorySummaryFragment
             TAXI -> com.drtaa.feature_taxi.R.id.taxiFragment
             TAXI_SEARCH -> com.drtaa.feature_taxi.R.id.taxiSearchFragment
             TAXI_SUMMARY -> com.drtaa.feature_taxi.R.id.taxiSummaryFragment
@@ -49,5 +50,6 @@ enum class Page(val hideBottomNav: Boolean) {
             TRAVEL -> com.drtaa.feature_travel.R.id.travelFragment
             PAYMENT -> com.drtaa.feature_payment.R.id.paymentDoneFragment
             PAYMENT_LIST -> com.drtaa.feature_mypage.R.id.paymentListFragment
+            PROFILE -> com.drtaa.feature_mypage.R.id.profileFragment
         }
 }
