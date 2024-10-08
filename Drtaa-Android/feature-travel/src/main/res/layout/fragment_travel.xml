@@ -21,7 +21,7 @@
 
             <TextView
                 android:id="@+id/tv_travel_title"
-                style="@style/jua"
+                style="@style/ptd_extra_bold"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="28sp"
@@ -31,10 +31,9 @@
 
             <TextView
                 android:id="@+id/tv_travel_address_title"
-                style="@style/jua"
+                style="@style/ptd_semi_bold"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
                 android:text="주소: "
                 android:textSize="14sp"
                 app:layout_constraintStart_toStartOf="parent"
@@ -42,7 +41,7 @@
 
             <TextView
                 android:id="@+id/tv_travel_address"
-                style="@style/jua"
+                style="@style/ptd_semi_bold"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
@@ -83,10 +82,10 @@
 
             <TextView
                 android:id="@+id/tv_travel_weather_title"
-                style="@style/jua"
+                style="@style/ptd_bold"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="15dp"
                 android:text="여행지 날씨 예보"
                 android:textSize="24sp"
                 app:layout_constraintStart_toStartOf="parent"
@@ -98,18 +97,18 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
+                android:layout_marginBottom="5dp"
                 android:text="*10월01일 기준"
                 android:textColor="@color/red"
                 android:textSize="12sp"
                 app:layout_constraintBottom_toBottomOf="@+id/tv_travel_weather_title"
-                app:layout_constraintStart_toEndOf="@+id/tv_travel_weather_title"
-                app:layout_constraintTop_toTopOf="@id/tv_travel_weather_title" />
+                app:layout_constraintStart_toEndOf="@+id/tv_travel_weather_title" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/cl_travel_weather"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="15dp"
                 android:layout_marginBottom="20dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -179,10 +178,10 @@
 
             <TextView
                 android:id="@+id/tv_travel_blog_title"
-                style="@style/jua"
+                style="@style/ptd_bold"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="15dp"
                 android:text="네이버 블로그 리뷰"
                 android:textSize="24sp"
                 app:layout_constraintStart_toStartOf="parent"
