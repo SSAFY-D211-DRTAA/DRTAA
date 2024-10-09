@@ -6,7 +6,6 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Environment
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
@@ -58,10 +57,6 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>(R.layout.fragment_sig
     }
 
     private fun initEditTextEvent() {
-        binding.etSignUpId.addTextChangedListener { _ ->
-            signUpFragmentViewModel.setIsDuplicatedId(null)
-        }
-
         binding.etSignUpPw.addTextChangedListener { text ->
             val inputText = text.toString()
 
@@ -186,15 +181,17 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>(R.layout.fragment_sig
             when (isDuplicatedId) {
                 null -> {
                     text = ""
-                    setTextColor(ContextCompat.getColor(context, Color.BLACK))
+                    setTextColor(Color.BLACK)
                 }
+
                 true -> {
                     text = "이미 사용중인 아이디입니다."
-                    setTextColor(ContextCompat.getColor(context, Color.RED))
+                    setTextColor(Color.RED)
                 }
+
                 false -> {
                     text = "사용 가능한 아이디입니다."
-                    setTextColor(ContextCompat.getColor(context, Color.BLUE))
+                    setTextColor(Color.BLUE)
                 }
             }
         }
