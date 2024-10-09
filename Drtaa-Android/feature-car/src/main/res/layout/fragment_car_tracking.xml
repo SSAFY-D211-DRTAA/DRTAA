@@ -26,60 +26,75 @@
 
         </com.naver.maps.map.MapView>
 
-        <TextView
-            android:id="@+id/tv_pin"
-            style="@style/ptd_bold"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="@color/black"
-            android:gravity="center"
-            android:padding="12dp"
-            android:text="호출할 위치를 길게 눌러주세요"
-            android:textColor="@color/white"
-            android:textSize="24sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/tv_pin_desc"
-            style="@style/ptd_bold"
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:background="@drawable/rect_black_rad30"
-            android:gravity="center"
-            android:paddingHorizontal="12dp"
-            android:paddingVertical="4dp"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            android:visibility="gone"
+            android:background="@color/black"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_pin" />
+            app:layout_constraintTop_toTopOf="parent">
 
-        <!--        <TextView-->
-        <!--            android:id="@+id/btn_call"-->
-        <!--            style="@style/ptd_semi_bold"-->
-        <!--            android:layout_width="wrap_content"-->
-        <!--            android:layout_height="50dp"-->
-        <!--            android:layout_marginBottom="12dp"-->
-        <!--            android:background="@drawable/selector_btn_blue"-->
-        <!--            android:gravity="center"-->
-        <!--            android:paddingHorizontal="12dp"-->
-        <!--            android:text="호출하기"-->
-        <!--            android:textColor="@color/white"-->
-        <!--            android:textSize="19sp"-->
-        <!--            app:layout_constraintBottom_toBottomOf="parent"-->
-        <!--            app:layout_constraintEnd_toEndOf="parent"-->
-        <!--            app:layout_constraintHorizontal_chainStyle="packed"-->
-        <!--            app:layout_constraintStart_toStartOf="parent" />-->
+            <TextView
+                android:id="@+id/tv_pin"
+                style="@style/ptd_bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="10dp"
+                android:background="@color/black"
+                android:text="호출 위치"
+                android:textColor="@color/white"
+                android:textSize="24sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_pin_desc"
+                style="@style/ptd_bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/rect_black_rad30"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="@id/tv_pin"
+                app:layout_constraintTop_toBottomOf="@id/tv_pin"
+                tools:text="주소가 들어갑니다" />
+
+            <FrameLayout
+                android:id="@+id/fl_tracking"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:id="@+id/iv_tracking_on"
+                    android:layout_width="90dp"
+                    android:layout_height="35dp"
+                    android:src="@drawable/ic_tracking_on"
+                    android:visibility="gone" />
+
+                <ImageView
+                    android:id="@+id/iv_tracking_off"
+                    android:layout_width="90dp"
+                    android:layout_height="35dp"
+                    android:src="@drawable/ic_tracking_off"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+            </FrameLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <LinearLayout
             android:id="@+id/btn_call"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/rect_white_rad30"
+            android:layout_marginBottom="15dp"
+            android:background="@drawable/rect_black_rad30"
             android:gravity="center"
             android:orientation="horizontal"
             android:paddingHorizontal="5dp"
@@ -87,8 +102,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintStart_toStartOf="parent"
-            tools:background="@drawable/rect_blue_rad30">
+            app:layout_constraintStart_toStartOf="parent">
 
             <ImageView
                 android:layout_width="60dp"
@@ -99,43 +113,12 @@
                 style="@style/jua"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="3dp"
                 android:layout_marginEnd="10dp"
                 android:text="차량 호출"
-                android:layout_marginStart="3dp"
                 android:textColor="@color/white"
                 android:textSize="20sp" />
         </LinearLayout>
-
-        <TextView
-            android:id="@+id/btn_tracking"
-            style="@style/ptd_extra_bold"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:background="@drawable/rect_blue_rad30"
-            android:gravity="center"
-            android:padding="12dp"
-            android:text="차량\n추적\nON"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/btn_return"
-            style="@style/ptd_extra_bold"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:background="@drawable/rect_black_rad30"
-            android:padding="12dp"
-            android:text="차량\n반납"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="@+id/btn_tracking"
-            app:layout_constraintTop_toBottomOf="@+id/btn_tracking" />
-
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

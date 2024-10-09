@@ -125,6 +125,7 @@
                     android:id="@+id/cl_car_bottom_text"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
+                    android:visibility="gone"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -278,13 +279,30 @@
         <TextView
             android:id="@+id/tv_rent_end"
             style="@style/btn_short_black"
-            android:layout_width="200dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:layout_marginEnd="10dp"
             android:text="오늘 일정 끝내기"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btn_tour_extend" />
+            android:visibility="gone"
+            app:layout_constraintEnd_toStartOf="@+id/tv_rent_return"
+            app:layout_constraintStart_toStartOf="@id/cv_tour_card"
+            app:layout_constraintTop_toBottomOf="@+id/btn_tour_extend"
+            tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/tv_rent_return"
+            style="@style/btn_short_red"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:paddingHorizontal="20dp"
+            android:text="렌트 반납하기"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="@id/cv_tour_card"
+            app:layout_constraintStart_toEndOf="@+id/tv_rent_end"
+            app:layout_constraintTop_toBottomOf="@+id/btn_tour_extend"
+            tools:visibility="visible" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

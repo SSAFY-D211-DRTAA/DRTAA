@@ -78,7 +78,7 @@ class CarTrackingFragment :
             }
         }
 
-        naverMap.setOnMapLongClickListener { pointF, latLng ->
+        naverMap.setOnMapLongClickListener { _, latLng ->
             positionMarker.apply {
                 position = latLng
                 map = naverMap
@@ -86,38 +86,28 @@ class CarTrackingFragment :
             viewModel.setDestination(latLng)
         }
 
-        binding.btnTracking.setOnClickListener {
+        binding.flTracking.setOnClickListener {
             viewModel.toggleTrackingState()
-        }
-
-        binding.btnReturn.setOnClickListener {
-            viewModel.returnRent()
         }
     }
 
     private fun observeCarTracking() {
         viewModel.reverseGeocode.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { res ->
-                res?.let {
-                    with(binding.tvPinDesc) {
-                        this.visibility = View.VISIBLE
-                        it.onSuccess { road ->
-                            text = if (road == "주소를 찾을 수 없습니다.") {
-                                road
-                            } else {
-                                road + "\n이 장소로 호출합니다"
-                            }
-                        }
-                    }
+                if (res == null) {
+                    binding.tvPinDesc.text = "호출할 위치를 길게 눌러주세요"
+                    return@onEach
+                }
+
+                res.onSuccess { road ->
+                    binding.tvPinDesc.text = road
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
+
         viewModel.trackingState.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { isTracking ->
-                binding.btnTracking.text = if (isTracking) {
-                    "차량\n추적\nON"
-                } else {
-                    "차량\n추적\nOFF"
-                }
+                binding.ivTrackingOn.visibility = if (isTracking) View.VISIBLE else View.GONE
+                binding.ivTrackingOff.visibility = if (isTracking) View.GONE else View.VISIBLE
             }.launchIn(viewLifecycleOwner.lifecycleScope)
 
         viewModel.isReturn.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach {
