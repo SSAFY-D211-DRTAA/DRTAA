@@ -14,6 +14,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.drtaa.core_model.rent.RentDetail
 import com.drtaa.core_ui.base.BaseFragment
+import com.drtaa.core_ui.component.TwoButtonMessageDialog
 import com.drtaa.core_ui.fitCenter
 import com.drtaa.core_ui.parseLocalDateTime
 import com.drtaa.core_ui.showSnackBar
@@ -69,6 +70,7 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
             clCarBottomTextGotoUse.setOnClickListener {
                 navigateDestination(R.id.action_carFragment_to_carTrackingFragment)
             }
+
             btnTourQrcode.setOnClickListener {
                 if (checkCameraPermission()) {
                     startQRCodeScanner()
@@ -76,15 +78,33 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
                     requestCameraPermission()
                 }
             }
+
             btnGetOffQrcode.setOnClickListener {
                 carViewModel.currentRentDetail.value?.let {
                     carViewModel.getOffCar(rentId = it.rentId!!)
                 }
             }
+
             tvRentEnd.setOnClickListener {
                 carViewModel.currentRentDetail.value?.let {
-                    carViewModel.requestRentCompleteToday(it.rentId!!)
+                    TwoButtonMessageDialog(
+                        context = requireActivity(),
+                        message = "오늘 일정을 종료하시겠습니까?",
+                        onCheckClick = {
+                            carViewModel.requestRentCompleteToday(it.rentId!!)
+                        }
+                    ).show()
                 }
+            }
+
+            tvRentReturn.setOnClickListener {
+                TwoButtonMessageDialog(
+                    context = requireActivity(),
+                    message = "렌트 이용을 종료하시겠습니까?",
+                    onCheckClick = {
+                        carViewModel.returnRent()
+                    }
+                ).show()
             }
         }
     }
@@ -115,15 +135,14 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
                 // 진행 중인 렌트 없고 예약은 있을 경우
                 dismissLoading()
                 binding.apply {
-                    tvTourRemainTime.visibility = View.GONE
                     clCarBottomTextGotoUse.visibility = View.VISIBLE
                     btnTrackingCar.isClickable = false
                     clCarBottomText.visibility = View.GONE
                     animeCarNorent.visibility = View.VISIBLE
                     toggleCarOption(false)
                     tvRentEnd.visibility = View.GONE
+                    tvRentReturn.visibility = View.GONE
                     tvReservedState.text = "예약한 차량이 있습니다"
-                    tvTourRemainTime.text = "현재 이용중인 차량이 없습니다."
                 }
             }
         }.launchIn(viewLifecycleOwner.lifecycleScope)
@@ -133,16 +152,15 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
                 // 진행 중인 렌트 없고 예약도 없을 경우
                 dismissLoading()
                 binding.apply {
-                    tvTourRemainTime.visibility = View.GONE
                     clCarBottomTextGotoUse.isClickable = false
                     clCarBottomTextGotoUse.visibility = View.VISIBLE
                     btnTrackingCar.isClickable = false
                     clCarBottomText.visibility = View.GONE
                     tvRentEnd.visibility = View.GONE
+                    tvRentReturn.visibility = View.GONE
                     animeCarNorent.visibility = View.VISIBLE
                     toggleCarOption(false)
                     tvReservedState.text = "예약한 차량이 없습니다"
-                    tvTourRemainTime.text = "현재 이용중인 차량이 없습니다."
                 }
             }
         }.launchIn(viewLifecycleOwner.lifecycleScope)
@@ -162,12 +180,10 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
             animeCarNorent.visibility = View.GONE
             clCarBottomText.visibility = View.VISIBLE
             btnTrackingCar.isClickable = true
-            tvTourRemainTime.visibility = View.VISIBLE
+            tvRentReturn.visibility = View.VISIBLE
             if (!isToday(currentRentDetail.rentEndTime)) {
                 tvRentEnd.visibility = View.VISIBLE
             }
-            tvTourRemainTime.text =
-                "남은시간 : ${currentRentDetail.rentTime * MIN} 분"
             currentRentDetail.rentCarImg?.let {
                 imgCarCarimage.fitCenter(
                     it,
@@ -387,6 +403,5 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
         const val DURATION = 300L
         const val TOUCH_PRESS_TIME = 100
         const val MAX_ROTATION = 15f
-        const val MIN = 60
     }
 }
