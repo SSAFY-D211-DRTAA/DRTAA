@@ -167,7 +167,7 @@ cython_debug/
 # Poetry local configuration file - https://python-poetry.org/docs/configuration/#local-configuration
 poetry.toml
 
-# ruff
+# ruff 
 .ruff_cache/
 
 # LSP config files
@@ -176,3 +176,5 @@ pyrightconfig.json
 # End of https://www.toptal.com/developers/gitignore/api/python
 
 training/dataset/*
+*.h5
+*.wav
