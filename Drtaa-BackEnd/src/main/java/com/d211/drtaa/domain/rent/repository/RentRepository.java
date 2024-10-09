@@ -39,6 +39,7 @@ public interface RentRepository extends JpaRepository<Rent, Long> {
     Optional<Rent> findRentByUserAndStatusAndToday(@Param("user") User user,
                                                    @Param("today") LocalDateTime today,
                                                    @Param("statuses") List<RentStatus> statuses);
+    Optional<Rent> findByUserAndRentStartTimeLessThanEqualAndRentEndTimeGreaterThanEqual(User user, LocalDateTime now, LocalDateTime now1);
 
 
     List<Rent> findByUser(User user);

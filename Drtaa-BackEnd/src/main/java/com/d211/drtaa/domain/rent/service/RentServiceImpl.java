@@ -249,10 +249,11 @@ public class RentServiceImpl implements RentService{
         RentStatusResponseDTO response = RentStatusResponseDTO.builder().build();
 
         try {
-            // 오늘 날짜 기준 사용자의 렌트 찾기
-            LocalDateTime startDate = LocalDateTime.now().plusDays(0).withHour(0).withMinute(0).withSecond(0);
-            LocalDateTime endDate = LocalDateTime.now().plusDays(0).withHour(23).withMinute(59).withSecond(59);
-            Rent rent = rentRepository.findByUserAndRentStartTimeBetween(user, startDate, endDate)
+            // 현재 시간
+            LocalDateTime now = LocalDateTime.now();
+
+            // 오늘 날짜가 렌트 시작과 종료 시간 사이에 포함되는 렌트 찾기
+            Rent rent = rentRepository.findByUserAndRentStartTimeLessThanEqualAndRentEndTimeGreaterThanEqual(user, now, now)
                     .orElseThrow(() -> new RentNotFoundException("오늘 날짜 기준 사용자의 렌트가 없습니다."));
 
             response.setRentStatus(rent.getRentStatus());

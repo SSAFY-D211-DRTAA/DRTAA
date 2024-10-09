@@ -201,6 +201,7 @@ public class TravelServiceImpl implements TravelService {
     }
 
     @Override
+    @Transactional
     public List<PlacesDetailResponseDTO> getTravelToday(String userProviderId) {
         // 응답
         List<PlacesDetailResponseDTO> response = new ArrayList<>();
