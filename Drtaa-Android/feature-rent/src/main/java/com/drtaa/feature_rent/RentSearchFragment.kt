@@ -136,6 +136,10 @@ class RentSearchFragment :
 
     private fun initEvent() {
         binding.layoutRentSearchBottomSheet.apply {
+            this.ivInitTyping.setOnClickListener {
+                etSearchLocation.setText("")
+            }
+
             this.ivSearchLocation.setOnClickListener {
                 if (this.etSearchLocation.text.isEmpty()) {
                     showSnackBar("검색어를 입력해주세요.")
