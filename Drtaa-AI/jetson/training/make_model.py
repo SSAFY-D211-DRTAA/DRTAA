@@ -53,33 +53,33 @@ def load_dataset(csv_path, target_sr=16000):
 def create_model(input_shape):
     model = Sequential()
 
-    # # 1D Conv Layer
-    # model.add(Conv1D(32, kernel_size=3, activation='relu', input_shape=input_shape))
-    # model.add(MaxPooling1D(pool_size=2))
-
-    # model.add(Conv1D(64, kernel_size=3, activation='relu'))
-    # model.add(MaxPooling1D(pool_size=2))
-
-    # model.add(Flatten())
-    # model.add(Dense(64, activation='relu'))  # 밀집 레이어
-    # model.add(Dense(1, activation='sigmoid'))  # 이진 분류 (웨이크 워드 여부)
-
-    # 첫 번째 블록
-    model.add(Conv1D(64, kernel_size=3, activation='relu', input_shape=input_shape))
+    # 1D Conv Layer
+    model.add(Conv1D(32, kernel_size=3, activation='relu', input_shape=input_shape))
     model.add(MaxPooling1D(pool_size=2))
-    
-    # 두 번째 블록
-    model.add(Conv1D(128, kernel_size=3, activation='relu'))
+
+    model.add(Conv1D(64, kernel_size=3, activation='relu'))
     model.add(MaxPooling1D(pool_size=2))
-    
-    # 세 번째 블록
-    model.add(Conv1D(256, kernel_size=3, activation='relu'))
-    model.add(MaxPooling1D(pool_size=2))
-    
-    # Flatten and Dense
+
     model.add(Flatten())
-    model.add(Dense(128, activation='relu'))
-    model.add(Dense(1, activation='sigmoid'))  # 이진 분류
+    model.add(Dense(64, activation='relu'))  # 밀집 레이어
+    model.add(Dense(1, activation='sigmoid'))  # 이진 분류 (웨이크 워드 여부)
+
+    # # 첫 번째 블록
+    # model.add(Conv1D(64, kernel_size=3, activation='relu', input_shape=input_shape))
+    # model.add(MaxPooling1D(pool_size=2))
+    
+    # # 두 번째 블록
+    # model.add(Conv1D(128, kernel_size=3, activation='relu'))
+    # model.add(MaxPooling1D(pool_size=2))
+    
+    # # 세 번째 블록
+    # model.add(Conv1D(256, kernel_size=3, activation='relu'))
+    # model.add(MaxPooling1D(pool_size=2))
+    
+    # # Flatten and Dense
+    # model.add(Flatten())
+    # model.add(Dense(128, activation='relu'))
+    # model.add(Dense(1, activation='sigmoid'))  # 이진 분류
 
     # 모델 컴파일
     model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])

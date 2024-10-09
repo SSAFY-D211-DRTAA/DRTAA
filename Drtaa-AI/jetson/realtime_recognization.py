@@ -9,6 +9,7 @@ import subprocess
 # 1. 모델 불러오기
 # --------------------------------------------
 
+# model_path = 'one_depth_wakeword_model.h5'
 model_path = 'wakeword_model.h5'
 
 def load_wakeword_model():
@@ -53,7 +54,7 @@ def process_audio_data(audio_data, model):
     prediction = model.predict(audio_data)
 
     # 웨이크 워드 감지 여부 판단
-    if prediction[0] > 0.7:
+    if prediction[0] > 0.5:
         print(f"웨이크 워드 감지됨! {prediction[0]}")
         # 추가 스크립트 실행
         print("음성 인식 및 추천 장소 요청 스크립트 실행 중...")

@@ -41,6 +41,8 @@ def record_audio(filename):
     wf.writeframes(b''.join(frames))
     wf.close()
 
+start_index = 1  # 첫 파일 처리 후 이어질 인덱스 설정
+
 # 반복적으로 음성 데이터를 수집
 def collect_data(num_samples, data_type="wakeword"):
     # 저장할 폴더 결정
@@ -48,9 +50,9 @@ def collect_data(num_samples, data_type="wakeword"):
         save_dir = wakeword_dir
     else:
         save_dir = not_wakeword_dir
-    
+
     for i in range(num_samples):
-        filename = os.path.join(save_dir, f"{data_type}_{i + 1}.wav")
+        filename = os.path.join(save_dir, f"{data_type}_{start_index + i}.wav")
         print(f"Saving to: {filename}")
         record_audio(filename)
         

@@ -56,18 +56,36 @@ def augment_audio(audio, sr=16000):
     return augmented_audios
 
 # 오디오 저장 함수
-def save_augmented_audios(augmented_audios, sr=16000, base_filename='dataset/not_wakeword/not_wakeword'):
+def save_augmented_audios(augmented_audios, sr=16000, base_filename='result/dataset/wakeword/wakeword', start_index=11):
     for idx, audio in enumerate(augmented_audios):
-        filename = f"{base_filename}_{idx+47}.wav"  # 파일명에 번호 추가
+        filename = f"{base_filename}_{start_index + idx}.wav"  # 시작 인덱스 반영
         sf.write(filename, audio, sr)
         print(f"Saved {filename}")
 
+    # 'dataset/not_wakeword/not_wakeword_12.wav'
 # 예시 사용
-file_path = 'dataset/not_wakeword/not_wakeword_10.wav'
-audio, sr = librosa.load(file_path, sr=16000)
+file_paths = [
+    'dataset/not_wakeword/not_wakeword_61.wav', 
+    'dataset/not_wakeword/not_wakeword_62.wav', 
+    'dataset/not_wakeword/not_wakeword_63.wav', 
+    'dataset/not_wakeword/not_wakeword_64.wav', 
+    'dataset/not_wakeword/not_wakeword_65.wav', 
+    'dataset/not_wakeword/not_wakeword_66.wav', 
+    'dataset/not_wakeword/not_wakeword_67.wav', 
+    'dataset/not_wakeword/not_wakeword_68.wav', 
+    'dataset/not_wakeword/not_wakeword_69.wav', 
+    'dataset/not_wakeword/not_wakeword_70.wav', 
+    ]  # 파일 리스트
 
-# 증강된 오디오 생성
-augmented_audios = augment_audio(audio, sr=sr)
+start_index = 131  # 첫 파일 처리 후 이어질 인덱스 설정
+for file_path in file_paths:
+    audio, sr = librosa.load(file_path, sr=16000)
 
-# 오디오 저장
-save_augmented_audios(augmented_audios, sr=sr)
+    # 증강된 오디오 생성
+    augmented_audios = augment_audio(audio, sr=sr)
+
+    # 오디오 저장 (파일 별로 인덱스 조정)
+    save_augmented_audios(augmented_audios, sr=sr, base_filename='dataset/not_wakeword/not_wakeword', start_index=start_index)
+
+    # 다음 파일 처리 시 인덱스를 증가시킴
+    start_index += len(augmented_audios)
