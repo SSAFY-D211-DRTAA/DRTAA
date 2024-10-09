@@ -1,5 +1,6 @@
 package com.d211.drtaa.domain.rent.repository.car;
 
+import com.d211.drtaa.domain.rent.entity.Rent;
 import com.d211.drtaa.domain.rent.entity.car.RentCar;
 import com.d211.drtaa.domain.rent.entity.car.RentCarSchedule;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,4 +14,6 @@ public interface RentCarScheduleRepository extends JpaRepository<RentCarSchedule
     Optional<RentCarSchedule> findByRentCarScheduleId(long rentCarScheduleId);
     List<RentCarSchedule> findByRentCarAndRentCarScheduleIsDoneFalse(RentCar car);
     Optional<RentCarSchedule> findByRentRentId(long rentId);
+    Optional<RentCarSchedule> findByRent(Rent rent);
+
 }

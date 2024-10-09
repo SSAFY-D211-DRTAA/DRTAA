@@ -8,6 +8,7 @@ import com.drtaa.core_data.paging.TourPagingSource
 import com.drtaa.core_data.repository.TourRepository
 import com.drtaa.core_model.tour.TourItem
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -18,16 +19,32 @@ class TourRepositoryImpl @Inject constructor(
         mapX: String,
         mapY: String,
         radius: String,
-    ): Flow<PagingData<TourItem>> {
+    ): Flow<Result<Flow<PagingData<TourItem>>>> {
         Timber.tag("tour").d("TourRepository call")
-        return Pager(
-            config = PagingConfig(
-                pageSize = PAGE_SIZE,
-                enablePlaceholders = false,
-                initialLoadSize = PAGE_SIZE
-            ),
-            pagingSourceFactory = { TourPagingSource(tourDataSource, mapX, mapY, radius) },
-        ).flow
+        try {
+            return flowOf(
+                Result.success(
+                    Pager(
+                        config = PagingConfig(
+                            pageSize = PAGE_SIZE,
+                            enablePlaceholders = false,
+                            initialLoadSize = PAGE_SIZE
+                        ),
+                        pagingSourceFactory = {
+                            TourPagingSource(
+                                tourDataSource,
+                                mapX,
+                                mapY,
+                                radius
+                            )
+                        }
+                    ).flow
+                )
+            )
+        } catch (e: Exception) {
+            Timber.tag("tour").e(e, "Error fetching tour items")
+            return flowOf(Result.failure(e))
+        }
     }
 
     companion object {

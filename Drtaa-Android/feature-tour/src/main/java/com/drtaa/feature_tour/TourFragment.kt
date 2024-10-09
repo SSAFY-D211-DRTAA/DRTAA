@@ -57,6 +57,7 @@ class TourFragment : BaseFragment<FragmentTourBinding>(R.layout.fragment_tour) {
         binding.apply {
             llExpandPlan.setOnClickListener {
                 if (clPlan.visibility == View.GONE) {
+                    tourViewModel.getPlanList()
                     expandLayout(ivExpendPlan, clPlan)
                 } else {
                     foldLayout(ivExpendPlan, clPlan)
@@ -130,14 +131,28 @@ class TourFragment : BaseFragment<FragmentTourBinding>(R.layout.fragment_tour) {
 
         tourViewModel.pagedTour.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { pagingData ->
-                pagingData.let { tourData ->
-                    Timber.d("$tourData")
-                    tourAdapter.submitData(tourData)
+                if (pagingData == null) {
+                    binding.rvTour.visibility = View.GONE
+                    binding.tvTourError.visibility = View.VISIBLE
+                } else {
+                    tourAdapter.submitData(pagingData)
+
+                    binding.rvTour.visibility = View.VISIBLE
+                    binding.tvTourError.visibility = View.GONE
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
 
         tourAdapter.loadStateFlow.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { loadStates ->
+                if (loadStates.source.refresh is LoadState.Error) {
+                    Timber.tag("tourFragment").d("Network error occurred")
+                    binding.rvTour.visibility = View.GONE
+                    binding.tvTourError.visibility = View.VISIBLE
+                    dismissLoading()
+
+                    return@onEach
+                }
+
                 val isLoading =
                     loadStates.source.refresh is LoadState.Loading || loadStates.source.append is LoadState.Loading
                 if (!isLoading) dismissLoading() else showLoading()

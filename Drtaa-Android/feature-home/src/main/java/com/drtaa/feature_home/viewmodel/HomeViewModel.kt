@@ -55,8 +55,7 @@ class HomeViewModel @Inject constructor(
                                 else -> ""
                             }
                         }
-                        // 이때는 오류난 거라서 카드뷰 자체를 숨기게 했음
-                        else -> "null"
+                        else -> "이용 예정인 차량이 없습니다\n렌트를 예약해 보세요!"
                     }
                 }.onFailure {
                     _rentStatus.value = "오류가 발생했습니다.\n다시 시도해주세요!"

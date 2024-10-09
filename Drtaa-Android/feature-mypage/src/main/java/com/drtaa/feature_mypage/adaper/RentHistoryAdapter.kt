@@ -1,4 +1,4 @@
-package com.drtaa.feature_home.adapter
+package com.drtaa.feature_mypage.adaper
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.drtaa.core_model.rent.RentSimple
 import com.drtaa.core_ui.base.BaseDiffUtil
-import com.drtaa.feature_home.databinding.ItemRentHistoryBinding
+import com.drtaa.feature_mypage.databinding.ItemRentHistoryBinding
 
 class RentHistoryAdapter :
     ListAdapter<RentSimple, RentHistoryAdapter.RentHistoryViewHolder>(BaseDiffUtil<RentSimple>()) {

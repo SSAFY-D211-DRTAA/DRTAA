@@ -2,12 +2,14 @@ package com.d211.drtaa.domain.rent.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 
 @Data
 @AllArgsConstructor
 @Getter
+@Builder
 public class RentStatusRequestDTO {
     @Schema(description = "렌트 고유 번호", example = "1")
     private Long rentId;

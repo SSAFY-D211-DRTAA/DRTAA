@@ -9,5 +9,5 @@ interface TourRepository {
         mapX: String,
         mapY: String,
         radius: String,
-    ): Flow<PagingData<TourItem>>
+    ): Flow<Result<Flow<PagingData<TourItem>>>>
 }

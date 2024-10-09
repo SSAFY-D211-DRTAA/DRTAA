@@ -519,6 +519,29 @@ public class RentServiceImpl implements RentService{
 
     @Override
     @Transactional
+    public void rentStatusCompleted(Rent rent, RentCarSchedule rentCarSchedule) {
+        RentCar car = rent.getRentCar();
+
+        // 상태 변경
+        rent.setRentStatus(RentStatus.completed); // 완료
+        car.setRentCarDrivingStatus(RentDrivingStatus.idling); // 무상태
+        rentCarSchedule.setRentCarScheduleIsDone(true); // 완료
+
+        // 렌트 기록 생성
+        RentHistory history = RentHistory.builder()
+                .user(rent.getUser())
+                .rent(rent)
+                .build();
+
+        // 변경 상태 저장
+        rentHistoryRepository.save(history);
+        rentRepository.save(rent);
+        rentCarRepository.save(car);
+        rentCarScheduleRepository.save(rentCarSchedule);
+    }
+
+    @Override
+    @Transactional
     public void rentStatusCanceld(RentStatusRequestDTO requestDTO) {
         // 렌트 찾기
         Rent rent = rentRepository.findByRentId(requestDTO.getRentId())

@@ -61,8 +61,8 @@
             app:layout_constraintTop_toTopOf="@+id/textView7"
             app:setImgUrl="@{socialUser.profileImageUrl}" />
 
-        <ScrollView
-            android:id="@+id/sv_home_scroll"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_home_main"
             android:layout_width="match_parent"
             android:layout_height="410dp"
             android:background="@drawable/rect_white_top_rad30"
@@ -72,288 +72,220 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cv_home_rent_status"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_marginHorizontal="30dp"
+                android:layout_marginTop="40dp"
+                android:elevation="20dp"
+                app:cardCornerRadius="20dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/cv_home_rent_status"
-                    android:layout_width="0dp"
-                    android:layout_height="60dp"
-                    android:layout_marginHorizontal="30dp"
-                    android:layout_marginTop="40dp"
-                    android:elevation="20dp"
-                    app:cardCornerRadius="20dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/cl_home_rent_status"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/rect_stroke_blue_rad20">
 
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="match_parent"
-                        android:id="@+id/cl_home_rent_status"
-                        android:layout_height="match_parent"
-                        android:background="@drawable/rect_stroke_blue_rad20">
+                    <TextView
+                        android:id="@+id/tv_home_rent_status"
+                        style="@style/jua"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textAlignment="center"
+                        android:textSize="18sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:text="현재 차량이 이동중입니다!" />
 
-                        <TextView
-                            android:id="@+id/tv_home_rent_status"
-                            style="@style/jua"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text=""
-                            android:textAlignment="center"
-                            android:textSize="18sp"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            tools:text="현재 차량이 이동중입니다!" />
+                    <ImageView
+                        android:id="@+id/iv_home_car_driving"
+                        android:layout_width="0dp"
+                        android:layout_height="20dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginBottom="10dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/tv_home_rent_status"
+                        tools:src="@drawable/ic_car_image" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.cardview.widget.CardView>
 
-                        <ImageView
-                            android:id="@+id/iv_home_car_driving"
-                            android:layout_width="0dp"
-                            android:layout_height="20dp"
-                            android:layout_marginEnd="5dp"
-                            android:layout_marginBottom="10dp"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toEndOf="@+id/tv_home_rent_status"
-                            tools:src="@drawable/ic_car_image" />
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-                </androidx.cardview.widget.CardView>
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cv_home_rent"
+                android:layout_width="0dp"
+                android:layout_height="150dp"
+                android:layout_marginStart="30dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="8dp"
+                android:elevation="20dp"
+                app:cardCornerRadius="20dp"
+                app:layout_constraintEnd_toStartOf="@+id/cv_home_taxi"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cv_home_rent_status">
 
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/cv_home_rent"
-                    android:layout_width="0dp"
-                    android:layout_height="150dp"
-                    android:layout_marginStart="30dp"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginEnd="8dp"
-                    android:elevation="20dp"
-                    app:cardCornerRadius="20dp"
-                    app:layout_constraintEnd_toStartOf="@+id/cv_home_taxi"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/cv_home_rent_status">
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/rect_grad_blue_white_rad20">
 
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@drawable/rect_grad_blue_white_rad20">
+                    <TextView
+                        android:id="@+id/tv_home_rent"
+                        style="@style/jua"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginTop="20dp"
+                        android:text="렌트"
+                        android:textColor="@color/gray_5858"
+                        android:textSize="24sp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
 
-                        <TextView
-                            android:id="@+id/tv_home_rent"
-                            style="@style/jua"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="20dp"
-                            android:layout_marginTop="20dp"
-                            android:text="렌트"
-                            android:textColor="@color/gray_5858"
-                            android:textSize="24sp"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
+                    <TextView
+                        android:id="@+id/tv_home_rent_detail"
+                        style="@style/ptd_regular"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="손쉬운 여행을 위해"
+                        android:textColor="@color/gray_5858"
+                        app:layout_constraintStart_toStartOf="@+id/tv_home_rent"
+                        app:layout_constraintTop_toBottomOf="@+id/tv_home_rent" />
 
-                        <TextView
-                            android:id="@+id/tv_home_rent_detail"
-                            style="@style/ptd_regular"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="손쉬운 여행을 위해"
-                            android:textColor="@color/gray_5858"
-                            app:layout_constraintStart_toStartOf="@+id/tv_home_rent"
-                            app:layout_constraintTop_toBottomOf="@+id/tv_home_rent" />
+                    <ImageView
+                        android:id="@+id/iv_home_minirent"
+                        android:layout_width="80dp"
+                        android:layout_height="70dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginBottom="2dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:srcCompat="@drawable/ic_cute_rent" />
 
-                        <ImageView
-                            android:id="@+id/iv_home_minirent"
-                            android:layout_width="80dp"
-                            android:layout_height="70dp"
-                            android:layout_marginEnd="8dp"
-                            android:layout_marginBottom="2dp"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:srcCompat="@drawable/ic_cute_rent" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
-                    </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.cardview.widget.CardView>
 
-                </androidx.cardview.widget.CardView>
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cv_home_taxi"
+                android:layout_width="0dp"
+                android:layout_height="150dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="30dp"
+                android:elevation="30dp"
+                app:cardCornerRadius="20dp"
+                app:layout_constraintBottom_toBottomOf="@+id/cv_home_rent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/cv_home_rent"
+                app:layout_constraintTop_toTopOf="@id/cv_home_rent">
 
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/cv_home_taxi"
-                    android:layout_width="0dp"
-                    android:layout_height="150dp"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginEnd="30dp"
-                    android:elevation="30dp"
-                    app:cardCornerRadius="20dp"
-                    app:layout_constraintBottom_toBottomOf="@+id/cv_home_rent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/cv_home_rent"
-                    app:layout_constraintTop_toTopOf="@id/cv_home_rent">
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/rect_grad_blue_white_rad20">
 
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@drawable/rect_grad_blue_white_rad20">
+                    <TextView
+                        android:id="@+id/tv_home_taxi"
+                        style="@style/jua"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginTop="20dp"
+                        android:text="택시"
+                        android:textColor="@color/gray_5858"
+                        android:textSize="24sp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
 
-                        <TextView
-                            android:id="@+id/tv_home_taxi"
-                            style="@style/jua"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="20dp"
-                            android:layout_marginTop="20dp"
-                            android:text="택시"
-                            android:textColor="@color/gray_5858"
-                            android:textSize="24sp"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
+                    <TextView
+                        android:id="@+id/tv_home_taxi_detail"
+                        style="@style/ptd_regular"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="부르면 찾아오는 택시"
+                        android:textColor="@color/gray_5858"
+                        app:layout_constraintStart_toStartOf="@+id/tv_home_taxi"
+                        app:layout_constraintTop_toBottomOf="@+id/tv_home_taxi" />
 
-                        <TextView
-                            android:id="@+id/tv_home_taxi_detail"
-                            style="@style/ptd_regular"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="부르면 찾아오는 택시"
-                            android:textColor="@color/gray_5858"
-                            app:layout_constraintStart_toStartOf="@+id/tv_home_taxi"
-                            app:layout_constraintTop_toBottomOf="@+id/tv_home_taxi" />
+                    <ImageView
+                        android:id="@+id/iv_taxi_minirent"
+                        android:layout_width="80dp"
+                        android:layout_height="70dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginBottom="3dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:srcCompat="@drawable/ic_cute_taxi" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.cardview.widget.CardView>
 
-                        <ImageView
-                            android:id="@+id/iv_taxi_minirent"
-                            android:layout_width="80dp"
-                            android:layout_height="70dp"
-                            android:layout_marginEnd="8dp"
-                            android:layout_marginBottom="3dp"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:srcCompat="@drawable/ic_cute_taxi" />
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-                </androidx.cardview.widget.CardView>
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cv_home_plan"
+                android:layout_width="0dp"
+                android:layout_height="80dp"
+                android:layout_marginStart="30dp"
+                android:layout_marginTop="25dp"
+                android:layout_marginEnd="32dp"
+                android:elevation="20dp"
+                android:fontFamily="@font/ptd_semi_bold"
+                app:cardCornerRadius="20dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/cv_home_taxi">
 
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/cv_home_plan"
-                    android:layout_width="0dp"
-                    android:layout_height="80dp"
-                    android:layout_marginStart="30dp"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginEnd="32dp"
-                    android:elevation="20dp"
-                    android:fontFamily="@font/ptd_semi_bold"
-                    app:cardCornerRadius="20dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/cv_home_taxi">
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/rect_stroke_blue_rad20">
 
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@drawable/rect_stroke_blue_rad20">
+                    <ImageView
+                        android:id="@+id/imageView5"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_gravity="center"
+                        android:layout_marginEnd="20dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/tv_rent_plan_help"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_chainStyle="packed"
+                        app:srcCompat="@drawable/ic_home_calender" />
 
-                        <ImageView
-                            android:id="@+id/imageView5"
-                            android:layout_width="50dp"
-                            android:layout_height="50dp"
-                            android:layout_gravity="center"
-                            android:layout_marginEnd="20dp"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toEndOf="@+id/tv_rent_plan_help"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintVertical_chainStyle="packed"
-                            app:srcCompat="@drawable/ic_home_calender" />
+                    <TextView
+                        android:id="@+id/tv_rent_plan"
+                        style="@style/jua"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="50dp"
+                        android:text="일정 관리"
+                        android:textColor="@color/gray_5858"
+                        android:textSize="20sp"
+                        app:layout_constraintBottom_toTopOf="@id/tv_rent_plan_help"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/imageView5"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_chainStyle="packed" />
 
-                        <TextView
-                            android:id="@+id/tv_rent_plan"
-                            style="@style/jua"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="50dp"
-                            android:text="일정 관리"
-                            android:textColor="@color/gray_5858"
-                            android:textSize="20sp"
-                            app:layout_constraintBottom_toTopOf="@id/tv_rent_plan_help"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/imageView5"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintVertical_chainStyle="packed" />
-
-                        <TextView
-                            android:id="@+id/tv_rent_plan_help"
-                            style="@style/ptd_regular"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="50dp"
-                            android:text="여행 일정을 한눈에 살펴보세요!"
-                            android:textColor="@color/gray_5858"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/tv_rent_plan" />
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-                </androidx.cardview.widget.CardView>
-
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/cv_home_rent_history"
-                    android:layout_width="0dp"
-                    android:layout_height="80dp"
-                    android:layout_marginStart="30dp"
-                    android:layout_marginTop="15dp"
-                    android:layout_marginEnd="32dp"
-                    android:layout_marginBottom="20dp"
-                    android:elevation="20dp"
-                    android:fontFamily="@font/ptd_semi_bold"
-                    app:cardCornerRadius="20dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/cv_home_plan">
-
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@drawable/rect_stroke_blue_rad20">
-
-                        <ImageView
-                            android:id="@+id/imageView6"
-                            android:layout_width="50dp"
-                            android:layout_height="50dp"
-                            android:layout_gravity="center"
-                            android:layout_marginEnd="20dp"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toEndOf="@+id/tv_rent_history_help"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintVertical_chainStyle="packed"
-                            app:srcCompat="@drawable/ic_rent_history" />
-
-                        <TextView
-                            android:id="@+id/tv_rent_history"
-                            style="@style/jua"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="50dp"
-                            android:text="렌트 관리"
-                            android:textColor="@color/gray_5858"
-                            android:textSize="20sp"
-                            app:layout_constraintBottom_toTopOf="@id/tv_rent_history_help"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/imageView6"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintVertical_chainStyle="packed" />
-
-                        <TextView
-                            android:id="@+id/tv_rent_history_help"
-                            style="@style/ptd_regular"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="50dp"
-                            android:text="DRTAA 이용 기록을 확인하세요!"
-                            android:textColor="@color/gray_5858"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/tv_rent_history" />
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-                </androidx.cardview.widget.CardView>
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </ScrollView>
+                    <TextView
+                        android:id="@+id/tv_rent_plan_help"
+                        style="@style/ptd_regular"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="50dp"
+                        android:text="여행 일정을 한눈에 살펴보세요!"
+                        android:textColor="@color/gray_5858"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/tv_rent_plan" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.cardview.widget.CardView>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <ImageView
             android:id="@+id/img_home_maincar"
@@ -380,12 +312,12 @@
 
         <View
             android:id="@+id/guideline_for_car"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
             android:layout_marginTop="40dp"
             android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/sv_home_scroll" />
+            app:layout_constraintTop_toTopOf="@+id/cl_home_main" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph_my_page"
     app:startDestination="@id/myPageFragment">
 
@@ -12,11 +13,44 @@
             android:id="@+id/action_myPageFragment_to_paymentListFragment"
             app:destination="@id/paymentListFragment"
         />
+        <action
+            android:id="@+id/action_myPageFragment_to_rentHistoryFragment"
+            app:destination="@id/rentHistoryFragment"
+        />
+        <action
+            android:id="@+id/action_myPageFragment_to_profileFragment"
+            app:destination="@id/profileFragment">
+        </action>
+    </fragment>
+
+    <fragment
+        android:id="@+id/rentHistoryFragment"
+        android:name="com.drtaa.feature_mypage.RentHistoryFragment"
+        android:label="RentHistoryFragment"
+        tools:layout="@layout/fragment_rent_history">
+        <action
+            android:id="@+id/action_rentHistoryFragment_to_rentHistorySummaryFragment"
+            app:destination="@id/rentHistorySummaryFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/rentHistorySummaryFragment"
+        android:name="com.drtaa.feature_mypage.RentHistorySummaryFragment"
+        android:label="RentHistorySummaryFragment"
+        tools:layout="@layout/fragment_rent_history_summary">
+        <argument
+            android:name="rentId"
+            app:argType="long" />
     </fragment>
 
     <fragment
         android:id="@+id/paymentListFragment"
         android:name="com.drtaa.feature_mypage.PaymentListFragment"
         android:label="PaymentListFragment" />
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.drtaa.feature_mypage.ProfileFragment"
+        android:label="ProfileFragment" />
 
 </navigation>
