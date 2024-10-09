@@ -9,8 +9,8 @@ import subprocess
 # 1. 모델 불러오기
 # --------------------------------------------
 
-# model_path = 'one_depth_wakeword_model.h5'
-model_path = 'wakeword_model.h5'
+model_path = 'one_depth_wakeword_model.h5'
+# model_path = 'wakeword_model.h5'
 
 def load_wakeword_model():
     model = load_model(model_path)

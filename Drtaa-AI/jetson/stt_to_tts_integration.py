@@ -36,12 +36,12 @@ def convert_text_to_speech_and_modify(text):
     # 변환된 WAV 파일 로드
     y, sr = librosa.load("output/output.wav")
 
-    # 피치 및 속도 변형
-    y_shifted = librosa.effects.pitch_shift(y, sr=sr, n_steps=1)
-    y_speed = librosa.effects.time_stretch(y_shifted, rate=1.0)
+    # # 피치 및 속도 변형
+    # y_shifted = librosa.effects.pitch_shift(y, sr=sr, n_steps=1)
+    # y_speed = librosa.effects.time_stretch(y_shifted, rate=1.0)
 
     # 변형된 음성 파일 저장
-    sf.write("output/output.wav", y_speed, sr)
+    sf.write("output/output.wav", y, sr)
 
     # 변환된 음성 파일 실행
     open_audio_file("output/output.wav")
@@ -52,7 +52,7 @@ def convert_mp3_to_wav(mp3_file, wav_file):
 
 def get_recommendations(user_request):
     # 요청할 URL
-    url = "http://192.168.100.199:5000/ai-api-server/recommend_place"
+    url = "https://j11d211.p.ssafy.io/ai-api-server/recommend_place"
     
     # 요청에 포함할 데이터 (JSON 형식)
     data = {
@@ -94,9 +94,11 @@ def get_recommendations(user_request):
 # 음성을 인식하여 텍스트로 변환
 def record_and_recognize_speech():
     recognizer = sr.Recognizer()
-    with sr.Microphone() as source:
+    # Microphone 클래스에서 device_index를 설정
+    with sr.Microphone(device_index=9) as source:  # Microphone with index 9: default
         print("말씀하세요...")
-        audio = recognizer.listen(source)
+        recognizer.adjust_for_ambient_noise(source, duration=1)  # 배경 소음 조정
+        audio = recognizer.listen(source, timeout=5, phrase_time_limit=5)
     try:
         text = recognizer.recognize_google(audio, language="ko-KR")
         print(f"인식된 텍스트: {text}")
@@ -111,7 +113,6 @@ def record_and_recognize_speech():
         print("API 요청 중 문제가 발생했습니다.")
         return None
     return text
-
 
 # 파일에서 텍스트를 읽어오는 함수
 def read_command_from_file(file_path):
