@@ -40,6 +40,13 @@ public interface RentRepository extends JpaRepository<Rent, Long> {
                                                    @Param("today") LocalDateTime today,
                                                    @Param("statuses") List<RentStatus> statuses);
     Optional<Rent> findByUserAndRentStartTimeLessThanEqualAndRentEndTimeGreaterThanEqual(User user, LocalDateTime now, LocalDateTime now1);
+    @Query("SELECT r FROM Rent r WHERE r.user = :user AND r.rentStatus IN :statuses AND " +
+            "(r.rentStartTime BETWEEN :startOfDay AND :endOfDay OR r.rentEndTime BETWEEN :startOfDay AND :endOfDay)")
+    Optional<Rent> findRentByUserAndStatusAndDateRange(@Param("user") User user,
+                                                       @Param("startOfDay") LocalDateTime startOfDay,
+                                                       @Param("endOfDay") LocalDateTime endOfDay,
+                                                       @Param("statuses") List<RentStatus> statuses);
+
 
 
     List<Rent> findByUser(User user);
