@@ -417,6 +417,10 @@ class CarViewModel @Inject constructor(
         }
     }
 
+    fun clearPath(){
+        _routeData.value = emptyList()
+    }
+
     /**
      * 재호출
      */
@@ -434,6 +438,7 @@ class CarViewModel @Inject constructor(
                     ).collect { result ->
                         result.onSuccess {
                             Timber.tag("Car").d("재호출 성공 $it")
+                            fetchPath()
                             _isRecall.emit(true)
                             _carPosition.emit(it)
                         }.onFailure {
