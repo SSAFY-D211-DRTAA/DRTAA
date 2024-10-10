@@ -158,6 +158,12 @@ class CarTrackingFragment :
 
         viewModel.gpsData.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach { gps ->
             Timber.tag("gps").d("$gps")
+            if (viewModel.routeData.value.isNotEmpty()) {
+                pathOverlay.apply {
+                    coords = viewModel.routeData.value.map { LatLng(it.lat, it.lon) }
+                    map = naverMap
+                }
+            }
             pathOverlayProgress(gps)
             carMarker.apply {
                 position = gps
