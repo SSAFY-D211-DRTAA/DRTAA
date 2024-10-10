@@ -95,7 +95,8 @@ def get_recommendations(user_request):
 def record_and_recognize_speech():
     recognizer = sr.Recognizer()
     # Microphone 클래스에서 device_index를 설정
-    with sr.Microphone(device_index=9) as source:  # Microphone with index 9: default
+    # device_index=9
+    with sr.Microphone() as source:  # Microphone with index 9: default
         print("말씀하세요...")
         recognizer.adjust_for_ambient_noise(source, duration=1)  # 배경 소음 조정
         audio = recognizer.listen(source, timeout=5, phrase_time_limit=5)
