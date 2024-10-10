@@ -213,12 +213,26 @@ public class RentCarServiceImpl implements RentCarService {
             // 현재 렌트에 해당하는 첫째날 id
             TravelDates date = travelDatesRepository.findFirstByTravel(rent.getTravel());
             response[0].setTravelDatesId(date.getTravelDatesId());
-            // 첫째날의 첫 장소(탑승 장소) id
-            DatePlaces place = datePlacesRepository.findFirstByTravelDatesOrderByDatePlacesOrderAsc(date);
-            response[0].setDatePlacesId(place.getDatePlacesId());
+            // 첫째날의 첫번째 장소
+            DatePlaces firstPlace = datePlacesRepository.findFirstByTravelDatesAndDatePlacesOrder(date, 1)
+                    .orElseThrow(() -> new TravelNotFoundException("첫번째 장소가 없습니다."));
+
+            // 첫 탑승 장소 isVisited 처리
+            firstPlace.setDatePlacesIsVisited(true);
+            firstPlace.setDatePlacesIsExpired(true);
+
+            // 상태 변경 저장
+            datePlacesRepository.save(firstPlace);
+
+            // 첫째날의 두번째 장소 id
+            DatePlaces secondPlace = datePlacesRepository.findFirstByTravelDatesAndDatePlacesOrder(date, 2)
+                    .orElseThrow(() -> new TravelNotFoundException("두번째 장소가 없습니다."));
+            response[0].setDatePlacesId(secondPlace.getDatePlacesId());
+
+
 
             // 알림 보낼 내용
-            String content = "차량이 여행 첫번째 탑승 위치( "+ place.getDatePlacesName() +")로 이동중입니다.\n 위치를 확인해 주세요 !!";
+            String content = "차량이 여행 첫번째 탑승 위치( "+ secondPlace.getDatePlacesName() +")로 이동중입니다.\n 위치를 확인해 주세요 !!";
 
             // 사용자에게 알림 전송
             FcmMessage.FcmDTO fcmDTO = fcmUtil.makeFcmDTO("렌트 차량 위치", content);

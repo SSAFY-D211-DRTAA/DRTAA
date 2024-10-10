@@ -7,6 +7,7 @@ import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +19,7 @@ public interface DatePlacesRepository extends JpaRepository<DatePlaces, Long> {
     Optional<DatePlaces> findFirstByTravelAndDatePlacesIsExpiredFalseOrderByDatePlacesIdAsc(Travel travel);
     DatePlaces findFirstByTravelDatesOrderByDatePlacesOrderAsc(TravelDates travelDates);
     DatePlaces findFirstByTravelDates(TravelDates travelDates);
+    Optional<DatePlaces> findFirstByTravelDatesAndDatePlacesOrder(TravelDates date, int datePlacesOrder);
     List<DatePlaces> findByTravelDates(TravelDates travelDates);
     List<DatePlaces> findByTravelDatesAndDatePlacesOrderGreaterThan(TravelDates date, int datePlacesOrder);
     List<DatePlaces> findByTravelDatesAndDatePlacesIsExpiredFalse(TravelDates date);
