@@ -29,8 +29,8 @@
 
             <ImageView
                 android:id="@+id/iv_sign_up_profile"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:scaleType="centerCrop"
                 android:src="@drawable/ic_add" />
@@ -64,7 +64,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text=""
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toStartOf="@id/et_sign_up_id"
             app:layout_constraintTop_toBottomOf="@+id/et_sign_up_id" />
 
         <androidx.appcompat.widget.AppCompatButton
@@ -113,7 +113,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text=""
-            app:layout_constraintStart_toStartOf="parent"
+            android:textColor="@color/red_90"
+            app:layout_constraintStart_toStartOf="@id/et_sign_up_id"
             app:layout_constraintTop_toBottomOf="@+id/et_sign_up_pw" />
 
         <TextView
@@ -145,7 +146,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text=""
-            app:layout_constraintStart_toStartOf="parent"
+            android:textColor="@color/red_90"
+            app:layout_constraintStart_toStartOf="@id/et_sign_up_id"
             app:layout_constraintTop_toBottomOf="@+id/et_sign_up_chk_pw" />
 
         <TextView
@@ -177,10 +179,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="25dp"
-            android:layout_marginTop="5dp"
-            android:text="닉네임 관련 메세지 띄울 예정"
+            android:textColor="@color/red_90"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/et_sign_up_nickname" />
+            app:layout_constraintTop_toBottomOf="@+id/et_sign_up_nickname"
+            tools:text="닉네임 관련 메세지 띄울 예정" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_sign_up"
