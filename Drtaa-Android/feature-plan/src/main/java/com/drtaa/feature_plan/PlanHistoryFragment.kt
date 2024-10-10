@@ -48,7 +48,7 @@ class PlanHistoryFragment :
                     requireContext(),
                     "추천받은 장소를 일정에 추가할까요? 일정 마지막에 추가되며, " +
                             "필요시 순서를 바꿔주세요!" +
-                            "\n${recommend.title}\n${recommend.roadAddress}"
+                            "\n\n${recommend.title}\n${recommend.roadAddress}"
                 ) {
                     planHistoryViewModel.planInProgress.value?.let { progress ->
                         moveToPlanListFragment(progress.travelId, progress.rentId, recommend)
