@@ -4,12 +4,10 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Environment
-import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import com.drtaa.core_auth.SocialLoginManager
 import com.drtaa.core_ui.base.BaseFragment
 import com.drtaa.core_ui.component.TwoButtonMessageDialog
@@ -87,27 +85,32 @@ class MyPageFragment : BaseFragment<FragmentMyPageBinding>(R.layout.fragment_my_
 
     private fun setupMyPageItems() {
         with(binding) {
+            llMypageItem1
             llMypageItem1.apply {
-                findViewById<TextView>(R.id.tv_mypage_item_title).text = "프로필 정보"
-                setOnClickListener {
-                    findNavController().navigate(R.id.action_myPageFragment_to_profileFragment)
+                tvMypageItemTitle.text = "프로필 정보"
+                imgMypageItemImage.setImageResource(R.drawable.ic_user)
+                clMypageItem.setOnClickListener {
+                    navigateDestination(R.id.action_myPageFragment_to_profileFragment)
                 }
             }
             llMypageItem2.apply {
-                findViewById<TextView>(R.id.tv_mypage_item_title).text = "결제 내역"
-                setOnClickListener {
-                    findNavController().navigate(R.id.action_myPageFragment_to_paymentListFragment)
+                tvMypageItemTitle.text = "결제 내역"
+                imgMypageItemImage.setImageResource(R.drawable.ic_money)
+                clMypageItem.setOnClickListener {
+                    navigateDestination(R.id.action_myPageFragment_to_paymentListFragment)
                 }
             }
             llMypageItem3.apply {
-                findViewById<TextView>(R.id.tv_mypage_item_title).text = "렌트 관리"
-                setOnClickListener {
-                    findNavController().navigate(R.id.action_myPageFragment_to_rentHistoryFragment)
+                tvMypageItemTitle.text = "렌트 관리"
+                imgMypageItemImage.setImageResource(R.drawable.ic_car)
+                clMypageItem.setOnClickListener {
+                    navigateDestination(R.id.action_myPageFragment_to_rentHistoryFragment)
                 }
             }
             llMypageItem4.apply {
-                findViewById<TextView>(R.id.tv_mypage_item_title).text = "로그아웃"
-                setOnClickListener {
+                tvMypageItemTitle.text = "로그아웃"
+                imgMypageItemImage.setImageResource(R.drawable.ic_sign_out)
+                clMypageItem.setOnClickListener {
                     TwoButtonMessageDialog(
                         context = requireActivity(),
                         message = "로그아웃 하시겠습니까?",

@@ -158,6 +158,12 @@ class CarTrackingFragment :
 
         viewModel.gpsData.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach { gps ->
             Timber.tag("gps").d("$gps")
+//            if (viewModel.routeData.value.isNotEmpty()) {
+//                pathOverlay.apply {
+//                    coords = viewModel.routeData.value.map { LatLng(it.lat, it.lon) }
+//                    map = naverMap
+//                }
+//            }
             pathOverlayProgress(gps)
             carMarker.apply {
                 position = gps
@@ -194,8 +200,6 @@ class CarTrackingFragment :
         val path = viewModel.routeData.value
         if (path.isNotEmpty()) {
             val end = path.last().idx
-            Timber.tag("gps path").d("$path || $end")
-
             // 현재 GPS와 경로의 점들 간의 거리를 계산하여 THRESHOLD 범위 내에서 가장 가까운 지점을 찾음
             val closestPoint = path.minByOrNull { point ->
                 gps.distanceTo(LatLng(point.lat, point.lon))
@@ -210,6 +214,7 @@ class CarTrackingFragment :
                     Timber.tag("gps progress")
                         .d("path and end: $path || $end -- ${(progress.toFloat() / end.toFloat()).toDouble()}")
                     pathOverlay.progress = (progress.toFloat() / end.toFloat()).toDouble()
+                    if (pathOverlay.progress == 1.0) viewModel.clearPath()
                 } else {
                     Timber.tag("gps progress")
                         .d("매칭 안됨: 가장 가까운 지점이 허용 범위 밖입니다. $distanceToClosestPoint")
@@ -231,6 +236,7 @@ class CarTrackingFragment :
 
     override fun iniView() {
 //
+        viewModel.fetchPath()
     }
 
     companion object {

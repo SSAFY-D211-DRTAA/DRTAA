@@ -29,6 +29,10 @@ class GPSRepositoryImpl @Inject constructor(
         }
     }
 
+    override fun fetchPath(data: String, topic: String) {
+        mqttManager.publishMessage(data, topic)
+    }
+
     override suspend fun setupMqttConnection() {
         mqttManager.setupMqttClient()
     }

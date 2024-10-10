@@ -2,6 +2,7 @@ package com.drtaa.core_ui
 
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import java.lang.String.format
@@ -59,7 +60,7 @@ fun TextView.setPaymentMethod(method: String) {
         "카카오페이" -> R.color.kakao_yellow
         else -> R.color.default_text_color
     }
-    setTextColor(color)
+    setTextColor(ContextCompat.getColor(context, color))
 }
 
 @BindingAdapter("rentTime")

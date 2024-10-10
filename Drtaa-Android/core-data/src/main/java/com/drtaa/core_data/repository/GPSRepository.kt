@@ -11,4 +11,5 @@ interface GPSRepository {
     fun publishGpsData(data: String, topic: String)
     fun disconnectMqtt()
     fun observeConnectionStatus(): Flow<Int>
+    fun fetchPath(data: String, topic: String)
 }

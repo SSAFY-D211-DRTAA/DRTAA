@@ -13,6 +13,7 @@ import com.drtaa.core_model.network.RequestCompleteRent
 import com.drtaa.core_model.network.ResponseRentStateAll
 import com.drtaa.core_model.network.ResponseReverseGeocode
 import com.drtaa.core_model.plan.Plan
+import com.drtaa.core_model.plan.PlanItem
 import com.drtaa.core_model.rent.CarPosition
 import com.drtaa.core_model.rent.RentDetail
 import com.naver.maps.geometry.LatLng
@@ -145,6 +146,17 @@ class CarViewModel @Inject constructor(
         gpsRepository.publishGpsData(data, GPS_SUB)
     }
 
+    fun fetchPath(
+        data: String =
+            """
+         {"action":"vehicle_global_path"}
+            """.trimIndent(),
+    ) {
+        viewModelScope.launch {
+            gpsRepository.fetchPath(data, PATH_SUB)
+        }
+    }
+
     fun stopGPSPublish() {
         publishJob?.cancel()
         publishJob = null
@@ -153,7 +165,7 @@ class CarViewModel @Inject constructor(
     private fun observeMqttMessages() {
         viewModelScope.launch {
             gpsRepository.observeMqttGPSMessages().collectLatest {
-                Timber.tag("Car").d("observeMqttMessages: $it")
+//                Timber.tag("Car").d("observeMqttMessages: $it")
                 val lat = it.msg.latitude
                 val lng = it.msg.longitude
                 Timber.tag("Car").d("check: $lat, $lng")
@@ -182,7 +194,7 @@ class CarViewModel @Inject constructor(
     fun getCarDrivingStatus() {
         viewModelScope.launch {
             _currentRentDetail.value?.let {
-                rentCarRepository.getDriveStatus(it.rentId!!).collect { status ->
+                rentCarRepository.getDriveStatus(it.rentCarId.toLong()).collect { status ->
                     status.onSuccess { data ->
                         Timber.tag("Car").d("드라이브 상태 조회 성공 $data")
                         _drivingStatus.value = when (data) {
@@ -192,6 +204,10 @@ class CarViewModel @Inject constructor(
 
                             "calling" -> {
                                 CarStatus.CALLING
+                            }
+
+                            "parking" -> {
+                                CarStatus.DRIVING
                             }
 
                             else -> {
@@ -222,15 +238,18 @@ class CarViewModel @Inject constructor(
                     result.onSuccess { data ->
                         // 탑승에 성공했다면 update
                         Timber.tag("Car").d("탑승 $data")
+                        val request = RequestCarStatus(
+                            rentId = rentId.toInt(),
+                            travelId = data.travelId,
+                            travelDatesId = data.travelDatesId,
+                            datePlacesId = data.datePlacesId
+                        )
+                        Timber.tag("Car 탑승").d("$request")
                         rentCarRepository.setCarWithTravelInfo(
-                            RequestCarStatus(
-                                rentId = rentId.toInt(),
-                                travelId = data.travelId,
-                                travelDatesId = data.travelDatesId,
-                                datePlacesId = data.datePlacesId
-                            )
+                            request
                         )
                         getCarDrivingStatus()
+                        Timber.tag("drivingstatus").d("탑승 ${_drivingStatus.value}")
                     }.onFailure { e ->
                         Timber.tag("Car").d("승차 $e")
                     }
@@ -398,6 +417,10 @@ class CarViewModel @Inject constructor(
         }
     }
 
+    fun clearPath() {
+        _routeData.value = emptyList()
+    }
+
     /**
      * 재호출
      */
@@ -415,6 +438,7 @@ class CarViewModel @Inject constructor(
                     ).collect { result ->
                         result.onSuccess {
                             Timber.tag("Car").d("재호출 성공 $it")
+                            fetchPath()
                             _isRecall.emit(true)
                             _carPosition.emit(it)
                         }.onFailure {
@@ -474,6 +498,7 @@ class CarViewModel @Inject constructor(
                         .collect { planResult ->
                             planResult.onSuccess { plan ->
                                 val planList = plan.datesDetail.toMutableList()
+                                // 첫 일정이 다음 일정으로 밀려야 됨
                                 val firstDayPlan = plan.datesDetail.first() // 첫 호출이니까
                                 val addressName = _reverseGeocode.value?.getOrNull()
                                 val buildingName = addressName?.split(" ")?.last()
@@ -487,9 +512,11 @@ class CarViewModel @Inject constructor(
                                         datePlacesLat = latlng.latitude,
                                         datePlacesLon = latlng.longitude
                                     )
-                                placeList[0] = modifiedFirstPlanItem
+                                val newPlanItemList = mutableListOf<PlanItem>()
+                                newPlanItemList.add(modifiedFirstPlanItem)
+                                newPlanItemList.add(placeList[0])
                                 val modifiedDayPlan = firstDayPlan.copy(
-                                    placesDetail = placeList
+                                    placesDetail = newPlanItemList
                                 )
                                 planList[0] = modifiedDayPlan
                                 planRepository.putPlan(
@@ -501,8 +528,16 @@ class CarViewModel @Inject constructor(
                                         travelEndDate = plan.travelEndDate,
                                     )
                                 ).collect { planModify ->
-                                    planModify.onSuccess {
-                                        Timber.tag("Car").d("수정 성공")
+                                    planModify.onSuccess { result ->
+                                        Timber.tag("Car").d("수정 성공 $result")
+                                        rentCarRepository.setCarWithTravelInfo(
+                                            RequestCarStatus(
+                                                rentId = rent.rentId.toInt(),
+                                                travelId = result.travelId,
+                                                travelDatesId = result.travelDatesId,
+                                                datePlacesId = result.datePlacesId
+                                            )
+                                        )
                                         callFirstAssignedCar()
                                     }.onFailure { e ->
                                         Timber.tag("Car").d("수정 실패 $e")
@@ -523,7 +558,7 @@ class CarViewModel @Inject constructor(
     companion object {
         private const val DEFAULT_INTERVAL = 1000L
         private const val GPS_SUB = "gps/data/v1/subscribe"
-//        private const val PATH_SUB = "path/data/v1/subscribe"
+        private const val PATH_SUB = "path/data/v1/subscribe"
 //        private const val ORIENTATION_SUB = "orientation/data/v1/subscribe"
     }
 }

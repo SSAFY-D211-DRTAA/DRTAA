@@ -106,7 +106,7 @@ class MqttManager @Inject constructor() {
                                 gson.fromJson(message, ResponseGPS::class.java)
                             }.onSuccess { parsedMessage ->
                                 _receivedGPSMessages.emit(parsedMessage)
-                                Timber.tag(TAG).d("GPS 데이터 수신: $parsedMessage")
+//                                Timber.tag(TAG).d("GPS 데이터 수신: $parsedMessage")
                             }.onFailure { e ->
                                 Timber.tag(TAG).e(e, "GPS 메시지 파싱 실패")
                             }
@@ -117,7 +117,7 @@ class MqttManager @Inject constructor() {
                                 gson.fromJson(message, ResponseGPS::class.java)
                             }.onSuccess { parsedMessage ->
                                 _receivedGPSMessages.emit(parsedMessage)
-                                Timber.tag(TAG).d("GPS 데이터 수신: $parsedMessage")
+//                                Timber.tag(TAG).d("GPS 데이터 수신: $parsedMessage")
                             }.onFailure { e ->
                                 Timber.tag(TAG).e(e, "GPS 메시지 파싱 실패")
                             }
