@@ -171,6 +171,14 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
                     updateCarStateUi(current)
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+        carViewModel.isReturn.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach {
+            if (it) {
+                showSnackBar("반납 성공")
+                carViewModel.getRentTravelInfo()
+                carViewModel.getValidRent()
+            }
+        }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
     private fun updateCarStateUi(currentRentDetail: RentDetail) {
