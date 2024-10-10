@@ -178,6 +178,9 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
                 carViewModel.getRentTravelInfo()
                 carViewModel.getValidRent()
                 binding.clCarBottomTextGotoUse.visibility = View.VISIBLE
+                binding.imgCarCarimage.visibility = View.GONE
+                binding.tvReservedState.visibility = View.VISIBLE
+                binding.tvReservedState.text = "예약한 차량이 없습니다."
             }
         }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
