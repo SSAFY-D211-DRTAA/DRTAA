@@ -232,7 +232,7 @@ public class RentCarServiceImpl implements RentCarService {
 
 
             // 알림 보낼 내용
-            String content = "차량이 여행 첫번째 탑승 위치( "+ secondPlace.getDatePlacesName() +")로 이동중입니다.\n 위치를 확인해 주세요 !!";
+            String content = "차량이 여행 첫번째 탑승 위치( "+ firstPlace.getDatePlacesName() +")로 이동중입니다.\n 위치를 확인해 주세요 !!";
 
             // 사용자에게 알림 전송
             FcmMessage.FcmDTO fcmDTO = fcmUtil.makeFcmDTO("렌트 차량 위치", content);
