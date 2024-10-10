@@ -12,7 +12,9 @@ import com.drtaa.core_model.network.RequestCarStatus
 import com.drtaa.core_model.network.RequestCompleteRent
 import com.drtaa.core_model.network.ResponseRentStateAll
 import com.drtaa.core_model.network.ResponseReverseGeocode
+import com.drtaa.core_model.plan.DayPlan
 import com.drtaa.core_model.plan.Plan
+import com.drtaa.core_model.plan.PlanItem
 import com.drtaa.core_model.rent.CarPosition
 import com.drtaa.core_model.rent.RentDetail
 import com.naver.maps.geometry.LatLng
@@ -192,6 +194,10 @@ class CarViewModel @Inject constructor(
 
                             "calling" -> {
                                 CarStatus.CALLING
+                            }
+
+                            "parking" -> {
+                                CarStatus.DRIVING
                             }
 
                             else -> {
@@ -474,6 +480,7 @@ class CarViewModel @Inject constructor(
                         .collect { planResult ->
                             planResult.onSuccess { plan ->
                                 val planList = plan.datesDetail.toMutableList()
+                                // 첫 일정이 다음 일정으로 밀려야 됨
                                 val firstDayPlan = plan.datesDetail.first() // 첫 호출이니까
                                 val addressName = _reverseGeocode.value?.getOrNull()
                                 val buildingName = addressName?.split(" ")?.last()
@@ -487,9 +494,11 @@ class CarViewModel @Inject constructor(
                                         datePlacesLat = latlng.latitude,
                                         datePlacesLon = latlng.longitude
                                     )
-                                placeList[0] = modifiedFirstPlanItem
+                                val newPlanItemList = mutableListOf<PlanItem>()
+                                newPlanItemList.add(modifiedFirstPlanItem)
+                                newPlanItemList.add(placeList[0])
                                 val modifiedDayPlan = firstDayPlan.copy(
-                                    placesDetail = placeList
+                                    placesDetail = newPlanItemList
                                 )
                                 planList[0] = modifiedDayPlan
                                 planRepository.putPlan(
