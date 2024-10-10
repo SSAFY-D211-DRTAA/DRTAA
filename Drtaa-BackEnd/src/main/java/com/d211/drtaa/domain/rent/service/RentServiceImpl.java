@@ -249,12 +249,14 @@ public class RentServiceImpl implements RentService{
         RentStatusResponseDTO response = RentStatusResponseDTO.builder().build();
 
         try {
-            // 현재 시간
-            LocalDateTime now = LocalDateTime.now();
+            LocalDate today = LocalDate.now();
+            LocalDateTime startOfDay = today.atStartOfDay();  // 00:00:00
+            LocalDateTime endOfDay = today.atTime(LocalTime.MAX);  // 23:59:59
 
-            // 오늘 날짜가 렌트 시작과 종료 시간 사이에 포함되는 렌트 찾기
-            Rent rent = rentRepository.findByUserAndRentStartTimeLessThanEqualAndRentEndTimeGreaterThanEqual(user, now, now)
-                    .orElseThrow(() -> new RentNotFoundException("오늘 날짜 기준 사용자의 렌트가 없습니다."));
+            // 사용자의 진행중인 렌트 찾기
+            List<RentStatus> statuses = Arrays.asList(RentStatus.in_progress, RentStatus.reserved);
+            Rent rent = rentRepository.findRentByUserAndStatusAndDateRange(user, startOfDay, endOfDay, statuses)
+                    .orElseThrow(() -> new RentNotFoundException("해당 사용자의 진행 중인 렌트가 없습니다."));
 
             response.setRentStatus(rent.getRentStatus());
             response.setRentCarDrivingStatus(rent.getRentCar().getRentCarDrivingStatus());
