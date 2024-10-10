@@ -107,7 +107,8 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/constraintLayout2">
+                    app:layout_constraintTop_toBottomOf="@+id/constraintLayout2"
+                    tools:visibility="visible">
 
                     <TextView
                         android:id="@+id/tv_reserved_state"
@@ -117,7 +118,8 @@
                         android:gravity="center"
                         android:textSize="24sp"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:text="상태가 들어가요" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -130,7 +132,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/constraintLayout2"
-                    tools:visibility="visible">
+                    tools:visibility="gone">
 
                     <TextView
                         android:id="@+id/tv_tour_title_cartype"

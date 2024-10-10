@@ -177,6 +177,7 @@ class CarFragment : BaseFragment<FragmentCarBinding>(R.layout.fragment_car) {
                 showSnackBar("반납 성공")
                 carViewModel.getRentTravelInfo()
                 carViewModel.getValidRent()
+                binding.clCarBottomTextGotoUse.visibility = View.VISIBLE
             }
         }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
