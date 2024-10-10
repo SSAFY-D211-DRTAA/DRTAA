@@ -91,7 +91,7 @@
                 android:background="#E0E0E0" />
 
             <include
-                android:id="@+id/ll_mypage_item2"
+                android:id="@+id/ll_mypage_item3"
                 layout="@layout/my_page_item"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
@@ -104,7 +104,7 @@
                 android:background="#E0E0E0" />
 
             <include
-                android:id="@+id/ll_mypage_item3"
+                android:id="@+id/ll_mypage_item2"
                 layout="@layout/my_page_item"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
