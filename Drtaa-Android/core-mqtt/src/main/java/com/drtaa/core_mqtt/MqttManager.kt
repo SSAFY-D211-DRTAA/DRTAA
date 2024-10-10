@@ -165,7 +165,7 @@ class MqttManager @Inject constructor() {
                 if (throwable != null) {
                     Timber.tag(TAG).e(throwable, "발행 실패")
                 } else {
-//                    Timber.tag(TAG).d("발행 성공 $connAck")
+                    Timber.tag(TAG).d("발행 성공 $connAck")
                 }
             }
     }

@@ -146,6 +146,17 @@ class CarViewModel @Inject constructor(
         gpsRepository.publishGpsData(data, GPS_SUB)
     }
 
+    fun fetchPath(
+        data: String =
+            """
+         {"action":"vehicle_global_path"}
+            """.trimIndent(),
+    ) {
+        viewModelScope.launch {
+            gpsRepository.fetchPath(data, PATH_SUB)
+        }
+    }
+
     fun stopGPSPublish() {
         publishJob?.cancel()
         publishJob = null
@@ -542,7 +553,7 @@ class CarViewModel @Inject constructor(
     companion object {
         private const val DEFAULT_INTERVAL = 1000L
         private const val GPS_SUB = "gps/data/v1/subscribe"
-//        private const val PATH_SUB = "path/data/v1/subscribe"
+        private const val PATH_SUB = "path/data/v1/subscribe"
 //        private const val ORIENTATION_SUB = "orientation/data/v1/subscribe"
     }
 }

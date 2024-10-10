@@ -200,8 +200,6 @@ class CarTrackingFragment :
         val path = viewModel.routeData.value
         if (path.isNotEmpty()) {
             val end = path.last().idx
-            Timber.tag("gps path").d("$path || $end")
-
             // 현재 GPS와 경로의 점들 간의 거리를 계산하여 THRESHOLD 범위 내에서 가장 가까운 지점을 찾음
             val closestPoint = path.minByOrNull { point ->
                 gps.distanceTo(LatLng(point.lat, point.lon))
@@ -237,6 +235,7 @@ class CarTrackingFragment :
 
     override fun iniView() {
 //
+        viewModel.fetchPath()
     }
 
     companion object {
