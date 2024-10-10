@@ -230,7 +230,7 @@
                 android:layout_width="0dp"
                 android:layout_height="80dp"
                 android:layout_marginStart="30dp"
-                android:layout_marginTop="25dp"
+                android:layout_marginTop="20dp"
                 android:layout_marginEnd="32dp"
                 android:elevation="20dp"
                 android:fontFamily="@font/ptd_semi_bold"
@@ -242,7 +242,7 @@
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@drawable/rect_stroke_blue_rad20">
+                    android:background="@drawable/rect_grad_blue_white_rad20">
 
                     <ImageView
                         android:id="@+id/imageView5"
