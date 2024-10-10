@@ -214,9 +214,7 @@ class CarTrackingFragment :
                     Timber.tag("gps progress")
                         .d("path and end: $path || $end -- ${(progress.toFloat() / end.toFloat()).toDouble()}")
                     pathOverlay.progress = (progress.toFloat() / end.toFloat()).toDouble()
-                    if (pathOverlay.progress == 1.0){
-                        viewModel.clearPath()
-                    }
+                    if (pathOverlay.progress == 1.0) viewModel.clearPath()
                 } else {
                     Timber.tag("gps progress")
                         .d("매칭 안됨: 가장 가까운 지점이 허용 범위 밖입니다. $distanceToClosestPoint")

@@ -417,7 +417,7 @@ class CarViewModel @Inject constructor(
         }
     }
 
-    fun clearPath(){
+    fun clearPath() {
         _routeData.value = emptyList()
     }
 
