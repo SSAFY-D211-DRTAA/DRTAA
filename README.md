@@ -35,7 +35,7 @@
 
 | <div align="center">**메인 화면**</div> | <div align="center">**메인 화면 동작**</div> |
 | :---: | :---: |
-| ![image](./최종 녹화 - frame at 0m0s.jpg) |  |
+| ![image](/Readme-Img/최종 녹화 - frame at 0m0s.jpg) |  |
 
 <br>
 
