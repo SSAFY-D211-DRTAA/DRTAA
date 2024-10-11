@@ -12,7 +12,7 @@ from nav_msgs.msg import Odometry, Path
 from morai_msgs.msg import CtrlCmd, EgoVehicleStatus, ObjectStatusList, GetTrafficLightStatus, EventInfo, Lamps
 from morai_msgs.srv import MoraiEventCmdSrv, MoraiEventCmdSrvRequest
 from tf.transformations import euler_from_quaternion, quaternion_from_euler
-from std_msgs.msg import Bool, String
+from std_msgs.msg import Bool, String, Int8
 
 class TrafficLightManager:
     def __init__(self):
@@ -56,7 +56,7 @@ class pure_pursuit:
         rospy.Subscriber('/command_status', String, self.command_callback)
 
         # 좌회전 여부 확인
-        rospy.Subscriber("/is_left_turn", Bool, self.turning_left_callback)
+        rospy.Subscriber("/is_left_turn", Int8, self.turning_left_callback)
 
         # 목적지 도착  여부
         rospy.Subscriber("/complete_drive", PoseStamped, self.complete_drive_callback)
@@ -94,12 +94,12 @@ class pure_pursuit:
         self.vehicle_status = None
         self.previous_vehicle_status = None
  
-        self.vehicle_length = 2.7
+        self.vehicle_length = 1.5 #2.0 #2.7
         self.lfd = 8
         self.min_lfd = 5
         self.max_lfd = 15
         self.lfd_gain = 0.78
-        self.target_velocity = 35 # 70
+        self.target_velocity = 50 # 30
         self.stop_line_threshold = 15  ## 정지선 감지 거리 
 
         self.nodes = self.load_nodes()
@@ -200,7 +200,7 @@ class pure_pursuit:
         if self.previous_global_path is None or not self.is_same_path(self.previous_global_path, msg):
             self.global_path = msg
             self.is_global_path = True
-            self.velocity_list = self.vel_planning.curvedBaseVelocity(self.global_path, 50)
+            self.velocity_list = self.vel_planning.curvedBaseVelocity(self.global_path, 20) # 50 
             self.is_complete_drive = False
             rospy.loginfo("Global path updated and velocity list recalculated")
             self.previous_global_path = msg  # 이전 경로 업데이트
@@ -316,9 +316,11 @@ class pure_pursuit:
     def turning_left_callback(self, msg):
         self.is_turning_left = msg.data # Bool은 data로 값을 가져옴!!
 
-        if self.is_turning_left:
+        if self.is_turning_left == 1:
             self.set_lamp(turn_signal=1, emergency_signal=0)
-        else:   
+        elif self.is_turning_left == -1:   
+            self.set_lamp(turn_signal=2, emergency_signal=0)
+        else:
             self.set_lamp(turn_signal=0, emergency_signal=0)
         # rospy.loginfo(f"Left turn signal: {self.is_turning_left}")
     
@@ -366,7 +368,7 @@ class pure_pursuit:
             if is_near_stop_line: # 정지선 근처인 경우
                 # rospy.loginfo(f"Near stop line, distance: {distance_to_stop_line:.2f}")
                 
-                if self.is_turning_left: # 좌회전을 해야할 경우
+                if self.is_turning_left == 1: # 좌회전을 해야할 경우
                     if self.traffic_light_manager.can_turn_left(): # 좌회전 가능
                         #rospy.loginfo("Left turn signal on, proceeding with left turn")
                         return

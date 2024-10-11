@@ -69,10 +69,14 @@ class AStarPathPublisher:
         self.parking_attempt_count = 0
         self.max_parking_attempts = 70
         self.move_to_last_dropoff_called = False
+        self.is_pub_goal = False
 
         # 주차장 좌표 리스트
-        self.parking_positions = [Point(x=1528.0742188008735, y=-835.3732928442769, z=0.0), Point(x=1539.7406006369274, y= -843.428895869758, z=0.0)]
-        #"x": 1528.0742188008735, "y": -835.3732928442769, "x": 1539.7406006369274, "y": -843.428895869758
+        # self.parking_positions = [Point(x=1528.0742188008735, y=-835.3732928442769, z=0.0), Point(x=1539.7406006369274, y= -843.428895869758, z=0.0)]
+        self.parking_positions = [Point(x=427.82528691680636, y= -142.5813922053203, z=0.0), Point(x=430.7770691434853, y= -138.62242308957502, z=0.0)]
+
+        #"orientation": {"x": -0.006980617996305227, "y": -0.005783775355666876, "z": -0.9149314165115356,
+        # "x": -0.005475656595081091, "y": 0.010562765412032604
 
         try:
             # MGeo 데이터 로드
@@ -124,6 +128,7 @@ class AStarPathPublisher:
         
         self.end_node = self.find_closest_node(msg.pose.position)
         self.is_goal_pose = True
+        self.is_pub_goal = False
         # self.is_global_path_once_pub = False
         rospy.loginfo(f"목적지 노드: {self.end_node}")
         # [INFO] [1727033826.562245]: 목적지 노드: A119AS319285
@@ -142,7 +147,6 @@ class AStarPathPublisher:
             self.is_dropoff = False
             self.vehicle_state = 'pickup'
             self.status_pub.publish(self.vehicle_state)
-
 
     def odom_callback(self, msg):
         self.current_position = msg.pose.pose.position
@@ -229,7 +233,10 @@ class AStarPathPublisher:
                     goal_pose_msg.pose.position.x = self.goal_pos[0]
                     goal_pose_msg.pose.position.y = self.goal_pos[1]
                     goal_pose_msg.pose.position.z = 0  # Assuming z=0 for 2D navigation
-                    self.destination_reached_pub.publish(goal_pose_msg) # 목적지 좌표 발행
+
+                    if not self.is_pub_goal:
+                        self.destination_reached_pub.publish(goal_pose_msg) # 목적지 좌표 발행
+                        self.is_pub_goal = True
                     # Reset state variables and global path
                     self.reset_global_path()
 
@@ -479,7 +486,7 @@ class AStar:
         angle_diff = abs(atan2(direction_vector[1], direction_vector[0]) - current_heading)
         return distance + angle_diff * 10
 
-    def smooth_path(self, path, weight_data=0.2, weight_smooth=0.3, tolerance=0.001): # 0.5 0.1 0.000001
+    def smooth_path(self, path, weight_data=0.2, weight_smooth=0.1, tolerance=0.001): # 0.5 0.1 0.000001
         # 경로 평활화
         newpath = copy.deepcopy(path)
         change = tolerance
