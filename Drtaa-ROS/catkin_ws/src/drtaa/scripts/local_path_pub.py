@@ -6,7 +6,7 @@ import rospkg
 from math import sqrt, atan2
 from geometry_msgs.msg import PoseStamped
 from nav_msgs.msg import Odometry, Path
-from std_msgs.msg import Bool, String
+from std_msgs.msg import Bool, String, Int8
 from tf.transformations import euler_from_quaternion
 import numpy as np
 from scipy.interpolate import interp1d
@@ -24,7 +24,7 @@ class LocalPathPublisher:
 
         # Publishers
         self.local_path_pub = rospy.Publisher('/local_path', Path, queue_size=1)
-        self.left_turn_pub = rospy.Publisher('/is_left_turn', Bool, queue_size=1)
+        self.left_turn_pub = rospy.Publisher('/is_left_turn', Int8, queue_size=1)
 
         # Initialization
         self.is_odom = False
@@ -103,14 +103,23 @@ class LocalPathPublisher:
             self.kdtree = None
 
         # Immediately update the local path
-        if self.vehicle_status in ["move_to_drop_off", "pickup"]:
+        if self.vehicle_status == "move_to_drop_off":
             self.is_changing_lane = True
             self.lane_change_progress = 0
+
+        if self.vehicle_status == "pickup":
+            if self.prev_vehicle_status == "parked":
+
+                self.is_changing_lane = True
+                self.lane_change_progress = 0
 
         self.update_local_path()
 
     def command_status_callback(self, msg):
-        self.prev_vehicle_status = self.vehicle_status
+
+        if self.vehicle_status != self.prev_vehicle_status:
+            self.prev_vehicle_status = self.vehicle_status
+
         self.vehicle_status = msg.data
 
         if self.vehicle_status == "parked" and self.new_path_received:
@@ -167,8 +176,8 @@ class LocalPathPublisher:
             self.prev_current_waypoint = smoothed_waypoint
 
             # Publish local path
-            is_turning_left = self.predict_left_turn(local_path_msg)
-            self.left_turn_pub.publish(Bool(is_turning_left))
+            check_cornering = self.predict_left_turn(local_path_msg)
+            self.left_turn_pub.publish(check_cornering)
             self.local_path_pub.publish(local_path_msg)
 
             rospy.loginfo(f"Local path published with {len(local_path_msg.poses)} poses")
@@ -178,7 +187,7 @@ class LocalPathPublisher:
 
     def generate_lane_change_path(self, start_index):
         lane_change_path = []
-        sharp_turn_angle = np.pi / 4  # Adjust angle for more sharpness (e.g., 45 degrees)
+        sharp_turn_angle = np.pi / 3  # Adjust angle for more sharpness (e.g., 45 degrees) # 4!!!!
         total_length = 10  # Shorten the path length for a quicker turn
 
         for i in range(total_length):
@@ -298,9 +307,17 @@ class LocalPathPublisher:
         curvature = (dx * ddy - dy * ddx) / (dx**2 + dy**2)**1.5
         avg_curvature = np.mean(curvature)
         is_left_turn = avg_curvature > 0.01
-
-        rospy.loginfo(f"Average curvature: {avg_curvature}, Is left turn: {is_left_turn}")
-        return is_left_turn
+        is_right_turn = avg_curvature < -0.01
+        
+        if is_left_turn:
+            return 1
+        elif is_right_turn:
+            return -1
+        else:
+            return 0
+        
+        # rospy.loginfo(f"Average curvature: {avg_curvature}, Is left turn: {is_left_turn}")
+        # return is_left_turn
 
 if __name__ == '__main__':
     try:
