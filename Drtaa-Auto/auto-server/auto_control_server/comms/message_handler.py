@@ -31,6 +31,8 @@ class MessageHandler:
             return self.handle_vehicle_gps(data)
         elif action == 'vehicle_orientation':
             return self.handle_vehicle_orientaion(data)
+        elif action == 'vehicle_global_path':
+            return self.handle_vehicle_global_path(data)
         elif action == 'Auto Client Connect':
             return self.handle_connect(data)
         elif action == 'Spring Boot Connect':
@@ -97,3 +99,16 @@ class MessageHandler:
         except json.JSONDecodeError:
             logger.error(f"orientation_data.json 파일 형식이 잘못되었습니다.")
             return self.prev_orientaion
+        
+    def handle_vehicle_global_path(self, data):
+        # 차량 방향
+        try:
+            with open(f'{data_dir}/global_path.json') as f:
+                self.prev_global_path = json.load(f)
+                return self.prev_global_path
+        except FileNotFoundError:
+            logger.error(f"global_path.json 파일을 찾을 수 없습니다.")
+            return self.prev_global_path
+        except json.JSONDecodeError:
+            logger.error(f"global_path.json 파일 형식이 잘못되었습니다.")
+            return self.prev_global_path
