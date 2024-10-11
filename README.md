@@ -9,15 +9,19 @@
 ### 🚗 팀원 소개
 | <div align="center">**이름**</div> | <div align="center">**역할**</div> |
 | :---: | :---: |
-| 이정재 | 팀장 |
-| 김민규 |  |
-| 윤가희 |  |
-| 이재영 |  |
-| 이현진 |  |
-| 최승준 |  |
+| 이정재 | 팀장, AI, Auto Control |
+| 김민규 | Android, AI |
+| 윤가희 | BackEnd, Infra |
+| 이재영 | Auto Control |
+| 이현진 | Android |
+| 최승준 | Android, BackEnd, Infra |
 ### 🚗 기획 배경
-
+기존의 렌트카 및 이동 수단 서비스는 여러 가지 불편함을 수반합니다.<br>
+특히, **운전 면허**가 필요하거나 **주차 문제**로 인해 목적지에서 주차 공간을 찾는 데 스트레스를 받는 경우가 많습니다.<br>
+이러한 불편함을 해결하고, 더 나은 여행 경험을 제공하기 위해 **자율주행 기반 렌트 및 여행 서비스**를 기획하게 되었습니다.
 ### 🚗 목표
+자율주행 기술을 활용해 운전 스트레스 없이 **어디서든 쉽게 이용할 수 있는 렌트카 서비스**를 제공하는 것입니다.<br>
+고객이 **여행에 온전히 집중**할 수 있는 편리한 환경을 조성하고자 합니다.
 
 <br>
 
@@ -25,34 +29,34 @@
 ### 🚗 로그인 및 메인 화면
 | <div align="center">**로그인 화면**</div> | <div align="center">**로그인 동작**</div> |
 | :---: | :---: |
-| ![image](/uploads/1b3d00ddcf5b02b264229f6c500e9543/image.png) |  |
+| ![로그인 화면](/uploads/1b3d00ddcf5b02b264229f6c500e9543/image.png) |  |
 
 <br>
 
 | <div align="center">**메인 화면**</div> | <div align="center">**메인 화면 동작**</div> |
 | :---: | :---: |
-|  |  |
+| ![메인 화면](/Readme-Img/최종 녹화 - frame at 0m0s.jpg) |  |
 
 <br>
 
 ### 🚗 렌트 요청 및 결제
 | <div align="center">**렌트 요청 화면**</div> | <div align="center">**렌트 요청 동작**</div> |
 | :---: | :---: |
-|  |  |
+| ![렌트 요청 화면](/Readme-Img/최종 녹화 - frame at 0m25s.jpg) |  |
 
 <br>
 
 ### 🚗 여행 일정 관리
 | <div align="center">**여행 일정 화면**</div> | <div align="center">**여행 일정 동작**</div> |
 | :---: | :---: |
-|  |  |
+| ![여행 일정 화면](/Readme-Img/최종 녹화 - frame at 2m12s.jpg) |  |
 
 <br>
 
 ### 🚗 렌트 호출
 | <div align="center">**렌트 호출 화면**</div> | <div align="center">**렌트 호출 동작**</div> |
 | :---: | :---: |
-|  |  |
+| ![렌트 호출 화면](/Readme-Img/최종 녹화 - frame at 2m34s.jpg) |  |
 
 | <div align="center">**차량 주차 화면**</div> |
 | :---: |
@@ -63,13 +67,13 @@
 ### 🚗 렌트 탑승 및 하차
 | <div align="center">**렌트 탑승 화면**</div> | <div align="center">**렌트 탑승 동작**</div> |
 | :---: | :---: |
-|  |  |
+| ![렌트 탑승 화면.jpg](/Readme-Img/렌트 탑승 화면.jpg) |  |
 
 <br>
 
 | <div align="center">**렌트 하차 화면**</div> | <div align="center">**렌트 하차 동작**</div> |
 | :---: | :---: |
-|  |  |
+| ![렌트 하차 화면.jpg](/Readme-Img/렌트 하차 화면.jpg) |  |
 
 | <div align="center">**차량 주차 화면**</div> | <div align="center">**차량 배회 화면**</div> |
 | :---: | :---: |
@@ -79,6 +83,19 @@
 
 ### 🚗 관광지 추천
 | <div align="center">**관광지 추천 화면**</div> | <div align="center">**관광지 추천 동작**</div> |
+| :---: | :---: |
+| ![image.png](/Readme-Img/image.png) |  |
+
+<br>
+
+### 🚗 렌트 알림
+| <div align="center">**렌트 3일 전 알림 동작**</div> | <div align="center">**렌트 하루 전 알림 동작**</div> |
+| :---: | :---: |
+|  |  |
+
+<br>
+
+| <div align="center">**렌트 시작 알림 동작**</div> | <div align="center">**렌트 종료 알림 동작**</div> |
 | :---: | :---: |
 |  |  |
 
