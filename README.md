@@ -29,34 +29,34 @@
 ### 🚗 로그인 및 메인 화면
 | <div align="center">**로그인 화면**</div> | <div align="center">**로그인 동작**</div> |
 | :---: | :---: |
-| ![image](/uploads/1b3d00ddcf5b02b264229f6c500e9543/image.png) |  |
+| ![로그인 화면](/uploads/1b3d00ddcf5b02b264229f6c500e9543/image.png) |  |
 
 <br>
 
 | <div align="center">**메인 화면**</div> | <div align="center">**메인 화면 동작**</div> |
 | :---: | :---: |
-| ![image](/Readme-Img/최종 녹화 - frame at 0m0s.jpg) |  |
+| ![메인 화면](/Readme-Img/최종 녹화 - frame at 0m0s.jpg) |  |
 
 <br>
 
 ### 🚗 렌트 요청 및 결제
 | <div align="center">**렌트 요청 화면**</div> | <div align="center">**렌트 요청 동작**</div> |
 | :---: | :---: |
-| ![최종 녹화 - frame at 0m25s.jpg](./최종 녹화 - frame at 0m25s.jpg) |  |
+| ![렌트 요청 화면](/Readme-Img/최종 녹화 - frame at 0m25s.jpg) |  |
 
 <br>
 
 ### 🚗 여행 일정 관리
 | <div align="center">**여행 일정 화면**</div> | <div align="center">**여행 일정 동작**</div> |
 | :---: | :---: |
-| ![최종 녹화 - frame at 2m12s.jpg](./최종 녹화 - frame at 2m12s.jpg) |  |
+| ![여행 일정 화면](/Readme-Img/최종 녹화 - frame at 2m12s.jpg) |  |
 
 <br>
 
 ### 🚗 렌트 호출
 | <div align="center">**렌트 호출 화면**</div> | <div align="center">**렌트 호출 동작**</div> |
 | :---: | :---: |
-| ![최종 녹화 - frame at 2m34s.jpg](./최종 녹화 - frame at 2m34s.jpg) |  |
+| ![렌트 호출 화면](/Readme-Img/최종 녹화 - frame at 2m34s.jpg) |  |
 
 | <div align="center">**차량 주차 화면**</div> |
 | :---: |
@@ -67,13 +67,13 @@
 ### 🚗 렌트 탑승 및 하차
 | <div align="center">**렌트 탑승 화면**</div> | <div align="center">**렌트 탑승 동작**</div> |
 | :---: | :---: |
-|  |  |
+| ![렌트 탑승 화면.jpg](/Readme-Img/렌트 탑승 화면.jpg) |  |
 
 <br>
 
 | <div align="center">**렌트 하차 화면**</div> | <div align="center">**렌트 하차 동작**</div> |
 | :---: | :---: |
-|  |  |
+| ![렌트 하차 화면.jpg](/Readme-Img/렌트 하차 화면.jpg) |  |
 
 | <div align="center">**차량 주차 화면**</div> | <div align="center">**차량 배회 화면**</div> |
 | :---: | :---: |
@@ -84,7 +84,7 @@
 ### 🚗 관광지 추천
 | <div align="center">**관광지 추천 화면**</div> | <div align="center">**관광지 추천 동작**</div> |
 | :---: | :---: |
-|  |  |
+| ![image.png](/Readme-Img/image.png) |  |
 
 <br>
 
