@@ -35,28 +35,28 @@
 
 | <div align="center">**메인 화면**</div> | <div align="center">**메인 화면 동작**</div> |
 | :---: | :---: |
-|  |  |
+| ![image](./최종 녹화 - frame at 0m0s.jpg) |  |
 
 <br>
 
 ### 🚗 렌트 요청 및 결제
 | <div align="center">**렌트 요청 화면**</div> | <div align="center">**렌트 요청 동작**</div> |
 | :---: | :---: |
-|  |  |
+| ![최종 녹화 - frame at 0m25s.jpg](./최종 녹화 - frame at 0m25s.jpg) |  |
 
 <br>
 
 ### 🚗 여행 일정 관리
 | <div align="center">**여행 일정 화면**</div> | <div align="center">**여행 일정 동작**</div> |
 | :---: | :---: |
-|  |  |
+| ![최종 녹화 - frame at 2m12s.jpg](./최종 녹화 - frame at 2m12s.jpg) |  |
 
 <br>
 
 ### 🚗 렌트 호출
 | <div align="center">**렌트 호출 화면**</div> | <div align="center">**렌트 호출 동작**</div> |
 | :---: | :---: |
-|  |  |
+| ![최종 녹화 - frame at 2m34s.jpg](./최종 녹화 - frame at 2m34s.jpg) |  |
 
 | <div align="center">**차량 주차 화면**</div> |
 | :---: |
