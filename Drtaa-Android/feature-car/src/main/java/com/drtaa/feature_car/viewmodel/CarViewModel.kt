@@ -187,16 +187,16 @@ class CarViewModel @Inject constructor(
             """
          {"action":"vehicle_global_path"}
             """.trimIndent(),
-    ){
+    ) {
         viewModelScope.launch {
             gpsRepository.fetchPath(data, PATH_SUB)
         }
     }
 
     // 남은 시간, 남은 거리 수신
-    fun getNavigationInfo(){
+    fun getNavigationInfo() {
         viewModelScope.launch {
-            gpsRepository.observeMqttInfoMessages().collect{
+            gpsRepository.observeMqttInfoMessages().collect {
                 Timber.tag("시간거리").d("$it")
                 _infoData.value = it
             }
