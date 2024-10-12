@@ -99,7 +99,7 @@ def record_and_recognize_speech():
     with sr.Microphone() as source:  # Microphone with index 9: default
         print("말씀하세요...")
         recognizer.adjust_for_ambient_noise(source, duration=1)  # 배경 소음 조정
-        audio = recognizer.listen(source, timeout=5, phrase_time_limit=5)
+        audio = recognizer.listen(source, timeout=3, phrase_time_limit=3)
     try:
         text = recognizer.recognize_google(audio, language="ko-KR")
         print(f"인식된 텍스트: {text}")
