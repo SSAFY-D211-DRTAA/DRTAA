@@ -2,6 +2,7 @@ package com.drtaa.core_mqtt
 
 import com.drtaa.core_model.map.ResponseCarRoute
 import com.drtaa.core_model.map.ResponseGPS
+import com.drtaa.core_model.map.ResponseRouteInfo
 import com.google.gson.Gson
 import com.hivemq.client.mqtt.MqttClient
 import com.hivemq.client.mqtt.datatypes.MqttQos
@@ -31,6 +32,8 @@ class MqttManager @Inject constructor() {
     val receivedGPSMessages: SharedFlow<ResponseGPS> = _receivedGPSMessages.asSharedFlow()
     private val _receivedPathMessages = MutableSharedFlow<ResponseCarRoute>()
     val receivedPathMessages: SharedFlow<ResponseCarRoute> = _receivedPathMessages.asSharedFlow()
+    private val _receivedInfoMessages = MutableSharedFlow<ResponseRouteInfo>()
+    val receivedInfoMessages: SharedFlow<ResponseRouteInfo> = _receivedInfoMessages.asSharedFlow()
     private var reconnectAttempts = 0
     private var isConnected = false
     private val _connectionStatus = MutableSharedFlow<Int>()
@@ -114,10 +117,10 @@ class MqttManager @Inject constructor() {
 
                         ORIENTATION_PUB -> {
                             kotlin.runCatching {
-                                gson.fromJson(message, ResponseGPS::class.java)
+                                gson.fromJson(message, ResponseRouteInfo::class.java)
                             }.onSuccess { parsedMessage ->
-                                _receivedGPSMessages.emit(parsedMessage)
-//                                Timber.tag(TAG).d("GPS 데이터 수신: $parsedMessage")
+                                _receivedInfoMessages.emit(parsedMessage)
+                                Timber.tag(TAG).d("GPS 데이터 수신: $parsedMessage")
                             }.onFailure { e ->
                                 Timber.tag(TAG).e(e, "GPS 메시지 파싱 실패")
                             }
@@ -183,7 +186,7 @@ class MqttManager @Inject constructor() {
         private const val PORT = 1883
         private const val DELAY = 5
         private const val MAX_TRY = 10
-        private const val MAX_RECONNECT_DELAY = 20000L // 최대 30초
+        private const val MAX_RECONNECT_DELAY = 20000L // 최대 20초
         private const val INITIAL_RECONNECT_DELAY = 1000L // 초기 1초
         private const val GPS_PUB = "gps/data/v1/publish"
 
