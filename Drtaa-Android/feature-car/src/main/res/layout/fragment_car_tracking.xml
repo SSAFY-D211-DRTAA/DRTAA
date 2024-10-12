@@ -27,6 +27,7 @@
         </com.naver.maps.map.MapView>
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_appbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/black"
@@ -87,6 +88,37 @@
                     android:visibility="gone"
                     tools:visibility="visible" />
             </FrameLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cl_car_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_pin_desc">
+
+                <TextView
+                    android:id="@+id/tv_time"
+                    style="@style/ptd_bold"
+                    android:gravity="center"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    tools:text="남은시간 들어가유" />
+                <TextView
+                    android:id="@+id/tv_distance"
+                    style="@style/ptd_bold"
+                    android:gravity="center"
+                    app:layout_constraintTop_toBottomOf="@id/tv_time"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    tools:text="남은거리 들어가유" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <LinearLayout

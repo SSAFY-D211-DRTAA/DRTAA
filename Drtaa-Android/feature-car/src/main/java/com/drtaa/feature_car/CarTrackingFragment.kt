@@ -41,6 +41,12 @@ class CarTrackingFragment :
         height = ICON_SIZE
     }
 
+    private var destinationMarker: Marker = Marker().apply {
+        icon = OverlayImage.fromResource(com.drtaa.core_ui.R.drawable.ic_destination)
+        width = ICON_SIZE
+        height = ICON_SIZE
+    }
+
     private val pathOverlay by lazy {
         PathOverlay().apply {
             color = Color.RED
@@ -156,14 +162,16 @@ class CarTrackingFragment :
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
 
+        viewModel.infoData.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach { data ->
+            data?.let {
+                binding.clCarInfo.visibility = View.VISIBLE
+                binding.tvTime.text = "예상 도착 시간: ${it.leftTime}분 후"
+                binding.tvDistance.text = "목적지까지 남은 거리: ${it.leftDistance}m"
+            }
+        }.launchIn(viewLifecycleOwner.lifecycleScope)
+
         viewModel.gpsData.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach { gps ->
             Timber.tag("gps").d("$gps")
-//            if (viewModel.routeData.value.isNotEmpty()) {
-//                pathOverlay.apply {
-//                    coords = viewModel.routeData.value.map { LatLng(it.lat, it.lon) }
-//                    map = naverMap
-//                }
-//            }
             pathOverlayProgress(gps)
             carMarker.apply {
                 position = gps
@@ -189,6 +197,11 @@ class CarTrackingFragment :
         viewModel.routeData.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach { routeData ->
             if (routeData.isEmpty()) return@onEach
             Timber.tag("pathFrag").d("$routeData")
+            val destination = routeData.last()
+            destinationMarker.apply {
+                position = LatLng(destination.lat, destination.lon)
+                map = naverMap
+            }
             pathOverlay.apply {
                 coords = routeData.map { LatLng(it.lat, it.lon) }
                 map = naverMap

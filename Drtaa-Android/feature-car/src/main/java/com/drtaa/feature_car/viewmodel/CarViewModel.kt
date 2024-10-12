@@ -8,6 +8,7 @@ import com.drtaa.core_data.repository.PlanRepository
 import com.drtaa.core_data.repository.RentCarRepository
 import com.drtaa.core_data.repository.RentRepository
 import com.drtaa.core_model.map.CarRoute
+import com.drtaa.core_model.map.Info
 import com.drtaa.core_model.network.RequestCarStatus
 import com.drtaa.core_model.network.RequestCompleteRent
 import com.drtaa.core_model.network.ResponseRentStateAll
@@ -53,6 +54,8 @@ class CarViewModel @Inject constructor(
     private val mqttScope = CoroutineScope(Dispatchers.IO)
     private val _gpsData = MutableSharedFlow<LatLng>()
     val gpsData = _gpsData.asSharedFlow()
+    private val _infoData = MutableStateFlow<Info?>(null)
+    val infoData: StateFlow<Info?> = _infoData
     private val _mqttConnectionStatus = MutableStateFlow<Int>(-1)
     val mqttConnectionStatus: StateFlow<Int> = _mqttConnectionStatus
     private val _routeData = MutableStateFlow<List<CarRoute>>(emptyList())
@@ -174,6 +177,28 @@ class CarViewModel @Inject constructor(
                 } else {
                     Timber.tag("Car").d("null들어왔슈 $it")
                 }
+            }
+        }
+    }
+
+    // 남은 거리, 시간 요청
+    fun fetchRouteInfo(
+        data: String =
+            """
+         {"action":"vehicle_global_path"}
+            """.trimIndent(),
+    ){
+        viewModelScope.launch {
+            gpsRepository.fetchPath(data, PATH_SUB)
+        }
+    }
+
+    // 남은 시간, 남은 거리 수신
+    fun getNavigationInfo(){
+        viewModelScope.launch {
+            gpsRepository.observeMqttInfoMessages().collect{
+                Timber.tag("시간거리").d("$it")
+                _infoData.value = it
             }
         }
     }
