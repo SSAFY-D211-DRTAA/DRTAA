@@ -143,7 +143,7 @@
                         android:layout_marginStart="20dp"
                         android:layout_marginTop="20dp"
                         android:text="렌트"
-                        android:textColor="@color/gray_5858"
+                        android:textColor="@color/black"
                         android:textSize="24sp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
@@ -198,7 +198,7 @@
                         android:layout_marginStart="20dp"
                         android:layout_marginTop="20dp"
                         android:text="택시"
-                        android:textColor="@color/gray_5858"
+                        android:textColor="@color/black"
                         android:textSize="24sp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
@@ -264,7 +264,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="50dp"
                         android:text="일정 관리"
-                        android:textColor="@color/gray_5858"
+                        android:textColor="@color/black"
                         android:textSize="20sp"
                         app:layout_constraintBottom_toTopOf="@id/tv_rent_plan_help"
                         app:layout_constraintStart_toStartOf="parent"
