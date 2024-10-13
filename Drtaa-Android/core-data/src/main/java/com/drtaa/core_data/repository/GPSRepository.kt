@@ -2,7 +2,6 @@ package com.drtaa.core_data.repository
 
 import com.drtaa.core_model.map.CarRoute
 import com.drtaa.core_model.map.Destination
-import com.drtaa.core_model.map.Info
 import com.drtaa.core_model.map.ResponseGPS
 import kotlinx.coroutines.flow.Flow
 

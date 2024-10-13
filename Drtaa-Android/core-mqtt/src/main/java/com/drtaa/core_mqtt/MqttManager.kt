@@ -3,7 +3,6 @@ package com.drtaa.core_mqtt
 import com.drtaa.core_model.map.ResponseCarRoute
 import com.drtaa.core_model.map.ResponseDest
 import com.drtaa.core_model.map.ResponseGPS
-import com.drtaa.core_model.map.ResponseRouteInfo
 import com.google.gson.Gson
 import com.hivemq.client.mqtt.MqttClient
 import com.hivemq.client.mqtt.datatypes.MqttQos

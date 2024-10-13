@@ -3,11 +3,9 @@ package com.drtaa.core_data.repositoryimpl
 import com.drtaa.core_data.repository.GPSRepository
 import com.drtaa.core_model.map.CarRoute
 import com.drtaa.core_model.map.Destination
-import com.drtaa.core_model.map.Info
 import com.drtaa.core_mqtt.MqttManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import timber.log.Timber
 import javax.inject.Inject
 
 class GPSRepositoryImpl @Inject constructor(
