@@ -1,6 +1,10 @@
 package com.drtaa.feature_car
 
 import android.graphics.Color
+import android.graphics.Typeface
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.StyleSpan
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
@@ -14,6 +18,7 @@ import com.drtaa.feature_car.viewmodel.CarViewModel
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.MapView
 import com.naver.maps.map.NaverMap
+import com.naver.maps.map.overlay.InfoWindow
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.overlay.PathOverlay
@@ -162,14 +167,6 @@ class CarTrackingFragment :
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
 
-        viewModel.infoData.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach { data ->
-            data?.let {
-                binding.clCarInfo.visibility = View.VISIBLE
-                binding.tvTime.text = "예상 도착 시간: ${it.leftTime}분 후"
-                binding.tvDistance.text = "목적지까지 남은 거리: ${it.leftDistance}m"
-            }
-        }.launchIn(viewLifecycleOwner.lifecycleScope)
-
         viewModel.gpsData.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach { gps ->
             Timber.tag("gps").d("$gps")
             pathOverlayProgress(gps)
@@ -194,14 +191,44 @@ class CarTrackingFragment :
             }
         }.launchIn(viewLifecycleOwner.lifecycleScope)
 
+        viewModel.carDestination.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach {
+            it?.let {
+                binding.clCarInfo.visibility = View.VISIBLE
+                val min = it.remainingTime / 60
+                val sec = it.remainingTime % 60
+                binding.tvTime.text = if (min > 0) {
+                    "${min}분 ${sec}초"
+                } else {
+                    "${sec}초"
+                }
+                binding.tvDistance.text = "${it.remainingDistance}m"
+                destinationMarker.apply {
+                    position = LatLng(it.latitude, it.longitude)
+                    map = naverMap
+                }
+                mapView.apply {
+                    InfoWindow().apply {
+                        adapter = object : InfoWindow.DefaultTextAdapter(requireActivity()) {
+                            override fun getText(infoWindow: InfoWindow): CharSequence {
+                                val boldText = SpannableString("${it.name}").apply {
+                                    setSpan(
+                                        StyleSpan(Typeface.BOLD), 0, length,
+                                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                                    )
+                                }
+                                return boldText
+                            }
+                        }
+                        open(destinationMarker)
+                    }
+                }
+            }
+        }.launchIn(viewLifecycleOwner.lifecycleScope)
+
         viewModel.routeData.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach { routeData ->
             if (routeData.isEmpty()) return@onEach
             Timber.tag("pathFrag").d("$routeData")
-            val destination = routeData.last()
-            destinationMarker.apply {
-                position = LatLng(destination.lat, destination.lon)
-                map = naverMap
-            }
+
             pathOverlay.apply {
                 coords = routeData.map { LatLng(it.lat, it.lon) }
                 map = naverMap
