@@ -1,0 +1,371 @@
+{
+  "version": 1.0,
+  "egoVehicle": {
+    "DataID": 20700004,
+    "UNIQUEID": -1,
+    "m_eobstacleObjType": 0,
+    "initPosition": {
+      "initPositionMode": "Absolute",
+      "pos": {
+        "x": 244.00900268554688,
+        "y": -40.803001403808594,
+        "z": 0.8059999942779541,
+        "_x": "244.009",
+        "_y": "-40.803",
+        "_z": "0.806"
+      },
+      "rot": {
+        "roll": "-359.606",
+        "pitch": "0.304",
+        "yaw": "-12.987"
+      },
+      "initLink": "",
+      "initLinkRatio": 0,
+      "gear": 4,
+      "vehicleSaveData": {
+        "velocity": 1.4273726940155029,
+        "inputData": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          4,
+          0,
+          0,
+          0
+        ],
+        "vehicle": {
+          "time": 441.33599853515625,
+          "lastVelocity": {
+            "x": -0.38360142707824707,
+            "y": -0.0028735115192830563,
+            "z": 0.097944557666778564
+          },
+          "lastImpactTime": 40.578079223632813
+        },
+        "wheels": [
+          {
+            "L": 1.5026878118515015,
+            "Tr": 0.21669793128967285,
+            "contactDepth": 0.086333431303501129,
+            "lastTireForce": {
+              "x": -9.23440933227539,
+              "y": -0.65666043758392334
+            }
+          },
+          {
+            "L": 1.505524754524231,
+            "Tr": 0.21674363315105438,
+            "contactDepth": 0.089794673025608063,
+            "lastTireForce": {
+              "x": -36.024322509765625,
+              "y": -0.65679866075515747
+            }
+          },
+          {
+            "L": 1.5026756525039673,
+            "Tr": 0.21668866276741028,
+            "contactDepth": 0.046615738421678543,
+            "lastTireForce": {
+              "x": -41.58856201171875,
+              "y": -0.65663230419158936
+            }
+          },
+          {
+            "L": 1.5056279897689819,
+            "Tr": 0.21645720303058624,
+            "contactDepth": 0.042291004210710526,
+            "lastTireForce": {
+              "x": -57.213577270507813,
+              "y": -0.65593093633651733
+            }
+          }
+        ],
+        "engine": {
+          "L": 0.0,
+          "Treaction": 0.0,
+          "rpmLimiterActive": false,
+          "rpmLimiterTime": 0.0,
+          "tcsActivationTime": 0.0
+        },
+        "gearbox": {
+          "L": 0.0,
+          "manualGear": 0,
+          "manualRatio": 0.0,
+          "engaged": false,
+          "lastEngagedTime": 0.0,
+          "lastAutoShiftTime": 0.0,
+          "vehicleMoving": false,
+          "gearMode": 0,
+          "automaticGear": 0,
+          "automaticRatio": 0.0,
+          "transition": false,
+          "transitionStartedTime": 0.0,
+          "fromGear": 0,
+          "toGear": 0,
+          "fromRatio": 0.0,
+          "toRatio": 0.0,
+          "transitionRatio": 0.0
+        },
+        "lastVelocity": {
+          "x": -0.38360142707824707,
+          "y": -0.0028735115192830563,
+          "z": 0.097944557666778564
+        }
+      }
+    },
+    "currentVelocity": 1.4273726940155029,
+    "v2vUDPSessionInfo": {
+      "isInit": false,
+      "v2vConfig": {
+        "hostIP": "0.0.0.0",
+        "Port": 5641,
+        "receiveTimeout": 0,
+        "BuffSize": 8196,
+        "surroundVehiclePubTime": 100
+      }
+    },
+    "beforeControlMode": 0,
+    "currentControlMode": 1
+  },
+  "vehicleList": [],
+  "pedestrianList": [],
+  "objectList": [],
+  "spawnPointList": [],
+  "tlList": [
+    {
+      "index": 0,
+      "state": 0,
+      "deltaTime": 21.334060668945313
+    },
+    {
+      "index": 1,
+      "state": 3,
+      "deltaTime": 12.27872371673584
+    },
+    {
+      "index": 2,
+      "state": 0,
+      "deltaTime": 21.334060668945313
+    },
+    {
+      "index": 3,
+      "state": 3,
+      "deltaTime": 12.27872371673584
+    },
+    {
+      "index": 4,
+      "state": 1,
+      "deltaTime": 9.2135438919067383
+    },
+    {
+      "index": 5,
+      "state": 1,
+      "deltaTime": 9.2135438919067383
+    },
+    {
+      "index": 6,
+      "state": 1,
+      "deltaTime": 12.27872371673584
+    },
+    {
+      "index": 7,
+      "state": 1,
+      "deltaTime": 9.2135438919067383
+    },
+    {
+      "index": 8,
+      "state": 2,
+      "deltaTime": 21.334060668945313
+    },
+    {
+      "index": 9,
+      "state": 0,
+      "deltaTime": 21.334060668945313
+    },
+    {
+      "index": 10,
+      "state": 3,
+      "deltaTime": 12.27872371673584
+    },
+    {
+      "index": 11,
+      "state": 2,
+      "deltaTime": 21.334060668945313
+    },
+    {
+      "index": 12,
+      "state": 2,
+      "deltaTime": 21.334060668945313
+    },
+    {
+      "index": 13,
+      "state": 2,
+      "deltaTime": 21.334060668945313
+    },
+    {
+      "index": 14,
+      "state": 1,
+      "deltaTime": 12.27872371673584
+    },
+    {
+      "index": 15,
+      "state": 2,
+      "deltaTime": 21.334060668945313
+    },
+    {
+      "index": 16,
+      "state": 2,
+      "deltaTime": 21.334060668945313
+    },
+    {
+      "index": 17,
+      "state": 1,
+      "deltaTime": 12.27872371673584
+    },
+    {
+      "index": 18,
+      "state": 0,
+      "deltaTime": 21.334060668945313
+    },
+    {
+      "index": 19,
+      "state": 2,
+      "deltaTime": 21.334060668945313
+    },
+    {
+      "index": 20,
+      "state": 1,
+      "deltaTime": 12.27872371673584
+    },
+    {
+      "index": 21,
+      "state": 1,
+      "deltaTime": 12.27872371673584
+    },
+    {
+      "index": 22,
+      "state": 0,
+      "deltaTime": 21.253292083740234
+    },
+    {
+      "index": 23,
+      "state": 1,
+      "deltaTime": 12.27872371673584
+    },
+    {
+      "index": 24,
+      "state": 0,
+      "deltaTime": 21.253292083740234
+    },
+    {
+      "index": 25,
+      "state": 1,
+      "deltaTime": 12.27872371673584
+    },
+    {
+      "index": 26,
+      "state": 0,
+      "deltaTime": 21.253292083740234
+    },
+    {
+      "index": 27,
+      "state": 1,
+      "deltaTime": 12.27872371673584
+    },
+    {
+      "index": 28,
+      "state": 3,
+      "deltaTime": 12.27872371673584
+    },
+    {
+      "index": 29,
+      "state": 1,
+      "deltaTime": 12.27872371673584
+    },
+    {
+      "index": 30,
+      "state": 0,
+      "deltaTime": 21.253292083740234
+    },
+    {
+      "index": 31,
+      "state": 2,
+      "deltaTime": 21.334060668945313
+    },
+    {
+      "index": 32,
+      "state": 3,
+      "deltaTime": 12.27872371673584
+    },
+    {
+      "index": 33,
+      "state": 3,
+      "deltaTime": 12.27872371673584
+    },
+    {
+      "index": 34,
+      "state": 0,
+      "deltaTime": 21.253292083740234
+    },
+    {
+      "index": 35,
+      "state": 0,
+      "deltaTime": 21.253292083740234
+    },
+    {
+      "index": 36,
+      "state": 0,
+      "deltaTime": 21.253292083740234
+    },
+    {
+      "index": 37,
+      "state": 1,
+      "deltaTime": 12.27872371673584
+    },
+    {
+      "index": 38,
+      "state": 1,
+      "deltaTime": 12.27872371673584
+    },
+    {
+      "index": 39,
+      "state": 1,
+      "deltaTime": 12.27872371673584
+    },
+    {
+      "index": 40,
+      "state": 1,
+      "deltaTime": 12.27872371673584
+    },
+    {
+      "index": 41,
+      "state": 1,
+      "deltaTime": 12.27872371673584
+    },
+    {
+      "index": 42,
+      "state": 1,
+      "deltaTime": 12.27872371673584
+    }
+  ],
+  "mapInfo": {
+    "mapName": "R_KR_PR_Sangam_NoBuildings",
+    "eastOffset": 313008.55819800857,
+    "northOffset": 4161698.628368007,
+    "globalCoordinateSystem": "UTM52N",
+    "scenarioCoordinateSystem": "ENU"
+  },
+  "v2IInfo": {
+    "isAlive": false,
+    "acceptIp": "127.0.0.1",
+    "acceptPort": 5000,
+    "v2vIP": "127.0.0.1"
+  },
+  "pedspawnPointList": [],
+  "aiPedstrianList": [],
+  "shadedAreaList": [],
+  "frictionChangeMaterialList": []
+}
