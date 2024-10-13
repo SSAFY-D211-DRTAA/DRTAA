@@ -211,18 +211,18 @@ class WakewordApp(QWidget):
         self.image_label.setPixmap(QPixmap(self.image_paths["waiting"]).scaled(1080, 720))
 
         # 감지 시작 버튼
-        self.start_button = QPushButton('Start Wakeword Detection', self)
+        self.start_button = QPushButton(' ', self)
         self.start_button.clicked.connect(self.start_wakeword_detection)
 
-        # 감지 종료 버튼
-        self.stop_button = QPushButton('Stop Wakeword Detection', self)
-        self.stop_button.clicked.connect(self.stop_wakeword_detection)
+        # # 감지 종료 버튼
+        # self.stop_button = QPushButton('Stop Wakeword Detection', self)
+        # self.stop_button.clicked.connect(self.stop_wakeword_detection)
 
         # 레이아웃 설정
         layout = QVBoxLayout()
         layout.addWidget(self.image_label)
         layout.addWidget(self.start_button)
-        layout.addWidget(self.stop_button)
+        # layout.addWidget(self.stop_button)
 
         self.setLayout(layout)
         self.show()
