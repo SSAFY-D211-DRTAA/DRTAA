@@ -193,15 +193,15 @@ class CarTrackingFragment :
 
         viewModel.carDestination.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach {
             it?.let {
-                binding.clCarInfo.visibility = View.VISIBLE
-                val min = it.remainingTime / SEC
-                val sec = it.remainingTime % SEC
-                binding.tvTime.text = if (min > 0) {
-                    "${min}분 ${sec}초"
-                } else {
-                    "${sec}초"
-                }
-                binding.tvDistance.text = "${it.remainingDistance}m"
+//                binding.clCarInfo.visibility = View.VISIBLE
+//                val min = it.remainingTime / SEC
+//                val sec = it.remainingTime % SEC
+//                binding.tvTime.text = if (min > 0) {
+//                    "${min}분 ${sec}초"
+//                } else {
+//                    "${sec}초"
+//                }
+//                binding.tvDistance.text = "${it.remainingDistance}m"
                 destinationMarker.apply {
                     position = LatLng(it.latitude, it.longitude)
                     map = naverMap
