@@ -282,7 +282,7 @@ class CarTrackingFragment :
     companion object {
         private const val THRESHOLD = 20.0 // 너무 좌표가 튀어서 일단 크게 잡는다
         private const val ICON_SIZE = 100
-        private const val SEC = 60
+//        private const val SEC = 60
         val jungryujang = LatLng(37.57578754990568, 126.90027478459672)
 //        private val STARBUCKS = LatLng(37.576636819990284, 126.89879021208397)
 //        private val SANGAM_LATLNG = LatLng(37.57569116736151, 126.90039723462993)

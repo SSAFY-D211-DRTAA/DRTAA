@@ -10,6 +10,7 @@ import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
@@ -63,7 +64,7 @@ class SignRepositoryTest {
                     refreshToken = null
                 )
             )
-            signDataSource.getUserData()
+            signDataSource.getUserData().first()
         } returns mockResponse
 
         // When
@@ -103,7 +104,7 @@ class SignRepositoryTest {
                 )
             )
             signDataSource.clearUserData()
-            signDataSource.getUserData()
+            signDataSource.getUserData().first()
         } returns mockResponse
         // When
         val result = signRepository.getUserData().toList()
