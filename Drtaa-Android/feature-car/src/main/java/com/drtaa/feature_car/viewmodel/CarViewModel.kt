@@ -8,6 +8,8 @@ import com.drtaa.core_data.repository.PlanRepository
 import com.drtaa.core_data.repository.RentCarRepository
 import com.drtaa.core_data.repository.RentRepository
 import com.drtaa.core_model.map.CarRoute
+import com.drtaa.core_model.map.Destination
+import com.drtaa.core_model.map.Info
 import com.drtaa.core_model.network.RequestCarStatus
 import com.drtaa.core_model.network.RequestCompleteRent
 import com.drtaa.core_model.network.ResponseRentStateAll
@@ -53,12 +55,16 @@ class CarViewModel @Inject constructor(
     private val mqttScope = CoroutineScope(Dispatchers.IO)
     private val _gpsData = MutableSharedFlow<LatLng>()
     val gpsData = _gpsData.asSharedFlow()
+    private val _infoData = MutableStateFlow<Info?>(null)
+    val infoData: StateFlow<Info?> = _infoData
     private val _mqttConnectionStatus = MutableStateFlow<Int>(-1)
     val mqttConnectionStatus: StateFlow<Int> = _mqttConnectionStatus
     private val _routeData = MutableStateFlow<List<CarRoute>>(emptyList())
     val routeData: StateFlow<List<CarRoute>> = _routeData
     private val _carPosition = MutableSharedFlow<CarPosition>()
     val carPosition: SharedFlow<CarPosition> = _carPosition.asSharedFlow()
+    private val _carDestination = MutableStateFlow<Destination?>(null)
+    val carDestination: MutableStateFlow<Destination?> = _carDestination
 
     // CAR FRAGMENT
     private val _isInProgress = MutableStateFlow<Boolean>(false)
@@ -139,6 +145,7 @@ class CarViewModel @Inject constructor(
         publishJob = mqttScope.launch {
             while (isActive) {
                 gpsRepository.publishGpsData(data, GPS_SUB)
+                fetchDestination()
                 delay(DEFAULT_INTERVAL)
             }
         }
@@ -168,6 +175,7 @@ class CarViewModel @Inject constructor(
 //                Timber.tag("Car").d("observeMqttMessages: $it")
                 val lat = it.msg.latitude
                 val lng = it.msg.longitude
+                observeMqttDestMessages()
                 Timber.tag("Car").d("check: $lat, $lng")
                 if (lat != null && lng != null) {
                     _gpsData.emit(LatLng(lat, lng))
@@ -175,6 +183,18 @@ class CarViewModel @Inject constructor(
                     Timber.tag("Car").d("null들어왔슈 $it")
                 }
             }
+        }
+    }
+
+    // 남은 거리, 시간 요청
+    fun fetchDestination(
+        data: String =
+            """
+         {"action":"vehicle_destination"}
+            """.trimIndent(),
+    ) {
+        viewModelScope.launch {
+            gpsRepository.fetchDest(data, DEST_SUB)
         }
     }
 
@@ -460,6 +480,15 @@ class CarViewModel @Inject constructor(
         }
     }
 
+    private fun observeMqttDestMessages() {
+        viewModelScope.launch {
+            gpsRepository.observeMqttDestMessages().collect { dest ->
+                Timber.tag("Car dest").d("$dest")
+                _carDestination.value = dest
+            }
+        }
+    }
+
     private fun getReverseGeocode(latitude: Double, longitude: Double) {
         viewModelScope.launch {
             naverRepository.getReverseGeocode(latitude, longitude).collect { result ->
@@ -559,6 +588,6 @@ class CarViewModel @Inject constructor(
         private const val DEFAULT_INTERVAL = 1000L
         private const val GPS_SUB = "gps/data/v1/subscribe"
         private const val PATH_SUB = "path/data/v1/subscribe"
-//        private const val ORIENTATION_SUB = "orientation/data/v1/subscribe"
+        private const val DEST_SUB = "destination/data/v1/subscribe"
     }
 }

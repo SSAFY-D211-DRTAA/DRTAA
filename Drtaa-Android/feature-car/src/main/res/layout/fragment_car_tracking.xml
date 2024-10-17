@@ -27,6 +27,7 @@
         </com.naver.maps.map.MapView>
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_appbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/black"
@@ -41,6 +42,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="10dp"
+                app:layout_constraintBottom_toTopOf="@id/tv_pin_desc"
                 android:background="@color/black"
                 android:text="호출 위치"
                 android:textColor="@color/white"
@@ -56,7 +58,7 @@
                 android:layout_marginBottom="10dp"
                 android:background="@drawable/rect_black_rad30"
                 android:textColor="@color/white"
-                android:textSize="16sp"
+                android:textSize="20sp"
                 android:visibility="visible"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="@id/tv_pin"
@@ -68,9 +70,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintTop_toTopOf="@id/tv_pin">
 
                 <ImageView
                     android:id="@+id/iv_tracking_on"
@@ -87,6 +88,45 @@
                     android:visibility="gone"
                     tools:visibility="visible" />
             </FrameLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cl_car_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="8dp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_pin_desc">
+
+                <TextView
+                    android:id="@+id/tv_time"
+                    style="@style/ptd_bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    app:layout_constraintEnd_toStartOf="@id/tv_distance"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="남은시간 들어가유" />
+
+                <TextView
+                    android:id="@+id/tv_distance"
+                    style="@style/ptd_bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:gravity="center"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/tv_time"
+                    app:layout_constraintTop_toTopOf="@id/tv_time"
+                    tools:text="남은거리 들어가유" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <LinearLayout

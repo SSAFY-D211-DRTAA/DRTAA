@@ -2,6 +2,7 @@ package com.drtaa.core_data.repositoryimpl
 
 import com.drtaa.core_data.repository.GPSRepository
 import com.drtaa.core_model.map.CarRoute
+import com.drtaa.core_model.map.Destination
 import com.drtaa.core_mqtt.MqttManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -23,10 +24,22 @@ class GPSRepositoryImpl @Inject constructor(
         }
     }
 
+    override fun observeMqttDestMessages(): Flow<Destination> = flow {
+        mqttManager.receivedDestMessages.collect { message ->
+            message.msg.name?.let {
+                emit(message.msg)
+            }
+        }
+    }
+
     override fun observeConnectionStatus() = flow {
         mqttManager.connectionStatus.collect { status ->
             emit(status)
         }
+    }
+
+    override fun fetchDest(data: String, topic: String) {
+        mqttManager.publishMessage(data, topic)
     }
 
     override fun fetchPath(data: String, topic: String) {

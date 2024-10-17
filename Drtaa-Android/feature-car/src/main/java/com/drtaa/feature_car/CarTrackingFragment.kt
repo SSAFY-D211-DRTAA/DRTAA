@@ -1,6 +1,10 @@
 package com.drtaa.feature_car
 
 import android.graphics.Color
+import android.graphics.Typeface
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.StyleSpan
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
@@ -14,6 +18,7 @@ import com.drtaa.feature_car.viewmodel.CarViewModel
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.MapView
 import com.naver.maps.map.NaverMap
+import com.naver.maps.map.overlay.InfoWindow
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.overlay.PathOverlay
@@ -37,6 +42,12 @@ class CarTrackingFragment :
 
     private var positionMarker: Marker = Marker().apply {
         icon = OverlayImage.fromResource(com.drtaa.core_ui.R.drawable.ic_center_marker)
+        width = ICON_SIZE
+        height = ICON_SIZE
+    }
+
+    private var destinationMarker: Marker = Marker().apply {
+        icon = OverlayImage.fromResource(com.drtaa.core_ui.R.drawable.ic_destination)
         width = ICON_SIZE
         height = ICON_SIZE
     }
@@ -158,12 +169,6 @@ class CarTrackingFragment :
 
         viewModel.gpsData.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach { gps ->
             Timber.tag("gps").d("$gps")
-//            if (viewModel.routeData.value.isNotEmpty()) {
-//                pathOverlay.apply {
-//                    coords = viewModel.routeData.value.map { LatLng(it.lat, it.lon) }
-//                    map = naverMap
-//                }
-//            }
             pathOverlayProgress(gps)
             carMarker.apply {
                 position = gps
@@ -186,9 +191,44 @@ class CarTrackingFragment :
             }
         }.launchIn(viewLifecycleOwner.lifecycleScope)
 
+        viewModel.carDestination.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach {
+            it?.let {
+//                binding.clCarInfo.visibility = View.VISIBLE
+//                val min = it.remainingTime / SEC
+//                val sec = it.remainingTime % SEC
+//                binding.tvTime.text = if (min > 0) {
+//                    "${min}분 ${sec}초"
+//                } else {
+//                    "${sec}초"
+//                }
+//                binding.tvDistance.text = "${it.remainingDistance}m"
+                destinationMarker.apply {
+                    position = LatLng(it.latitude, it.longitude)
+                    map = naverMap
+                }
+                mapView.apply {
+                    InfoWindow().apply {
+                        adapter = object : InfoWindow.DefaultTextAdapter(requireActivity()) {
+                            override fun getText(infoWindow: InfoWindow): CharSequence {
+                                val boldText = SpannableString("${it.name}").apply {
+                                    setSpan(
+                                        StyleSpan(Typeface.BOLD), 0, length,
+                                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                                    )
+                                }
+                                return boldText
+                            }
+                        }
+                        open(destinationMarker)
+                    }
+                }
+            }
+        }.launchIn(viewLifecycleOwner.lifecycleScope)
+
         viewModel.routeData.flowWithLifecycle(viewLifecycleOwner.lifecycle).onEach { routeData ->
             if (routeData.isEmpty()) return@onEach
             Timber.tag("pathFrag").d("$routeData")
+
             pathOverlay.apply {
                 coords = routeData.map { LatLng(it.lat, it.lon) }
                 map = naverMap
@@ -242,6 +282,7 @@ class CarTrackingFragment :
     companion object {
         private const val THRESHOLD = 20.0 // 너무 좌표가 튀어서 일단 크게 잡는다
         private const val ICON_SIZE = 100
+//        private const val SEC = 60
         val jungryujang = LatLng(37.57578754990568, 126.90027478459672)
 //        private val STARBUCKS = LatLng(37.576636819990284, 126.89879021208397)
 //        private val SANGAM_LATLNG = LatLng(37.57569116736151, 126.90039723462993)
