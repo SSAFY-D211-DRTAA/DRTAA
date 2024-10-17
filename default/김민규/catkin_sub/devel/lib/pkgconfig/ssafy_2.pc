@@ -1,8 +1,0 @@
-prefix=/home/mingyu/catkin_sub/devel
-
-Name: ssafy_2
-Description: Description of ssafy_2
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: message_runtime

@@ -1,2 +1,0 @@
-skeleton/ssafy_ad/MORAI-ROS_morai_msgs:skeleton/ssafy_ad/ssafy_1:skeleton/ssafy_ad/ssafy_2:skeleton/ssafy_ad/ssafy_3
--DCATKIN_DEVEL_PREFIX=/home/jeongjae/catkin_ws/devel -DCMAKE_INSTALL_PREFIX=/home/jeongjae/catkin_ws/install -G Unix Makefiles
