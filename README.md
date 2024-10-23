@@ -29,14 +29,14 @@
 ### 🚗 로그인 및 메인 화면
 | <div align="center">**로그인 화면**</div> | <div align="center">**로그인 동작**</div> |
 | :---: | :---: |
-| ![login](https://github.com/user-attachments/assets/1f3fa2c4-022c-49eb-b21b-d4903348a314) |  |
+| <img src="https://github.com/user-attachments/assets/1f3fa2c4-022c-49eb-b21b-d4903348a314" width="350"/> |  |
 
 
 <br>
 
 | <div align="center">**메인 화면**</div> | <div align="center">**메인 화면 동작**</div> |
 | :---: | :---: |
-| ![home](https://github.com/user-attachments/assets/46b0e684-a629-42d5-a5d6-01395c1d5501) |  |
+| <img src="https://github.com/user-attachments/assets/46b0e684-a629-42d5-a5d6-01395c1d5501" width="350"/> |  |
 
 
 <br>
@@ -44,7 +44,7 @@
 ### 🚗 렌트 요청 및 결제
 | <div align="center">**렌트 요청 화면**</div> | <div align="center">**렌트 요청 동작**</div> |
 | :---: | :---: |
-| ![rent](https://github.com/user-attachments/assets/e71bb58e-5599-4b78-bbbc-0402884d0e10) |  |
+| <img src="https://github.com/user-attachments/assets/e71bb58e-5599-4b78-bbbc-0402884d0e10" width="350"/> |  |
 
 
 <br>
@@ -52,7 +52,7 @@
 ### 🚗 여행 일정 관리
 | <div align="center">**여행 일정 화면**</div> | <div align="center">**여행 일정 동작**</div> |
 | :---: | :---: |
-| ![schedule](https://github.com/user-attachments/assets/f817a1f5-0f43-42d7-af4b-fc4ff4dc719e) |  |
+| <img src="https://github.com/user-attachments/assets/f817a1f5-0f43-42d7-af4b-fc4ff4dc719e" width="350"/> |  |
 
 
 <br>
@@ -60,7 +60,7 @@
 ### 🚗 렌트 호출
 | <div align="center">**렌트 호출 화면**</div> | <div align="center">**렌트 호출 동작**</div> |
 | :---: | :---: |
-| ![alrim](https://github.com/user-attachments/assets/0de66763-3734-4815-8396-b2c4171d9e9b) |  |
+| <img src="https://github.com/user-attachments/assets/0de66763-3734-4815-8396-b2c4171d9e9b" width="350"/> |  |
 
 
 | <div align="center">**차량 주차 화면**</div> |
@@ -72,14 +72,14 @@
 ### 🚗 렌트 탑승 및 하차
 | <div align="center">**렌트 탑승 화면**</div> | <div align="center">**렌트 탑승 동작**</div> |
 | :---: | :---: |
-| ![렌트 탑승 화면](https://github.com/user-attachments/assets/503e9f7a-6b23-4212-a140-65a94e0d90c1) |  |
+| <img src="https://github.com/user-attachments/assets/503e9f7a-6b23-4212-a140-65a94e0d90c1" width="350"/> |  |
 
 <br>
 
 
 | <div align="center">**렌트 하차 화면**</div> | <div align="center">**렌트 하차 동작**</div> |
 | :---: | :---: |
-| ![렌트 하차 화면](https://github.com/user-attachments/assets/bb95a2ed-a356-423e-a971-98d7710a9808) |  |
+| <img src="https://github.com/user-attachments/assets/bb95a2ed-a356-423e-a971-98d7710a9808" width="350"/> |  |
 
 
 | <div align="center">**차량 주차 화면**</div> | <div align="center">**차량 배회 화면**</div> |
@@ -91,7 +91,7 @@
 ### 🚗 관광지 추천
 | <div align="center">**관광지 추천 화면**</div> | <div align="center">**관광지 추천 동작**</div> |
 | :---: | :---: |
-| ![image.png](/Readme-Img/image.png) |  |
+| <img src="/Readme-Img/image.png" width="350"/> |  |
 
 <br>
 
