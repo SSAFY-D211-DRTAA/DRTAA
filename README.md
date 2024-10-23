@@ -1,5 +1,5 @@
 # Drtaa, 다타
-![image](/uploads/d87776f56fc70e20d383f6f1efe04902/image.png)
+![main](https://github.com/user-attachments/assets/5d9e3fad-8d61-49f2-b6ff-4ebc92bb81d2)
 
 <br>
 
@@ -29,20 +29,23 @@
 ### 🚗 로그인 및 메인 화면
 | <div align="center">**로그인 화면**</div> | <div align="center">**로그인 동작**</div> |
 | :---: | :---: |
-| ![로그인 화면](/uploads/1b3d00ddcf5b02b264229f6c500e9543/image.png) |  |
+| ![login](https://github.com/user-attachments/assets/1f3fa2c4-022c-49eb-b21b-d4903348a314) |  |
+
 
 <br>
 
 | <div align="center">**메인 화면**</div> | <div align="center">**메인 화면 동작**</div> |
 | :---: | :---: |
-| ![메인 화면](/Readme-Img/최종 녹화 - frame at 0m0s.jpg) |  |
+| ![home](https://github.com/user-attachments/assets/46b0e684-a629-42d5-a5d6-01395c1d5501) |  |
+
 
 <br>
 
 ### 🚗 렌트 요청 및 결제
 | <div align="center">**렌트 요청 화면**</div> | <div align="center">**렌트 요청 동작**</div> |
 | :---: | :---: |
-| ![렌트 요청 화면](/Readme-Img/최종 녹화 - frame at 0m25s.jpg) |  |
+| ![rent](https://github.com/user-attachments/assets/e71bb58e-5599-4b78-bbbc-0402884d0e10) |  |
+
 
 <br>
 
