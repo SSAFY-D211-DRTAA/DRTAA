@@ -52,14 +52,16 @@
 ### 🚗 여행 일정 관리
 | <div align="center">**여행 일정 화면**</div> | <div align="center">**여행 일정 동작**</div> |
 | :---: | :---: |
-| ![여행 일정 화면](/Readme-Img/최종 녹화 - frame at 2m12s.jpg) |  |
+| ![schedule](https://github.com/user-attachments/assets/f817a1f5-0f43-42d7-af4b-fc4ff4dc719e) |  |
+
 
 <br>
 
 ### 🚗 렌트 호출
 | <div align="center">**렌트 호출 화면**</div> | <div align="center">**렌트 호출 동작**</div> |
 | :---: | :---: |
-| ![렌트 호출 화면](/Readme-Img/최종 녹화 - frame at 2m34s.jpg) |  |
+| ![alrim](https://github.com/user-attachments/assets/0de66763-3734-4815-8396-b2c4171d9e9b) |  |
+
 
 | <div align="center">**차량 주차 화면**</div> |
 | :---: |
@@ -70,13 +72,15 @@
 ### 🚗 렌트 탑승 및 하차
 | <div align="center">**렌트 탑승 화면**</div> | <div align="center">**렌트 탑승 동작**</div> |
 | :---: | :---: |
-| ![렌트 탑승 화면.jpg](/Readme-Img/렌트 탑승 화면.jpg) |  |
+| ![렌트 탑승 화면](https://github.com/user-attachments/assets/503e9f7a-6b23-4212-a140-65a94e0d90c1) |  |
 
 <br>
 
+
 | <div align="center">**렌트 하차 화면**</div> | <div align="center">**렌트 하차 동작**</div> |
 | :---: | :---: |
-| ![렌트 하차 화면.jpg](/Readme-Img/렌트 하차 화면.jpg) |  |
+| ![렌트 하차 화면](https://github.com/user-attachments/assets/bb95a2ed-a356-423e-a971-98d7710a9808) |  |
+
 
 | <div align="center">**차량 주차 화면**</div> | <div align="center">**차량 배회 화면**</div> |
 | :---: | :---: |
@@ -261,19 +265,23 @@
 
 # 프로젝트 산출물
 ### 🚗 와이어 프레임
-![image](/uploads/e249db762e9f49ba0823c1619f611098/image.png)
+![image](https://github.com/user-attachments/assets/3cdd5824-38a0-4387-847a-a4b6ba513922)
+
 ### 🚗 화면 디자인
-![image](/uploads/b79f641cd849fbfafbba0b7316f0ca51/image.png)
+![image (1)](https://github.com/user-attachments/assets/ddca4f78-a337-4cc8-88fe-af4123754ee5)
+
 ### 🚗 API 명세서
 - Notion
-![image](/uploads/476db17970bb18aafd446928d4f957a3/image.png)
+![image (2)](https://github.com/user-attachments/assets/c68f1197-350b-4a20-b297-a77b09247218)
+
 - Swagger
-![image](/uploads/03cc993abdd3a1ec0393f9d1dd6290c4/image.png)
+![image (3)](https://github.com/user-attachments/assets/4844fb3d-071a-40f6-967f-2784840a8ff1)
+
 ### 🚗 시스템 아키텍처
-![image](/uploads/059b91229ffa5fffb92e925ab6526f70/image.png)
+![image (4)](https://github.com/user-attachments/assets/13f4d098-8976-45b4-85cd-9395111b03f6)
 ### 🚗 통신 아키텍처
-![image](/uploads/e1600a3670a64d4a0b41a37f235e48f0/image.png)
+![image (5)](https://github.com/user-attachments/assets/48236ff7-bd88-4abb-858d-17f1cdb9f8b4)
 ### 🚗 ERD
-![image](/uploads/2d922618efa945d64d0b5ad8764f44a5/image.png)
+![image (6)](https://github.com/user-attachments/assets/f1fece9c-4089-4f9f-8236-b5f909e8d21d)
 ### 🚗 Android Module
-![image](/uploads/e18946e9a853ea90cf17c44d8fa5aeea/image.png)
+![image (7)](https://github.com/user-attachments/assets/bf2133b8-c6cc-4ec2-8383-06a59d723716)
