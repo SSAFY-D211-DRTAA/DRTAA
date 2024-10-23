@@ -1,5 +1,5 @@
 # Drtaa, 다타
-![main](https://github.com/user-attachments/assets/5d9e3fad-8d61-49f2-b6ff-4ebc92bb81d2)
+<img src="Readme-Img/Drtaa 소개.png">
 
 <br>
 
@@ -7,14 +7,10 @@
 ### 🚗 개발 기간
 2024.08.19 ~ 2024.10.11 (7주)
 ### 🚗 팀원 소개
-| <div align="center">**이름**</div> | <div align="center">**역할**</div> |
-| :---: | :---: |
-| 이정재 | 팀장, AI, Auto Control |
-| 김민규 | Android, AI |
-| 윤가희 | BackEnd, Infra |
-| 이재영 | Auto Control |
-| 이현진 | Android |
-| 최승준 | Android, BackEnd, Infra |
+| ![이정재](https://avatars.githubusercontent.com/u/156164669?v=4) | ![김민규](https://avatars.githubusercontent.com/u/46841652?v=4) | ![윤가희](https://avatars.githubusercontent.com/u/72852508?v=4) | ![이재영](https://avatars.githubusercontent.com/u/107921434?v=4) | ![이현진](https://avatars.githubusercontent.com/u/48899088?v=4) | ![최승준](https://avatars.githubusercontent.com/u/117347226?v=4) |
+| :---: | :---: | :---: | :---: | :---: | :---: |
+| [이정재](https://github.com/devocft) | [김민규](https://github.com/kimmandoo) | [윤가희](https://github.com/0ct25th) |  [이재영](https://github.com/dd-jero) |  [이현진](https://github.com/dlguswls456) | [최승준](https://github.com/csjcozy) |
+| 팀장, AI, Auto Control | Android, AI | BackEnd, Infra | Auto Control | Android | Android, BackEnd, Infra |
 ### 🚗 기획 배경
 기존의 렌트카 및 이동 수단 서비스는 여러 가지 불편함을 수반합니다.<br>
 특히, **운전 면허**가 필요하거나 **주차 문제**로 인해 목적지에서 주차 공간을 찾는 데 스트레스를 받는 경우가 많습니다.<br>
@@ -29,7 +25,7 @@
 ### 🚗 로그인 및 메인 화면
 | <div align="center">**로그인 화면**</div> | <div align="center">**로그인 동작**</div> |
 | :---: | :---: |
-| <img src="https://github.com/user-attachments/assets/1f3fa2c4-022c-49eb-b21b-d4903348a314" width="350"/> |  |
+| <img src="https://github.com/user-attachments/assets/1f3fa2c4-022c-49eb-b21b-d4903348a314" width="350"/> | <img src="/Readme-Img/로그인.gif" width="350"> |
 
 
 <br>
@@ -96,13 +92,13 @@
 <br>
 
 ### 🚗 렌트 알림
-| <div align="center">**렌트 3일 전 알림 동작**</div> | <div align="center">**렌트 하루 전 알림 동작**</div> |
+| <div align="center">**렌트 3일 전 알림 화면**</div> | <div align="center">**렌트 하루 전 알림 화면**</div> |
 | :---: | :---: |
-|  |  |
+| <img src="Readme-Img/렌트 3일 전 알림 화면.jpg" width="350"/> | <img src="Readme-Img/렌트 하루 전 알림 화면.jpg" width="350"/> |
 
 <br>
 
-| <div align="center">**렌트 시작 알림 동작**</div> | <div align="center">**렌트 종료 알림 동작**</div> |
+| <div align="center">**렌트 시작 알림 화면**</div> | <div align="center">**렌트 종료 알림 화면**</div> |
 | :---: | :---: |
 |  |  |
 
