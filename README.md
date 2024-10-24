@@ -106,6 +106,23 @@
 
 <br>
 
+### 🚗 자율주행
+| <div align="center">**인지**</div> | <div align="center">**판단**</div> |  <div align="center">**제어**</div> |
+| :---: | :---: | :---: |
+| <img src="https://github.com/user-attachments/assets/981c1ec9-3735-434e-866a-fd59781eb594" width="270"/> | <img src="https://github.com/user-attachments/assets/49ead1b1-ed02-47c0-b6fd-3dfb84931c16" width="350"/> | <img src="https://github.com/user-attachments/assets/248592dc-662e-40e7-b3f4-ab57688f932d" width="270"/> |
+
+<br>
+
+### 🚗 승객 하차 
+| <div align="center">**주차 가능**</div> |  <div align="center">**주차 불가능**</div> |
+| :---: | :---: |
+| <img src="https://github.com/user-attachments/assets/972d60f1-4c04-45fd-86e7-577490591ee8" width="350"/> | <img src="https://github.com/user-attachments/assets/0ef8fe3d-c592-439a-b690-457b9e19d31f" width="350"/> |
+
+| <div align="center">**배회**</div> |
+| :---: |
+| <img src="https://github.com/user-attachments/assets/9b3cc024-65a0-4baf-9033-6a78a5d382d4" width="727"/> |
+<br>
+
 # 기술 스택
 <details>
   <summary><h3>🚗 Auto Control</h3></summary>
@@ -283,3 +300,5 @@
 ![image (6)](https://github.com/user-attachments/assets/f1fece9c-4089-4f9f-8236-b5f909e8d21d)
 ### 🚗 Android Module
 ![image (7)](https://github.com/user-attachments/assets/bf2133b8-c6cc-4ec2-8383-06a59d723716)
+### 🚗 ROS rqt_graph
+![image(8)](https://github.com/user-attachments/assets/6d966731-4c22-4084-bbf0-e61898c71179)
