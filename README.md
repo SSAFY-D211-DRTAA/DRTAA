@@ -25,14 +25,14 @@
 ### 🚗 로그인 및 메인 화면
 | <div align="center">**로그인 화면**</div> | <div align="center">**로그인 동작**</div> |
 | :---: | :---: |
-| <img src="https://github.com/user-attachments/assets/1f3fa2c4-022c-49eb-b21b-d4903348a314" width="350"/> |  |
+| <img src="https://github.com/user-attachments/assets/1f3fa2c4-022c-49eb-b21b-d4903348a314" width="350"/> | ![Oct-23-2024 20-40-56](https://github.com/user-attachments/assets/99cc11c4-27f0-4576-a2b3-89f8d1786204)|
 
 
 <br>
 
 | <div align="center">**메인 화면**</div> | <div align="center">**메인 화면 동작**</div> |
 | :---: | :---: |
-| <img src="https://github.com/user-attachments/assets/46b0e684-a629-42d5-a5d6-01395c1d5501" width="350"/> |  |
+| <img src="https://github.com/user-attachments/assets/46b0e684-a629-42d5-a5d6-01395c1d5501" width="350"/> | ![1](https://github.com/user-attachments/assets/a4a238f6-b923-43f7-b534-306b9f521182)|
 
 
 <br>
@@ -40,7 +40,7 @@
 ### 🚗 렌트 요청 및 결제
 | <div align="center">**렌트 요청 화면**</div> | <div align="center">**렌트 요청 동작**</div> |
 | :---: | :---: |
-| <img src="https://github.com/user-attachments/assets/e71bb58e-5599-4b78-bbbc-0402884d0e10" width="350"/> |  |
+| <img src="https://github.com/user-attachments/assets/e71bb58e-5599-4b78-bbbc-0402884d0e10" width="350"/> | ![Oct-23-2024 20-08-24](https://github.com/user-attachments/assets/9d05f66a-24d3-4d3b-855f-b77f7837a450)|
 
 
 <br>
@@ -48,7 +48,7 @@
 ### 🚗 여행 일정 관리
 | <div align="center">**여행 일정 화면**</div> | <div align="center">**여행 일정 동작**</div> |
 | :---: | :---: |
-| <img src="https://github.com/user-attachments/assets/f817a1f5-0f43-42d7-af4b-fc4ff4dc719e" width="350"/> |  |
+| <img src="https://github.com/user-attachments/assets/f817a1f5-0f43-42d7-af4b-fc4ff4dc719e" width="350"/> | ![Oct-23-2024 20-12-11](https://github.com/user-attachments/assets/0c464245-3099-4984-8221-dec0e6b7682b)|
 
 
 <br>
@@ -56,52 +56,73 @@
 ### 🚗 렌트 호출
 | <div align="center">**렌트 호출 화면**</div> | <div align="center">**렌트 호출 동작**</div> |
 | :---: | :---: |
-| <img src="https://github.com/user-attachments/assets/0de66763-3734-4815-8396-b2c4171d9e9b" width="350"/> |  |
+| <img src="https://github.com/user-attachments/assets/0de66763-3734-4815-8396-b2c4171d9e9b" width="350"/> | ![Oct-23-2024 20-14-32](https://github.com/user-attachments/assets/8d5a4e92-e683-4792-8cf2-73bff857889f) |
 
 
-| <div align="center">**차량 주차 화면**</div> |
-| :---: |
-|  |
 
 <br>
 
 ### 🚗 렌트 탑승 및 하차
 | <div align="center">**렌트 탑승 화면**</div> | <div align="center">**렌트 탑승 동작**</div> |
 | :---: | :---: |
-| <img src="https://github.com/user-attachments/assets/503e9f7a-6b23-4212-a140-65a94e0d90c1" width="350"/> |  |
+| <img src="https://github.com/user-attachments/assets/503e9f7a-6b23-4212-a140-65a94e0d90c1" width="350"/> | ![Oct-23-2024 20-17-23](https://github.com/user-attachments/assets/6b028f8c-f687-4f03-9ab2-d287081d218a)|
 
 <br>
 
 
 | <div align="center">**렌트 하차 화면**</div> | <div align="center">**렌트 하차 동작**</div> |
 | :---: | :---: |
-| <img src="https://github.com/user-attachments/assets/bb95a2ed-a356-423e-a971-98d7710a9808" width="350"/> |  |
+| <img src="https://github.com/user-attachments/assets/bb95a2ed-a356-423e-a971-98d7710a9808" width="350"/> | ![Oct-23-2024 20-19-41](https://github.com/user-attachments/assets/924ac181-585c-4b33-b2ae-7eccc43c3e66) |
 
 
 | <div align="center">**차량 주차 화면**</div> | <div align="center">**차량 배회 화면**</div> |
 | :---: | :---: |
-|  |  |
+| ![Oct-23-2024 20-21-05](https://github.com/user-attachments/assets/8361a6df-8055-47c9-bb33-c55a30c2b39e)| ![Oct-23-2024 20-21-22](https://github.com/user-attachments/assets/0b68b103-7a1d-4207-8593-cb594d134a3c)|
 
 <br>
 
 ### 🚗 관광지 추천
 | <div align="center">**관광지 추천 화면**</div> | <div align="center">**관광지 추천 동작**</div> |
 | :---: | :---: |
-| <img src="/Readme-Img/image.png" width="350"/> |  |
+| <img src="/Readme-Img/image.png" width="350"/> |<img src="https://github.com/user-attachments/assets/a7b0caa1-532c-49f2-8a58-386160c62fb5" width="350"/>|
 
 <br>
 
 ### 🚗 렌트 알림
+<<<<<<< HEAD
 | <div align="center">**렌트 3일 전 알림 화면**</div> | <div align="center">**렌트 하루 전 알림 화면**</div> |
 | :---: | :---: |
 | <img src="Readme-Img/렌트 3일 전 알림 화면.jpg" width="350"/> | <img src="Readme-Img/렌트 하루 전 알림 화면.jpg" width="350"/> |
+=======
+<!--
+
+| <div align="center">**렌트 3일 전 알림 동작**</div> | <div align="center">**렌트 하루 전 알림 동작**</div> |
+| :---: | :---: |
+|  |  |
+<br>
+-->
+| <div align="center">**렌트 시작 알림 동작**</div> | <div align="center">**렌트 종료 알림 동작**</div> |
+| :---: | :---: |
+| ![Oct-23-2024 20-31-38](https://github.com/user-attachments/assets/615a2473-732b-42ac-bd76-557d3a267c6e) | ![Oct-23-2024 20-30-09](https://github.com/user-attachments/assets/c81a21a8-b392-4c55-a41c-b363efb646af)|
+>>>>>>> 59681ca613912177a80ab9f7d287ea3771180cbd
 
 <br>
 
-| <div align="center">**렌트 시작 알림 동작**</div> | <div align="center">**렌트 종료 알림 동작**</div> |
-| :---: | :---: |
-|  |  |
+### 🚗 자율주행
+| <div align="center">**인지**</div> | <div align="center">**판단**</div> |  <div align="center">**제어**</div> |
+| :---: | :---: | :---: |
+| <img src="https://github.com/user-attachments/assets/981c1ec9-3735-434e-866a-fd59781eb594" width="270"/> | <img src="https://github.com/user-attachments/assets/49ead1b1-ed02-47c0-b6fd-3dfb84931c16" width="350"/> | <img src="https://github.com/user-attachments/assets/248592dc-662e-40e7-b3f4-ab57688f932d" width="270"/> |
 
+<br>
+
+### 🚗 승객 하차 
+| <div align="center">**주차 가능**</div> |  <div align="center">**주차 불가능**</div> |
+| :---: | :---: |
+| <img src="https://github.com/user-attachments/assets/972d60f1-4c04-45fd-86e7-577490591ee8" width="350"/> | <img src="https://github.com/user-attachments/assets/0ef8fe3d-c592-439a-b690-457b9e19d31f" width="350"/> |
+
+| <div align="center">**배회**</div> |
+| :---: |
+| <img src="https://github.com/user-attachments/assets/9b3cc024-65a0-4baf-9033-6a78a5d382d4" width="727"/> |
 <br>
 
 # 기술 스택
@@ -281,3 +302,5 @@
 ![image (6)](https://github.com/user-attachments/assets/f1fece9c-4089-4f9f-8236-b5f909e8d21d)
 ### 🚗 Android Module
 ![image (7)](https://github.com/user-attachments/assets/bf2133b8-c6cc-4ec2-8383-06a59d723716)
+### 🚗 ROS rqt_graph
+![image(8)](https://github.com/user-attachments/assets/6d966731-4c22-4084-bbf0-e61898c71179)
