@@ -25,7 +25,7 @@
 ### 🚗 로그인 및 메인 화면
 | <div align="center">**로그인 화면**</div> | <div align="center">**로그인 동작**</div> |
 | :---: | :---: |
-| <img src="https://github.com/user-attachments/assets/1f3fa2c4-022c-49eb-b21b-d4903348a314" width="350"/> | <img src="/Readme-Img/로그인.gif" width="350"> |
+| <img src="https://github.com/user-attachments/assets/1f3fa2c4-022c-49eb-b21b-d4903348a314" width="350"/> |  |
 
 
 <br>
@@ -98,7 +98,7 @@
 
 <br>
 
-| <div align="center">**렌트 시작 알림 화면**</div> | <div align="center">**렌트 종료 알림 화면**</div> |
+| <div align="center">**렌트 시작 알림 동작**</div> | <div align="center">**렌트 종료 알림 동작**</div> |
 | :---: | :---: |
 |  |  |
 
