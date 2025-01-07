@@ -11,7 +11,7 @@
 ### 🚗 팀원 소개
 | ![이정재](https://avatars.githubusercontent.com/u/156164669?v=4) | ![김민규](https://avatars.githubusercontent.com/u/46841652?v=4) | ![윤가희](https://avatars.githubusercontent.com/u/72852508?v=4) | ![이재영](https://avatars.githubusercontent.com/u/107921434?v=4) | ![이현진](https://avatars.githubusercontent.com/u/48899088?v=4) | ![최승준](https://avatars.githubusercontent.com/u/117347226?v=4) |
 | :---: | :---: | :---: | :---: | :---: | :---: |
-| [이정재](https://github.com/devocft) | [김민규](https://github.com/kimmandoo) | [윤가희](https://github.com/0ct25th) |  [이재영](https://github.com/dd-jero) |  [이현진](https://github.com/dlguswls456) | [최승준](https://github.com/csjcozy) |
+| [이정재](https://github.com/devocft) | [김민규](https://github.com/kimmandoo) | [윤가희](https://github.com/0ct25th) |  [이재영](https://github.com/dd-jero) |  [이현진](https://github.com/dlguswls456) | [최승준](https://github.com/seungjun9999) |
 | 팀장, AI, Auto Control | Android, AI | BackEnd, Infra | Auto Control | Android | Android, BackEnd, Infra |
 ### 🚗 기획 배경
 기존의 렌트카 및 이동 수단 서비스는 여러 가지 불편함을 수반합니다.<br>
